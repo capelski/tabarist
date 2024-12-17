@@ -1,0 +1,31 @@
+{
+  "name": "tabarist",
+  "version": "1.0.0",
+  "description": "WYSIWYG editor for guitar tabs",
+  "main": "index.js",
+  "author": "Carles Capellas <capellas.carles@gmail.com>",
+  "license": "ISC",
+  "scripts": {
+    "build": "npm run clean && webpack --config webpack/production.config.js",
+    "clean": "rm -rf docs",
+    "dev": "webpack serve --config webpack/development.config.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "css-loader": "^7.1.2",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.3",
+    "mini-css-extract-plugin": "^2.9.2",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.6.3",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0",
+    "webpack-merge": "^6.0.1"
+  }
+}
