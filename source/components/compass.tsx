@@ -14,10 +14,11 @@ export interface CompassProps {
     removeCompass: () => void;
     updateCompass: (frameIndex: number, stringIndex: number, value: string) => void;
   };
+  isEditMode: boolean;
 }
 
 export const CompassComponent: React.FC<CompassProps> = (props) => {
-  const isEditMode = props.compassIndex === props.editingCompass;
+  const isEditModeCompass = props.compassIndex === props.editingCompass;
   const framesWidth = Math.floor(10000 / props.compass.length) / 100;
 
   return (
@@ -37,7 +38,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             <FrameComponent
               frame={frame}
               frameIndex={frameIndex}
-              isEditMode={isEditMode}
+              isEditMode={isEditModeCompass}
               key={frameIndex}
               updateFrame={(stringIndex, value) => {
                 props.handlers.updateCompass(frameIndex, stringIndex, value);
@@ -47,29 +48,37 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           );
         })}
       </div>
-      <div className="controls">
-        <button onClick={() => props.handlers.copyCompass('before')} type="button">
-          ⏪
-        </button>
-        {isEditMode ? (
-          <button onClick={() => props.handlers.editCompassFinish()} type="button">
-            ✅
+      {props.isEditMode && (
+        <div
+          className="controls"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <button onClick={() => props.handlers.copyCompass('before')} type="button">
+            ⏪
           </button>
-        ) : (
-          <button onClick={() => props.handlers.editCompass()} type="button">
-            🔧
+          {isEditModeCompass ? (
+            <button onClick={() => props.handlers.editCompassFinish()} type="button">
+              ✅
+            </button>
+          ) : (
+            <button onClick={() => props.handlers.editCompass()} type="button">
+              🔧
+            </button>
+          )}
+          <button onClick={() => props.handlers.clearCompass()} type="button">
+            🗒️
           </button>
-        )}
-        <button onClick={() => props.handlers.clearCompass()} type="button">
-          🗑️
-        </button>
-        <button onClick={() => props.handlers.removeCompass()} type="button">
-          ❌
-        </button>
-        <button onClick={() => props.handlers.copyCompass('after')} type="button">
-          ⏩
-        </button>
-      </div>
+          <button onClick={() => props.handlers.removeCompass()} type="button">
+            🗑️
+          </button>
+          <button onClick={() => props.handlers.copyCompass('after')} type="button">
+            ⏩
+          </button>
+        </div>
+      )}
     </div>
   );
 };

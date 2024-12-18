@@ -1,37 +1,18 @@
 import React, { useState } from 'react';
 import { editingCompassDefault } from '../constants';
-import { Compass } from '../types';
+import { getNewTab } from '../logic';
+import { Tab } from '../types';
 import { CompassComponent, CompassProps } from './compass';
 
 export const App: React.FC = () => {
   const [editingCompass, setEditingCompass] = useState(editingCompassDefault);
-  const [compasses, setCompasses] = useState<Compass[]>([
-    [
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-    ],
-    [
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-    ],
-  ]);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [tab, setTab] = useState<Tab>(getNewTab);
 
   const getHandlers = (compassIndex: number): CompassProps['handlers'] => ({
     clearCompass() {
-      setCompasses(
-        compasses.map((compass, cIndex) => {
+      setTab({
+        compasses: tab.compasses.map((compass, cIndex) => {
           return cIndex !== compassIndex
             ? compass
             : compass.map((frame) => {
@@ -40,17 +21,18 @@ export const App: React.FC = () => {
                 });
               });
         }),
-      );
+        title: tab.title,
+      });
     },
     copyCompass(position) {
-      const sourceCompass = compasses[compassIndex];
-      const nextCompasses = [...compasses];
+      const sourceCompass = tab.compasses[compassIndex];
+      const nextCompasses = [...tab.compasses];
       nextCompasses.splice(
         compassIndex + (position === 'before' ? 0 : 1),
         0,
         sourceCompass.map((frame) => [...frame].map((_) => _)),
       );
-      setCompasses(nextCompasses);
+      setTab({ compasses: nextCompasses, title: tab.title });
 
       if (editingCompass !== editingCompassDefault) {
         const nextEditingCompass = position === 'before' ? editingCompass + 1 : editingCompass;
@@ -64,8 +46,8 @@ export const App: React.FC = () => {
       setEditingCompass(editingCompassDefault);
     },
     removeCompass() {
-      const nextCompasses = compasses.filter((_, cIndex) => cIndex !== compassIndex);
-      setCompasses(nextCompasses);
+      const nextCompasses = tab.compasses.filter((_, cIndex) => cIndex !== compassIndex);
+      setTab({ compasses: nextCompasses, title: tab.title });
 
       if (editingCompass === compassIndex) {
         setEditingCompass(editingCompassDefault);
@@ -74,8 +56,8 @@ export const App: React.FC = () => {
       }
     },
     updateCompass(frameIndex, stringIndex, value) {
-      setCompasses(
-        compasses.map((compass, cIndex) => {
+      setTab({
+        compasses: tab.compasses.map((compass, cIndex) => {
           return cIndex !== compassIndex
             ? compass
             : compass.map((frame, fIndex) => {
@@ -86,26 +68,50 @@ export const App: React.FC = () => {
                     });
               });
         }),
-      );
+        title: tab.title,
+      });
     },
   });
 
   return (
-    <div
-      className="tab"
-      style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
-    >
-      {compasses.map((compass, compassIndex) => {
-        return (
-          <CompassComponent
-            key={compassIndex}
-            compass={compass}
-            compassIndex={compassIndex}
-            editingCompass={editingCompass}
-            handlers={getHandlers(compassIndex)}
-          />
-        );
-      })}
+    <div className="tab">
+      <div style={{ alignItems: 'center', display: 'flex' }}>
+        <div style={{ marginRight: 8 }}>
+          <button onClick={() => setIsEditMode(!isEditMode)} type="button">
+            {isEditMode ? '✅' : '🔧'}
+          </button>
+        </div>
+        <h3>
+          {isEditMode ? (
+            <input
+              value={tab.title}
+              onChange={(event) => {
+                setTab({ compasses: tab.compasses, title: event.target.value });
+              }}
+            />
+          ) : (
+            tab.title
+          )}
+        </h3>
+      </div>
+
+      <div
+        className="compasses"
+        style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
+      >
+        {tab.compasses.map((compass, compassIndex) => {
+          return (
+            <CompassComponent
+              key={compassIndex}
+              compass={compass}
+              compassIndex={compassIndex}
+              editingCompass={editingCompass}
+              handlers={getHandlers(compassIndex)}
+              isEditMode={isEditMode}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 };
