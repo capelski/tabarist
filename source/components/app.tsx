@@ -73,11 +73,18 @@ export const App: React.FC = () => {
     },
   });
 
+  const toggleEditMode = () => {
+    if (isEditMode) {
+      setEditingCompass(editingCompassDefault);
+    }
+    setIsEditMode(!isEditMode);
+  };
+
   return (
     <div className="tab">
       <div style={{ alignItems: 'center', display: 'flex' }}>
         <div style={{ marginRight: 8 }}>
-          <button onClick={() => setIsEditMode(!isEditMode)} type="button">
+          <button onClick={toggleEditMode} type="button">
             {isEditMode ? '✅' : '🔧'}
           </button>
         </div>
