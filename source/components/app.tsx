@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { editingCompassDefault, stringHeight } from '../constants';
+import { addCompassSymbol, editingCompassDefault, stringHeight } from '../constants';
 import { createCompass, createTab } from '../logic';
 import { Tab } from '../types';
 import { CompassComponent, CompassProps } from './compass';
@@ -21,33 +21,11 @@ export const App: React.FC = () => {
   };
 
   const getHandlers = (compassIndex: number): CompassProps['handlers'] => ({
-    clearCompass() {
-      setTab({
-        compasses: tab.compasses.map((compass, cIndex) => {
-          return cIndex !== compassIndex
-            ? compass
-            : compass.map((frame) => {
-                return [...frame].map((_) => {
-                  return '';
-                });
-              });
-        }),
-        title: tab.title,
-      });
-    },
-    copyCompass(position) {
-      const sourceCompass = tab.compasses[compassIndex];
-      const nextCompasses = [...tab.compasses];
-      nextCompasses.splice(
-        compassIndex + (position === 'before' ? 0 : 1),
-        0,
-        sourceCompass.map((frame) => [...frame].map((_) => _)),
-      );
-      setTab({ compasses: nextCompasses, title: tab.title });
+    addCompassBefore() {
+      addCompass(compassIndex);
 
-      if (editingCompass !== editingCompassDefault) {
-        const nextEditingCompass = position === 'before' ? editingCompass + 1 : editingCompass;
-        setEditingCompass(nextEditingCompass);
+      if (compassIndex < editingCompass && editingCompass !== editingCompassDefault) {
+        setEditingCompass(editingCompass + 1);
       }
     },
     editCompass() {
@@ -153,7 +131,7 @@ export const App: React.FC = () => {
                 justifyContent: 'center',
               }}
             >
-              ✚
+              {addCompassSymbol}
             </div>
           </div>
         )}

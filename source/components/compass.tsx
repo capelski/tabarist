@@ -1,4 +1,5 @@
 import React from 'react';
+import { addCompassSymbol, stringHeight } from '../constants';
 import { Compass } from '../types';
 import { FrameComponent } from './frame';
 
@@ -7,8 +8,7 @@ export interface CompassProps {
   compassIndex: number;
   editingCompass: number;
   handlers: {
-    clearCompass: () => void;
-    copyCompass: (position: 'before' | 'after') => void;
+    addCompassBefore: () => void;
     editCompass: () => void;
     editCompassFinish: () => void;
     removeCompass: () => void;
@@ -23,7 +23,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
   const framesWidth = Math.floor(10000 / props.compass.length) / 100;
 
   return (
-    <div className="compass" style={{ flexBasis: `${props.width}%` }}>
+    <div className="compass" style={{ flexBasis: `${props.width}%`, position: 'relative' }}>
       <div
         className="frames"
         style={{
@@ -49,17 +49,26 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           );
         })}
       </div>
+
+      {props.isEditMode && !isEditModeCompass && (
+        <button
+          onClick={() => props.handlers.addCompassBefore()}
+          style={{ height: stringHeight * 6, left: -4, padding: 0, position: 'absolute', top: 0 }}
+          type="button"
+        >
+          {addCompassSymbol}
+        </button>
+      )}
+
       {props.isEditMode && (
         <div
           className="controls"
           style={{
             display: 'flex',
-            justifyContent: 'center',
+            justifyContent: 'end',
+            marginBottom: 8,
           }}
         >
-          <button onClick={() => props.handlers.copyCompass('before')} type="button">
-            ⏪
-          </button>
           {isEditModeCompass ? (
             <button onClick={() => props.handlers.editCompassFinish()} type="button">
               ✅
@@ -69,14 +78,8 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
               🔧
             </button>
           )}
-          <button onClick={() => props.handlers.clearCompass()} type="button">
-            🗒️
-          </button>
           <button onClick={() => props.handlers.removeCompass()} type="button">
             🗑️
-          </button>
-          <button onClick={() => props.handlers.copyCompass('after')} type="button">
-            ⏩
           </button>
         </div>
       )}
