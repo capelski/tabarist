@@ -1,27 +1,10 @@
-import { Tab } from '../types';
+import { Compass, Frame, Tab } from '../types';
 
-export const getNewTab = (): Tab => ({
-  compasses: [
-    [
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-      [, , , , '14', '12'],
-    ],
-    [
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-      [, , , , '12', '10'],
-    ],
-  ],
+export const createCompass = (): Compass => Array.from({ length: 8 }, createFrame);
+
+export const createFrame = (): Frame => ['', '', '', '', '', ''];
+
+export const createTab = (): Tab => ({
+  compasses: [createCompass()],
   title: 'Unnamed tab',
 });

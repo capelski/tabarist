@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMediaQuery } from 'react-responsive';
 import { Compass } from '../types';
 import { FrameComponent } from './frame';
 
@@ -16,18 +15,15 @@ export interface CompassProps {
     updateCompass: (frameIndex: number, stringIndex: number, value: string) => void;
   };
   isEditMode: boolean;
+  width: number;
 }
 
 export const CompassComponent: React.FC<CompassProps> = (props) => {
   const isEditModeCompass = props.compassIndex === props.editingCompass;
   const framesWidth = Math.floor(10000 / props.compass.length) / 100;
 
-  const isBigScreen = useMediaQuery({ minWidth: 1000 });
-  const isMediumScreen = useMediaQuery({ minWidth: 600 });
-  const compassWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
-
   return (
-    <div className="compass" style={{ flexBasis: `${compassWidth}%` }}>
+    <div className="compass" style={{ flexBasis: `${props.width}%` }}>
       <div
         className="frames"
         style={{

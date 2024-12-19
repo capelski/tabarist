@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
-import { editingCompassDefault } from '../constants';
-import { getNewTab } from '../logic';
+import { useMediaQuery } from 'react-responsive';
+import { editingCompassDefault, stringHeight } from '../constants';
+import { createCompass, createTab } from '../logic';
 import { Tab } from '../types';
 import { CompassComponent, CompassProps } from './compass';
 
 export const App: React.FC = () => {
   const [editingCompass, setEditingCompass] = useState(editingCompassDefault);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [tab, setTab] = useState<Tab>(getNewTab);
+  const [tab, setTab] = useState<Tab>(createTab);
+
+  const isBigScreen = useMediaQuery({ minWidth: 1000 });
+  const isMediumScreen = useMediaQuery({ minWidth: 600 });
+  const compassWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
+
+  const addCompass = (index: number) => {
+    const nextCompasses = [...tab.compasses];
+    nextCompasses.splice(index, 0, createCompass());
+    setTab({ compasses: nextCompasses, title: tab.title });
+  };
 
   const getHandlers = (compassIndex: number): CompassProps['handlers'] => ({
     clearCompass() {
@@ -115,9 +126,37 @@ export const App: React.FC = () => {
               editingCompass={editingCompass}
               handlers={getHandlers(compassIndex)}
               isEditMode={isEditMode}
+              width={compassWidth}
             />
           );
         })}
+        {isEditMode && (
+          <div
+            className="add-compass"
+            style={{
+              boxSizing: 'border-box',
+              flexBasis: `${compassWidth}%`,
+              height: stringHeight * 6,
+              padding: '0 8px',
+            }}
+          >
+            <div
+              onClick={() => {
+                addCompass(tab.compasses.length);
+              }}
+              style={{
+                alignItems: 'center',
+                backgroundColor: '#eee',
+                cursor: 'pointer',
+                display: 'flex',
+                height: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              ✚
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

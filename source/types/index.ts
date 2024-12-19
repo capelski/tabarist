@@ -1,6 +1,4 @@
-export type String = string | undefined;
-
-export type Frame = String[];
+export type Frame = string[];
 
 export type Compass = Frame[];
 

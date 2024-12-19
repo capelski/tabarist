@@ -1,4 +1,5 @@
 import React from 'react';
+import { stringHeight } from '../constants';
 import { Frame } from '../types';
 
 export interface FrameProps {
@@ -20,7 +21,6 @@ export const FrameComponent: React.FC<FrameProps> = (props) => {
             style={{
               background:
                 'linear-gradient(180deg, white calc(50% - 1px), black calc(50%), white calc(50% + 1px)',
-              height: 20,
               textAlign: 'center',
             }}
           >
@@ -32,7 +32,7 @@ export const FrameComponent: React.FC<FrameProps> = (props) => {
                 }}
                 style={{
                   boxSizing: 'border-box',
-                  height: 20,
+                  height: stringHeight,
                   maxWidth: 30,
                   padding: 0,
                   textAlign: 'center',
@@ -42,6 +42,7 @@ export const FrameComponent: React.FC<FrameProps> = (props) => {
             ) : (
               <div
                 style={{
+                  height: stringHeight,
                   padding: '0 4px',
                 }}
               >
