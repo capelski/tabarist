@@ -1,12 +1,12 @@
 import { nanoid } from 'nanoid';
 import { editIndexDefault } from '../constants';
-import { Compass, CompassReference, Frame, Tab } from '../types';
+import { Compass, CompassReference, Frame, PickingCompass, Tab } from '../types';
 
-export const addCompassToTab = (tab: Tab, newCompass: Compass | CompassReference): Tab => {
+export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
   const nextCompasses = tab.compasses.reduce((reduced, compass) => {
     const isLastCompass = compass.index === tab.compasses.length;
 
-    const nextCompass: Compass | CompassReference = {
+    const nextCompass: Compass = {
       ...compass,
       index: getIndexIncrease(compass.index, newCompass.index),
       ...(compass.type === 'reference'
@@ -42,13 +42,7 @@ export const arrayIndexToCompassIndex = (arrayIndex: number) => arrayIndex + 1;
 
 export const compassIndexToArrayIndex = (compassIndex: number) => compassIndex - 1;
 
-export const createCompass = (index: number): Compass => ({
-  index,
-  frames: Array.from({ length: 8 }, createFrame),
-  type: 'compass',
-});
-
-export const createCompassReference = (compass: Compass | CompassReference): CompassReference => ({
+export const createCompassReference = (compass: Compass): CompassReference => ({
   index: compass.index + 1,
   reference: compass.type === 'compass' ? compass.index : compass.reference,
   type: 'reference',
@@ -56,8 +50,14 @@ export const createCompassReference = (compass: Compass | CompassReference): Com
 
 export const createFrame = (): Frame => Array.from({ length: 6 }, () => '');
 
+export const createPickingCompass = (index: number): PickingCompass => ({
+  index,
+  frames: Array.from({ length: 8 }, createFrame),
+  type: 'compass',
+});
+
 export const createTab = (): Tab => ({
-  compasses: [createCompass(1)],
+  compasses: [createPickingCompass(1)],
   editIndex: editIndexDefault,
   id: nanoid(),
   title: 'Unnamed tab',
@@ -89,7 +89,7 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
         };
       }
 
-      const nextCompass: Compass | CompassReference = {
+      const nextCompass: Compass = {
         ...compass,
         index: getIndexDecrease(compass.index, deletionIndex, reduced.deletedCount),
         ...(compass.type === 'reference'
@@ -119,7 +119,7 @@ export const resetEditIndex = (tab: Tab): Tab => {
   return { ...tab, editIndex: editIndexDefault };
 };
 
-export const setEditIndex = (tab: Tab, compass: Compass | CompassReference): Tab => {
+export const setEditIndex = (tab: Tab, compass: Compass): Tab => {
   return { ...tab, editIndex: compass.type === 'compass' ? compass.index : compass.reference };
 };
 

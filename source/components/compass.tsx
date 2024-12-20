@@ -1,11 +1,11 @@
 import React from 'react';
 import { addCompassSymbol, removeSymbol, stringHeight } from '../constants';
-import { Compass } from '../types';
+import { PickingCompass } from '../types';
 import { FrameComponent } from './frame';
 
 export interface CompassProps {
   backgroundColor: string;
-  compass: Compass;
+  compass: PickingCompass;
   currentIndex: number;
   editIndex: number;
   handlers: {

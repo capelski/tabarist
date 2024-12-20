@@ -4,15 +4,15 @@ import { addCompassSymbol, stringHeight } from '../constants';
 import {
   addCompassToTab,
   arrayIndexToCompassIndex,
-  createCompass,
   createCompassReference,
+  createPickingCompass,
   removeCompassFromTab,
   resetEditIndex,
   setEditIndex,
   updateCompass,
   updateTitle,
 } from '../logic';
-import { Compass, CompassReference, Tab } from '../types';
+import { Compass, PickingCompass, Tab } from '../types';
 import { CompassComponent, CompassProps } from './compass';
 
 export type TabProps = {
@@ -32,13 +32,13 @@ export const TabComponent: React.FC<TabProps> = (props) => {
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
   const compassWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
 
-  const addCompass = (compass: Compass | CompassReference) => {
+  const addCompass = (compass: Compass) => {
     setTab(addCompassToTab(tab, compass));
   };
 
-  const getHandlers = (compass: Compass | CompassReference): CompassProps['handlers'] => ({
+  const getHandlers = (compass: Compass): CompassProps['handlers'] => ({
     addCompassBefore() {
-      addCompass(createCompass(compass.index));
+      addCompass(createPickingCompass(compass.index));
     },
     copyCompass() {
       addCompass(createCompassReference(compass));
@@ -95,7 +95,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
           const actualCompass =
             compass.type === 'compass'
               ? compass
-              : (tab.compasses.find((c) => c.index === compass.reference) as Compass);
+              : (tab.compasses.find((c) => c.index === compass.reference) as PickingCompass);
 
           return (
             <CompassComponent
@@ -124,7 +124,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
           >
             <div
               onClick={() => {
-                addCompass(createCompass(arrayIndexToCompassIndex(tab.compasses.length)));
+                addCompass(createPickingCompass(arrayIndexToCompassIndex(tab.compasses.length)));
               }}
               style={{
                 alignItems: 'center',
