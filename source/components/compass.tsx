@@ -81,35 +81,31 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             </span>
           )}
 
-          {!isReference && (
-            <React.Fragment>
-              {isEditModeCompass ? (
-                <button
-                  onClick={() => props.handlers.editCompassFinish()}
-                  style={{ marginRight: 8 }}
-                  type="button"
-                >
-                  ✅
-                </button>
-              ) : (
-                <button
-                  onClick={() => props.handlers.editCompass()}
-                  style={{ marginRight: 8 }}
-                  type="button"
-                >
-                  🔧
-                </button>
-              )}
-
-              <button
-                onClick={() => props.handlers.copyCompass()}
-                style={{ marginRight: 8 }}
-                type="button"
-              >
-                =
-              </button>
-            </React.Fragment>
+          {isEditModeCompass ? (
+            <button
+              onClick={() => props.handlers.editCompassFinish()}
+              style={{ marginRight: 8 }}
+              type="button"
+            >
+              ✅
+            </button>
+          ) : (
+            <button
+              onClick={() => props.handlers.editCompass()}
+              style={{ marginRight: 8 }}
+              type="button"
+            >
+              🔧
+            </button>
           )}
+
+          <button
+            onClick={() => props.handlers.copyCompass()}
+            style={{ marginRight: 8 }}
+            type="button"
+          >
+            =
+          </button>
 
           <button onClick={() => props.handlers.removeCompass()} type="button">
             🗑️

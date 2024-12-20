@@ -47,9 +47,9 @@ export const createCompass = (index: number): Compass => ({
   type: 'compass',
 });
 
-export const createCompassReference = (index: number): CompassReference => ({
-  index: index + 1,
-  reference: index,
+export const createCompassReference = (compass: Compass | CompassReference): CompassReference => ({
+  index: compass.index + 1,
+  reference: compass.type === 'compass' ? compass.index : compass.reference,
   type: 'reference',
 });
 
@@ -117,8 +117,8 @@ export const resetEditIndex = (tab: Tab): Tab => {
   return { ...tab, editIndex: editIndexDefault };
 };
 
-export const setEditIndex = (tab: Tab, editIndex: number): Tab => {
-  return { ...tab, editIndex };
+export const setEditIndex = (tab: Tab, compass: Compass | CompassReference): Tab => {
+  return { ...tab, editIndex: compass.type === 'compass' ? compass.index : compass.reference };
 };
 
 export const updateCompass = (

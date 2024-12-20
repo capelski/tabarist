@@ -31,24 +31,24 @@ export const TabComponent: React.FC<TabProps> = (props) => {
     setTab(addCompassToTab(tab, compass));
   };
 
-  const getHandlers = (compassIndex: number): CompassProps['handlers'] => ({
+  const getHandlers = (compass: Compass | CompassReference): CompassProps['handlers'] => ({
     addCompassBefore() {
-      addCompass(createCompass(compassIndex));
+      addCompass(createCompass(compass.index));
     },
     copyCompass() {
-      addCompass(createCompassReference(compassIndex));
+      addCompass(createCompassReference(compass));
     },
     editCompass() {
-      setTab(setEditIndex(tab, compassIndex));
+      setTab(setEditIndex(tab, compass));
     },
     editCompassFinish() {
       setTab(resetEditIndex(tab));
     },
     removeCompass() {
-      setTab(removeCompassFromTab(tab, compassIndex));
+      setTab(removeCompassFromTab(tab, compass.index));
     },
     updateCompass(frameIndex, stringIndex, value) {
-      setTab(updateCompass(tab, compassIndex, frameIndex, stringIndex, value));
+      setTab(updateCompass(tab, compass.index, frameIndex, stringIndex, value));
     },
   });
 
@@ -99,7 +99,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
               compass={actualCompass}
               currentIndex={compass.index}
               editIndex={tab.editIndex}
-              handlers={getHandlers(compass.index)}
+              handlers={getHandlers(compass)}
               isEditMode={isEditMode}
               key={compass.index}
               width={compassWidth}
