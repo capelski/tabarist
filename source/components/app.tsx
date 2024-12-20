@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { localStorageKey_tab, localStorageKey_tabRegistry, removeSymbol } from '../constants';
+import {
+  addSymbol,
+  localStorageKey_tab,
+  localStorageKey_tabRegistry,
+  removeSymbol,
+} from '../constants';
 import { createTab } from '../logic';
 import { Tab, TabRegistry } from '../types';
 import { TabComponent } from './tab';
@@ -75,7 +80,7 @@ export const App: React.FC = () => {
     <div>
       <p>
         <button onClick={createNewTab} type="button">
-          ➕ Create tab
+          {addSymbol} Create tab
         </button>
       </p>
       {Object.entries(tabRegistry).map(([id, title]) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { addCompassSymbol, stringHeight } from '../constants';
+import { addSymbol, editSymbol, saveSymbol, stringHeight } from '../constants';
 import {
   addCompassToTab,
   arrayIndexToCompassIndex,
@@ -9,7 +9,8 @@ import {
   removeCompassFromTab,
   resetEditIndex,
   setEditIndex,
-  updateCompass,
+  updateCompassFrames,
+  updateCompassValue,
   updateTitle,
 } from '../logic';
 import { Compass, PickingCompass, Tab } from '../types';
@@ -52,8 +53,11 @@ export const TabComponent: React.FC<TabProps> = (props) => {
     removeCompass() {
       setTab(removeCompassFromTab(tab, compass.index));
     },
-    updateCompass(frameIndex, stringIndex, value) {
-      setTab(updateCompass(tab, compass.index, frameIndex, stringIndex, value));
+    updateCompassValue(frameIndex, stringIndex, value) {
+      setTab(updateCompassValue(tab, compass.index, frameIndex, stringIndex, value));
+    },
+    updateCompassFrames(frames) {
+      setTab(updateCompassFrames(tab, compass.index, frames));
     },
   });
 
@@ -70,7 +74,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
       <div style={{ alignItems: 'center', display: 'flex' }}>
         <div style={{ marginRight: 8 }}>
           <button onClick={toggleEditMode} type="button">
-            {isEditMode ? '✅' : '🔧'}
+            {isEditMode ? saveSymbol : editSymbol}
           </button>
         </div>
         <h3>
@@ -135,7 +139,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
                 justifyContent: 'center',
               }}
             >
-              {addCompassSymbol}
+              {addSymbol}
             </div>
           </div>
         )}

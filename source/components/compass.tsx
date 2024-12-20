@@ -1,5 +1,12 @@
 import React from 'react';
-import { addCompassSymbol, removeSymbol, stringHeight } from '../constants';
+import {
+  addSymbol,
+  editSymbol,
+  framesNumberOptions,
+  removeSymbol,
+  saveSymbol,
+  stringHeight,
+} from '../constants';
 import { PickingCompass } from '../types';
 import { FrameComponent } from './frame';
 
@@ -14,7 +21,8 @@ export interface CompassProps {
     editCompass: () => void;
     editCompassFinish: () => void;
     removeCompass: () => void;
-    updateCompass: (frameIndex: number, stringIndex: number, value: string) => void;
+    updateCompassValue: (frameIndex: number, stringIndex: number, value: string) => void;
+    updateCompassFrames: (framesNumber: number) => void;
   };
   isEditMode: boolean;
   width: number;
@@ -47,7 +55,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
               isEditMode={isEditModeCompass}
               key={frameIndex}
               updateFrame={(stringIndex, value) => {
-                props.handlers.updateCompass(frameIndex, stringIndex, value);
+                props.handlers.updateCompassValue(frameIndex, stringIndex, value);
               }}
               width={framesWidth}
             />
@@ -61,7 +69,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           style={{ height: stringHeight * 6, left: -4, padding: 0, position: 'absolute', top: 0 }}
           type="button"
         >
-          {addCompassSymbol}
+          {addSymbol}
         </button>
       )}
 
@@ -81,22 +89,42 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             </span>
           )}
 
-          {isEditModeCompass ? (
-            <button
-              onClick={() => props.handlers.editCompassFinish()}
-              style={{ marginRight: 8 }}
-              type="button"
-            >
-              ✅
-            </button>
-          ) : (
-            <button
-              onClick={() => props.handlers.editCompass()}
-              style={{ marginRight: 8 }}
-              type="button"
-            >
-              🔧
-            </button>
+          {!isReference && (
+            <React.Fragment>
+              {isEditModeCompass ? (
+                <button
+                  onClick={() => props.handlers.editCompassFinish()}
+                  style={{ marginRight: 8 }}
+                  type="button"
+                >
+                  {saveSymbol}
+                </button>
+              ) : (
+                <button
+                  onClick={() => props.handlers.editCompass()}
+                  style={{ marginRight: 8 }}
+                  type="button"
+                >
+                  {editSymbol}
+                </button>
+              )}
+
+              <select
+                onChange={(event) => {
+                  props.handlers.updateCompassFrames(parseInt(event.target.value));
+                }}
+                style={{ marginRight: 8 }}
+                value={props.compass.framesNumber}
+              >
+                {framesNumberOptions.map((option) => {
+                  return (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  );
+                })}
+              </select>
+            </React.Fragment>
           )}
 
           <button

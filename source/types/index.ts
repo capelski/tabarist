@@ -11,6 +11,7 @@ export type CompassReference = CompassBase & {
 
 export type PickingCompass = CompassBase & {
   frames: Frame[];
+  framesNumber: number;
   type: 'compass';
 };
 

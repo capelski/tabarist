@@ -1,8 +1,15 @@
 import { nanoid } from 'nanoid';
-import { editIndexDefault } from '../constants';
+import { editIndexDefault, framesNumberDefault } from '../constants';
 import { Compass, CompassReference, Frame, PickingCompass, Tab } from '../types';
 
 export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
+  if (tab.compasses.length === 0) {
+    return {
+      ...tab,
+      compasses: [newCompass],
+    };
+  }
+
   const nextCompasses = tab.compasses.reduce((reduced, compass) => {
     const isLastCompass = compass.index === tab.compasses.length;
 
@@ -52,12 +59,13 @@ export const createFrame = (): Frame => Array.from({ length: 6 }, () => '');
 
 export const createPickingCompass = (index: number): PickingCompass => ({
   index,
-  frames: Array.from({ length: 8 }, createFrame),
+  frames: Array.from({ length: framesNumberDefault }, createFrame),
+  framesNumber: framesNumberDefault,
   type: 'compass',
 });
 
 export const createTab = (): Tab => ({
-  compasses: [createPickingCompass(1)],
+  compasses: [],
   editIndex: editIndexDefault,
   id: nanoid(),
   title: 'Unnamed tab',
@@ -123,7 +131,7 @@ export const setEditIndex = (tab: Tab, compass: Compass): Tab => {
   return { ...tab, editIndex: compass.type === 'compass' ? compass.index : compass.reference };
 };
 
-export const updateCompass = (
+export const updateCompassValue = (
   tab: Tab,
   compassIndex: number,
   frameIndex: number,
@@ -144,6 +152,24 @@ export const updateCompass = (
                     return sIndex !== stringIndex ? string : value;
                   });
             }),
+          };
+    }),
+  };
+};
+
+export const updateCompassFrames = (tab: Tab, compassIndex: number, framesNumber: number): Tab => {
+  return {
+    ...tab,
+    compasses: tab.compasses.map((compass, cIndex) => {
+      return compass.type === 'reference' || arrayIndexToCompassIndex(cIndex) !== compassIndex
+        ? compass
+        : {
+            ...compass,
+            frames: Array.from(
+              { length: framesNumber },
+              (_, index) => compass.frames[index] ?? createFrame(),
+            ),
+            framesNumber,
           };
     }),
   };
