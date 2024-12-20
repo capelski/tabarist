@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { addCompassSymbol, stringHeight } from '../constants';
 import {
@@ -17,11 +17,16 @@ import { CompassComponent, CompassProps } from './compass';
 
 export type TabProps = {
   tab: Tab;
+  updateTab: (updatedTab: Tab) => void;
 };
 
 export const TabComponent: React.FC<TabProps> = (props) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [tab, setTab] = useState<Tab>(props.tab);
+
+  useEffect(() => {
+    setTab(props.tab);
+  }, [props.tab]);
 
   const isBigScreen = useMediaQuery({ minWidth: 1000 });
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
@@ -54,6 +59,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
 
   const toggleEditMode = () => {
     if (isEditMode) {
+      props.updateTab(tab);
       setTab(resetEditIndex(tab));
     }
     setIsEditMode(!isEditMode);

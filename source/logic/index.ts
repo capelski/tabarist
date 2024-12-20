@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { editIndexDefault } from '../constants';
 import { Compass, CompassReference, Frame, Tab } from '../types';
 
@@ -58,6 +59,7 @@ export const createFrame = (): Frame => Array.from({ length: 6 }, () => '');
 export const createTab = (): Tab => ({
   compasses: [createCompass(1)],
   editIndex: editIndexDefault,
+  id: nanoid(),
   title: 'Unnamed tab',
 });
 

@@ -15,5 +15,10 @@ export type CompassReference = CompassBase & {
 export type Tab = {
   compasses: (Compass | CompassReference)[];
   editIndex: number;
+  id: string;
   title: string;
+};
+
+export type TabRegistry = {
+  [id: string]: string;
 };

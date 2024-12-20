@@ -1,5 +1,5 @@
 import React from 'react';
-import { addCompassSymbol, stringHeight } from '../constants';
+import { addCompassSymbol, removeSymbol, stringHeight } from '../constants';
 import { Compass } from '../types';
 import { FrameComponent } from './frame';
 
@@ -108,7 +108,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           </button>
 
           <button onClick={() => props.handlers.removeCompass()} type="button">
-            🗑️
+            {removeSymbol}
           </button>
         </div>
       )}
