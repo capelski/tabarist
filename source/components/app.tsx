@@ -80,7 +80,10 @@ export const App: React.FC = () => {
       </p>
       {Object.entries(tabRegistry).map(([id, title]) => {
         return (
-          <p key={id} style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div
+            key={id}
+            style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
+          >
             <span>{title}</span>
             <div>
               <button onClick={() => openTab(id)} style={{ marginRight: 8 }} type="button">
@@ -90,7 +93,7 @@ export const App: React.FC = () => {
                 {removeSymbol}
               </button>
             </div>
-          </p>
+          </div>
         );
       })}
       {selectedTab && (
