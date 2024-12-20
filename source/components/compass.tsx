@@ -4,11 +4,13 @@ import { Compass } from '../types';
 import { FrameComponent } from './frame';
 
 export interface CompassProps {
+  backgroundColor: string;
   compass: Compass;
-  compassIndex: number;
-  editingCompass: number;
+  currentIndex: number;
+  editIndex: number;
   handlers: {
     addCompassBefore: () => void;
+    copyCompass: () => void;
     editCompass: () => void;
     editCompassFinish: () => void;
     removeCompass: () => void;
@@ -19,14 +21,16 @@ export interface CompassProps {
 }
 
 export const CompassComponent: React.FC<CompassProps> = (props) => {
-  const isEditModeCompass = props.compassIndex === props.editingCompass;
-  const framesWidth = Math.floor(10000 / props.compass.length) / 100;
+  const isEditModeCompass = props.currentIndex === props.editIndex;
+  const isReference = props.compass.index !== props.currentIndex;
+  const framesWidth = Math.floor(10000 / props.compass.frames.length) / 100;
 
   return (
     <div className="compass" style={{ flexBasis: `${props.width}%`, position: 'relative' }}>
       <div
         className="frames"
         style={{
+          backgroundColor: props.backgroundColor,
           borderLeft: '1px solid black',
           boxSizing: 'border-box',
           display: 'flex',
@@ -34,9 +38,10 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           marginBottom: 8,
         }}
       >
-        {props.compass.map((frame, frameIndex) => {
+        {props.compass.frames.map((frame, frameIndex) => {
           return (
             <FrameComponent
+              backgroundColor={props.backgroundColor}
               frame={frame}
               frameIndex={frameIndex}
               isEditMode={isEditModeCompass}
@@ -69,15 +74,43 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             marginBottom: 8,
           }}
         >
-          {isEditModeCompass ? (
-            <button onClick={() => props.handlers.editCompassFinish()} type="button">
-              ✅
-            </button>
-          ) : (
-            <button onClick={() => props.handlers.editCompass()} type="button">
-              🔧
-            </button>
+          <span style={{ marginRight: 8 }}>{props.currentIndex}</span>
+          {isReference && (
+            <span style={{ marginRight: 8 }}>
+              ={'>'} {props.compass.index}
+            </span>
           )}
+
+          {!isReference && (
+            <React.Fragment>
+              {isEditModeCompass ? (
+                <button
+                  onClick={() => props.handlers.editCompassFinish()}
+                  style={{ marginRight: 8 }}
+                  type="button"
+                >
+                  ✅
+                </button>
+              ) : (
+                <button
+                  onClick={() => props.handlers.editCompass()}
+                  style={{ marginRight: 8 }}
+                  type="button"
+                >
+                  🔧
+                </button>
+              )}
+
+              <button
+                onClick={() => props.handlers.copyCompass()}
+                style={{ marginRight: 8 }}
+                type="button"
+              >
+                =
+              </button>
+            </React.Fragment>
+          )}
+
           <button onClick={() => props.handlers.removeCompass()} type="button">
             🗑️
           </button>

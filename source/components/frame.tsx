@@ -3,6 +3,7 @@ import { stringHeight } from '../constants';
 import { Frame } from '../types';
 
 export interface FrameProps {
+  backgroundColor: string;
   frame: Frame;
   frameIndex: number;
   isEditMode: boolean;
@@ -20,7 +21,7 @@ export const FrameComponent: React.FC<FrameProps> = (props) => {
             key={stringIndex}
             style={{
               background:
-                'linear-gradient(180deg, white calc(50% - 1px), black calc(50%), white calc(50% + 1px)',
+                'linear-gradient(180deg, transparent calc(50% - 1px), black calc(50%), transparent calc(50% + 1px)',
               textAlign: 'center',
             }}
           >
@@ -46,7 +47,7 @@ export const FrameComponent: React.FC<FrameProps> = (props) => {
                   padding: '0 4px',
                 }}
               >
-                <span style={{ backgroundColor: 'white' }}>{string}</span>
+                <span style={{ backgroundColor: props.backgroundColor }}>{string}</span>
               </div>
             )}
           </div>

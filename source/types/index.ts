@@ -1,8 +1,19 @@
 export type Frame = string[];
 
-export type Compass = Frame[];
+export type CompassBase = { index: number };
+
+export type Compass = CompassBase & {
+  frames: Frame[];
+  type: 'compass';
+};
+
+export type CompassReference = CompassBase & {
+  reference: number;
+  type: 'reference';
+};
 
 export type Tab = {
-  compasses: Compass[];
+  compasses: (Compass | CompassReference)[];
+  editIndex: number;
   title: string;
 };
