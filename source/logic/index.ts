@@ -1,6 +1,13 @@
 import { nanoid } from 'nanoid';
 import { editIndexDefault, framesNumberDefault } from '../constants';
-import { Compass, CompassReference, Frame, PickingCompass, Tab } from '../types';
+import {
+  ChordCompass,
+  Compass,
+  CompassReference,
+  PickingCompass,
+  PickingFrame,
+  Tab,
+} from '../types';
 
 export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
   if (tab.compasses.length === 0) {
@@ -49,20 +56,27 @@ export const arrayIndexToCompassIndex = (arrayIndex: number) => arrayIndex + 1;
 
 export const compassIndexToArrayIndex = (compassIndex: number) => compassIndex - 1;
 
+export const createChordCompass = (index: number): ChordCompass => ({
+  index,
+  frames: Array.from({ length: framesNumberDefault }, () => ''),
+  framesNumber: framesNumberDefault,
+  type: 'chord',
+});
+
 export const createCompassReference = (compass: Compass): CompassReference => ({
   index: compass.index + 1,
-  reference: compass.type === 'compass' ? compass.index : compass.reference,
+  reference: compass.type === 'reference' ? compass.reference : compass.index,
   type: 'reference',
 });
 
-export const createFrame = (): Frame => Array.from({ length: 6 }, () => '');
-
 export const createPickingCompass = (index: number): PickingCompass => ({
   index,
-  frames: Array.from({ length: framesNumberDefault }, createFrame),
+  frames: Array.from({ length: framesNumberDefault }, createPickingFrame),
   framesNumber: framesNumberDefault,
-  type: 'compass',
+  type: 'picking',
 });
+
+export const createPickingFrame = (): PickingFrame => Array.from({ length: 6 }, () => '');
 
 export const createTab = (): Tab => ({
   compasses: [],
@@ -127,30 +141,25 @@ export const resetEditIndex = (tab: Tab): Tab => {
   return { ...tab, editIndex: editIndexDefault };
 };
 
-export const setEditIndex = (tab: Tab, compass: Compass): Tab => {
-  return { ...tab, editIndex: compass.type === 'compass' ? compass.index : compass.reference };
+export const setEditIndex = (tab: Tab, compassIndex: number): Tab => {
+  return { ...tab, editIndex: compassIndex };
 };
 
-export const updateCompassValue = (
+export const updateChordCompass = (
   tab: Tab,
   compassIndex: number,
   frameIndex: number,
-  stringIndex: number,
   value: string,
 ): Tab => {
   return {
     ...tab,
     compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type === 'reference' || arrayIndexToCompassIndex(cIndex) !== compassIndex
+      return compass.type !== 'chord' || arrayIndexToCompassIndex(cIndex) !== compassIndex
         ? compass
         : {
             ...compass,
             frames: compass.frames.map((frame, fIndex) => {
-              return fIndex !== frameIndex
-                ? frame
-                : [...frame].map((string, sIndex) => {
-                    return sIndex !== stringIndex ? string : value;
-                  });
+              return fIndex !== frameIndex ? frame : value;
             }),
           };
     }),
@@ -163,13 +172,45 @@ export const updateCompassFrames = (tab: Tab, compassIndex: number, framesNumber
     compasses: tab.compasses.map((compass, cIndex) => {
       return compass.type === 'reference' || arrayIndexToCompassIndex(cIndex) !== compassIndex
         ? compass
-        : {
+        : compass.type === 'picking'
+        ? {
             ...compass,
             frames: Array.from(
               { length: framesNumber },
-              (_, index) => compass.frames[index] ?? createFrame(),
+              (_, index) => compass.frames[index] ?? createPickingFrame(),
             ),
             framesNumber,
+          }
+        : {
+            ...compass,
+            frames: Array.from({ length: framesNumber }, (_, index) => compass.frames[index] ?? ''),
+            framesNumber,
+          };
+    }),
+  };
+};
+
+export const updatePickingCompass = (
+  tab: Tab,
+  compassIndex: number,
+  frameIndex: number,
+  stringIndex: number,
+  value: string,
+): Tab => {
+  return {
+    ...tab,
+    compasses: tab.compasses.map((compass, cIndex) => {
+      return compass.type !== 'picking' || arrayIndexToCompassIndex(cIndex) !== compassIndex
+        ? compass
+        : {
+            ...compass,
+            frames: compass.frames.map((frame, fIndex) => {
+              return fIndex !== frameIndex
+                ? frame
+                : [...frame].map((string, sIndex) => {
+                    return sIndex !== stringIndex ? string : value;
+                  });
+            }),
           };
     }),
   };

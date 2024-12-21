@@ -3,8 +3,8 @@ export const editSymbol = '📝';
 export const removeSymbol = '🗑️';
 export const saveSymbol = '✅';
 
-export const framesNumberOptions = [4, 8];
-export const framesNumberDefault = framesNumberOptions[0];
+export const framesNumberOptions = [1, 2, 4, 8];
+export const framesNumberDefault = framesNumberOptions[2];
 
 export const editIndexDefault = -1;
 

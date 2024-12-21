@@ -1,6 +1,10 @@
-export type Frame = string[];
+export type ChordCompass = CompassBase & {
+  frames: string[];
+  framesNumber: number;
+  type: 'chord';
+};
 
-export type Compass = CompassReference | PickingCompass;
+export type Compass = ChordCompass | CompassReference | PickingCompass;
 
 export type CompassBase = { index: number };
 
@@ -10,10 +14,12 @@ export type CompassReference = CompassBase & {
 };
 
 export type PickingCompass = CompassBase & {
-  frames: Frame[];
+  frames: PickingFrame[];
   framesNumber: number;
-  type: 'compass';
+  type: 'picking';
 };
+
+export type PickingFrame = string[];
 
 export type Tab = {
   compasses: Compass[];

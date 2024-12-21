@@ -1,17 +1,17 @@
 import React from 'react';
 import { stringHeight } from '../constants';
-import { Frame } from '../types';
+import { PickingFrame } from '../types';
 
-export interface FrameProps {
+export interface PickingFrameProps {
   backgroundColor: string;
-  frame: Frame;
+  frame: PickingFrame;
   frameIndex: number;
   isEditMode: boolean;
   updateFrame: (stringIndex: number, value: string) => void;
   width: number;
 }
 
-export const FrameComponent: React.FC<FrameProps> = (props) => {
+export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
   return (
     <div className="frame" style={{ width: `${props.width}%` }}>
       {[...props.frame].map((string, stringIndex) => {

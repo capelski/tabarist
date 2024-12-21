@@ -1,28 +1,24 @@
 import React from 'react';
-import {
-  addSymbol,
-  editSymbol,
-  framesNumberOptions,
-  removeSymbol,
-  saveSymbol,
-  stringHeight,
-} from '../constants';
-import { PickingCompass } from '../types';
-import { FrameComponent } from './frame';
+import { editSymbol, framesNumberOptions, removeSymbol, saveSymbol } from '../constants';
+import { ChordCompass, PickingCompass } from '../types';
+import { AddCompass } from './add-compass';
+import { ChordFrame } from './chord-frame';
+import { PickingFrameComponent } from './picking-frame';
 
 export interface CompassProps {
   backgroundColor: string;
-  compass: PickingCompass;
+  compass: ChordCompass | PickingCompass;
   currentIndex: number;
   editIndex: number;
   handlers: {
-    addCompassBefore: () => void;
+    addCompass: (newCompass: ChordCompass | PickingCompass) => void;
     copyCompass: () => void;
     editCompass: () => void;
     editCompassFinish: () => void;
     removeCompass: () => void;
-    updateCompassValue: (frameIndex: number, stringIndex: number, value: string) => void;
+    updateChordCompass: (frameIndex: number, value: string) => void;
     updateCompassFrames: (framesNumber: number) => void;
+    updatePickingCompass: (frameIndex: number, stringIndex: number, value: string) => void;
   };
   isEditMode: boolean;
   width: number;
@@ -34,44 +30,65 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
   const framesWidth = Math.floor(10000 / props.compass.frames.length) / 100;
 
   return (
-    <div className="compass" style={{ flexBasis: `${props.width}%`, position: 'relative' }}>
-      <div
-        className="frames"
-        style={{
-          backgroundColor: props.backgroundColor,
-          borderLeft: '1px solid black',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'row',
-          marginBottom: 8,
-        }}
-      >
-        {props.compass.frames.map((frame, frameIndex) => {
-          return (
-            <FrameComponent
-              backgroundColor={props.backgroundColor}
-              frame={frame}
-              frameIndex={frameIndex}
-              isEditMode={isEditModeCompass}
-              key={frameIndex}
-              updateFrame={(stringIndex, value) => {
-                props.handlers.updateCompassValue(frameIndex, stringIndex, value);
-              }}
-              width={framesWidth}
-            />
-          );
-        })}
-      </div>
-
-      {props.isEditMode && !isEditModeCompass && (
-        <button
-          onClick={() => props.handlers.addCompassBefore()}
-          style={{ height: stringHeight * 6, left: -4, padding: 0, position: 'absolute', top: 0 }}
-          type="button"
+    <div
+      className="compass"
+      style={{ display: 'flex', flexDirection: 'column', flexBasis: `${props.width}%` }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
+        {props.isEditMode && (
+          <AddCompass
+            addCompass={props.handlers.addCompass}
+            compassIndex={props.currentIndex}
+            style={{ minHeight: 60 }}
+          />
+        )}
+        <div
+          className="frames"
+          style={{
+            backgroundColor: props.backgroundColor,
+            borderLeft: '1px solid black',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'row',
+            flexGrow: 1,
+            width: '100%',
+          }}
         >
-          {addSymbol}
-        </button>
-      )}
+          {props.compass.type === 'picking'
+            ? props.compass.frames.map((frame, frameIndex) => {
+                return (
+                  <PickingFrameComponent
+                    backgroundColor={props.backgroundColor}
+                    frame={frame}
+                    frameIndex={frameIndex}
+                    isEditMode={isEditModeCompass}
+                    key={frameIndex}
+                    updateFrame={(stringIndex, value) => {
+                      props.handlers.updatePickingCompass(frameIndex, stringIndex, value);
+                    }}
+                    width={framesWidth}
+                  />
+                );
+              })
+            : props.compass.frames.map((frame, frameIndex) => {
+                return (
+                  <ChordFrame
+                    frame={frame}
+                    isEditMode={isEditModeCompass}
+                    key={frameIndex}
+                    style={{
+                      borderLeft: props.isEditMode && frameIndex > 0 ? '1px solid #ccc' : undefined,
+                      boxSizing: 'border-box',
+                      width: `${framesWidth}%`,
+                    }}
+                    updateFrame={(value) => {
+                      props.handlers.updateChordCompass(frameIndex, value);
+                    }}
+                  />
+                );
+              })}
+        </div>
+      </div>
 
       {props.isEditMode && (
         <div
@@ -79,7 +96,8 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           style={{
             display: 'flex',
             justifyContent: 'end',
-            marginBottom: 8,
+            marginBottom: 24,
+            width: '100%',
           }}
         >
           <span style={{ marginRight: 8 }}>{props.currentIndex}</span>

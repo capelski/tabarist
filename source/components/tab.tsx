@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { addSymbol, editSymbol, saveSymbol, stringHeight } from '../constants';
+import { editSymbol, saveSymbol, stringHeight } from '../constants';
 import {
   addCompassToTab,
   arrayIndexToCompassIndex,
   createCompassReference,
-  createPickingCompass,
   removeCompassFromTab,
   resetEditIndex,
   setEditIndex,
+  updateChordCompass,
   updateCompassFrames,
-  updateCompassValue,
+  updatePickingCompass,
   updateTitle,
 } from '../logic';
-import { Compass, PickingCompass, Tab } from '../types';
+import { ChordCompass, Compass, PickingCompass, Tab } from '../types';
+import { AddCompass } from './add-compass';
 import { CompassComponent, CompassProps } from './compass';
 
 export type TabProps = {
@@ -38,14 +39,14 @@ export const TabComponent: React.FC<TabProps> = (props) => {
   };
 
   const getHandlers = (compass: Compass): CompassProps['handlers'] => ({
-    addCompassBefore() {
-      addCompass(createPickingCompass(compass.index));
+    addCompass(newCompass) {
+      addCompass(newCompass);
     },
     copyCompass() {
       addCompass(createCompassReference(compass));
     },
     editCompass() {
-      setTab(setEditIndex(tab, compass));
+      setTab(setEditIndex(tab, compass.index));
     },
     editCompassFinish() {
       setTab(resetEditIndex(tab));
@@ -53,11 +54,14 @@ export const TabComponent: React.FC<TabProps> = (props) => {
     removeCompass() {
       setTab(removeCompassFromTab(tab, compass.index));
     },
-    updateCompassValue(frameIndex, stringIndex, value) {
-      setTab(updateCompassValue(tab, compass.index, frameIndex, stringIndex, value));
+    updateChordCompass(frameIndex, value) {
+      setTab(updateChordCompass(tab, compass.index, frameIndex, value));
     },
     updateCompassFrames(frames) {
       setTab(updateCompassFrames(tab, compass.index, frames));
+    },
+    updatePickingCompass(frameIndex, stringIndex, value) {
+      setTab(updatePickingCompass(tab, compass.index, frameIndex, stringIndex, value));
     },
   });
 
@@ -97,9 +101,11 @@ export const TabComponent: React.FC<TabProps> = (props) => {
       >
         {tab.compasses.map((compass) => {
           const actualCompass =
-            compass.type === 'compass'
-              ? compass
-              : (tab.compasses.find((c) => c.index === compass.reference) as PickingCompass);
+            compass.type === 'reference'
+              ? (tab.compasses.find((c) => c.index === compass.reference) as
+                  | ChordCompass
+                  | PickingCompass)
+              : compass;
 
           return (
             <CompassComponent
@@ -116,32 +122,19 @@ export const TabComponent: React.FC<TabProps> = (props) => {
             />
           );
         })}
+
         {isEditMode && (
-          <div
-            className="add-compass"
+          <AddCompass
+            addCompass={addCompass}
+            compassIndex={arrayIndexToCompassIndex(tab.compasses.length)}
+            expanded={true}
             style={{
               boxSizing: 'border-box',
               flexBasis: `${compassWidth}%`,
               height: stringHeight * 6,
               padding: '0 8px',
             }}
-          >
-            <div
-              onClick={() => {
-                addCompass(createPickingCompass(arrayIndexToCompassIndex(tab.compasses.length)));
-              }}
-              style={{
-                alignItems: 'center',
-                backgroundColor: '#eee',
-                cursor: 'pointer',
-                display: 'flex',
-                height: '100%',
-                justifyContent: 'center',
-              }}
-            >
-              {addSymbol}
-            </div>
-          </div>
+          />
         )}
       </div>
     </div>
