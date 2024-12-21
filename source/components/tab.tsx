@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { editSymbol, saveSymbol, stringHeight } from '../constants';
+import { NavLink, useParams } from 'react-router';
+import { editSymbol, RouteNames, saveSymbol, stringHeight } from '../constants';
 import {
   addCompassToTab,
   arrayIndexToCompassIndex,
   createCompassReference,
+  getTabLocalStorageKey,
   removeCompassFromTab,
   resetEditIndex,
   setEditIndex,
@@ -18,21 +20,41 @@ import { AddCompass } from './add-compass';
 import { CompassComponent, CompassProps } from './compass';
 
 export type TabProps = {
-  tab: Tab;
   updateTab: (updatedTab: Tab) => void;
 };
 
 export const TabComponent: React.FC<TabProps> = (props) => {
   const [isEditMode, setIsEditMode] = useState(false);
-  const [tab, setTab] = useState<Tab>(props.tab);
+  const [tab, setTab] = useState<Tab>();
+
+  const { tabId } = useParams();
 
   useEffect(() => {
-    setTab(props.tab);
-  }, [props.tab]);
+    const stringifiedTab = localStorage.getItem(getTabLocalStorageKey(tabId!));
+    if (stringifiedTab) {
+      try {
+        const nextSelectedTab = JSON.parse(stringifiedTab);
+        setTab(nextSelectedTab);
+      } catch (error) {
+        console.error('Error retrieving the selected tab', error);
+      }
+    }
+  }, [tabId]);
 
   const isBigScreen = useMediaQuery({ minWidth: 1000 });
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
   const compassWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
+
+  if (!tab) {
+    return (
+      <div style={{ alignItems: 'center', display: 'flex' }}>
+        <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
+          ⬅️
+        </NavLink>
+        <h3>Couldn't load tab</h3>
+      </div>
+    );
+  }
 
   const addCompass = (compass: Compass) => {
     setTab(addCompassToTab(tab, compass));
@@ -76,6 +98,9 @@ export const TabComponent: React.FC<TabProps> = (props) => {
   return (
     <div className="tab">
       <div style={{ alignItems: 'center', display: 'flex' }}>
+        <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
+          ⬅️
+        </NavLink>
         <div style={{ marginRight: 8 }}>
           <button onClick={toggleEditMode} type="button">
             {isEditMode ? saveSymbol : editSymbol}

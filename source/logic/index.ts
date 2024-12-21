@@ -9,6 +9,9 @@ import {
   Tab,
 } from '../types';
 
+export * from './local-storage';
+export * from './routes';
+
 export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
   if (tab.compasses.length === 0) {
     return {
