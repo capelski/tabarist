@@ -53,11 +53,13 @@ export const TabRegistryComponent: React.FC<TabRegistryProps> = (props) => {
               key={id}
               style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
             >
-              <span>{title}</span>
               <div>
-                <NavLink style={{ marginRight: 8 }} to={getTabRelativeUrl(id)}>
+                {title}
+                <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(id)}>
                   ➡️
                 </NavLink>
+              </div>
+              <div>
                 <button onClick={() => props.removeTab(id)} type="button">
                   {removeSymbol}
                 </button>

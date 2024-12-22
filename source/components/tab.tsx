@@ -97,15 +97,10 @@ export const TabComponent: React.FC<TabProps> = (props) => {
 
   return (
     <div className="tab">
+      <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
+        ⬅️ Home page
+      </NavLink>
       <div style={{ alignItems: 'center', display: 'flex' }}>
-        <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
-          ⬅️
-        </NavLink>
-        <div style={{ marginRight: 8 }}>
-          <button onClick={toggleEditMode} type="button">
-            {isEditMode ? saveSymbol : editSymbol}
-          </button>
-        </div>
         <h3>
           {isEditMode ? (
             <input
@@ -118,6 +113,11 @@ export const TabComponent: React.FC<TabProps> = (props) => {
             tab.title
           )}
         </h3>
+        <div style={{ marginLeft: 8 }}>
+          <button onClick={toggleEditMode} type="button">
+            {isEditMode ? saveSymbol : editSymbol}
+          </button>
+        </div>
       </div>
 
       <div
