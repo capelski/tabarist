@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { NavLink, useParams } from 'react-router';
-import { editSymbol, RouteNames, saveSymbol, stringHeight } from '../constants';
+import { NavLink, useNavigate, useParams } from 'react-router';
+import { editSymbol, removeSymbol, RouteNames, saveSymbol, stringHeight } from '../constants';
 import {
   addCompassToTab,
   arrayIndexToCompassIndex,
@@ -20,6 +20,7 @@ import { AddCompass } from './add-compass';
 import { CompassComponent, CompassProps } from './compass';
 
 export type TabProps = {
+  removeTab: (tabId: string) => void;
   updateTab: (updatedTab: Tab) => void;
 };
 
@@ -28,6 +29,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
   const [tab, setTab] = useState<Tab>();
 
   const { tabId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stringifiedTab = localStorage.getItem(getTabLocalStorageKey(tabId!));
@@ -116,6 +118,17 @@ export const TabComponent: React.FC<TabProps> = (props) => {
         <div style={{ marginLeft: 8 }}>
           <button onClick={toggleEditMode} type="button">
             {isEditMode ? saveSymbol : editSymbol}
+          </button>
+        </div>
+        <div style={{ marginLeft: 8 }}>
+          <button
+            onClick={() => {
+              props.removeTab(tab.id);
+              navigate(RouteNames.home);
+            }}
+            type="button"
+          >
+            {removeSymbol}
           </button>
         </div>
       </div>

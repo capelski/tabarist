@@ -74,7 +74,10 @@ export const App: React.FC = () => {
           }
         />
 
-        <Route path={RouteNames.tabDetails} element={<TabComponent updateTab={updateTab} />} />
+        <Route
+          path={RouteNames.tabDetails}
+          element={<TabComponent removeTab={removeTab} updateTab={updateTab} />}
+        />
       </Routes>
     </HashRouter>
   );
