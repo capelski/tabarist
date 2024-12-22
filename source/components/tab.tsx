@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { NavLink, useNavigate, useParams } from 'react-router';
-import { editSymbol, removeSymbol, RouteNames, saveSymbol, stringHeight } from '../constants';
+import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
+import {
+  editSymbol,
+  queryParameters,
+  removeSymbol,
+  RouteNames,
+  saveSymbol,
+  stringHeight,
+} from '../constants';
 import {
   addCompassToTab,
   arrayIndexToCompassIndex,
@@ -28,6 +35,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [tab, setTab] = useState<Tab>();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const { tabId } = useParams();
   const navigate = useNavigate();
 
@@ -42,6 +50,14 @@ export const TabComponent: React.FC<TabProps> = (props) => {
       }
     }
   }, [tabId]);
+
+  useEffect(() => {
+    if (searchParams.get(queryParameters.editMode) === 'true') {
+      setIsEditMode(true);
+    } else {
+      setIsEditMode(false);
+    }
+  }, [searchParams]);
 
   const isBigScreen = useMediaQuery({ minWidth: 1000 });
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
@@ -90,11 +106,19 @@ export const TabComponent: React.FC<TabProps> = (props) => {
   });
 
   const toggleEditMode = () => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+
     if (isEditMode) {
-      props.updateTab(tab);
-      setTab(resetEditIndex(tab));
+      const nextTab = resetEditIndex(tab);
+      props.updateTab(nextTab);
+      setTab(nextTab);
+      nextSearchParams.delete(queryParameters.editMode);
+    } else {
+      nextSearchParams.set(queryParameters.editMode, 'true');
     }
+
     setIsEditMode(!isEditMode);
+    setSearchParams(nextSearchParams);
   };
 
   return (

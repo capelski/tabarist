@@ -1,5 +1,7 @@
-import { RouteNames } from '../constants';
+import { queryParameters, RouteNames } from '../constants';
 
-export const getTabRelativeUrl = (tabId: string) => {
-  return RouteNames.tabDetails.replace(':tabId', tabId);
+export const getTabRelativeUrl = (tabId: string, editMode = false) => {
+  return `${RouteNames.tabDetails.replace(':tabId', tabId)}${
+    editMode ? `?${queryParameters.editMode}=true` : ''
+  }`;
 };

@@ -22,7 +22,7 @@ export const TabRegistryComponent: React.FC<TabRegistryProps> = (props) => {
         <button
           onClick={() => {
             const tabId = props.createTab();
-            navigate(getTabRelativeUrl(tabId));
+            navigate(getTabRelativeUrl(tabId, true));
           }}
           style={{ marginRight: 16 }}
           type="button"
