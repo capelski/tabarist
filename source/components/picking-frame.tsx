@@ -37,6 +37,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
                   maxWidth: 30,
                   padding: 0,
                   textAlign: 'center',
+                  width: '100%',
                 }}
                 value={string || ''}
               />

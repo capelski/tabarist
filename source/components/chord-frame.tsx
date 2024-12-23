@@ -4,6 +4,8 @@ import { stringHeight } from '../constants';
 export interface ChordFrameProps {
   frame: string;
   isEditMode: boolean;
+  isReference: boolean;
+  strumming: string;
   style?: CSSProperties;
   updateFrame: (value: string) => void;
 }
@@ -15,18 +17,14 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
       style={{
         alignItems: 'center',
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
         ...props.style,
       }}
     >
-      <div
-        className="chord"
-        style={{
-          textAlign: 'center',
-        }}
-      >
+      <div className="chord">
         {props.isEditMode ? (
           <input
+            disabled={props.isReference}
             maxLength={3}
             onChange={(event) => {
               props.updateFrame(event.target.value);
@@ -37,6 +35,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
               maxWidth: 30,
               padding: 0,
               textAlign: 'center',
+              width: '100%',
             }}
             value={props.frame || ''}
           />
@@ -51,6 +50,8 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
           </div>
         )}
       </div>
+
+      <div className="strumming">{props.strumming}</div>
     </div>
   );
 };

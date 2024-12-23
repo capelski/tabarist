@@ -27,7 +27,7 @@ export const TabRegistryComponent: React.FC<TabRegistryProps> = (props) => {
           style={{ marginRight: 16 }}
           type="button"
         >
-          {addSymbol} Create tab
+          {addSymbol} tab
         </button>
 
         <span style={{ marginRight: 8 }}>🔎</span>

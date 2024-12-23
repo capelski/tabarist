@@ -1,7 +1,7 @@
 import React from 'react';
-import { editSymbol, framesNumberOptions, removeSymbol, saveSymbol } from '../constants';
-import { ChordCompass, PickingCompass } from '../types';
-import { AddCompass } from './add-compass';
+import { addSymbol, CompassType, framesNumberOptions, removeSymbol } from '../constants';
+import { ChordCompass, PickingCompass, StrummingPattern } from '../types';
+import { AddCompass, AddCompassProps } from './add-compass';
 import { ChordFrame } from './chord-frame';
 import { PickingFrameComponent } from './picking-frame';
 
@@ -9,30 +9,38 @@ export interface CompassProps {
   backgroundColor: string;
   compass: ChordCompass | PickingCompass;
   currentIndex: number;
-  editIndex: number;
   handlers: {
-    addCompass: (newCompass: ChordCompass | PickingCompass) => void;
+    addStrummingPattern: () => void;
+    addCompass: AddCompassProps['addCompass'];
     copyCompass: () => void;
     editCompass: () => void;
     editCompassFinish: () => void;
     removeCompass: () => void;
     updateChordCompass: (frameIndex: number, value: string) => void;
-    updateCompassFrames: (framesNumber: number) => void;
+    updateChordCompassFrames: (strummingPatternIndex: number) => void;
     updatePickingCompass: (frameIndex: number, stringIndex: number, value: string) => void;
+    updatePickingCompassFrames: (framesNumber: number) => void;
   };
   isEditMode: boolean;
+  strummingPatterns: StrummingPattern[];
   width: number;
 }
 
 export const CompassComponent: React.FC<CompassProps> = (props) => {
-  const isEditModeCompass = props.currentIndex === props.editIndex;
   const isReference = props.compass.index !== props.currentIndex;
   const framesWidth = Math.floor(10000 / props.compass.frames.length) / 100;
+
+  const strummingPattern =
+    props.compass.type === CompassType.chord
+      ? props.strummingPatterns.find(
+          (sp) => sp.index === (props.compass as ChordCompass).strummingPatternIndex,
+        )
+      : undefined;
 
   return (
     <div
       className="compass"
-      style={{ display: 'flex', flexDirection: 'column', flexBasis: `${props.width}%` }}
+      style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
         {props.isEditMode && (
@@ -42,52 +50,114 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             style={{ minHeight: 60 }}
           />
         )}
-        <div
-          className="frames"
-          style={{
-            backgroundColor: props.backgroundColor,
-            borderLeft: '1px solid black',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'row',
-            flexGrow: 1,
-            width: '100%',
-          }}
-        >
-          {props.compass.type === 'picking'
-            ? props.compass.frames.map((frame, frameIndex) => {
-                return (
-                  <PickingFrameComponent
-                    backgroundColor={props.backgroundColor}
-                    frame={frame}
-                    frameIndex={frameIndex}
-                    isEditMode={isEditModeCompass}
-                    key={frameIndex}
-                    updateFrame={(stringIndex, value) => {
-                      props.handlers.updatePickingCompass(frameIndex, stringIndex, value);
+
+        {props.compass.type === CompassType.picking && (
+          <div
+            className="frames"
+            style={{
+              backgroundColor: props.backgroundColor,
+              borderLeft: '1px solid black',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'row',
+              flexGrow: 1,
+            }}
+          >
+            {props.compass.frames.map((frame, frameIndex) => {
+              return (
+                <PickingFrameComponent
+                  backgroundColor={props.backgroundColor}
+                  frame={frame}
+                  frameIndex={frameIndex}
+                  isEditMode={props.isEditMode}
+                  key={frameIndex}
+                  updateFrame={(stringIndex, value) => {
+                    props.handlers.updatePickingCompass(frameIndex, stringIndex, value);
+                  }}
+                  width={framesWidth}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {props.compass.type === CompassType.chord && (
+          <div
+            style={{
+              backgroundColor: props.backgroundColor,
+              borderLeft: '1px solid black',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1,
+              justifyContent: 'center',
+              padding: '8px 0',
+            }}
+          >
+            <div
+              className="frames"
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+              }}
+            >
+              {strummingPattern &&
+                strummingPattern.frames.map((strumming, frameIndex) => {
+                  return (
+                    <ChordFrame
+                      frame={(props.compass as ChordCompass).frames[frameIndex]}
+                      isEditMode={props.isEditMode}
+                      isReference={isReference}
+                      key={frameIndex}
+                      strumming={strumming}
+                      style={{
+                        borderLeft: frameIndex > 0 ? '1px solid #ccc' : undefined,
+                        boxSizing: 'border-box',
+                        width: `${framesWidth}%`,
+                      }}
+                      updateFrame={(value) => {
+                        props.handlers.updateChordCompass(frameIndex, value);
+                      }}
+                    />
+                  );
+                })}
+            </div>
+
+            {props.isEditMode && (
+              <div style={{ marginTop: 16, textAlign: 'center' }}>
+                Strumming pattern:
+                {props.strummingPatterns.length === 0 ? (
+                  <button
+                    onClick={props.handlers.addStrummingPattern}
+                    style={{ marginLeft: 8 }}
+                    type="button"
+                  >
+                    {addSymbol}
+                  </button>
+                ) : (
+                  <select
+                    disabled={props.strummingPatterns.length < 2 || isReference}
+                    onChange={(event) => {
+                      const strummingPatternIndex = parseInt(event.target.value);
+                      props.handlers.updateChordCompassFrames(strummingPatternIndex);
                     }}
-                    width={framesWidth}
-                  />
-                );
-              })
-            : props.compass.frames.map((frame, frameIndex) => {
-                return (
-                  <ChordFrame
-                    frame={frame}
-                    isEditMode={isEditModeCompass}
-                    key={frameIndex}
-                    style={{
-                      borderLeft: props.isEditMode && frameIndex > 0 ? '1px solid #ccc' : undefined,
-                      boxSizing: 'border-box',
-                      width: `${framesWidth}%`,
-                    }}
-                    updateFrame={(value) => {
-                      props.handlers.updateChordCompass(frameIndex, value);
-                    }}
-                  />
-                );
-              })}
-        </div>
+                    style={{ marginLeft: 8, minWidth: 40 }}
+                    value={props.compass.strummingPatternIndex}
+                  >
+                    {props.strummingPatterns.map((sp) => {
+                      return (
+                        <option key={sp.index} value={sp.index}>
+                          {sp.index}
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {props.isEditMode && (
@@ -107,42 +177,22 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             </span>
           )}
 
-          {!isReference && (
-            <React.Fragment>
-              {isEditModeCompass ? (
-                <button
-                  onClick={() => props.handlers.editCompassFinish()}
-                  style={{ marginRight: 8 }}
-                  type="button"
-                >
-                  {saveSymbol}
-                </button>
-              ) : (
-                <button
-                  onClick={() => props.handlers.editCompass()}
-                  style={{ marginRight: 8 }}
-                  type="button"
-                >
-                  {editSymbol}
-                </button>
-              )}
-
-              <select
-                onChange={(event) => {
-                  props.handlers.updateCompassFrames(parseInt(event.target.value));
-                }}
-                style={{ marginRight: 8 }}
-                value={props.compass.framesNumber}
-              >
-                {framesNumberOptions.map((option) => {
-                  return (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  );
-                })}
-              </select>
-            </React.Fragment>
+          {!isReference && props.compass.type === CompassType.picking && (
+            <select
+              onChange={(event) => {
+                props.handlers.updatePickingCompassFrames(parseInt(event.target.value));
+              }}
+              style={{ marginRight: 8 }}
+              value={props.compass.framesNumber}
+            >
+              {framesNumberOptions.map((option) => {
+                return (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                );
+              })}
+            </select>
           )}
 
           <button

@@ -1,11 +1,12 @@
 import { nanoid } from 'nanoid';
-import { editIndexDefault, framesNumberDefault } from '../constants';
+import { CompassType, editIndexDefault, framesNumberDefault } from '../constants';
 import {
   ChordCompass,
   Compass,
   CompassReference,
   PickingCompass,
   PickingFrame,
+  StrummingPattern,
   Tab,
 } from '../types';
 
@@ -26,7 +27,7 @@ export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
     const nextCompass: Compass = {
       ...compass,
       index: getIndexIncrease(compass.index, newCompass.index),
-      ...(compass.type === 'reference'
+      ...(compass.type === CompassType.reference
         ? {
             reference: getIndexIncrease(compass.reference, newCompass.index),
           }
@@ -55,36 +56,65 @@ export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
   };
 };
 
+export const addStrummingPatternToTab = (tab: Tab, strummingPattern: StrummingPattern): Tab => {
+  return {
+    ...tab,
+    strummingPatterns: [...tab.strummingPatterns, strummingPattern],
+    compasses:
+      tab.strummingPatterns.length > 0
+        ? tab.compasses
+        : tab.compasses.map((compass) => {
+            return compass.type !== CompassType.chord || compass.strummingPatternIndex !== undefined
+              ? compass
+              : {
+                  ...compass,
+                  strummingPatternIndex: strummingPattern.index,
+                  frames: Array.from({ length: strummingPattern.framesNumber }, () => ''),
+                };
+          }),
+  };
+};
+
 export const arrayIndexToCompassIndex = (arrayIndex: number) => arrayIndex + 1;
 
 export const compassIndexToArrayIndex = (compassIndex: number) => compassIndex - 1;
 
-export const createChordCompass = (index: number): ChordCompass => ({
+export const createChordCompass = (
+  index: number,
+  strummingPattern: StrummingPattern | undefined,
+): ChordCompass => ({
   index,
-  frames: Array.from({ length: framesNumberDefault }, () => ''),
-  framesNumber: framesNumberDefault,
-  type: 'chord',
+  frames: Array.from({ length: strummingPattern?.framesNumber ?? 0 }, () => ''),
+  strummingPatternIndex: strummingPattern?.index,
+  type: CompassType.chord,
 });
 
 export const createCompassReference = (compass: Compass): CompassReference => ({
   index: compass.index + 1,
-  reference: compass.type === 'reference' ? compass.reference : compass.index,
-  type: 'reference',
+  reference: compass.type === CompassType.reference ? compass.reference : compass.index,
+  type: CompassType.reference,
 });
 
 export const createPickingCompass = (index: number): PickingCompass => ({
   index,
   frames: Array.from({ length: framesNumberDefault }, createPickingFrame),
   framesNumber: framesNumberDefault,
-  type: 'picking',
+  type: CompassType.picking,
 });
 
 export const createPickingFrame = (): PickingFrame => Array.from({ length: 6 }, () => '');
+
+export const createStrummingPattern = (index: number): StrummingPattern => ({
+  frames: Array.from({ length: framesNumberDefault }, () => ''),
+  framesNumber: framesNumberDefault,
+  index,
+});
 
 export const createTab = (): Tab => ({
   compasses: [],
   editIndex: editIndexDefault,
   id: nanoid(),
+  strummingPatterns: [],
   title: 'Unnamed tab',
 });
 
@@ -105,7 +135,7 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
     (reduced, compass) => {
       if (
         compass.index === deletionIndex ||
-        (compass.type === 'reference' && compass.reference === deletionIndex)
+        (compass.type === CompassType.reference && compass.reference === deletionIndex)
       ) {
         return {
           deletedCount: reduced.deletedCount + 1,
@@ -117,7 +147,7 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
       const nextCompass: Compass = {
         ...compass,
         index: getIndexDecrease(compass.index, deletionIndex, reduced.deletedCount),
-        ...(compass.type === 'reference'
+        ...(compass.type === CompassType.reference
           ? {
               reference: getIndexDecrease(compass.reference, deletionIndex, reduced.deletedCount),
             }
@@ -157,7 +187,7 @@ export const updateChordCompass = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type !== 'chord' || arrayIndexToCompassIndex(cIndex) !== compassIndex
+      return compass.type !== CompassType.chord || arrayIndexToCompassIndex(cIndex) !== compassIndex
         ? compass
         : {
             ...compass,
@@ -169,25 +199,28 @@ export const updateChordCompass = (
   };
 };
 
-export const updateCompassFrames = (tab: Tab, compassIndex: number, framesNumber: number): Tab => {
+export const updateChordCompassFrames = (
+  tab: Tab,
+  compassIndex: number,
+  strummingPatternIndex: number,
+): Tab => {
+  const strummingPattern = tab.strummingPatterns.find((sp) => sp.index === strummingPatternIndex);
+  if (!strummingPattern) {
+    return tab;
+  }
+
   return {
     ...tab,
     compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type === 'reference' || arrayIndexToCompassIndex(cIndex) !== compassIndex
+      return compass.type !== CompassType.chord || arrayIndexToCompassIndex(cIndex) !== compassIndex
         ? compass
-        : compass.type === 'picking'
-        ? {
-            ...compass,
-            frames: Array.from(
-              { length: framesNumber },
-              (_, index) => compass.frames[index] ?? createPickingFrame(),
-            ),
-            framesNumber,
-          }
         : {
             ...compass,
-            frames: Array.from({ length: framesNumber }, (_, index) => compass.frames[index] ?? ''),
-            framesNumber,
+            strummingPatternIndex,
+            frames: Array.from(
+              { length: strummingPattern.framesNumber },
+              (_, index) => compass.frames[index] ?? '',
+            ),
           };
     }),
   };
@@ -203,7 +236,8 @@ export const updatePickingCompass = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type !== 'picking' || arrayIndexToCompassIndex(cIndex) !== compassIndex
+      return compass.type !== CompassType.picking ||
+        arrayIndexToCompassIndex(cIndex) !== compassIndex
         ? compass
         : {
             ...compass,
@@ -213,6 +247,78 @@ export const updatePickingCompass = (
                 : [...frame].map((string, sIndex) => {
                     return sIndex !== stringIndex ? string : value;
                   });
+            }),
+          };
+    }),
+  };
+};
+
+export const updatePickingCompassFrames = (
+  tab: Tab,
+  compassIndex: number,
+  framesNumber: number,
+): Tab => {
+  return {
+    ...tab,
+    compasses: tab.compasses.map((compass, cIndex) => {
+      return compass.type !== CompassType.picking ||
+        arrayIndexToCompassIndex(cIndex) !== compassIndex
+        ? compass
+        : {
+            ...compass,
+            frames: Array.from(
+              { length: framesNumber },
+              (_, index) => compass.frames[index] ?? createPickingFrame(),
+            ),
+            framesNumber,
+          };
+    }),
+  };
+};
+
+export const updateStrummingPatternFrames = (
+  tab: Tab,
+  strummingPatternIndex: number,
+  framesNumber: number,
+): Tab => {
+  return {
+    ...tab,
+    compasses: tab.compasses.map((compass) => {
+      return compass.type !== CompassType.chord ||
+        compass.strummingPatternIndex !== strummingPatternIndex
+        ? compass
+        : {
+            ...compass,
+            frames: Array.from({ length: framesNumber }, (_, index) => compass.frames[index] ?? ''),
+          };
+    }),
+    strummingPatterns: tab.strummingPatterns.map((sp, spIndex) => {
+      return arrayIndexToCompassIndex(spIndex) !== strummingPatternIndex
+        ? sp
+        : {
+            ...sp,
+            frames: Array.from({ length: framesNumber }, (_, index) => sp.frames[index] ?? ''),
+            framesNumber,
+          };
+    }),
+  };
+};
+
+export const updateStrummingPatternValue = (
+  tab: Tab,
+  strummingPatternIndex: number,
+  frameIndex: number,
+  value: string,
+): Tab => {
+  return {
+    ...tab,
+    strummingPatterns: tab.strummingPatterns.map((sp, spIndex) => {
+      return arrayIndexToCompassIndex(spIndex) !== strummingPatternIndex
+        ? sp
+        : {
+            ...sp,
+            frames: sp.frames.map((frame, fIndex) => {
+              return fIndex !== frameIndex ? frame : value;
             }),
           };
     }),

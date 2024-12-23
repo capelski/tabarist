@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
 import {
+  addSymbol,
+  CompassType,
   editSymbol,
   queryParameters,
   removeSymbol,
@@ -11,20 +13,28 @@ import {
 } from '../constants';
 import {
   addCompassToTab,
+  addStrummingPatternToTab,
   arrayIndexToCompassIndex,
+  createChordCompass,
   createCompassReference,
+  createPickingCompass,
+  createStrummingPattern,
   getTabLocalStorageKey,
   removeCompassFromTab,
   resetEditIndex,
   setEditIndex,
   updateChordCompass,
-  updateCompassFrames,
+  updateChordCompassFrames,
   updatePickingCompass,
+  updatePickingCompassFrames,
+  updateStrummingPatternFrames,
+  updateStrummingPatternValue,
   updateTitle,
 } from '../logic';
 import { ChordCompass, Compass, PickingCompass, Tab } from '../types';
-import { AddCompass } from './add-compass';
+import { AddCompass, AddCompassProps } from './add-compass';
 import { CompassComponent, CompassProps } from './compass';
+import { StrummingPatternComponent } from './strumming-pattern';
 
 export type TabProps = {
   removeTab: (tabId: string) => void;
@@ -74,16 +84,32 @@ export const TabComponent: React.FC<TabProps> = (props) => {
     );
   }
 
-  const addCompass = (compass: Compass) => {
+  const addCompass: AddCompassProps['addCompass'] = (index, type) => {
+    const compass =
+      type === CompassType.chord
+        ? createChordCompass(index, tab.strummingPatterns[0])
+        : createPickingCompass(index);
     setTab(addCompassToTab(tab, compass));
   };
 
-  const getHandlers = (compass: Compass): CompassProps['handlers'] => ({
-    addCompass(newCompass) {
-      addCompass(newCompass);
+  const addStrummingPattern = () => {
+    setTab(
+      addStrummingPatternToTab(
+        tab,
+        createStrummingPattern(arrayIndexToCompassIndex(tab.strummingPatterns.length)),
+      ),
+    );
+  };
+
+  const getCompassHandlers = (compass: Compass): CompassProps['handlers'] => ({
+    addCompass(index, type) {
+      addCompass(index, type);
+    },
+    addStrummingPattern() {
+      addStrummingPattern();
     },
     copyCompass() {
-      addCompass(createCompassReference(compass));
+      setTab(addCompassToTab(tab, createCompassReference(compass)));
     },
     editCompass() {
       setTab(setEditIndex(tab, compass.index));
@@ -97,11 +123,14 @@ export const TabComponent: React.FC<TabProps> = (props) => {
     updateChordCompass(frameIndex, value) {
       setTab(updateChordCompass(tab, compass.index, frameIndex, value));
     },
-    updateCompassFrames(frames) {
-      setTab(updateCompassFrames(tab, compass.index, frames));
+    updateChordCompassFrames(strummingPatternIndex) {
+      setTab(updateChordCompassFrames(tab, compass.index, strummingPatternIndex));
     },
     updatePickingCompass(frameIndex, stringIndex, value) {
       setTab(updatePickingCompass(tab, compass.index, frameIndex, stringIndex, value));
+    },
+    updatePickingCompassFrames(frames) {
+      setTab(updatePickingCompassFrames(tab, compass.index, frames));
     },
   });
 
@@ -163,7 +192,7 @@ export const TabComponent: React.FC<TabProps> = (props) => {
       >
         {tab.compasses.map((compass) => {
           const actualCompass =
-            compass.type === 'reference'
+            compass.type === CompassType.reference
               ? (tab.compasses.find((c) => c.index === compass.reference) as
                   | ChordCompass
                   | PickingCompass)
@@ -176,10 +205,10 @@ export const TabComponent: React.FC<TabProps> = (props) => {
               }
               compass={actualCompass}
               currentIndex={compass.index}
-              editIndex={tab.editIndex}
-              handlers={getHandlers(compass)}
+              handlers={getCompassHandlers(compass)}
               isEditMode={isEditMode}
               key={compass.index}
+              strummingPatterns={tab.strummingPatterns}
               width={compassWidth}
             />
           );
@@ -199,6 +228,31 @@ export const TabComponent: React.FC<TabProps> = (props) => {
           />
         )}
       </div>
+
+      {isEditMode && (
+        <React.Fragment>
+          <h3>Strumming patterns</h3>
+          <p>
+            <button onClick={addStrummingPattern} type="button">
+              {addSymbol} strumming pattern
+            </button>
+          </p>
+
+          {tab.strummingPatterns.map((sp) => {
+            return (
+              <StrummingPatternComponent
+                strummingPattern={sp}
+                updateFrames={(framesNumber) => {
+                  setTab(updateStrummingPatternFrames(tab, sp.index, framesNumber));
+                }}
+                updateValue={(frameIndex, value) => {
+                  setTab(updateStrummingPatternValue(tab, sp.index, frameIndex, value));
+                }}
+              />
+            );
+          })}
+        </React.Fragment>
+      )}
     </div>
   );
 };
