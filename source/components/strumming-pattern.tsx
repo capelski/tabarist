@@ -12,11 +12,11 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex' }}>
-        {props.strummingPattern.frames.map((frame, frameIndex) => {
+        {props.strummingPattern.frames.map((frame) => {
           return (
             <div
               className="frame"
-              key={frameIndex}
+              key={frame.index}
               style={{
                 alignItems: 'center',
                 display: 'flex',
@@ -32,7 +32,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
                 <input
                   maxLength={3}
                   onChange={(event) => {
-                    props.updateValue(frameIndex, event.target.value);
+                    props.updateValue(frame.index, event.target.value);
                   }}
                   style={{
                     boxSizing: 'border-box',
@@ -41,7 +41,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
                     padding: 0,
                     textAlign: 'center',
                   }}
-                  value={frame || ''}
+                  value={frame.value || ''}
                 />
               </div>
             </div>

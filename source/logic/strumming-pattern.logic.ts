@@ -2,7 +2,7 @@ import { CompassType, framesNumberDefault } from '../constants';
 import { StrummingPattern, Tab } from '../types';
 
 export const createStrummingPattern = (index: number): StrummingPattern => ({
-  frames: Array.from({ length: framesNumberDefault }, () => ''),
+  frames: Array.from({ length: framesNumberDefault }, (_, index) => ({ index, value: '' })),
   framesNumber: framesNumberDefault,
   index,
 });
@@ -50,8 +50,8 @@ export const updateStrummingPatternValue = (
         ? sPattern
         : {
             ...sPattern,
-            frames: sPattern.frames.map((frame, fIndex) => {
-              return fIndex !== frameIndex ? frame : value;
+            frames: sPattern.frames.map((frame) => {
+              return frame.index !== frameIndex ? frame : { ...frame, value };
             }),
           };
     }),

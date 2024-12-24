@@ -101,21 +101,21 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
               }}
             >
               {strummingPattern &&
-                strummingPattern.frames.map((frame, frameIndex) => {
+                strummingPattern.frames.map((frame) => {
                   return (
                     <ChordFrame
-                      frame={(props.compass as ChordCompass).frames[frameIndex]}
+                      frame={(props.compass as ChordCompass).frames[frame.index]}
                       isEditMode={props.isEditMode}
                       isReference={isReference}
-                      key={frameIndex}
-                      strumming={frame}
+                      key={frame.index}
+                      strumming={frame.value}
                       style={{
-                        borderLeft: frameIndex > 0 ? '1px solid #ccc' : undefined,
+                        borderLeft: frame.index > 0 ? '1px solid #ccc' : undefined,
                         boxSizing: 'border-box',
                         width: `${framesWidth}%`,
                       }}
                       updateFrame={(value) => {
-                        props.handlers.updateChordCompass(frameIndex, value);
+                        props.handlers.updateChordCompass(frame.index, value);
                       }}
                     />
                   );
