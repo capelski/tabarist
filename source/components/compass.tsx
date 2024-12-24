@@ -15,7 +15,7 @@ export interface CompassProps {
     copyCompass: () => void;
     removeCompass: () => void;
     updateChordCompass: (frameIndex: number, value: string) => void;
-    updateChordCompassFrames: (strummingPatternIndex: number) => void;
+    updateChordCompassFrames: (sPatternIndex: number) => void;
     updatePickingCompass: (frameIndex: number, stringIndex: number, value: string) => void;
     updatePickingCompassFrames: (framesNumber: number) => void;
   };
@@ -31,7 +31,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
   const strummingPattern =
     props.compass.type === CompassType.chord
       ? props.strummingPatterns.find(
-          (sp) => sp.index === (props.compass as ChordCompass).strummingPatternIndex,
+          (sp) => sp.index === (props.compass as ChordCompass).sPatternIndex,
         )
       : undefined;
 
@@ -137,11 +137,11 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                   <select
                     disabled={props.strummingPatterns.length < 2 || isReference}
                     onChange={(event) => {
-                      const strummingPatternIndex = parseInt(event.target.value);
-                      props.handlers.updateChordCompassFrames(strummingPatternIndex);
+                      const sPatternIndex = parseInt(event.target.value);
+                      props.handlers.updateChordCompassFrames(sPatternIndex);
                     }}
                     style={{ marginLeft: 8, minWidth: 40 }}
-                    value={props.compass.strummingPatternIndex}
+                    value={props.compass.sPatternIndex}
                   >
                     {props.strummingPatterns.map((sp) => {
                       return (
@@ -168,10 +168,10 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             width: '100%',
           }}
         >
-          <span style={{ marginRight: 8 }}>{props.currentIndex}</span>
+          <span style={{ marginRight: 8 }}>{props.currentIndex + 1}</span>
           {isReference && (
             <span style={{ marginRight: 8 }}>
-              ={'>'} {props.compass.index}
+              ={'>'} {props.compass.index + 1}
             </span>
           )}
 

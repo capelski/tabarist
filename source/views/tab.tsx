@@ -21,11 +21,9 @@ import {
 import {
   addCompassToTab,
   addStrummingPatternToTab,
-  arrayIndexToCompassIndex,
   createChordCompass,
   createCompassReference,
   createPickingCompass,
-  createStrummingPattern,
   getTabLocalStorageKey,
   removeCompassFromTab,
   updateChordCompass,
@@ -95,12 +93,7 @@ export const TabView: React.FC<TabProps> = (props) => {
   };
 
   const addStrummingPattern = () => {
-    setTab(
-      addStrummingPatternToTab(
-        tab,
-        createStrummingPattern(arrayIndexToCompassIndex(tab.strummingPatterns.length)),
-      ),
-    );
+    setTab(addStrummingPatternToTab(tab, tab.strummingPatterns.length));
   };
 
   const getCompassHandlers = (compass: Compass): CompassProps['handlers'] => ({
@@ -119,8 +112,8 @@ export const TabView: React.FC<TabProps> = (props) => {
     updateChordCompass(frameIndex, value) {
       setTab(updateChordCompass(tab, compass.index, frameIndex, value));
     },
-    updateChordCompassFrames(strummingPatternIndex) {
-      setTab(updateChordCompassFrames(tab, compass.index, strummingPatternIndex));
+    updateChordCompassFrames(sPatternIndex) {
+      setTab(updateChordCompassFrames(tab, compass.index, sPatternIndex));
     },
     updatePickingCompass(frameIndex, stringIndex, value) {
       setTab(updatePickingCompass(tab, compass.index, frameIndex, stringIndex, value));
@@ -187,7 +180,7 @@ export const TabView: React.FC<TabProps> = (props) => {
         {tab.compasses.map((compass) => {
           const actualCompass =
             compass.type === CompassType.reference
-              ? (tab.compasses.find((c) => c.index === compass.reference) as
+              ? (tab.compasses.find((c) => c.index === compass.compassIndex) as
                   | ChordCompass
                   | PickingCompass)
               : compass;
@@ -211,7 +204,7 @@ export const TabView: React.FC<TabProps> = (props) => {
         {isEditMode && (
           <AddCompass
             addCompass={addCompass}
-            compassIndex={arrayIndexToCompassIndex(tab.compasses.length)}
+            compassIndex={tab.compasses.length}
             expanded={true}
             style={{
               boxSizing: 'border-box',
@@ -235,6 +228,7 @@ export const TabView: React.FC<TabProps> = (props) => {
           {tab.strummingPatterns.map((sp) => {
             return (
               <StrummingPatternComponent
+                key={sp.index}
                 strummingPattern={sp}
                 updateFrames={(framesNumber) => {
                   setTab(updateStrummingPatternFrames(tab, sp.index, framesNumber));

@@ -10,7 +10,7 @@ export type StrummingPatternProps = {
 
 export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props) => {
   return (
-    <div key={props.strummingPattern.index} style={{ marginBottom: 16 }}>
+    <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex' }}>
         {props.strummingPattern.frames.map((frame, frameIndex) => {
           return (
