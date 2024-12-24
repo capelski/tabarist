@@ -1,7 +1,8 @@
 import { CompassType } from '../constants';
+import { IndexedValue } from './indexed-value.type';
 
 export type ChordCompass = CompassBase & {
-  frames: string[];
+  frames: IndexedValue[];
   /** Strumming pattern index */
   sPatternIndex?: number;
   type: CompassType.chord;
@@ -22,4 +23,7 @@ export type ReferenceCompass = CompassBase & {
   type: CompassType.reference;
 };
 
-export type PickingFrame = string[];
+export type PickingFrame = {
+  index: number;
+  strings: IndexedValue[];
+};

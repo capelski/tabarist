@@ -61,16 +61,15 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
               flexGrow: 1,
             }}
           >
-            {props.compass.frames.map((frame, frameIndex) => {
+            {props.compass.frames.map((frame) => {
               return (
                 <PickingFrameComponent
                   backgroundColor={props.backgroundColor}
                   frame={frame}
-                  frameIndex={frameIndex}
                   isEditMode={props.isEditMode}
-                  key={frameIndex}
+                  key={frame.index}
                   updateFrame={(stringIndex, value) => {
-                    props.handlers.updatePickingCompass(frameIndex, stringIndex, value);
+                    props.handlers.updatePickingCompass(frame.index, stringIndex, value);
                   }}
                   width={framesWidth}
                 />
@@ -104,7 +103,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                 strummingPattern.frames.map((frame) => {
                   return (
                     <ChordFrame
-                      frame={(props.compass as ChordCompass).frames[frame.index]}
+                      frame={(props.compass as ChordCompass).frames[frame.index].value}
                       isEditMode={props.isEditMode}
                       isReference={isReference}
                       key={frame.index}

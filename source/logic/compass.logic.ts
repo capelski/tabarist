@@ -8,25 +8,29 @@ import {
   StrummingPattern,
   Tab,
 } from '../types';
+import { createIndexedValuesArray } from './indexed-value.logic';
 
 export const createChordCompass = (
   index: number,
   strummingPattern: StrummingPattern | undefined,
 ): ChordCompass => ({
   index,
-  frames: Array.from({ length: strummingPattern?.framesNumber ?? 0 }, () => ''),
+  frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
   sPatternIndex: strummingPattern?.index,
   type: CompassType.chord,
 });
 
 export const createPickingCompass = (index: number): PickingCompass => ({
   index,
-  frames: Array.from({ length: framesNumberDefault }, createPickingFrame),
+  frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
   framesNumber: framesNumberDefault,
   type: CompassType.picking,
 });
 
-export const createPickingFrame = (): PickingFrame => Array.from({ length: 6 }, () => '');
+export const createPickingFrame = (index: number): PickingFrame => ({
+  index,
+  strings: createIndexedValuesArray(6, ''),
+});
 
 export const createReferenceCompass = (compass: Compass): ReferenceCompass => ({
   index: compass.index + 1,
@@ -47,8 +51,8 @@ export const updateChordCompass = (
         ? compass
         : {
             ...compass,
-            frames: compass.frames.map((frame, fIndex) => {
-              return fIndex !== frameIndex ? frame : value;
+            frames: compass.frames.map((frame) => {
+              return frame.index !== frameIndex ? frame : { ...frame, value };
             }),
           };
     }),
@@ -60,10 +64,8 @@ export const updateChordCompassFrames = (
   compassIndex: number,
   sPatternIndex: number,
 ): Tab => {
-  const strummingPattern = tab.strummingPatterns.find(
-    (sPattern) => sPattern.index === sPatternIndex,
-  );
-  if (!strummingPattern) {
+  const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
+  if (!sPattern) {
     return tab;
   }
 
@@ -74,10 +76,10 @@ export const updateChordCompassFrames = (
         ? compass
         : {
             ...compass,
-            sPatternIndex: sPatternIndex,
-            frames: Array.from(
-              { length: strummingPattern.framesNumber },
-              (_, index) => compass.frames[index] ?? '',
+            sPatternIndex,
+            frames: createIndexedValuesArray(
+              sPattern.framesNumber,
+              (index) => compass.frames[index]?.value ?? '',
             ),
           };
     }),
@@ -98,12 +100,15 @@ export const updatePickingCompass = (
         ? compass
         : {
             ...compass,
-            frames: compass.frames.map((frame, fIndex) => {
-              return fIndex !== frameIndex
+            frames: compass.frames.map((frame) => {
+              return frame.index !== frameIndex
                 ? frame
-                : [...frame].map((string, sIndex) => {
-                    return sIndex !== stringIndex ? string : value;
-                  });
+                : {
+                    ...frame,
+                    strings: frame.strings.map((string) => {
+                      return string.index !== stringIndex ? string : { ...string, value };
+                    }),
+                  };
             }),
           };
     }),
@@ -124,7 +129,7 @@ export const updatePickingCompassFrames = (
             ...compass,
             frames: Array.from(
               { length: framesNumber },
-              (_, index) => compass.frames[index] ?? createPickingFrame(),
+              (_, index) => compass.frames[index] ?? createPickingFrame(index),
             ),
             framesNumber,
           };

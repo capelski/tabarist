@@ -1,8 +1,9 @@
 import { CompassType, framesNumberDefault } from '../constants';
 import { StrummingPattern, Tab } from '../types';
+import { createIndexedValuesArray } from './indexed-value.logic';
 
 export const createStrummingPattern = (index: number): StrummingPattern => ({
-  frames: Array.from({ length: framesNumberDefault }, (_, index) => ({ index, value: '' })),
+  frames: createIndexedValuesArray(framesNumberDefault, ''),
   framesNumber: framesNumberDefault,
   index,
 });
@@ -19,7 +20,10 @@ export const updateStrummingPatternFrames = (
         ? compass
         : {
             ...compass,
-            frames: Array.from({ length: framesNumber }, (_, index) => compass.frames[index] ?? ''),
+            frames: createIndexedValuesArray(
+              framesNumber,
+              (index) => compass.frames[index]?.value ?? '',
+            ),
           };
     }),
     strummingPatterns: tab.strummingPatterns.map((sPattern) => {
@@ -27,9 +31,9 @@ export const updateStrummingPatternFrames = (
         ? sPattern
         : {
             ...sPattern,
-            frames: Array.from(
-              { length: framesNumber },
-              (_, index) => sPattern.frames[index] ?? '',
+            frames: createIndexedValuesArray(
+              framesNumber,
+              (index) => sPattern.frames[index]?.value ?? '',
             ),
             framesNumber,
           };

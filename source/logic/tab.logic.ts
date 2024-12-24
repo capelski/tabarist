@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { CompassType } from '../constants';
 import { Compass, Tab } from '../types';
+import { createIndexedValuesArray } from './indexed-value.logic';
 import { createStrummingPattern } from './strumming-pattern.logic';
 
 export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
@@ -57,7 +58,7 @@ export const addStrummingPatternToTab = (tab: Tab, spIndex: number): Tab => {
               : {
                   ...compass,
                   sPatternIndex: sPattern.index,
-                  frames: Array.from({ length: sPattern.framesNumber }, () => ''),
+                  frames: createIndexedValuesArray(sPattern.framesNumber, ''),
                 };
           }),
   };

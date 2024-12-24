@@ -5,7 +5,6 @@ import { PickingFrame } from '../types';
 export interface PickingFrameProps {
   backgroundColor: string;
   frame: PickingFrame;
-  frameIndex: number;
   isEditMode: boolean;
   updateFrame: (stringIndex: number, value: string) => void;
   width: number;
@@ -14,11 +13,11 @@ export interface PickingFrameProps {
 export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
   return (
     <div className="frame" style={{ width: `${props.width}%` }}>
-      {[...props.frame].map((string, stringIndex) => {
+      {props.frame.strings.map((string) => {
         return (
           <div
             className="string"
-            key={stringIndex}
+            key={string.index}
             style={{
               background:
                 'linear-gradient(180deg, transparent calc(50% - 1px), black calc(50%), transparent calc(50% + 1px)',
@@ -29,7 +28,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
               <input
                 maxLength={3}
                 onChange={(event) => {
-                  props.updateFrame(stringIndex, event.target.value);
+                  props.updateFrame(string.index, event.target.value);
                 }}
                 style={{
                   boxSizing: 'border-box',
@@ -39,7 +38,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
                   textAlign: 'center',
                   width: '100%',
                 }}
-                value={string || ''}
+                value={string.value || ''}
               />
             ) : (
               <div
@@ -48,7 +47,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
                   padding: '0 4px',
                 }}
               >
-                <span style={{ backgroundColor: props.backgroundColor }}>{string}</span>
+                <span style={{ backgroundColor: props.backgroundColor }}>{string.value}</span>
               </div>
             )}
           </div>
