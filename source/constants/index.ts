@@ -1,8 +1,3 @@
-export const addSymbol = '➕';
-export const editSymbol = '📝';
-export const removeSymbol = '🗑️';
-export const saveSymbol = '✅';
-
 export const framesNumberOptions = [1, 2, 4, 8];
 export const framesNumberDefault = framesNumberOptions[2];
 
@@ -13,3 +8,4 @@ export const stringHeight = 20;
 
 export * from './compass-type';
 export * from './route-names';
+export * from './symbols';
