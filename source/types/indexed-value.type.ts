@@ -1,4 +1,4 @@
-export type Frame = {
+export type IndexedValue = {
   index: number;
   value: string;
 };

@@ -1,7 +1,7 @@
-import { Frame } from './frame.type';
+import { IndexedValue } from './indexed-value.type';
 
 export type StrummingPattern = {
-  frames: Frame[];
+  frames: IndexedValue[];
   framesNumber: number;
   index: number;
 };
