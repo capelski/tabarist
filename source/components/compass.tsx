@@ -13,8 +13,6 @@ export interface CompassProps {
     addStrummingPattern: () => void;
     addCompass: AddCompassProps['addCompass'];
     copyCompass: () => void;
-    editCompass: () => void;
-    editCompassFinish: () => void;
     removeCompass: () => void;
     updateChordCompass: (frameIndex: number, value: string) => void;
     updateChordCompassFrames: (strummingPatternIndex: number) => void;

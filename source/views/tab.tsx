@@ -28,8 +28,6 @@ import {
   createStrummingPattern,
   getTabLocalStorageKey,
   removeCompassFromTab,
-  resetEditIndex,
-  setEditIndex,
   updateChordCompass,
   updateChordCompassFrames,
   updatePickingCompass,
@@ -115,12 +113,6 @@ export const TabView: React.FC<TabProps> = (props) => {
     copyCompass() {
       setTab(addCompassToTab(tab, createCompassReference(compass)));
     },
-    editCompass() {
-      setTab(setEditIndex(tab, compass.index));
-    },
-    editCompassFinish() {
-      setTab(resetEditIndex(tab));
-    },
     removeCompass() {
       setTab(removeCompassFromTab(tab, compass.index));
     },
@@ -142,9 +134,7 @@ export const TabView: React.FC<TabProps> = (props) => {
     const nextSearchParams = new URLSearchParams(searchParams);
 
     if (isEditMode) {
-      const nextTab = resetEditIndex(tab);
-      props.updateTab(nextTab);
-      setTab(nextTab);
+      props.updateTab(tab);
       nextSearchParams.delete(queryParameters.editMode);
     } else {
       nextSearchParams.set(queryParameters.editMode, 'true');

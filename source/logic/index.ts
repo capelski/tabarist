@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { CompassType, editIndexDefault, framesNumberDefault } from '../constants';
+import { CompassType, framesNumberDefault } from '../constants';
 import {
   ChordCompass,
   Compass,
@@ -49,10 +49,6 @@ export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
   return {
     ...tab,
     compasses: nextCompasses,
-    editIndex:
-      tab.editIndex === editIndexDefault
-        ? tab.editIndex
-        : getIndexIncrease(tab.editIndex, newCompass.index),
   };
 };
 
@@ -112,7 +108,6 @@ export const createStrummingPattern = (index: number): StrummingPattern => ({
 
 export const createTab = (): Tab => ({
   compasses: [],
-  editIndex: editIndexDefault,
   id: nanoid(),
   strummingPatterns: [],
   title: 'Unnamed tab',
@@ -131,7 +126,7 @@ export const getIndexIncrease = (currentIndex: number, insertionIndex: number) =
 };
 
 export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
-  const { editIndex, nextCompasses } = tab.compasses.reduce(
+  const { nextCompasses } = tab.compasses.reduce(
     (reduced, compass) => {
       if (
         compass.index === deletionIndex ||
@@ -139,7 +134,6 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
       ) {
         return {
           deletedCount: reduced.deletedCount + 1,
-          editIndex: tab.editIndex === compass.index ? editIndexDefault : reduced.editIndex,
           nextCompasses: reduced.nextCompasses,
         };
       }
@@ -156,26 +150,16 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
 
       return {
         deletedCount: reduced.deletedCount,
-        editIndex: getIndexDecrease(tab.editIndex, deletionIndex, reduced.deletedCount),
         nextCompasses: [...reduced.nextCompasses, nextCompass],
       };
     },
-    { deletedCount: 0, editIndex: tab.editIndex, nextCompasses: [] },
+    { deletedCount: 0, nextCompasses: [] },
   );
 
   return {
     ...tab,
     compasses: nextCompasses,
-    editIndex,
   };
-};
-
-export const resetEditIndex = (tab: Tab): Tab => {
-  return { ...tab, editIndex: editIndexDefault };
-};
-
-export const setEditIndex = (tab: Tab, compassIndex: number): Tab => {
-  return { ...tab, editIndex: compassIndex };
 };
 
 export const updateChordCompass = (

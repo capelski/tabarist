@@ -31,7 +31,6 @@ export type StrummingPattern = {
 
 export type Tab = {
   compasses: Compass[];
-  editIndex: number;
   id: string;
   strummingPatterns: StrummingPattern[];
   title: string;
