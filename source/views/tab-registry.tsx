@@ -11,7 +11,7 @@ export type TabRegistryProps = {
   tabRegistrySetter: (tabRegistry: TabRegistry) => void;
 };
 
-export const TabRegistryComponent: React.FC<TabRegistryProps> = (props) => {
+export const TabRegistryView: React.FC<TabRegistryProps> = (props) => {
   const [filter, setFilter] = useState('');
 
   const navigate = useNavigate();

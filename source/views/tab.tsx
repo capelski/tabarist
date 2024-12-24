@@ -2,6 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
 import {
+  AddCompass,
+  AddCompassProps,
+  CompassComponent,
+  CompassProps,
+  StrummingPatternComponent,
+} from '../components';
+import {
   addSymbol,
   CompassType,
   editSymbol,
@@ -32,16 +39,13 @@ import {
   updateTitle,
 } from '../logic';
 import { ChordCompass, Compass, PickingCompass, Tab } from '../types';
-import { AddCompass, AddCompassProps } from './add-compass';
-import { CompassComponent, CompassProps } from './compass';
-import { StrummingPatternComponent } from './strumming-pattern';
 
 export type TabProps = {
   removeTab: (tabId: string) => void;
   updateTab: (updatedTab: Tab) => void;
 };
 
-export const TabComponent: React.FC<TabProps> = (props) => {
+export const TabView: React.FC<TabProps> = (props) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [tab, setTab] = useState<Tab>();
 

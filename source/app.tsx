@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
-import { localStorageKey_tabRegistry, RouteNames } from '../constants';
-import { createTab, getTabLocalStorageKey } from '../logic';
-import { Tab, TabRegistry } from '../types';
-import { TabComponent } from './tab';
-import { TabRegistryComponent } from './tab-registry';
+import { localStorageKey_tabRegistry, RouteNames } from './constants';
+import { createTab, getTabLocalStorageKey } from './logic';
+import { Tab, TabRegistry } from './types';
+import { TabRegistryView, TabView } from './views';
 
 export const App: React.FC = () => {
   const [tabRegistry, setTabRegistry] = useState<TabRegistry>({});
@@ -65,7 +64,7 @@ export const App: React.FC = () => {
         <Route
           path={RouteNames.home}
           element={
-            <TabRegistryComponent
+            <TabRegistryView
               createTab={createNewTab}
               removeTab={removeTab}
               tabRegistry={tabRegistry}
@@ -76,7 +75,7 @@ export const App: React.FC = () => {
 
         <Route
           path={RouteNames.tabDetails}
-          element={<TabComponent removeTab={removeTab} updateTab={updateTab} />}
+          element={<TabView removeTab={removeTab} updateTab={updateTab} />}
         />
       </Routes>
     </HashRouter>
