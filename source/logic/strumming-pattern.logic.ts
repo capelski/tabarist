@@ -22,12 +22,15 @@ export const updateStrummingPatternFrames = (
             frames: Array.from({ length: framesNumber }, (_, index) => compass.frames[index] ?? ''),
           };
     }),
-    strummingPatterns: tab.strummingPatterns.map((sp, spIndex) => {
-      return spIndex !== sPatternIndex
-        ? sp
+    strummingPatterns: tab.strummingPatterns.map((sPattern) => {
+      return sPattern.index !== sPatternIndex
+        ? sPattern
         : {
-            ...sp,
-            frames: Array.from({ length: framesNumber }, (_, index) => sp.frames[index] ?? ''),
+            ...sPattern,
+            frames: Array.from(
+              { length: framesNumber },
+              (_, index) => sPattern.frames[index] ?? '',
+            ),
             framesNumber,
           };
     }),
@@ -42,12 +45,12 @@ export const updateStrummingPatternValue = (
 ): Tab => {
   return {
     ...tab,
-    strummingPatterns: tab.strummingPatterns.map((sp, spIndex) => {
-      return spIndex !== sPatternIndex
-        ? sp
+    strummingPatterns: tab.strummingPatterns.map((sPattern) => {
+      return sPattern.index !== sPatternIndex
+        ? sPattern
         : {
-            ...sp,
-            frames: sp.frames.map((frame, fIndex) => {
+            ...sPattern,
+            frames: sPattern.frames.map((frame, fIndex) => {
               return fIndex !== frameIndex ? frame : value;
             }),
           };

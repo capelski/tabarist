@@ -31,7 +31,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
   const strummingPattern =
     props.compass.type === CompassType.chord
       ? props.strummingPatterns.find(
-          (sp) => sp.index === (props.compass as ChordCompass).sPatternIndex,
+          (sPattern) => sPattern.index === (props.compass as ChordCompass).sPatternIndex,
         )
       : undefined;
 
@@ -101,14 +101,14 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
               }}
             >
               {strummingPattern &&
-                strummingPattern.frames.map((strumming, frameIndex) => {
+                strummingPattern.frames.map((frame, frameIndex) => {
                   return (
                     <ChordFrame
                       frame={(props.compass as ChordCompass).frames[frameIndex]}
                       isEditMode={props.isEditMode}
                       isReference={isReference}
                       key={frameIndex}
-                      strumming={strumming}
+                      strumming={frame}
                       style={{
                         borderLeft: frameIndex > 0 ? '1px solid #ccc' : undefined,
                         boxSizing: 'border-box',
@@ -143,10 +143,10 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                     style={{ marginLeft: 8, minWidth: 40 }}
                     value={props.compass.sPatternIndex}
                   >
-                    {props.strummingPatterns.map((sp) => {
+                    {props.strummingPatterns.map((sPattern) => {
                       return (
-                        <option key={sp.index} value={sp.index}>
-                          {sp.index}
+                        <option key={sPattern.index} value={sPattern.index}>
+                          {sPattern.index}
                         </option>
                       );
                     })}

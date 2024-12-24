@@ -42,8 +42,8 @@ export const updateChordCompass = (
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type !== CompassType.chord || cIndex !== compassIndex
+    compasses: tab.compasses.map((compass) => {
+      return compass.type !== CompassType.chord || compass.index !== compassIndex
         ? compass
         : {
             ...compass,
@@ -60,15 +60,17 @@ export const updateChordCompassFrames = (
   compassIndex: number,
   sPatternIndex: number,
 ): Tab => {
-  const strummingPattern = tab.strummingPatterns.find((sp) => sp.index === sPatternIndex);
+  const strummingPattern = tab.strummingPatterns.find(
+    (sPattern) => sPattern.index === sPatternIndex,
+  );
   if (!strummingPattern) {
     return tab;
   }
 
   return {
     ...tab,
-    compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type !== CompassType.chord || cIndex !== compassIndex
+    compasses: tab.compasses.map((compass) => {
+      return compass.type !== CompassType.chord || compass.index !== compassIndex
         ? compass
         : {
             ...compass,
@@ -91,8 +93,8 @@ export const updatePickingCompass = (
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type !== CompassType.picking || cIndex !== compassIndex
+    compasses: tab.compasses.map((compass) => {
+      return compass.type !== CompassType.picking || compass.index !== compassIndex
         ? compass
         : {
             ...compass,
@@ -115,8 +117,8 @@ export const updatePickingCompassFrames = (
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass, cIndex) => {
-      return compass.type !== CompassType.picking || cIndex !== compassIndex
+    compasses: tab.compasses.map((compass) => {
+      return compass.type !== CompassType.picking || compass.index !== compassIndex
         ? compass
         : {
             ...compass,

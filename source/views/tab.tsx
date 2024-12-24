@@ -225,16 +225,16 @@ export const TabView: React.FC<TabProps> = (props) => {
             </button>
           </p>
 
-          {tab.strummingPatterns.map((sp) => {
+          {tab.strummingPatterns.map((sPattern) => {
             return (
               <StrummingPatternComponent
-                key={sp.index}
-                strummingPattern={sp}
+                key={sPattern.index}
+                strummingPattern={sPattern}
                 updateFrames={(framesNumber) => {
-                  setTab(updateStrummingPatternFrames(tab, sp.index, framesNumber));
+                  setTab(updateStrummingPatternFrames(tab, sPattern.index, framesNumber));
                 }}
                 updateValue={(frameIndex, value) => {
-                  setTab(updateStrummingPatternValue(tab, sp.index, frameIndex, value));
+                  setTab(updateStrummingPatternValue(tab, sPattern.index, frameIndex, value));
                 }}
               />
             );
