@@ -3,9 +3,9 @@ import { CompassType, framesNumberDefault } from '../constants';
 import {
   ChordCompass,
   Compass,
-  CompassReference,
   PickingCompass,
   PickingFrame,
+  ReferenceCompass,
   StrummingPattern,
   Tab,
 } from '../types';
@@ -83,12 +83,6 @@ export const createChordCompass = (
   type: CompassType.chord,
 });
 
-export const createCompassReference = (compass: Compass): CompassReference => ({
-  index: compass.index + 1,
-  compassIndex: compass.type === CompassType.reference ? compass.compassIndex : compass.index,
-  type: CompassType.reference,
-});
-
 export const createPickingCompass = (index: number): PickingCompass => ({
   index,
   frames: Array.from({ length: framesNumberDefault }, createPickingFrame),
@@ -97,6 +91,12 @@ export const createPickingCompass = (index: number): PickingCompass => ({
 });
 
 export const createPickingFrame = (): PickingFrame => Array.from({ length: 6 }, () => '');
+
+export const createReferenceCompass = (compass: Compass): ReferenceCompass => ({
+  index: compass.index + 1,
+  compassIndex: compass.type === CompassType.reference ? compass.compassIndex : compass.index,
+  type: CompassType.reference,
+});
 
 export const createStrummingPattern = (index: number): StrummingPattern => ({
   frames: Array.from({ length: framesNumberDefault }, () => ''),

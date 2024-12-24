@@ -22,8 +22,8 @@ import {
   addCompassToTab,
   addStrummingPatternToTab,
   createChordCompass,
-  createCompassReference,
   createPickingCompass,
+  createReferenceCompass,
   getTabLocalStorageKey,
   removeCompassFromTab,
   updateChordCompass,
@@ -104,7 +104,7 @@ export const TabView: React.FC<TabProps> = (props) => {
       addStrummingPattern();
     },
     copyCompass() {
-      setTab(addCompassToTab(tab, createCompassReference(compass)));
+      setTab(addCompassToTab(tab, createReferenceCompass(compass)));
     },
     removeCompass() {
       setTab(removeCompassFromTab(tab, compass.index));

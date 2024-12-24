@@ -7,19 +7,19 @@ export type ChordCompass = CompassBase & {
   type: CompassType.chord;
 };
 
-export type Compass = ChordCompass | CompassReference | PickingCompass;
+export type Compass = ChordCompass | PickingCompass | ReferenceCompass;
 
 export type CompassBase = { index: number };
-
-export type CompassReference = CompassBase & {
-  compassIndex: number;
-  type: CompassType.reference;
-};
 
 export type PickingCompass = CompassBase & {
   frames: PickingFrame[];
   framesNumber: number;
   type: CompassType.picking;
+};
+
+export type ReferenceCompass = CompassBase & {
+  compassIndex: number;
+  type: CompassType.reference;
 };
 
 export type PickingFrame = string[];
