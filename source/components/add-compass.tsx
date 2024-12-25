@@ -1,8 +1,8 @@
 import React, { CSSProperties } from 'react';
-import { CompassType } from '../constants';
+import { BarType } from '../constants';
 
 export type AddCompassProps = {
-  addCompass: (index: number, type: CompassType.chord | CompassType.picking) => void;
+  addCompass: (index: number, type: BarType.chord | BarType.picking) => void;
   compassIndex: number;
   expanded?: boolean;
   style?: CSSProperties;
@@ -30,7 +30,7 @@ export const AddCompass: React.FC<AddCompassProps> = (props) => {
     >
       <div
         onClick={() => {
-          props.addCompass(props.compassIndex, CompassType.picking);
+          props.addCompass(props.compassIndex, BarType.picking);
         }}
         style={buttonStyle}
       >
@@ -39,7 +39,7 @@ export const AddCompass: React.FC<AddCompassProps> = (props) => {
 
       <div
         onClick={() => {
-          props.addCompass(props.compassIndex, CompassType.chord);
+          props.addCompass(props.compassIndex, BarType.chord);
         }}
         style={buttonStyle}
       >

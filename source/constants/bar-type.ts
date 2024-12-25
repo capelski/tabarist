@@ -1,4 +1,4 @@
-export enum CompassType {
+export enum BarType {
   chord = 'chord',
   picking = 'picking',
   reference = 'reference',

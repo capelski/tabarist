@@ -1,5 +1,5 @@
 import React from 'react';
-import { addSymbol, CompassType, framesNumberOptions, removeSymbol } from '../constants';
+import { addSymbol, BarType, framesNumberOptions, removeSymbol } from '../constants';
 import { ChordCompass, PickingCompass, StrummingPattern } from '../types';
 import { AddCompass, AddCompassProps } from './add-compass';
 import { ChordFrame } from './chord-frame';
@@ -29,7 +29,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
   const framesWidth = Math.floor(10000 / props.compass.frames.length) / 100;
 
   const strummingPattern =
-    props.compass.type === CompassType.chord
+    props.compass.type === BarType.chord
       ? props.strummingPatterns.find(
           (sPattern) => sPattern.index === (props.compass as ChordCompass).sPatternIndex,
         )
@@ -49,7 +49,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           />
         )}
 
-        {props.compass.type === CompassType.picking && (
+        {props.compass.type === BarType.picking && (
           <div
             className="frames"
             style={{
@@ -78,7 +78,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           </div>
         )}
 
-        {props.compass.type === CompassType.chord && (
+        {props.compass.type === BarType.chord && (
           <div
             style={{
               backgroundColor: props.backgroundColor,
@@ -174,7 +174,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             </span>
           )}
 
-          {!isReference && props.compass.type === CompassType.picking && (
+          {!isReference && props.compass.type === BarType.picking && (
             <select
               onChange={(event) => {
                 props.handlers.updatePickingCompassFrames(parseInt(event.target.value));

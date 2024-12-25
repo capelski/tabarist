@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { CompassType } from '../constants';
+import { BarType } from '../constants';
 import { Compass, Tab } from '../types';
 import { createIndexedValuesArray } from './indexed-value.logic';
 import { createStrummingPattern } from './strumming-pattern.logic';
@@ -18,7 +18,7 @@ export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
     const nextCompass: Compass = {
       ...compass,
       index: getIndexIncrease(compass.index, newCompass.index),
-      ...(compass.type === CompassType.reference
+      ...(compass.type === BarType.reference
         ? {
             compassIndex: getIndexIncrease(compass.compassIndex, newCompass.index),
           }
@@ -53,7 +53,7 @@ export const addStrummingPatternToTab = (tab: Tab, spIndex: number): Tab => {
       tab.strummingPatterns.length > 0
         ? tab.compasses
         : tab.compasses.map((compass) => {
-            return compass.type !== CompassType.chord || compass.sPatternIndex !== undefined
+            return compass.type !== BarType.chord || compass.sPatternIndex !== undefined
               ? compass
               : {
                   ...compass,
@@ -88,7 +88,7 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
     (reduced, compass) => {
       if (
         compass.index === deletionIndex ||
-        (compass.type === CompassType.reference && compass.compassIndex === deletionIndex)
+        (compass.type === BarType.reference && compass.compassIndex === deletionIndex)
       ) {
         return {
           deletedCount: reduced.deletedCount + 1,
@@ -99,7 +99,7 @@ export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
       const nextCompass: Compass = {
         ...compass,
         index: getIndexDecrease(compass.index, deletionIndex, reduced.deletedCount),
-        ...(compass.type === CompassType.reference
+        ...(compass.type === BarType.reference
           ? {
               compassIndex: getIndexDecrease(
                 compass.compassIndex,

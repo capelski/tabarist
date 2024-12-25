@@ -1,4 +1,4 @@
-import { CompassType, framesNumberDefault } from '../constants';
+import { BarType, framesNumberDefault } from '../constants';
 import { StrummingPattern, Tab } from '../types';
 import { createIndexedValuesArray } from './indexed-value.logic';
 
@@ -16,7 +16,7 @@ export const updateStrummingPatternFrames = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass) => {
-      return compass.type !== CompassType.chord || compass.sPatternIndex !== sPatternIndex
+      return compass.type !== BarType.chord || compass.sPatternIndex !== sPatternIndex
         ? compass
         : {
             ...compass,

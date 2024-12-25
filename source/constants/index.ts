@@ -6,6 +6,6 @@ export const localStorageKey_tabRegistry = 'tabarist_tabRegistry';
 
 export const stringHeight = 20;
 
-export * from './compass-type';
+export * from './bar-type';
 export * from './route-names';
 export * from './symbols';

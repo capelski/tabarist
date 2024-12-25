@@ -1,4 +1,4 @@
-import { CompassType, framesNumberDefault } from '../constants';
+import { BarType, framesNumberDefault } from '../constants';
 import {
   ChordCompass,
   Compass,
@@ -17,14 +17,14 @@ export const createChordCompass = (
   index,
   frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
   sPatternIndex: strummingPattern?.index,
-  type: CompassType.chord,
+  type: BarType.chord,
 });
 
 export const createPickingCompass = (index: number): PickingCompass => ({
   index,
   frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
   framesNumber: framesNumberDefault,
-  type: CompassType.picking,
+  type: BarType.picking,
 });
 
 export const createPickingFrame = (index: number): PickingFrame => ({
@@ -34,8 +34,8 @@ export const createPickingFrame = (index: number): PickingFrame => ({
 
 export const createReferenceCompass = (compass: Compass): ReferenceCompass => ({
   index: compass.index + 1,
-  compassIndex: compass.type === CompassType.reference ? compass.compassIndex : compass.index,
-  type: CompassType.reference,
+  compassIndex: compass.type === BarType.reference ? compass.compassIndex : compass.index,
+  type: BarType.reference,
 });
 
 export const updateChordCompass = (
@@ -47,7 +47,7 @@ export const updateChordCompass = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass) => {
-      return compass.type !== CompassType.chord || compass.index !== compassIndex
+      return compass.type !== BarType.chord || compass.index !== compassIndex
         ? compass
         : {
             ...compass,
@@ -72,7 +72,7 @@ export const updateChordCompassFrames = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass) => {
-      return compass.type !== CompassType.chord || compass.index !== compassIndex
+      return compass.type !== BarType.chord || compass.index !== compassIndex
         ? compass
         : {
             ...compass,
@@ -96,7 +96,7 @@ export const updatePickingCompass = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass) => {
-      return compass.type !== CompassType.picking || compass.index !== compassIndex
+      return compass.type !== BarType.picking || compass.index !== compassIndex
         ? compass
         : {
             ...compass,
@@ -123,7 +123,7 @@ export const updatePickingCompassFrames = (
   return {
     ...tab,
     compasses: tab.compasses.map((compass) => {
-      return compass.type !== CompassType.picking || compass.index !== compassIndex
+      return compass.type !== BarType.picking || compass.index !== compassIndex
         ? compass
         : {
             ...compass,

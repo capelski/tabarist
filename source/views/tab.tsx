@@ -10,7 +10,7 @@ import {
 } from '../components';
 import {
   addSymbol,
-  CompassType,
+  BarType,
   editSymbol,
   queryParameters,
   removeSymbol,
@@ -86,7 +86,7 @@ export const TabView: React.FC<TabProps> = (props) => {
 
   const addCompass: AddCompassProps['addCompass'] = (index, type) => {
     const compass =
-      type === CompassType.chord
+      type === BarType.chord
         ? createChordCompass(index, tab.strummingPatterns[0])
         : createPickingCompass(index);
     setTab(addCompassToTab(tab, compass));
@@ -179,7 +179,7 @@ export const TabView: React.FC<TabProps> = (props) => {
       >
         {tab.compasses.map((compass) => {
           const actualCompass =
-            compass.type === CompassType.reference
+            compass.type === BarType.reference
               ? (tab.compasses.find((c) => c.index === compass.compassIndex) as
                   | ChordCompass
                   | PickingCompass)
