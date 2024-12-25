@@ -1,5 +1,6 @@
 import React from 'react';
 import { framesNumberOptions, stringHeight } from '../constants';
+import { getIndexDisplayValue } from '../logic';
 import { StrummingPattern } from '../types';
 
 export type StrummingPatternProps = {
@@ -12,6 +13,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex' }}>
+        <p>{getIndexDisplayValue(props.strummingPattern.index)}&nbsp;</p>
         {props.strummingPattern.frames.map((frame) => {
           return (
             <div

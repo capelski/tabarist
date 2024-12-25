@@ -8,3 +8,7 @@ export const createIndexedValuesArray = (
     index,
     value: typeof valueOrValueGetter === 'string' ? valueOrValueGetter : valueOrValueGetter(index),
   }));
+
+export const getIndexDisplayValue = (index: number) => {
+  return index + 1;
+};

@@ -1,5 +1,6 @@
 import React from 'react';
 import { removeSymbol } from '../constants';
+import { getIndexDisplayValue } from '../logic';
 import { ChordBar, PickingBar } from '../types';
 
 export interface BarControlsProps {
@@ -25,10 +26,10 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         width: '100%',
       }}
     >
-      <span style={{ marginRight: 8 }}>{props.currentIndex + 1}</span>
+      <span style={{ marginRight: 8 }}>{getIndexDisplayValue(props.currentIndex)}</span>
       {isReference && (
         <span style={{ marginRight: 8 }}>
-          ={'>'} {props.bar.index + 1}
+          ={'>'} {getIndexDisplayValue(props.bar.index)}
         </span>
       )}
 

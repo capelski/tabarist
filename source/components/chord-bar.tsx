@@ -1,5 +1,6 @@
 import React from 'react';
 import { addSymbol } from '../constants';
+import { getIndexDisplayValue } from '../logic';
 import { ChordBar, StrummingPattern } from '../types';
 import { AddBar, AddBarProps } from './add-bar';
 import { BarControls, BarControlsProps } from './bar-controls';
@@ -100,7 +101,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
                   {props.strummingPatterns.map((sPattern) => {
                     return (
                       <option key={sPattern.index} value={sPattern.index}>
-                        {sPattern.index}
+                        {getIndexDisplayValue(sPattern.index)}
                       </option>
                     );
                   })}
