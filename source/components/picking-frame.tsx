@@ -6,6 +6,7 @@ export interface PickingFrameProps {
   backgroundColor: string;
   frame: PickingFrame;
   isEditMode: boolean;
+  isReference: boolean;
   updateValue: (stringIndex: number, value: string) => void;
   width: number;
 }
@@ -26,6 +27,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
           >
             {props.isEditMode ? (
               <input
+                disabled={props.isReference}
                 maxLength={3}
                 onChange={(event) => {
                   props.updateValue(string.index, event.target.value);

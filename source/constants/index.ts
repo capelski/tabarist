@@ -1,5 +1,5 @@
-export const framesNumberOptions = [1, 2, 4, 8];
-export const framesNumberDefault = framesNumberOptions[2];
+export const framesNumberOptions = [4, 8];
+export const framesNumberDefault = framesNumberOptions[0];
 
 export const localStorageKey_tab = 'tabarist_tab_ID';
 export const localStorageKey_tabRegistry = 'tabarist_tabRegistry';

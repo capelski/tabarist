@@ -47,6 +47,7 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
                 backgroundColor={props.backgroundColor}
                 frame={frame}
                 isEditMode={props.isEditMode}
+                isReference={isReference}
                 key={frame.index}
                 updateValue={(stringIndex, value) => {
                   props.handlers.updateValue(frame.index, stringIndex, value);
