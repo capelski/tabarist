@@ -4,8 +4,8 @@ import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
 import {
   AddBar,
   AddBarProps,
-  CompassComponent,
-  CompassProps,
+  BarComponent,
+  BarProps,
   StrummingPatternComponent,
 } from '../components';
 import {
@@ -19,13 +19,13 @@ import {
   stringHeight,
 } from '../constants';
 import {
-  addCompassToTab,
+  addBarToTab,
   addStrummingPatternToTab,
   createChordBar,
   createPickingBar,
   createReferenceBar,
   getTabLocalStorageKey,
-  removeCompassFromTab,
+  removeBarFromTab,
   updateChordBar,
   updateChordBarFrames,
   updatePickingBar,
@@ -71,7 +71,7 @@ export const TabView: React.FC<TabProps> = (props) => {
 
   const isBigScreen = useMediaQuery({ minWidth: 1000 });
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
-  const compassWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
+  const barWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
 
   if (!tab) {
     return (
@@ -89,32 +89,32 @@ export const TabView: React.FC<TabProps> = (props) => {
       type === BarType.chord
         ? createChordBar(index, tab.strummingPatterns[0])
         : createPickingBar(index);
-    setTab(addCompassToTab(tab, bar));
+    setTab(addBarToTab(tab, bar));
   };
 
   const addStrummingPattern = () => {
     setTab(addStrummingPatternToTab(tab, tab.strummingPatterns.length));
   };
 
-  const getBarHandlers = (bar: Bar): CompassProps['handlers'] => ({
+  const getBarHandlers = (bar: Bar): BarProps['handlers'] => ({
     addBar,
     addStrummingPattern,
-    copyCompass() {
-      setTab(addCompassToTab(tab, createReferenceBar(bar)));
+    copyBar() {
+      setTab(addBarToTab(tab, createReferenceBar(bar)));
     },
-    removeCompass() {
-      setTab(removeCompassFromTab(tab, bar.index));
+    removeBar() {
+      setTab(removeBarFromTab(tab, bar.index));
     },
-    updateChordCompass(frameIndex, value) {
+    updateChordBar(frameIndex, value) {
       setTab(updateChordBar(tab, bar.index, frameIndex, value));
     },
-    updateChordCompassFrames(sPatternIndex) {
+    updateChordBarFrames(sPatternIndex) {
       setTab(updateChordBarFrames(tab, bar.index, sPatternIndex));
     },
-    updatePickingCompass(frameIndex, stringIndex, value) {
+    updatePickingBar(frameIndex, stringIndex, value) {
       setTab(updatePickingBar(tab, bar.index, frameIndex, stringIndex, value));
     },
-    updatePickingCompassFrames(frames) {
+    updatePickingBarFrames(frames) {
       setTab(updatePickingBarFrames(tab, bar.index, frames));
     },
   });
@@ -170,7 +170,7 @@ export const TabView: React.FC<TabProps> = (props) => {
       </div>
 
       <div
-        className="compasses"
+        className="bars"
         style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
       >
         {tab.bars.map((bar) => {
@@ -180,15 +180,15 @@ export const TabView: React.FC<TabProps> = (props) => {
               : bar;
 
           return (
-            <CompassComponent
+            <BarComponent
               backgroundColor={actualBar.index !== bar.index && isEditMode ? '#ddd' : 'white'}
-              compass={actualBar}
+              bar={actualBar}
               currentIndex={bar.index}
               handlers={getBarHandlers(bar)}
               isEditMode={isEditMode}
               key={bar.index}
               strummingPatterns={tab.strummingPatterns}
-              width={compassWidth}
+              width={barWidth}
             />
           );
         })}
@@ -200,7 +200,7 @@ export const TabView: React.FC<TabProps> = (props) => {
             expanded={true}
             style={{
               boxSizing: 'border-box',
-              flexBasis: `${compassWidth}%`,
+              flexBasis: `${barWidth}%`,
               height: stringHeight * 6,
               padding: '0 8px',
             }}

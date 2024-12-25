@@ -4,7 +4,7 @@ import { Bar, Tab } from '../types';
 import { createIndexedValuesArray } from './indexed-value.logic';
 import { createStrummingPattern } from './strumming-pattern.logic';
 
-export const addCompassToTab = (tab: Tab, newBar: Bar): Tab => {
+export const addBarToTab = (tab: Tab, newBar: Bar): Tab => {
   if (tab.bars.length === 0) {
     return {
       ...tab,
@@ -83,7 +83,7 @@ export const getIndexIncrease = (currentIndex: number, insertionIndex: number) =
   return currentIndex < insertionIndex ? currentIndex : currentIndex + 1;
 };
 
-export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
+export const removeBarFromTab = (tab: Tab, deletionIndex: number): Tab => {
   const { nextBars } = tab.bars.reduce(
     (reduced, bar) => {
       if (

@@ -5,39 +5,39 @@ import { AddBar, AddBarProps } from './add-bar';
 import { ChordFrame } from './chord-frame';
 import { PickingFrameComponent } from './picking-frame';
 
-export interface CompassProps {
+export interface BarProps {
   backgroundColor: string;
-  compass: ChordBar | PickingBar;
+  bar: ChordBar | PickingBar;
   currentIndex: number;
   handlers: {
     addStrummingPattern: () => void;
     addBar: AddBarProps['addBar'];
-    copyCompass: () => void;
-    removeCompass: () => void;
-    updateChordCompass: (frameIndex: number, value: string) => void;
-    updateChordCompassFrames: (sPatternIndex: number) => void;
-    updatePickingCompass: (frameIndex: number, stringIndex: number, value: string) => void;
-    updatePickingCompassFrames: (framesNumber: number) => void;
+    copyBar: () => void;
+    removeBar: () => void;
+    updateChordBar: (frameIndex: number, value: string) => void;
+    updateChordBarFrames: (sPatternIndex: number) => void;
+    updatePickingBar: (frameIndex: number, stringIndex: number, value: string) => void;
+    updatePickingBarFrames: (framesNumber: number) => void;
   };
   isEditMode: boolean;
   strummingPatterns: StrummingPattern[];
   width: number;
 }
 
-export const CompassComponent: React.FC<CompassProps> = (props) => {
-  const isReference = props.compass.index !== props.currentIndex;
-  const framesWidth = Math.floor(10000 / props.compass.frames.length) / 100;
+export const BarComponent: React.FC<BarProps> = (props) => {
+  const isReference = props.bar.index !== props.currentIndex;
+  const framesWidth = Math.floor(10000 / props.bar.frames.length) / 100;
 
   const strummingPattern =
-    props.compass.type === BarType.chord
+    props.bar.type === BarType.chord
       ? props.strummingPatterns.find(
-          (sPattern) => sPattern.index === (props.compass as ChordBar).sPatternIndex,
+          (sPattern) => sPattern.index === (props.bar as ChordBar).sPatternIndex,
         )
       : undefined;
 
   return (
     <div
-      className="compass"
+      className="bar"
       style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
@@ -49,7 +49,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           />
         )}
 
-        {props.compass.type === BarType.picking && (
+        {props.bar.type === BarType.picking && (
           <div
             className="frames"
             style={{
@@ -61,7 +61,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
               flexGrow: 1,
             }}
           >
-            {props.compass.frames.map((frame) => {
+            {props.bar.frames.map((frame) => {
               return (
                 <PickingFrameComponent
                   backgroundColor={props.backgroundColor}
@@ -69,7 +69,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                   isEditMode={props.isEditMode}
                   key={frame.index}
                   updateFrame={(stringIndex, value) => {
-                    props.handlers.updatePickingCompass(frame.index, stringIndex, value);
+                    props.handlers.updatePickingBar(frame.index, stringIndex, value);
                   }}
                   width={framesWidth}
                 />
@@ -78,7 +78,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           </div>
         )}
 
-        {props.compass.type === BarType.chord && (
+        {props.bar.type === BarType.chord && (
           <div
             style={{
               backgroundColor: props.backgroundColor,
@@ -103,7 +103,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                 strummingPattern.frames.map((frame) => {
                   return (
                     <ChordFrame
-                      frame={(props.compass as ChordBar).frames[frame.index].value}
+                      frame={(props.bar as ChordBar).frames[frame.index].value}
                       isEditMode={props.isEditMode}
                       isReference={isReference}
                       key={frame.index}
@@ -114,7 +114,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                         width: `${framesWidth}%`,
                       }}
                       updateFrame={(value) => {
-                        props.handlers.updateChordCompass(frame.index, value);
+                        props.handlers.updateChordBar(frame.index, value);
                       }}
                     />
                   );
@@ -137,10 +137,10 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                     disabled={props.strummingPatterns.length < 2 || isReference}
                     onChange={(event) => {
                       const sPatternIndex = parseInt(event.target.value);
-                      props.handlers.updateChordCompassFrames(sPatternIndex);
+                      props.handlers.updateChordBarFrames(sPatternIndex);
                     }}
                     style={{ marginLeft: 8, minWidth: 40 }}
-                    value={props.compass.sPatternIndex}
+                    value={props.bar.sPatternIndex}
                   >
                     {props.strummingPatterns.map((sPattern) => {
                       return (
@@ -170,17 +170,17 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
           <span style={{ marginRight: 8 }}>{props.currentIndex + 1}</span>
           {isReference && (
             <span style={{ marginRight: 8 }}>
-              ={'>'} {props.compass.index + 1}
+              ={'>'} {props.bar.index + 1}
             </span>
           )}
 
-          {!isReference && props.compass.type === BarType.picking && (
+          {!isReference && props.bar.type === BarType.picking && (
             <select
               onChange={(event) => {
-                props.handlers.updatePickingCompassFrames(parseInt(event.target.value));
+                props.handlers.updatePickingBarFrames(parseInt(event.target.value));
               }}
               style={{ marginRight: 8 }}
-              value={props.compass.framesNumber}
+              value={props.bar.framesNumber}
             >
               {framesNumberOptions.map((option) => {
                 return (
@@ -192,15 +192,11 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
             </select>
           )}
 
-          <button
-            onClick={() => props.handlers.copyCompass()}
-            style={{ marginRight: 8 }}
-            type="button"
-          >
+          <button onClick={() => props.handlers.copyBar()} style={{ marginRight: 8 }} type="button">
             =
           </button>
 
-          <button onClick={() => props.handlers.removeCompass()} type="button">
+          <button onClick={() => props.handlers.removeBar()} type="button">
             {removeSymbol}
           </button>
         </div>
