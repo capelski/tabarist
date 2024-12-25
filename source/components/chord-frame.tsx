@@ -2,12 +2,12 @@ import React, { CSSProperties } from 'react';
 import { stringHeight } from '../constants';
 
 export interface ChordFrameProps {
-  frame: string;
   isEditMode: boolean;
   isReference: boolean;
   strumming: string;
   style?: CSSProperties;
-  updateFrame: (value: string) => void;
+  updateValue: (value: string) => void;
+  value: string;
 }
 
 export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
@@ -27,7 +27,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
             disabled={props.isReference}
             maxLength={3}
             onChange={(event) => {
-              props.updateFrame(event.target.value);
+              props.updateValue(event.target.value);
             }}
             style={{
               boxSizing: 'border-box',
@@ -37,7 +37,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
               textAlign: 'center',
               width: '100%',
             }}
-            value={props.frame || ''}
+            value={props.value || ''}
           />
         ) : (
           <div
@@ -46,7 +46,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
               minWidth: 25,
             }}
           >
-            <span>{props.frame}</span>
+            <span>{props.value}</span>
           </div>
         )}
       </div>

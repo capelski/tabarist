@@ -6,7 +6,7 @@ export interface PickingFrameProps {
   backgroundColor: string;
   frame: PickingFrame;
   isEditMode: boolean;
-  updateFrame: (stringIndex: number, value: string) => void;
+  updateValue: (stringIndex: number, value: string) => void;
   width: number;
 }
 
@@ -28,7 +28,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
               <input
                 maxLength={3}
                 onChange={(event) => {
-                  props.updateFrame(string.index, event.target.value);
+                  props.updateValue(string.index, event.target.value);
                 }}
                 style={{
                   boxSizing: 'border-box',

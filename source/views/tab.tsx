@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
-import { AddBar, BarComponent, BarProps, StrummingPatternComponent } from '../components';
+import {
+  AddBar,
+  ChordBarComponent,
+  ChordBarProps,
+  PickingBarComponent,
+  PickingBarProps,
+  StrummingPatternComponent,
+} from '../components';
 import {
   addSymbol,
   BarType,
@@ -90,7 +97,7 @@ export const TabView: React.FC<TabProps> = (props) => {
     setTab(addStrummingPatternToTab(tab, tab.strummingPatterns.length));
   };
 
-  const getBarHandlers = (bar: Bar): BarProps['handlers'] => ({
+  const getChordBarHandlers = (bar: Bar): ChordBarProps['handlers'] => ({
     addBar(type) {
       addBar(bar.index, type);
     },
@@ -101,17 +108,29 @@ export const TabView: React.FC<TabProps> = (props) => {
     removeBar() {
       setTab(removeBarFromTab(tab, bar.index));
     },
-    updateChordBar(frameIndex, value) {
-      setTab(updateChordBar(tab, bar.index, frameIndex, value));
-    },
-    updateChordBarFrames(sPatternIndex) {
+    updateFrames(sPatternIndex) {
       setTab(updateChordBarFrames(tab, bar.index, sPatternIndex));
     },
-    updatePickingBar(frameIndex, stringIndex, value) {
-      setTab(updatePickingBar(tab, bar.index, frameIndex, stringIndex, value));
+    updateValue(frameIndex, value) {
+      setTab(updateChordBar(tab, bar.index, frameIndex, value));
     },
-    updatePickingBarFrames(frames) {
+  });
+
+  const getPickingBarHandlers = (bar: Bar): PickingBarProps['handlers'] => ({
+    addBar(type) {
+      addBar(bar.index, type);
+    },
+    copyBar() {
+      setTab(addBarToTab(tab, createReferenceBar(bar)));
+    },
+    removeBar() {
+      setTab(removeBarFromTab(tab, bar.index));
+    },
+    updateFrames(frames) {
       setTab(updatePickingBarFrames(tab, bar.index, frames));
+    },
+    updateValue(frameIndex, stringIndex, value) {
+      setTab(updatePickingBar(tab, bar.index, frameIndex, stringIndex, value));
     },
   });
 
@@ -175,12 +194,22 @@ export const TabView: React.FC<TabProps> = (props) => {
               ? (tab.bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar)
               : bar;
 
-          return (
-            <BarComponent
+          return actualBar.type === BarType.picking ? (
+            <PickingBarComponent
               backgroundColor={actualBar.index !== bar.index && isEditMode ? '#ddd' : 'white'}
               bar={actualBar}
               currentIndex={bar.index}
-              handlers={getBarHandlers(bar)}
+              handlers={getPickingBarHandlers(bar)}
+              isEditMode={isEditMode}
+              key={bar.index}
+              width={barWidth}
+            />
+          ) : (
+            <ChordBarComponent
+              backgroundColor={actualBar.index !== bar.index && isEditMode ? '#ddd' : 'white'}
+              bar={actualBar}
+              currentIndex={bar.index}
+              handlers={getChordBarHandlers(bar)}
               isEditMode={isEditMode}
               key={bar.index}
               strummingPatterns={tab.strummingPatterns}
