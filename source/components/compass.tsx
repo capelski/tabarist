@@ -1,7 +1,7 @@
 import React from 'react';
 import { addSymbol, BarType, framesNumberOptions, removeSymbol } from '../constants';
 import { ChordBar, PickingBar, StrummingPattern } from '../types';
-import { AddCompass, AddCompassProps } from './add-compass';
+import { AddBar, AddBarProps } from './add-bar';
 import { ChordFrame } from './chord-frame';
 import { PickingFrameComponent } from './picking-frame';
 
@@ -11,7 +11,7 @@ export interface CompassProps {
   currentIndex: number;
   handlers: {
     addStrummingPattern: () => void;
-    addCompass: AddCompassProps['addCompass'];
+    addBar: AddBarProps['addBar'];
     copyCompass: () => void;
     removeCompass: () => void;
     updateChordCompass: (frameIndex: number, value: string) => void;
@@ -42,9 +42,9 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
         {props.isEditMode && (
-          <AddCompass
-            addCompass={props.handlers.addCompass}
-            compassIndex={props.currentIndex}
+          <AddBar
+            addBar={props.handlers.addBar}
+            barIndex={props.currentIndex}
             style={{ minHeight: 60 }}
           />
         )}

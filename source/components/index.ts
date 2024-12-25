@@ -1,4 +1,4 @@
-export * from './add-compass';
+export * from './add-bar';
 export * from './chord-frame';
 export * from './compass';
 export * from './picking-frame';

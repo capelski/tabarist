@@ -1,9 +1,9 @@
 import React, { CSSProperties } from 'react';
 import { BarType } from '../constants';
 
-export type AddCompassProps = {
-  addCompass: (index: number, type: BarType.chord | BarType.picking) => void;
-  compassIndex: number;
+export type AddBarProps = {
+  addBar: (index: number, type: BarType.chord | BarType.picking) => void;
+  barIndex: number;
   expanded?: boolean;
   style?: CSSProperties;
 };
@@ -18,10 +18,10 @@ const buttonStyle: CSSProperties = {
   padding: '0 4px',
 };
 
-export const AddCompass: React.FC<AddCompassProps> = (props) => {
+export const AddBar: React.FC<AddBarProps> = (props) => {
   return (
     <div
-      className="add-compass"
+      className="add-bar"
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -30,20 +30,20 @@ export const AddCompass: React.FC<AddCompassProps> = (props) => {
     >
       <div
         onClick={() => {
-          props.addCompass(props.compassIndex, BarType.picking);
+          props.addBar(props.barIndex, BarType.picking);
         }}
         style={buttonStyle}
       >
-        🎼{props.expanded ? ' picking compass' : ''}
+        🎼{props.expanded ? ' picking bar' : ''}
       </div>
 
       <div
         onClick={() => {
-          props.addCompass(props.compassIndex, BarType.chord);
+          props.addBar(props.barIndex, BarType.chord);
         }}
         style={buttonStyle}
       >
-        🎵{props.expanded ? ' chord compass' : ''}
+        🎵{props.expanded ? ' chord bar' : ''}
       </div>
     </div>
   );

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
 import {
-  AddCompass,
-  AddCompassProps,
+  AddBar,
+  AddBarProps,
   CompassComponent,
   CompassProps,
   StrummingPatternComponent,
@@ -84,7 +84,7 @@ export const TabView: React.FC<TabProps> = (props) => {
     );
   }
 
-  const addCompass: AddCompassProps['addCompass'] = (index, type) => {
+  const addBar: AddBarProps['addBar'] = (index, type) => {
     const bar =
       type === BarType.chord
         ? createChordBar(index, tab.strummingPatterns[0])
@@ -97,12 +97,8 @@ export const TabView: React.FC<TabProps> = (props) => {
   };
 
   const getBarHandlers = (bar: Bar): CompassProps['handlers'] => ({
-    addCompass(index, type) {
-      addCompass(index, type);
-    },
-    addStrummingPattern() {
-      addStrummingPattern();
-    },
+    addBar,
+    addStrummingPattern,
     copyCompass() {
       setTab(addCompassToTab(tab, createReferenceBar(bar)));
     },
@@ -198,9 +194,9 @@ export const TabView: React.FC<TabProps> = (props) => {
         })}
 
         {isEditMode && (
-          <AddCompass
-            addCompass={addCompass}
-            compassIndex={tab.bars.length}
+          <AddBar
+            addBar={addBar}
+            barIndex={tab.bars.length}
             expanded={true}
             style={{
               boxSizing: 'border-box',
