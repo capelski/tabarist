@@ -2,8 +2,7 @@ import React, { CSSProperties } from 'react';
 import { BarType } from '../constants';
 
 export type AddBarProps = {
-  addBar: (index: number, type: BarType.chord | BarType.picking) => void;
-  barIndex: number;
+  addBar: (type: BarType.chord | BarType.picking) => void;
   expanded?: boolean;
   style?: CSSProperties;
 };
@@ -30,7 +29,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
     >
       <div
         onClick={() => {
-          props.addBar(props.barIndex, BarType.picking);
+          props.addBar(BarType.picking);
         }}
         style={buttonStyle}
       >
@@ -39,7 +38,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
 
       <div
         onClick={() => {
-          props.addBar(props.barIndex, BarType.chord);
+          props.addBar(BarType.chord);
         }}
         style={buttonStyle}
       >

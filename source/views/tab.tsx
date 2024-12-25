@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
-import {
-  AddBar,
-  AddBarProps,
-  BarComponent,
-  BarProps,
-  StrummingPatternComponent,
-} from '../components';
+import { AddBar, BarComponent, BarProps, StrummingPatternComponent } from '../components';
 import {
   addSymbol,
   BarType,
@@ -84,7 +78,7 @@ export const TabView: React.FC<TabProps> = (props) => {
     );
   }
 
-  const addBar: AddBarProps['addBar'] = (index, type) => {
+  const addBar = (index: number, type: BarType.chord | BarType.picking) => {
     const bar =
       type === BarType.chord
         ? createChordBar(index, tab.strummingPatterns[0])
@@ -97,7 +91,9 @@ export const TabView: React.FC<TabProps> = (props) => {
   };
 
   const getBarHandlers = (bar: Bar): BarProps['handlers'] => ({
-    addBar,
+    addBar(type) {
+      addBar(bar.index, type);
+    },
     addStrummingPattern,
     copyBar() {
       setTab(addBarToTab(tab, createReferenceBar(bar)));
@@ -195,8 +191,7 @@ export const TabView: React.FC<TabProps> = (props) => {
 
         {isEditMode && (
           <AddBar
-            addBar={addBar}
-            barIndex={tab.bars.length}
+            addBar={(type) => addBar(tab.bars.length, type)}
             expanded={true}
             style={{
               boxSizing: 'border-box',

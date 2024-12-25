@@ -41,13 +41,7 @@ export const BarComponent: React.FC<BarProps> = (props) => {
       style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
-        {props.isEditMode && (
-          <AddBar
-            addBar={props.handlers.addBar}
-            barIndex={props.currentIndex}
-            style={{ minHeight: 60 }}
-          />
-        )}
+        {props.isEditMode && <AddBar addBar={props.handlers.addBar} style={{ minHeight: 60 }} />}
 
         {props.bar.type === BarType.picking && (
           <div
