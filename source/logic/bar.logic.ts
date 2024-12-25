@@ -10,7 +10,7 @@ import {
 } from '../types';
 import { createIndexedValuesArray } from './indexed-value.logic';
 
-export const createChordCompass = (
+export const createChordBar = (
   index: number,
   strummingPattern: StrummingPattern | undefined,
 ): ChordBar => ({
@@ -20,7 +20,7 @@ export const createChordCompass = (
   type: BarType.chord,
 });
 
-export const createPickingCompass = (index: number): PickingBar => ({
+export const createPickingBar = (index: number): PickingBar => ({
   frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
   framesNumber: framesNumberDefault,
   index,
@@ -32,13 +32,13 @@ export const createPickingFrame = (index: number): PickingFrame => ({
   strings: createIndexedValuesArray(6, ''),
 });
 
-export const createReferenceCompass = (bar: Bar): ReferenceBar => ({
+export const createReferenceBar = (bar: Bar): ReferenceBar => ({
   barIndex: bar.type === BarType.reference ? bar.barIndex : bar.index,
   index: bar.index + 1,
   type: BarType.reference,
 });
 
-export const updateChordCompass = (
+export const updateChordBar = (
   tab: Tab,
   barIndex: number,
   frameIndex: number,
@@ -59,11 +59,7 @@ export const updateChordCompass = (
   };
 };
 
-export const updateChordCompassFrames = (
-  tab: Tab,
-  barIndex: number,
-  sPatternIndex: number,
-): Tab => {
+export const updateChordBarFrames = (tab: Tab, barIndex: number, sPatternIndex: number): Tab => {
   const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
   if (!sPattern) {
     return tab;
@@ -86,7 +82,7 @@ export const updateChordCompassFrames = (
   };
 };
 
-export const updatePickingCompass = (
+export const updatePickingBar = (
   tab: Tab,
   barIndex: number,
   frameIndex: number,
@@ -115,11 +111,7 @@ export const updatePickingCompass = (
   };
 };
 
-export const updatePickingCompassFrames = (
-  tab: Tab,
-  barIndex: number,
-  framesNumber: number,
-): Tab => {
+export const updatePickingBarFrames = (tab: Tab, barIndex: number, framesNumber: number): Tab => {
   return {
     ...tab,
     bars: tab.bars.map((bar) => {

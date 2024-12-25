@@ -21,15 +21,15 @@ import {
 import {
   addCompassToTab,
   addStrummingPatternToTab,
-  createChordCompass,
-  createPickingCompass,
-  createReferenceCompass,
+  createChordBar,
+  createPickingBar,
+  createReferenceBar,
   getTabLocalStorageKey,
   removeCompassFromTab,
-  updateChordCompass,
-  updateChordCompassFrames,
-  updatePickingCompass,
-  updatePickingCompassFrames,
+  updateChordBar,
+  updateChordBarFrames,
+  updatePickingBar,
+  updatePickingBarFrames,
   updateStrummingPatternFrames,
   updateStrummingPatternValue,
   updateTitle,
@@ -85,11 +85,11 @@ export const TabView: React.FC<TabProps> = (props) => {
   }
 
   const addCompass: AddCompassProps['addCompass'] = (index, type) => {
-    const compass =
+    const bar =
       type === BarType.chord
-        ? createChordCompass(index, tab.strummingPatterns[0])
-        : createPickingCompass(index);
-    setTab(addCompassToTab(tab, compass));
+        ? createChordBar(index, tab.strummingPatterns[0])
+        : createPickingBar(index);
+    setTab(addCompassToTab(tab, bar));
   };
 
   const addStrummingPattern = () => {
@@ -104,22 +104,22 @@ export const TabView: React.FC<TabProps> = (props) => {
       addStrummingPattern();
     },
     copyCompass() {
-      setTab(addCompassToTab(tab, createReferenceCompass(bar)));
+      setTab(addCompassToTab(tab, createReferenceBar(bar)));
     },
     removeCompass() {
       setTab(removeCompassFromTab(tab, bar.index));
     },
     updateChordCompass(frameIndex, value) {
-      setTab(updateChordCompass(tab, bar.index, frameIndex, value));
+      setTab(updateChordBar(tab, bar.index, frameIndex, value));
     },
     updateChordCompassFrames(sPatternIndex) {
-      setTab(updateChordCompassFrames(tab, bar.index, sPatternIndex));
+      setTab(updateChordBarFrames(tab, bar.index, sPatternIndex));
     },
     updatePickingCompass(frameIndex, stringIndex, value) {
-      setTab(updatePickingCompass(tab, bar.index, frameIndex, stringIndex, value));
+      setTab(updatePickingBar(tab, bar.index, frameIndex, stringIndex, value));
     },
     updatePickingCompassFrames(frames) {
-      setTab(updatePickingCompassFrames(tab, bar.index, frames));
+      setTab(updatePickingBarFrames(tab, bar.index, frames));
     },
   });
 

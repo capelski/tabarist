@@ -1,4 +1,4 @@
-export * from './compass.logic';
+export * from './bar.logic';
 export * from './indexed-value.logic';
 export * from './local-storage.logic';
 export * from './routes.logic';
