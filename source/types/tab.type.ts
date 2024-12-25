@@ -1,8 +1,8 @@
-import { Compass } from './compass.type';
+import { Bar } from './bar.type';
 import { StrummingPattern } from './strumming-pattern.type';
 
 export type Tab = {
-  compasses: Compass[];
+  bars: Bar[];
   id: string;
   strummingPatterns: StrummingPattern[];
   title: string;

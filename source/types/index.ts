@@ -1,4 +1,4 @@
-export * from './compass.type';
+export * from './bar.type';
 export * from './indexed-value.type';
 export * from './strumming-pattern.type';
 export * from './tab-registry.type';

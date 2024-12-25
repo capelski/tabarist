@@ -1,13 +1,13 @@
 import React from 'react';
 import { addSymbol, BarType, framesNumberOptions, removeSymbol } from '../constants';
-import { ChordCompass, PickingCompass, StrummingPattern } from '../types';
+import { ChordBar, PickingBar, StrummingPattern } from '../types';
 import { AddCompass, AddCompassProps } from './add-compass';
 import { ChordFrame } from './chord-frame';
 import { PickingFrameComponent } from './picking-frame';
 
 export interface CompassProps {
   backgroundColor: string;
-  compass: ChordCompass | PickingCompass;
+  compass: ChordBar | PickingBar;
   currentIndex: number;
   handlers: {
     addStrummingPattern: () => void;
@@ -31,7 +31,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
   const strummingPattern =
     props.compass.type === BarType.chord
       ? props.strummingPatterns.find(
-          (sPattern) => sPattern.index === (props.compass as ChordCompass).sPatternIndex,
+          (sPattern) => sPattern.index === (props.compass as ChordBar).sPatternIndex,
         )
       : undefined;
 
@@ -103,7 +103,7 @@ export const CompassComponent: React.FC<CompassProps> = (props) => {
                 strummingPattern.frames.map((frame) => {
                   return (
                     <ChordFrame
-                      frame={(props.compass as ChordCompass).frames[frame.index].value}
+                      frame={(props.compass as ChordBar).frames[frame.index].value}
                       isEditMode={props.isEditMode}
                       isReference={isReference}
                       key={frame.index}

@@ -15,14 +15,14 @@ export const updateStrummingPatternFrames = (
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass) => {
-      return compass.type !== BarType.chord || compass.sPatternIndex !== sPatternIndex
-        ? compass
+    bars: tab.bars.map((bar) => {
+      return bar.type !== BarType.chord || bar.sPatternIndex !== sPatternIndex
+        ? bar
         : {
-            ...compass,
+            ...bar,
             frames: createIndexedValuesArray(
               framesNumber,
-              (index) => compass.frames[index]?.value ?? '',
+              (index) => bar.frames[index]?.value ?? '',
             ),
           };
     }),

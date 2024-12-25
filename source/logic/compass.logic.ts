@@ -1,10 +1,10 @@
 import { BarType, framesNumberDefault } from '../constants';
 import {
-  ChordCompass,
-  Compass,
-  PickingCompass,
+  Bar,
+  ChordBar,
+  PickingBar,
   PickingFrame,
-  ReferenceCompass,
+  ReferenceBar,
   StrummingPattern,
   Tab,
 } from '../types';
@@ -13,17 +13,17 @@ import { createIndexedValuesArray } from './indexed-value.logic';
 export const createChordCompass = (
   index: number,
   strummingPattern: StrummingPattern | undefined,
-): ChordCompass => ({
-  index,
+): ChordBar => ({
   frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
+  index,
   sPatternIndex: strummingPattern?.index,
   type: BarType.chord,
 });
 
-export const createPickingCompass = (index: number): PickingCompass => ({
-  index,
+export const createPickingCompass = (index: number): PickingBar => ({
   frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
   framesNumber: framesNumberDefault,
+  index,
   type: BarType.picking,
 });
 
@@ -32,26 +32,26 @@ export const createPickingFrame = (index: number): PickingFrame => ({
   strings: createIndexedValuesArray(6, ''),
 });
 
-export const createReferenceCompass = (compass: Compass): ReferenceCompass => ({
-  index: compass.index + 1,
-  compassIndex: compass.type === BarType.reference ? compass.compassIndex : compass.index,
+export const createReferenceCompass = (bar: Bar): ReferenceBar => ({
+  barIndex: bar.type === BarType.reference ? bar.barIndex : bar.index,
+  index: bar.index + 1,
   type: BarType.reference,
 });
 
 export const updateChordCompass = (
   tab: Tab,
-  compassIndex: number,
+  barIndex: number,
   frameIndex: number,
   value: string,
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass) => {
-      return compass.type !== BarType.chord || compass.index !== compassIndex
-        ? compass
+    bars: tab.bars.map((bar) => {
+      return bar.type !== BarType.chord || bar.index !== barIndex
+        ? bar
         : {
-            ...compass,
-            frames: compass.frames.map((frame) => {
+            ...bar,
+            frames: bar.frames.map((frame) => {
               return frame.index !== frameIndex ? frame : { ...frame, value };
             }),
           };
@@ -61,7 +61,7 @@ export const updateChordCompass = (
 
 export const updateChordCompassFrames = (
   tab: Tab,
-  compassIndex: number,
+  barIndex: number,
   sPatternIndex: number,
 ): Tab => {
   const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
@@ -71,15 +71,15 @@ export const updateChordCompassFrames = (
 
   return {
     ...tab,
-    compasses: tab.compasses.map((compass) => {
-      return compass.type !== BarType.chord || compass.index !== compassIndex
-        ? compass
+    bars: tab.bars.map((bar) => {
+      return bar.type !== BarType.chord || bar.index !== barIndex
+        ? bar
         : {
-            ...compass,
+            ...bar,
             sPatternIndex,
             frames: createIndexedValuesArray(
               sPattern.framesNumber,
-              (index) => compass.frames[index]?.value ?? '',
+              (index) => bar.frames[index]?.value ?? '',
             ),
           };
     }),
@@ -88,19 +88,19 @@ export const updateChordCompassFrames = (
 
 export const updatePickingCompass = (
   tab: Tab,
-  compassIndex: number,
+  barIndex: number,
   frameIndex: number,
   stringIndex: number,
   value: string,
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass) => {
-      return compass.type !== BarType.picking || compass.index !== compassIndex
-        ? compass
+    bars: tab.bars.map((bar) => {
+      return bar.type !== BarType.picking || bar.index !== barIndex
+        ? bar
         : {
-            ...compass,
-            frames: compass.frames.map((frame) => {
+            ...bar,
+            frames: bar.frames.map((frame) => {
               return frame.index !== frameIndex
                 ? frame
                 : {
@@ -117,19 +117,19 @@ export const updatePickingCompass = (
 
 export const updatePickingCompassFrames = (
   tab: Tab,
-  compassIndex: number,
+  barIndex: number,
   framesNumber: number,
 ): Tab => {
   return {
     ...tab,
-    compasses: tab.compasses.map((compass) => {
-      return compass.type !== BarType.picking || compass.index !== compassIndex
-        ? compass
+    bars: tab.bars.map((bar) => {
+      return bar.type !== BarType.picking || bar.index !== barIndex
+        ? bar
         : {
-            ...compass,
+            ...bar,
             frames: Array.from(
               { length: framesNumber },
-              (_, index) => compass.frames[index] ?? createPickingFrame(index),
+              (_, index) => bar.frames[index] ?? createPickingFrame(index),
             ),
             framesNumber,
           };

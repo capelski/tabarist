@@ -34,7 +34,7 @@ import {
   updateStrummingPatternValue,
   updateTitle,
 } from '../logic';
-import { ChordCompass, Compass, PickingCompass, Tab } from '../types';
+import { Bar, ChordBar, PickingBar, Tab } from '../types';
 
 export type TabProps = {
   removeTab: (tabId: string) => void;
@@ -96,7 +96,7 @@ export const TabView: React.FC<TabProps> = (props) => {
     setTab(addStrummingPatternToTab(tab, tab.strummingPatterns.length));
   };
 
-  const getCompassHandlers = (compass: Compass): CompassProps['handlers'] => ({
+  const getBarHandlers = (bar: Bar): CompassProps['handlers'] => ({
     addCompass(index, type) {
       addCompass(index, type);
     },
@@ -104,22 +104,22 @@ export const TabView: React.FC<TabProps> = (props) => {
       addStrummingPattern();
     },
     copyCompass() {
-      setTab(addCompassToTab(tab, createReferenceCompass(compass)));
+      setTab(addCompassToTab(tab, createReferenceCompass(bar)));
     },
     removeCompass() {
-      setTab(removeCompassFromTab(tab, compass.index));
+      setTab(removeCompassFromTab(tab, bar.index));
     },
     updateChordCompass(frameIndex, value) {
-      setTab(updateChordCompass(tab, compass.index, frameIndex, value));
+      setTab(updateChordCompass(tab, bar.index, frameIndex, value));
     },
     updateChordCompassFrames(sPatternIndex) {
-      setTab(updateChordCompassFrames(tab, compass.index, sPatternIndex));
+      setTab(updateChordCompassFrames(tab, bar.index, sPatternIndex));
     },
     updatePickingCompass(frameIndex, stringIndex, value) {
-      setTab(updatePickingCompass(tab, compass.index, frameIndex, stringIndex, value));
+      setTab(updatePickingCompass(tab, bar.index, frameIndex, stringIndex, value));
     },
     updatePickingCompassFrames(frames) {
-      setTab(updatePickingCompassFrames(tab, compass.index, frames));
+      setTab(updatePickingCompassFrames(tab, bar.index, frames));
     },
   });
 
@@ -177,24 +177,20 @@ export const TabView: React.FC<TabProps> = (props) => {
         className="compasses"
         style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
       >
-        {tab.compasses.map((compass) => {
-          const actualCompass =
-            compass.type === BarType.reference
-              ? (tab.compasses.find((c) => c.index === compass.compassIndex) as
-                  | ChordCompass
-                  | PickingCompass)
-              : compass;
+        {tab.bars.map((bar) => {
+          const actualBar =
+            bar.type === BarType.reference
+              ? (tab.bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar)
+              : bar;
 
           return (
             <CompassComponent
-              backgroundColor={
-                actualCompass.index !== compass.index && isEditMode ? '#ddd' : 'white'
-              }
-              compass={actualCompass}
-              currentIndex={compass.index}
-              handlers={getCompassHandlers(compass)}
+              backgroundColor={actualBar.index !== bar.index && isEditMode ? '#ddd' : 'white'}
+              compass={actualBar}
+              currentIndex={bar.index}
+              handlers={getBarHandlers(bar)}
               isEditMode={isEditMode}
-              key={compass.index}
+              key={bar.index}
               strummingPatterns={tab.strummingPatterns}
               width={compassWidth}
             />
@@ -204,7 +200,7 @@ export const TabView: React.FC<TabProps> = (props) => {
         {isEditMode && (
           <AddCompass
             addCompass={addCompass}
-            compassIndex={tab.compasses.length}
+            compassIndex={tab.bars.length}
             expanded={true}
             style={{
               boxSizing: 'border-box',

@@ -1,29 +1,29 @@
 import { BarType } from '../constants';
 import { IndexedValue } from './indexed-value.type';
 
-export type ChordCompass = CompassBase & {
+export type Bar = ChordBar | PickingBar | ReferenceBar;
+
+export type BarBase = { index: number };
+
+export type ChordBar = BarBase & {
   frames: IndexedValue[];
   /** Strumming pattern index */
   sPatternIndex?: number;
   type: BarType.chord;
 };
 
-export type Compass = ChordCompass | PickingCompass | ReferenceCompass;
-
-export type CompassBase = { index: number };
-
-export type PickingCompass = CompassBase & {
+export type PickingBar = BarBase & {
   frames: PickingFrame[];
   framesNumber: number;
   type: BarType.picking;
 };
 
-export type ReferenceCompass = CompassBase & {
-  compassIndex: number;
-  type: BarType.reference;
-};
-
 export type PickingFrame = {
   index: number;
   strings: IndexedValue[];
+};
+
+export type ReferenceBar = BarBase & {
+  barIndex: number;
+  type: BarType.reference;
 };

@@ -1,45 +1,45 @@
 import { nanoid } from 'nanoid';
 import { BarType } from '../constants';
-import { Compass, Tab } from '../types';
+import { Bar, Tab } from '../types';
 import { createIndexedValuesArray } from './indexed-value.logic';
 import { createStrummingPattern } from './strumming-pattern.logic';
 
-export const addCompassToTab = (tab: Tab, newCompass: Compass): Tab => {
-  if (tab.compasses.length === 0) {
+export const addCompassToTab = (tab: Tab, newBar: Bar): Tab => {
+  if (tab.bars.length === 0) {
     return {
       ...tab,
-      compasses: [newCompass],
+      bars: [newBar],
     };
   }
 
-  const nextCompasses = tab.compasses.reduce((reduced, compass) => {
-    const isLastCompass = compass.index === tab.compasses.length - 1;
+  const nextBars = tab.bars.reduce((reduced, bar) => {
+    const isLastBar = bar.index === tab.bars.length - 1;
 
-    const nextCompass: Compass = {
-      ...compass,
-      index: getIndexIncrease(compass.index, newCompass.index),
-      ...(compass.type === BarType.reference
+    const nextBar: Bar = {
+      ...bar,
+      index: getIndexIncrease(bar.index, newBar.index),
+      ...(bar.type === BarType.reference
         ? {
-            compassIndex: getIndexIncrease(compass.compassIndex, newCompass.index),
+            barIndex: getIndexIncrease(bar.barIndex, newBar.index),
           }
         : {}),
     };
 
     return [
       ...reduced,
-      ...(compass.index < newCompass.index
-        ? isLastCompass
-          ? [nextCompass, newCompass]
-          : [nextCompass]
-        : compass.index === newCompass.index
-        ? [newCompass, nextCompass]
-        : [nextCompass]),
+      ...(bar.index < newBar.index
+        ? isLastBar
+          ? [nextBar, newBar]
+          : [nextBar]
+        : bar.index === newBar.index
+        ? [newBar, nextBar]
+        : [nextBar]),
     ];
   }, []);
 
   return {
     ...tab,
-    compasses: nextCompasses,
+    bars: nextBars,
   };
 };
 
@@ -49,14 +49,14 @@ export const addStrummingPatternToTab = (tab: Tab, spIndex: number): Tab => {
   return {
     ...tab,
     strummingPatterns: [...tab.strummingPatterns, sPattern],
-    compasses:
+    bars:
       tab.strummingPatterns.length > 0
-        ? tab.compasses
-        : tab.compasses.map((compass) => {
-            return compass.type !== BarType.chord || compass.sPatternIndex !== undefined
-              ? compass
+        ? tab.bars
+        : tab.bars.map((bar) => {
+            return bar.type !== BarType.chord || bar.sPatternIndex !== undefined
+              ? bar
               : {
-                  ...compass,
+                  ...bar,
                   sPatternIndex: sPattern.index,
                   frames: createIndexedValuesArray(sPattern.framesNumber, ''),
                 };
@@ -65,7 +65,7 @@ export const addStrummingPatternToTab = (tab: Tab, spIndex: number): Tab => {
 };
 
 export const createTab = (): Tab => ({
-  compasses: [],
+  bars: [],
   id: nanoid(),
   strummingPatterns: [],
   title: 'Unnamed tab',
@@ -84,43 +84,39 @@ export const getIndexIncrease = (currentIndex: number, insertionIndex: number) =
 };
 
 export const removeCompassFromTab = (tab: Tab, deletionIndex: number): Tab => {
-  const { nextCompasses } = tab.compasses.reduce(
-    (reduced, compass) => {
+  const { nextBars } = tab.bars.reduce(
+    (reduced, bar) => {
       if (
-        compass.index === deletionIndex ||
-        (compass.type === BarType.reference && compass.compassIndex === deletionIndex)
+        bar.index === deletionIndex ||
+        (bar.type === BarType.reference && bar.barIndex === deletionIndex)
       ) {
         return {
           deletedCount: reduced.deletedCount + 1,
-          nextCompasses: reduced.nextCompasses,
+          nextBars: reduced.nextBars,
         };
       }
 
-      const nextCompass: Compass = {
-        ...compass,
-        index: getIndexDecrease(compass.index, deletionIndex, reduced.deletedCount),
-        ...(compass.type === BarType.reference
+      const nextBar: Bar = {
+        ...bar,
+        index: getIndexDecrease(bar.index, deletionIndex, reduced.deletedCount),
+        ...(bar.type === BarType.reference
           ? {
-              compassIndex: getIndexDecrease(
-                compass.compassIndex,
-                deletionIndex,
-                reduced.deletedCount,
-              ),
+              barIndex: getIndexDecrease(bar.barIndex, deletionIndex, reduced.deletedCount),
             }
           : {}),
       };
 
       return {
         deletedCount: reduced.deletedCount,
-        nextCompasses: [...reduced.nextCompasses, nextCompass],
+        nextBars: [...reduced.nextBars, nextBar],
       };
     },
-    { deletedCount: 0, nextCompasses: [] },
+    { deletedCount: 0, nextBars: [] },
   );
 
   return {
     ...tab,
-    compasses: nextCompasses,
+    bars: nextBars,
   };
 };
 
