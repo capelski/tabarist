@@ -1,14 +1,39 @@
 import { BarType, framesNumberDefault } from '../constants';
+import { Bar, ChordBar, PickingBar, PickingFrame, ReferenceBar, StrummingPattern } from '../types';
 import {
-  Bar,
-  ChordBar,
-  PickingBar,
-  PickingFrame,
-  ReferenceBar,
-  StrummingPattern,
-  Tab,
-} from '../types';
-import { createIndexedValuesArray } from './indexed-value.logic';
+  createIndexedValuesArray,
+  getIndexDecrease,
+  getIndexIncrease,
+} from './indexed-value.logic';
+
+export const addBarToGroup = (bars: Bar[], newBar: Bar): Bar[] => {
+  return bars.length === 0
+    ? [newBar]
+    : bars.reduce((reduced, bar) => {
+        const isLastBar = bar.index === bars.length - 1;
+
+        const nextBar: Bar = {
+          ...bar,
+          index: getIndexIncrease(bar.index, newBar.index),
+          ...(bar.type === BarType.reference
+            ? {
+                barIndex: getIndexIncrease(bar.barIndex, newBar.index),
+              }
+            : {}),
+        };
+
+        return [
+          ...reduced,
+          ...(bar.index < newBar.index
+            ? isLastBar
+              ? [nextBar, newBar]
+              : [nextBar]
+            : bar.index === newBar.index
+            ? [newBar, nextBar]
+            : [nextBar]),
+        ];
+      }, []);
+};
 
 export const createChordBar = (
   index: number,
@@ -38,93 +63,117 @@ export const createReferenceBar = (bar: Bar): ReferenceBar => ({
   type: BarType.reference,
 });
 
-export const updateChordBar = (
-  tab: Tab,
+const rebaseChordBar = (bars: Bar[], barIndex: number, sPattern: StrummingPattern): Bar[] => {
+  return bars.map((bar) => {
+    return bar.type !== BarType.chord || bar.index !== barIndex
+      ? bar
+      : {
+          ...bar,
+          sPatternIndex: sPattern.index,
+          frames: createIndexedValuesArray(
+            sPattern.framesNumber,
+            (index) => bar.frames[index]?.value ?? '',
+          ),
+        };
+  });
+};
+
+const rebasePickingBar = (bars: Bar[], barIndex: number, framesNumber: number): Bar[] => {
+  return bars.map((bar) => {
+    return bar.type !== BarType.picking || bar.index !== barIndex
+      ? bar
+      : {
+          ...bar,
+          frames: Array.from(
+            { length: framesNumber },
+            (_, index) => bar.frames[index] ?? createPickingFrame(index),
+          ),
+          framesNumber,
+        };
+  });
+};
+
+export const removeBarFromGroup = (bars: Bar[], deletionIndex: number): Bar[] => {
+  const { nextBars } = bars.reduce(
+    (reduced, bar) => {
+      if (
+        bar.index === deletionIndex ||
+        (bar.type === BarType.reference && bar.barIndex === deletionIndex)
+      ) {
+        return {
+          deletedCount: reduced.deletedCount + 1,
+          nextBars: reduced.nextBars,
+        };
+      }
+
+      const nextBar: Bar = {
+        ...bar,
+        index: getIndexDecrease(bar.index, deletionIndex, reduced.deletedCount),
+        ...(bar.type === BarType.reference
+          ? {
+              barIndex: getIndexDecrease(bar.barIndex, deletionIndex, reduced.deletedCount),
+            }
+          : {}),
+      };
+
+      return {
+        deletedCount: reduced.deletedCount,
+        nextBars: [...reduced.nextBars, nextBar],
+      };
+    },
+    { deletedCount: 0, nextBars: [] },
+  );
+
+  return nextBars;
+};
+
+const updateChordFrame = (
+  bars: Bar[],
   barIndex: number,
   frameIndex: number,
   value: string,
-): Tab => {
-  return {
-    ...tab,
-    bars: tab.bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            frames: bar.frames.map((frame) => {
-              return frame.index !== frameIndex ? frame : { ...frame, value };
-            }),
-          };
-    }),
-  };
+): Bar[] => {
+  return bars.map((bar) => {
+    return bar.type !== BarType.chord || bar.index !== barIndex
+      ? bar
+      : {
+          ...bar,
+          frames: bar.frames.map((frame) => {
+            return frame.index !== frameIndex ? frame : { ...frame, value };
+          }),
+        };
+  });
 };
 
-export const updateChordBarFrames = (tab: Tab, barIndex: number, sPatternIndex: number): Tab => {
-  const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
-  if (!sPattern) {
-    return tab;
-  }
-
-  return {
-    ...tab,
-    bars: tab.bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            sPatternIndex,
-            frames: createIndexedValuesArray(
-              sPattern.framesNumber,
-              (index) => bar.frames[index]?.value ?? '',
-            ),
-          };
-    }),
-  };
-};
-
-export const updatePickingBar = (
-  tab: Tab,
+const updatePickingFrame = (
+  bars: Bar[],
   barIndex: number,
   frameIndex: number,
   stringIndex: number,
   value: string,
-): Tab => {
-  return {
-    ...tab,
-    bars: tab.bars.map((bar) => {
-      return bar.type !== BarType.picking || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            frames: bar.frames.map((frame) => {
-              return frame.index !== frameIndex
-                ? frame
-                : {
-                    ...frame,
-                    strings: frame.strings.map((string) => {
-                      return string.index !== stringIndex ? string : { ...string, value };
-                    }),
-                  };
-            }),
-          };
-    }),
-  };
+): Bar[] => {
+  return bars.map((bar) => {
+    return bar.type !== BarType.picking || bar.index !== barIndex
+      ? bar
+      : {
+          ...bar,
+          frames: bar.frames.map((frame) => {
+            return frame.index !== frameIndex
+              ? frame
+              : {
+                  ...frame,
+                  strings: frame.strings.map((string) => {
+                    return string.index !== stringIndex ? string : { ...string, value };
+                  }),
+                };
+          }),
+        };
+  });
 };
 
-export const updatePickingBarFrames = (tab: Tab, barIndex: number, framesNumber: number): Tab => {
-  return {
-    ...tab,
-    bars: tab.bars.map((bar) => {
-      return bar.type !== BarType.picking || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            frames: Array.from(
-              { length: framesNumber },
-              (_, index) => bar.frames[index] ?? createPickingFrame(index),
-            ),
-            framesNumber,
-          };
-    }),
-  };
+export const barService = {
+  rebaseChordBar,
+  rebasePickingBar,
+  updateChordFrame,
+  updatePickingFrame,
 };

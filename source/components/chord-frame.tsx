@@ -6,7 +6,7 @@ export interface ChordFrameProps {
   isReference: boolean;
   strumming: string;
   style?: CSSProperties;
-  updateValue: (value: string) => void;
+  update: (value: string) => void;
   value: string;
 }
 
@@ -27,7 +27,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
             disabled={props.isReference}
             maxLength={3}
             onChange={(event) => {
-              props.updateValue(event.target.value);
+              props.update(event.target.value);
             }}
             style={{
               boxSizing: 'border-box',

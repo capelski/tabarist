@@ -12,3 +12,15 @@ export const createIndexedValuesArray = (
 export const getIndexDisplayValue = (index: number) => {
   return index + 1;
 };
+
+export const getIndexDecrease = (
+  currentIndex: number,
+  deletionIndex: number,
+  deletedCount: number,
+) => {
+  return currentIndex < deletionIndex ? currentIndex : currentIndex - deletedCount;
+};
+
+export const getIndexIncrease = (currentIndex: number, insertionIndex: number) => {
+  return currentIndex < insertionIndex ? currentIndex : currentIndex + 1;
+};

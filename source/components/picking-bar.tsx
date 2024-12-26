@@ -11,8 +11,8 @@ export interface PickingBarProps {
   currentIndex: number;
   handlers: BarControlsProps['handlers'] & {
     addBar: AddBarProps['addBar'];
-    updateFrames: (framesNumber: number) => void;
-    updateValue: (frameIndex: number, stringIndex: number, value: string) => void;
+    rebase: (framesNumber: number) => void;
+    updateFrame: (frameIndex: number, stringIndex: number, value: string) => void;
   };
   isEditMode: boolean;
   width: number;
@@ -49,8 +49,8 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
                 isEditMode={props.isEditMode}
                 isReference={isReference}
                 key={frame.index}
-                updateValue={(stringIndex, value) => {
-                  props.handlers.updateValue(frame.index, stringIndex, value);
+                update={(stringIndex, value) => {
+                  props.handlers.updateFrame(frame.index, stringIndex, value);
                 }}
                 width={framesWidth}
               />
@@ -64,7 +64,7 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
           {!isReference && (
             <select
               onChange={(event) => {
-                props.handlers.updateFrames(parseInt(event.target.value));
+                props.handlers.rebase(parseInt(event.target.value));
               }}
               style={{ marginRight: 8 }}
               value={props.bar.framesNumber}

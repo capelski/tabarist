@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 import { localStorageKey_tabRegistry, RouteNames } from './constants';
-import { createTab, getTabLocalStorageKey } from './logic';
+import { getTabLocalStorageKey, tabService } from './logic';
 import { Tab, TabRegistry } from './types';
 import { TabRegistryView, TabView } from './views';
 
@@ -22,7 +22,7 @@ export const App: React.FC = () => {
   }, []);
 
   const createNewTab = () => {
-    const newTab = createTab();
+    const newTab = tabService.create();
     updateTab(newTab);
 
     const nextTabRegistry = { ...tabRegistry, [newTab.id]: newTab.title };

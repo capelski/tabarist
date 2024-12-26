@@ -7,7 +7,7 @@ export interface PickingFrameProps {
   frame: PickingFrame;
   isEditMode: boolean;
   isReference: boolean;
-  updateValue: (stringIndex: number, value: string) => void;
+  update: (stringIndex: number, value: string) => void;
   width: number;
 }
 
@@ -30,7 +30,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
                 disabled={props.isReference}
                 maxLength={3}
                 onChange={(event) => {
-                  props.updateValue(string.index, event.target.value);
+                  props.update(string.index, event.target.value);
                 }}
                 style={{
                   boxSizing: 'border-box',

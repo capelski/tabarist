@@ -11,10 +11,10 @@ export interface ChordBarProps {
   bar: ChordBar;
   currentIndex: number;
   handlers: BarControlsProps['handlers'] & {
-    addStrummingPattern: () => void;
     addBar: AddBarProps['addBar'];
-    updateFrames: (sPatternIndex: number) => void;
-    updateValue: (frameIndex: number, value: string) => void;
+    addStrummingPattern: () => void;
+    rebase: (sPatternIndex: number) => void;
+    updateFrame: (frameIndex: number, value: string) => void;
   };
   isEditMode: boolean;
   strummingPatterns: StrummingPattern[];
@@ -68,8 +68,8 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
                     boxSizing: 'border-box',
                     width: `${framesWidth}%`,
                   }}
-                  updateValue={(value) => {
-                    props.handlers.updateValue(frame.index, value);
+                  update={(value) => {
+                    props.handlers.updateFrame(frame.index, value);
                   }}
                   value={frame.value}
                 />
@@ -82,6 +82,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
               Strumming pattern:
               {props.strummingPatterns.length === 0 ? (
                 <button
+                  disabled={isReference}
                   onClick={props.handlers.addStrummingPattern}
                   style={{ marginLeft: 8 }}
                   type="button"
@@ -93,7 +94,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
                   disabled={props.strummingPatterns.length < 2 || isReference}
                   onChange={(event) => {
                     const sPatternIndex = parseInt(event.target.value);
-                    props.handlers.updateFrames(sPatternIndex);
+                    props.handlers.rebase(sPatternIndex);
                   }}
                   style={{ marginLeft: 8, minWidth: 40 }}
                   value={props.bar.sPatternIndex}

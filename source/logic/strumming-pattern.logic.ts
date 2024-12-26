@@ -38,6 +38,17 @@ export const updateStrummingPatternFrames = (
             framesNumber,
           };
     }),
+    sections: tab.sections.map((section) => ({
+      ...section,
+      bars: section.bars.map((bar) => {
+        return bar.type !== BarType.chord || bar.sPatternIndex !== sPatternIndex
+          ? bar
+          : {
+              ...bar,
+              frames: createIndexedValuesArray(framesNumber, ''),
+            };
+      }),
+    })),
   };
 };
 

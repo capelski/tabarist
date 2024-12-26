@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useMediaQuery } from 'react-responsive';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
-import {
-  AddBar,
-  ChordBarComponent,
-  ChordBarProps,
-  PickingBarComponent,
-  PickingBarProps,
-  StrummingPatternComponent,
-} from '../components';
+import { StrummingPatternComponent } from '../components';
+import { BarGroup } from '../components/bar-group';
 import {
   addSymbol,
   BarType,
@@ -17,25 +10,19 @@ import {
   removeSymbol,
   RouteNames,
   saveSymbol,
-  stringHeight,
 } from '../constants';
 import {
-  addBarToTab,
-  addStrummingPatternToTab,
   createChordBar,
   createPickingBar,
   createReferenceBar,
+  getIndexDisplayValue,
   getTabLocalStorageKey,
-  removeBarFromTab,
-  updateChordBar,
-  updateChordBarFrames,
-  updatePickingBar,
-  updatePickingBarFrames,
+  sectionService,
+  tabService,
   updateStrummingPatternFrames,
   updateStrummingPatternValue,
-  updateTitle,
 } from '../logic';
-import { Bar, ChordBar, PickingBar, Tab } from '../types';
+import { Bar, Section, Tab } from '../types';
 
 export type TabProps = {
   removeTab: (tabId: string) => void;
@@ -70,10 +57,6 @@ export const TabView: React.FC<TabProps> = (props) => {
     }
   }, [searchParams]);
 
-  const isBigScreen = useMediaQuery({ minWidth: 1000 });
-  const isMediumScreen = useMediaQuery({ minWidth: 600 });
-  const barWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
-
   if (!tab) {
     return (
       <div style={{ alignItems: 'center', display: 'flex' }}>
@@ -85,54 +68,40 @@ export const TabView: React.FC<TabProps> = (props) => {
     );
   }
 
-  const addBar = (index: number, type: BarType.chord | BarType.picking) => {
-    const bar =
-      type === BarType.chord
-        ? createChordBar(index, tab.strummingPatterns[0])
-        : createPickingBar(index);
-    setTab(addBarToTab(tab, bar));
+  const addBar =
+    (section: Section | undefined) => (index: number, type: BarType.chord | BarType.picking) => {
+      const bar =
+        type === BarType.chord
+          ? createChordBar(index, tab.strummingPatterns[0])
+          : createPickingBar(index);
+      const nextTab = section
+        ? sectionService.addBar(tab, section.index, bar)
+        : tabService.addBar(tab, bar);
+      setTab(nextTab);
+    };
+
+  const addSection = () => {
+    setTab(tabService.addSection(tab));
   };
 
   const addStrummingPattern = () => {
-    setTab(addStrummingPatternToTab(tab, tab.strummingPatterns.length));
+    setTab(tabService.addStrummingPattern(tab));
   };
 
-  const getChordBarHandlers = (bar: Bar): ChordBarProps['handlers'] => ({
-    addBar(type) {
-      addBar(bar.index, type);
-    },
-    addStrummingPattern,
-    copyBar() {
-      setTab(addBarToTab(tab, createReferenceBar(bar)));
-    },
-    removeBar() {
-      setTab(removeBarFromTab(tab, bar.index));
-    },
-    updateFrames(sPatternIndex) {
-      setTab(updateChordBarFrames(tab, bar.index, sPatternIndex));
-    },
-    updateValue(frameIndex, value) {
-      setTab(updateChordBar(tab, bar.index, frameIndex, value));
-    },
-  });
+  const copyBar = (section: Section | undefined) => (bar: Bar) => {
+    const newBar = createReferenceBar(bar);
+    const nextTab = section
+      ? sectionService.addBar(tab, section.index, newBar)
+      : tabService.addBar(tab, newBar);
+    setTab(nextTab);
+  };
 
-  const getPickingBarHandlers = (bar: Bar): PickingBarProps['handlers'] => ({
-    addBar(type) {
-      addBar(bar.index, type);
-    },
-    copyBar() {
-      setTab(addBarToTab(tab, createReferenceBar(bar)));
-    },
-    removeBar() {
-      setTab(removeBarFromTab(tab, bar.index));
-    },
-    updateFrames(frames) {
-      setTab(updatePickingBarFrames(tab, bar.index, frames));
-    },
-    updateValue(frameIndex, stringIndex, value) {
-      setTab(updatePickingBar(tab, bar.index, frameIndex, stringIndex, value));
-    },
-  });
+  const removeBar = (section: Section | undefined) => (deletionIndex: number) => {
+    const nextTab = section
+      ? sectionService.removeBar(tab, section.index, deletionIndex)
+      : tabService.removeBar(tab, deletionIndex);
+    setTab(nextTab);
+  };
 
   const toggleEditMode = () => {
     const nextSearchParams = new URLSearchParams(searchParams);
@@ -159,7 +128,7 @@ export const TabView: React.FC<TabProps> = (props) => {
             <input
               value={tab.title}
               onChange={(event) => {
-                setTab(updateTitle(tab, event.target.value));
+                setTab(tabService.updateTitle(tab, event.target.value));
               }}
             />
           ) : (
@@ -184,53 +153,47 @@ export const TabView: React.FC<TabProps> = (props) => {
         </div>
       </div>
 
-      <div
-        className="bars"
-        style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
-      >
-        {tab.bars.map((bar) => {
-          const actualBar =
-            bar.type === BarType.reference
-              ? (tab.bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar)
-              : bar;
-
-          return actualBar.type === BarType.picking ? (
-            <PickingBarComponent
-              backgroundColor={actualBar.index !== bar.index && isEditMode ? '#ddd' : 'white'}
-              bar={actualBar}
-              currentIndex={bar.index}
-              handlers={getPickingBarHandlers(bar)}
-              isEditMode={isEditMode}
-              key={bar.index}
-              width={barWidth}
-            />
-          ) : (
-            <ChordBarComponent
-              backgroundColor={actualBar.index !== bar.index && isEditMode ? '#ddd' : 'white'}
-              bar={actualBar}
-              currentIndex={bar.index}
-              handlers={getChordBarHandlers(bar)}
-              isEditMode={isEditMode}
-              key={bar.index}
-              strummingPatterns={tab.strummingPatterns}
-              width={barWidth}
-            />
-          );
+      <BarGroup
+        addBar={addBar(undefined)}
+        bars={tab.bars}
+        getChordBarHandlers={(bar) => ({
+          addBar(type) {
+            addBar(undefined)(bar.index, type);
+          },
+          addStrummingPattern,
+          copyBar() {
+            copyBar(undefined)(bar);
+          },
+          rebase(sPatternIndex) {
+            setTab(tabService.rebaseChordBar(tab, bar.index, sPatternIndex));
+          },
+          removeBar() {
+            removeBar(undefined)(bar.index);
+          },
+          updateFrame(frameIndex, value) {
+            setTab(tabService.updateChordFrame(tab, bar.index, frameIndex, value));
+          },
         })}
-
-        {isEditMode && (
-          <AddBar
-            addBar={(type) => addBar(tab.bars.length, type)}
-            expanded={true}
-            style={{
-              boxSizing: 'border-box',
-              flexBasis: `${barWidth}%`,
-              height: stringHeight * 6,
-              padding: '0 8px',
-            }}
-          />
-        )}
-      </div>
+        getPickingBarHandlers={(bar) => ({
+          addBar(type) {
+            addBar(undefined)(bar.index, type);
+          },
+          copyBar() {
+            copyBar(undefined)(bar);
+          },
+          rebase(frames) {
+            setTab(tabService.rebasePickingBar(tab, bar.index, frames));
+          },
+          removeBar() {
+            removeBar(undefined)(bar.index);
+          },
+          updateFrame(frameIndex, stringIndex, value) {
+            setTab(tabService.updatePickingFrame(tab, bar.index, frameIndex, stringIndex, value));
+          },
+        })}
+        isEditMode={isEditMode}
+        strummingPatterns={tab.strummingPatterns}
+      />
 
       {isEditMode && (
         <React.Fragment>
@@ -253,6 +216,84 @@ export const TabView: React.FC<TabProps> = (props) => {
                   setTab(updateStrummingPatternValue(tab, sPattern.index, frameIndex, value));
                 }}
               />
+            );
+          })}
+
+          <h3>Sections</h3>
+          <p>
+            <button onClick={addSection} type="button">
+              {addSymbol} section
+            </button>
+          </p>
+
+          {tab.sections.map((section) => {
+            return (
+              <React.Fragment key={section.index}>
+                {section.name || `Section ${getIndexDisplayValue(section.index)}`}
+
+                <BarGroup
+                  addBar={addBar(section)}
+                  bars={section.bars}
+                  getChordBarHandlers={(bar) => ({
+                    addBar(type) {
+                      addBar(section)(bar.index, type);
+                    },
+                    addStrummingPattern,
+                    rebase(sPatternIndex) {
+                      setTab(
+                        sectionService.rebaseChordBar(tab, section.index, bar.index, sPatternIndex),
+                      );
+                    },
+                    copyBar() {
+                      copyBar(section)(bar);
+                    },
+                    removeBar() {
+                      removeBar(section)(bar.index);
+                    },
+                    updateFrame(frameIndex, value) {
+                      setTab(
+                        sectionService.updateChordFrame(
+                          tab,
+                          section.index,
+                          bar.index,
+                          frameIndex,
+                          value,
+                        ),
+                      );
+                    },
+                  })}
+                  getPickingBarHandlers={(bar) => ({
+                    addBar(type) {
+                      addBar(section)(bar.index, type);
+                    },
+                    copyBar() {
+                      copyBar(section)(bar);
+                    },
+                    removeBar() {
+                      removeBar(section)(bar.index);
+                    },
+                    rebase(frames) {
+                      setTab(
+                        sectionService.rebasePickingBar(tab, section.index, bar.index, frames),
+                      );
+                    },
+                    updateFrame(frameIndex, stringIndex, value) {
+                      setTab(
+                        sectionService.updatePickingFrame(
+                          tab,
+                          section.index,
+                          bar.index,
+                          frameIndex,
+                          stringIndex,
+                          value,
+                        ),
+                      );
+                    },
+                  })}
+                  isEditMode={isEditMode}
+                  strummingPatterns={tab.strummingPatterns}
+                />
+              </React.Fragment>
             );
           })}
         </React.Fragment>
