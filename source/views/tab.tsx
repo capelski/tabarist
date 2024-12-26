@@ -156,9 +156,6 @@ export const TabView: React.FC<TabProps> = (props) => {
         addBar={addBar(undefined)}
         bars={tab.bars}
         getChordBarHandlers={(bar) => ({
-          addBar(type) {
-            addBar(undefined)(bar.index, type);
-          },
           addStrummingPattern,
           copyBar() {
             copyBar(undefined)(bar);
@@ -174,9 +171,6 @@ export const TabView: React.FC<TabProps> = (props) => {
           },
         })}
         getPickingBarHandlers={(bar) => ({
-          addBar(type) {
-            addBar(undefined)(bar.index, type);
-          },
           copyBar() {
             copyBar(undefined)(bar);
           },
@@ -234,9 +228,6 @@ export const TabView: React.FC<TabProps> = (props) => {
                   addBar={addBar(section)}
                   bars={section.bars}
                   getChordBarHandlers={(bar) => ({
-                    addBar(type) {
-                      addBar(section)(bar.index, type);
-                    },
                     addStrummingPattern,
                     rebase(sPatternIndex) {
                       setTab(
@@ -262,9 +253,6 @@ export const TabView: React.FC<TabProps> = (props) => {
                     },
                   })}
                   getPickingBarHandlers={(bar) => ({
-                    addBar(type) {
-                      addBar(section)(bar.index, type);
-                    },
                     copyBar() {
                       copyBar(section)(bar);
                     },

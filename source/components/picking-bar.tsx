@@ -6,11 +6,11 @@ import { BarControls, BarControlsProps } from './bar-controls';
 import { PickingFrameComponent } from './picking-frame';
 
 export interface PickingBarProps {
+  addBar: AddBarProps['addBar'];
   backgroundColor: string;
   bar: PickingBar;
   currentIndex: number;
   handlers: BarControlsProps['handlers'] & {
-    addBar: AddBarProps['addBar'];
     rebase: (framesNumber: number) => void;
     updateFrame: (frameIndex: number, stringIndex: number, value: string) => void;
   };
@@ -28,7 +28,7 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
       style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
-        {props.isEditMode && <AddBar addBar={props.handlers.addBar} style={{ minHeight: 60 }} />}
+        {props.isEditMode && <AddBar addBar={props.addBar} style={{ minHeight: 60 }} />}
 
         <div
           className="frames"

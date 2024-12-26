@@ -37,6 +37,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
 
         return actualBar.type === BarType.picking ? (
           <PickingBarComponent
+            addBar={(type) => props.addBar(bar.index, type)}
             backgroundColor={actualBar.index !== bar.index && props.isEditMode ? '#ddd' : 'white'}
             bar={actualBar}
             currentIndex={bar.index}
@@ -47,6 +48,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           />
         ) : (
           <ChordBarComponent
+            addBar={(type) => props.addBar(bar.index, type)}
             backgroundColor={actualBar.index !== bar.index && props.isEditMode ? '#ddd' : 'white'}
             bar={actualBar}
             currentIndex={bar.index}

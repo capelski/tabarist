@@ -7,11 +7,11 @@ import { BarControls, BarControlsProps } from './bar-controls';
 import { ChordFrame } from './chord-frame';
 
 export interface ChordBarProps {
+  addBar: AddBarProps['addBar'];
   backgroundColor: string;
   bar: ChordBar;
   currentIndex: number;
   handlers: BarControlsProps['handlers'] & {
-    addBar: AddBarProps['addBar'];
     addStrummingPattern: () => void;
     rebase: (sPatternIndex: number) => void;
     updateFrame: (frameIndex: number, value: string) => void;
@@ -34,7 +34,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
       style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
-        {props.isEditMode && <AddBar addBar={props.handlers.addBar} style={{ minHeight: 60 }} />}
+        {props.isEditMode && <AddBar addBar={props.addBar} style={{ minHeight: 60 }} />}
 
         <div
           style={{
