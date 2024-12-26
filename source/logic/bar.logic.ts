@@ -6,7 +6,7 @@ import {
   getIndexIncrease,
 } from './indexed-value.logic';
 
-export const addBarToGroup = (bars: Bar[], newBar: Bar): Bar[] => {
+const addBar = (bars: Bar[], newBar: Bar): Bar[] => {
   return bars.length === 0
     ? [newBar]
     : bars.reduce((reduced, bar) => {
@@ -93,7 +93,7 @@ const rebasePickingBar = (bars: Bar[], barIndex: number, framesNumber: number): 
   });
 };
 
-export const removeBarFromGroup = (bars: Bar[], deletionIndex: number): Bar[] => {
+const removeBar = (bars: Bar[], deletionIndex: number): Bar[] => {
   const { nextBars } = bars.reduce(
     (reduced, bar) => {
       if (
@@ -191,8 +191,10 @@ const updatePickingFrame = (
 };
 
 export const barService = {
+  addBar,
   rebaseChordBar,
   rebasePickingBar,
+  removeBar,
   setStrummingPattern,
   updateChordFrame,
   updatePickingFrame,

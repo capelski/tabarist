@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid';
 import { Bar, Tab } from '../types';
-import { addBarToGroup, barService, removeBarFromGroup } from './bar.logic';
+import { barService } from './bar.logic';
 import { sectionService } from './section.logic';
 import { sPatternService } from './strumming-pattern.logic';
 
 const addBar = (tab: Tab, newBar: Bar): Tab => {
   return {
     ...tab,
-    bars: addBarToGroup(tab.bars, newBar),
+    bars: barService.addBar(tab.bars, newBar),
   };
 };
 
@@ -64,7 +64,7 @@ const rebasePickingBar = (tab: Tab, barIndex: number, framesNumber: number): Tab
 const removeBar = (tab: Tab, deletionIndex: number): Tab => {
   return {
     ...tab,
-    bars: removeBarFromGroup(tab.bars, deletionIndex),
+    bars: barService.removeBar(tab.bars, deletionIndex),
   };
 };
 

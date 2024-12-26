@@ -1,10 +1,10 @@
 import { Bar, Section, Tab } from '../types';
-import { addBarToGroup, barService, removeBarFromGroup } from './bar.logic';
+import { barService } from './bar.logic';
 
 const addBar = (tab: Tab, sectionIndex: number, newBar: Bar): Tab => {
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: addBarToGroup(section.bars, newBar),
+    bars: barService.addBar(section.bars, newBar),
   }));
 };
 
@@ -66,7 +66,7 @@ const rebasePickingBar = (
 const removeBar = (tab: Tab, sectionIndex: number, deletionIndex: number): Tab => {
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: removeBarFromGroup(section.bars, deletionIndex),
+    bars: barService.removeBar(section.bars, deletionIndex),
   }));
 };
 
