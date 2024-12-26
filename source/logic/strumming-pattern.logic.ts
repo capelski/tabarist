@@ -1,63 +1,40 @@
-import { BarType, framesNumberDefault } from '../constants';
+import { framesNumberDefault } from '../constants';
 import { StrummingPattern, Tab } from '../types';
+import { barService } from './bar.logic';
 import { createIndexedValuesArray } from './indexed-value.logic';
 
-export const createStrummingPattern = (index: number): StrummingPattern => ({
+const create = (index: number): StrummingPattern => ({
   frames: createIndexedValuesArray(framesNumberDefault, ''),
   framesNumber: framesNumberDefault,
   index,
 });
 
-export const updateStrummingPatternFrames = (
-  tab: Tab,
-  sPatternIndex: number,
-  framesNumber: number,
-): Tab => {
+const rebase = (tab: Tab, sPatternIndex: number, framesNumber: number): Tab => {
+  const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
+  if (!sPattern) {
+    return tab;
+  }
+
+  const nextStrummingPattern = {
+    ...sPattern,
+    frames: createIndexedValuesArray(framesNumber, (index) => sPattern.frames[index]?.value ?? ''),
+    framesNumber,
+  };
+
   return {
     ...tab,
-    bars: tab.bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.sPatternIndex !== sPatternIndex
-        ? bar
-        : {
-            ...bar,
-            frames: createIndexedValuesArray(
-              framesNumber,
-              (index) => bar.frames[index]?.value ?? '',
-            ),
-          };
-    }),
+    bars: barService.setStrummingPattern(tab.bars, nextStrummingPattern, sPatternIndex),
     strummingPatterns: tab.strummingPatterns.map((sPattern) => {
-      return sPattern.index !== sPatternIndex
-        ? sPattern
-        : {
-            ...sPattern,
-            frames: createIndexedValuesArray(
-              framesNumber,
-              (index) => sPattern.frames[index]?.value ?? '',
-            ),
-            framesNumber,
-          };
+      return sPattern.index !== sPatternIndex ? sPattern : nextStrummingPattern;
     }),
     sections: tab.sections.map((section) => ({
       ...section,
-      bars: section.bars.map((bar) => {
-        return bar.type !== BarType.chord || bar.sPatternIndex !== sPatternIndex
-          ? bar
-          : {
-              ...bar,
-              frames: createIndexedValuesArray(framesNumber, ''),
-            };
-      }),
+      bars: barService.setStrummingPattern(section.bars, nextStrummingPattern, sPatternIndex),
     })),
   };
 };
 
-export const updateStrummingPatternValue = (
-  tab: Tab,
-  sPatternIndex: number,
-  frameIndex: number,
-  value: string,
-): Tab => {
+const update = (tab: Tab, sPatternIndex: number, frameIndex: number, value: string): Tab => {
   return {
     ...tab,
     strummingPatterns: tab.strummingPatterns.map((sPattern) => {
@@ -71,4 +48,10 @@ export const updateStrummingPatternValue = (
           };
     }),
   };
+};
+
+export const sPatternService = {
+  create,
+  rebase,
+  update,
 };

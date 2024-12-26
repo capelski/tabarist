@@ -18,9 +18,8 @@ import {
   getIndexDisplayValue,
   getTabLocalStorageKey,
   sectionService,
+  sPatternService,
   tabService,
-  updateStrummingPatternFrames,
-  updateStrummingPatternValue,
 } from '../logic';
 import { Bar, Section, Tab } from '../types';
 
@@ -208,12 +207,12 @@ export const TabView: React.FC<TabProps> = (props) => {
             return (
               <StrummingPatternComponent
                 key={sPattern.index}
-                strummingPattern={sPattern}
-                updateFrames={(framesNumber) => {
-                  setTab(updateStrummingPatternFrames(tab, sPattern.index, framesNumber));
+                rebase={(framesNumber) => {
+                  setTab(sPatternService.rebase(tab, sPattern.index, framesNumber));
                 }}
-                updateValue={(frameIndex, value) => {
-                  setTab(updateStrummingPatternValue(tab, sPattern.index, frameIndex, value));
+                strummingPattern={sPattern}
+                update={(frameIndex, value) => {
+                  setTab(sPatternService.update(tab, sPattern.index, frameIndex, value));
                 }}
               />
             );

@@ -127,6 +127,25 @@ export const removeBarFromGroup = (bars: Bar[], deletionIndex: number): Bar[] =>
   return nextBars;
 };
 
+const setStrummingPattern = (
+  bars: Bar[],
+  sPattern: StrummingPattern,
+  matchingIndex: number | undefined,
+): Bar[] => {
+  return bars.map((bar) => {
+    return bar.type === BarType.chord && bar.sPatternIndex === matchingIndex
+      ? {
+          ...bar,
+          sPatternIndex: sPattern.index,
+          frames: createIndexedValuesArray(
+            sPattern.framesNumber,
+            (index) => bar.frames[index]?.value ?? '',
+          ),
+        }
+      : bar;
+  });
+};
+
 const updateChordFrame = (
   bars: Bar[],
   barIndex: number,
@@ -174,6 +193,7 @@ const updatePickingFrame = (
 export const barService = {
   rebaseChordBar,
   rebasePickingBar,
+  setStrummingPattern,
   updateChordFrame,
   updatePickingFrame,
 };

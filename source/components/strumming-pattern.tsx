@@ -4,9 +4,9 @@ import { getIndexDisplayValue } from '../logic';
 import { StrummingPattern } from '../types';
 
 export type StrummingPatternProps = {
+  rebase: (framesNumber: number) => void;
   strummingPattern: StrummingPattern;
-  updateFrames: (framesNumber: number) => void;
-  updateValue: (frameIndex: number, value: string) => void;
+  update: (frameIndex: number, value: string) => void;
 };
 
 export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props) => {
@@ -34,7 +34,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
                 <input
                   maxLength={3}
                   onChange={(event) => {
-                    props.updateValue(frame.index, event.target.value);
+                    props.update(frame.index, event.target.value);
                   }}
                   style={{
                     boxSizing: 'border-box',
@@ -53,7 +53,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
 
       <select
         onChange={(event) => {
-          props.updateFrames(parseInt(event.target.value));
+          props.rebase(parseInt(event.target.value));
         }}
         value={props.strummingPattern.framesNumber}
       >

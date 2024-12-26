@@ -1,10 +1,8 @@
 import { nanoid } from 'nanoid';
-import { BarType } from '../constants';
 import { Bar, Tab } from '../types';
 import { addBarToGroup, barService, removeBarFromGroup } from './bar.logic';
-import { createIndexedValuesArray } from './indexed-value.logic';
 import { sectionService } from './section.logic';
-import { createStrummingPattern } from './strumming-pattern.logic';
+import { sPatternService } from './strumming-pattern.logic';
 
 const addBar = (tab: Tab, newBar: Bar): Tab => {
   return {
@@ -23,38 +21,16 @@ const addSection = (tab: Tab): Tab => {
 };
 
 const addStrummingPattern = (tab: Tab): Tab => {
-  const sPattern = createStrummingPattern(tab.strummingPatterns.length);
+  const sPattern = sPatternService.create(tab.strummingPatterns.length);
 
   return {
     ...tab,
     strummingPatterns: [...tab.strummingPatterns, sPattern],
-    bars:
-      tab.strummingPatterns.length > 0
-        ? tab.bars
-        : tab.bars.map((bar) => {
-            return bar.type !== BarType.chord || bar.sPatternIndex !== undefined
-              ? bar
-              : {
-                  ...bar,
-                  sPatternIndex: sPattern.index,
-                  frames: createIndexedValuesArray(sPattern.framesNumber, ''),
-                };
-          }),
-    sections:
-      tab.strummingPatterns.length > 0
-        ? tab.sections
-        : tab.sections.map((section) => ({
-            ...section,
-            bars: section.bars.map((bar) => {
-              return bar.type !== BarType.chord || bar.sPatternIndex !== undefined
-                ? bar
-                : {
-                    ...bar,
-                    sPatternIndex: sPattern.index,
-                    frames: createIndexedValuesArray(sPattern.framesNumber, ''),
-                  };
-            }),
-          })),
+    bars: barService.setStrummingPattern(tab.bars, sPattern, undefined),
+    sections: tab.sections.map((section) => ({
+      ...section,
+      bars: barService.setStrummingPattern(section.bars, sPattern, undefined),
+    })),
   };
 };
 
