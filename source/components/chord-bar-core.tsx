@@ -1,6 +1,5 @@
 import React from 'react';
 import { addSymbol } from '../constants';
-import { getIndexDisplayValue } from '../logic';
 import { ChordBar, StrummingPattern } from '../types';
 import { ChordFrame } from './chord-frame';
 
@@ -92,7 +91,7 @@ export const getChordBarCore = (props: ChordBarCoreProps) => {
                 {props.strummingPatterns.map((sPattern) => {
                   return (
                     <option key={sPattern.index} value={sPattern.index}>
-                      {getIndexDisplayValue(sPattern.index)}
+                      {sPattern.name}
                     </option>
                   );
                 })}

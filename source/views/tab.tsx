@@ -133,16 +133,19 @@ export const TabView: React.FC<TabProps> = (props) => {
 
           {tab.strummingPatterns.map((sPattern) => {
             return (
-              <StrummingPatternComponent
-                key={sPattern.index}
-                rebase={(framesNumber) => {
-                  setTab(sPatternService.rebase(tab, sPattern.index, framesNumber));
-                }}
-                strummingPattern={sPattern}
-                update={(frameIndex, value) => {
-                  setTab(sPatternService.update(tab, sPattern.index, frameIndex, value));
-                }}
-              />
+              <React.Fragment key={sPattern.index}>
+                {sPattern.name}
+
+                <StrummingPatternComponent
+                  rebase={(framesNumber) => {
+                    setTab(sPatternService.rebase(tab, sPattern.index, framesNumber));
+                  }}
+                  strummingPattern={sPattern}
+                  update={(frameIndex, value) => {
+                    setTab(sPatternService.update(tab, sPattern.index, frameIndex, value));
+                  }}
+                />
+              </React.Fragment>
             );
           })}
 

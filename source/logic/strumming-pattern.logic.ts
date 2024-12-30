@@ -7,6 +7,7 @@ const create = (index: number): StrummingPattern => ({
   frames: createIndexedValuesArray(framesNumberDefault, ''),
   framesNumber: framesNumberDefault,
   index,
+  name: 'Unnamed pattern',
 });
 
 const rebase = (tab: Tab, sPatternIndex: number, framesNumber: number): Tab => {
