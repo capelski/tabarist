@@ -1,19 +1,33 @@
 import React from 'react';
 import { framesNumberOptions, stringHeight } from '../constants';
-import { getIndexDisplayValue } from '../logic';
-import { StrummingPattern } from '../types';
+import { tabService } from '../logic';
+import { StrummingPattern, Tab } from '../types';
 
 export type StrummingPatternProps = {
   rebase: (framesNumber: number) => void;
   strummingPattern: StrummingPattern;
+  tab: Tab;
   update: (frameIndex: number, value: string) => void;
+  updateTab: (tab: Tab) => void;
 };
 
 export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props) => {
   return (
     <div style={{ marginBottom: 16 }}>
+      <p>
+        <input
+          onChange={(event) => {
+            const nextTab = tabService.renameStrummingPattern(
+              props.tab,
+              props.strummingPattern.index,
+              event.target.value,
+            );
+            props.updateTab(nextTab);
+          }}
+          value={props.strummingPattern.name}
+        />
+      </p>
       <div style={{ display: 'flex' }}>
-        <p>{getIndexDisplayValue(props.strummingPattern.index)}&nbsp;</p>
         {props.strummingPattern.frames.map((frame) => {
           return (
             <div

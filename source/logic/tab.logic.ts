@@ -83,6 +83,24 @@ const removeBar = (tab: Tab, deletionIndex: number): Tab => {
   };
 };
 
+const renameSection = (tab: Tab, sectionIndex: number, name: string): Tab => {
+  return {
+    ...tab,
+    sections: tab.sections.map((section) => {
+      return section.index === sectionIndex ? { ...section, name } : section;
+    }),
+  };
+};
+
+const renameStrummingPattern = (tab: Tab, sPatternIndex: number, name: string): Tab => {
+  return {
+    ...tab,
+    strummingPatterns: tab.strummingPatterns.map((sPattern) => {
+      return sPattern.index === sPatternIndex ? { ...sPattern, name } : sPattern;
+    }),
+  };
+};
+
 const updateChordFrame = (tab: Tab, barIndex: number, frameIndex: number, value: string): Tab => {
   return {
     ...tab,
@@ -119,6 +137,8 @@ export const tabService = {
   rebaseChordBar,
   rebasePickingBar,
   removeBar,
+  renameSection,
+  renameStrummingPattern,
   updateChordFrame,
   updatePickingFrame,
   updateTitle,

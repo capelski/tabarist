@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
-import { BarGroup, StrummingPatternComponent } from '../components';
+import { BarGroup, SectionComponent, StrummingPatternComponent } from '../components';
 import {
   addSymbol,
   editSymbol,
@@ -133,19 +133,18 @@ export const TabView: React.FC<TabProps> = (props) => {
 
           {tab.strummingPatterns.map((sPattern) => {
             return (
-              <React.Fragment key={sPattern.index}>
-                {sPattern.name}
-
-                <StrummingPatternComponent
-                  rebase={(framesNumber) => {
-                    setTab(sPatternService.rebase(tab, sPattern.index, framesNumber));
-                  }}
-                  strummingPattern={sPattern}
-                  update={(frameIndex, value) => {
-                    setTab(sPatternService.update(tab, sPattern.index, frameIndex, value));
-                  }}
-                />
-              </React.Fragment>
+              <StrummingPatternComponent
+                key={sPattern.index}
+                rebase={(framesNumber) => {
+                  setTab(sPatternService.rebase(tab, sPattern.index, framesNumber));
+                }}
+                strummingPattern={sPattern}
+                tab={tab}
+                update={(frameIndex, value) => {
+                  setTab(sPatternService.update(tab, sPattern.index, frameIndex, value));
+                }}
+                updateTab={setTab}
+              />
             );
           })}
 
@@ -158,18 +157,14 @@ export const TabView: React.FC<TabProps> = (props) => {
 
           {tab.sections.map((section) => {
             return (
-              <React.Fragment key={section.index}>
-                {section.name}
-
-                <BarGroup
-                  addStrummingPattern={addStrummingPattern}
-                  bars={section.bars}
-                  isEditMode={isEditMode}
-                  inSection={section}
-                  tab={tab}
-                  updateTab={setTab}
-                />
-              </React.Fragment>
+              <SectionComponent
+                addStrummingPattern={addStrummingPattern}
+                isEditMode={isEditMode}
+                key={section.index}
+                section={section}
+                tab={tab}
+                updateTab={setTab}
+              />
             );
           })}
         </React.Fragment>
