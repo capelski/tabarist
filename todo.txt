@@ -1,0 +1,15 @@
+- Strumming pattern picker
+- Rename logic to services
+- Move handlers inside the Chord/Picking/Reference/Section components
+- Sections
+    - Create by default with first chord bar
+    - Delete 
+- Strumming patterns
+    - Create by default with first chord bar. Remove addSPattern dependency
+    - Delete
+    - 1 &, 2 &, etc.
+- Offer default sPatterns: Common, asynchopated, waltz, etc.
+- Possibility to assign a color to sections/sPatterns
+- Grey marks for the beats in a picking bar
+- Move bars around
+- Line breaks
