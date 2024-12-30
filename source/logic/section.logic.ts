@@ -1,7 +1,9 @@
-import { Bar, Section, Tab } from '../types';
+import { NonSectionBar, Section, Tab } from '../types';
 import { barService } from './bar.logic';
 
-const addBar = (tab: Tab, sectionIndex: number, newBar: Bar): Tab => {
+const addBar = (tab: Tab, sectionIndex: number, newBar: NonSectionBar): Tab => {
+  newBar.inSectionIndex = sectionIndex;
+
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
     bars: barService.addBar(section.bars, newBar),
@@ -12,7 +14,7 @@ const create = (index: number): Section => {
   return {
     bars: [],
     index,
-    name: '',
+    name: 'Unnamed section',
   };
 };
 

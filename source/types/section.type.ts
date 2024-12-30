@@ -1,7 +1,7 @@
-import { Bar } from './bar.type';
+import { NonSectionBar } from './bar.type';
 
 export type Section = {
-  bars: Bar[];
+  bars: NonSectionBar[];
   index: number;
   name: string;
 };

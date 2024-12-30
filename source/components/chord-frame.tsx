@@ -2,8 +2,8 @@ import React, { CSSProperties } from 'react';
 import { stringHeight } from '../constants';
 
 export interface ChordFrameProps {
+  disabled?: boolean;
   isEditMode: boolean;
-  isReference: boolean;
   strumming: string;
   style?: CSSProperties;
   update: (value: string) => void;
@@ -24,7 +24,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
       <div className="chord">
         {props.isEditMode ? (
           <input
-            disabled={props.isReference}
+            disabled={props.disabled}
             maxLength={3}
             onChange={(event) => {
               props.update(event.target.value);
@@ -44,6 +44,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
             style={{
               height: stringHeight,
               minWidth: 25,
+              textAlign: 'center',
             }}
           >
             <span>{props.value}</span>

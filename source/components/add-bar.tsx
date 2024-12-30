@@ -1,8 +1,12 @@
 import React, { CSSProperties } from 'react';
 import { BarType } from '../constants';
 
-export type AddBarProps = {
-  addBar: (type: BarType.chord | BarType.picking) => void;
+export type AddBarPropsHandlers = {
+  addBar: (type: BarType.chord | BarType.picking | BarType.section) => void;
+};
+
+export type AddBarProps = AddBarPropsHandlers & {
+  allowInsertSection?: boolean;
   expanded?: boolean;
   style?: CSSProperties;
 };
@@ -44,6 +48,17 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
       >
         🎵{props.expanded ? ' chord bar' : ''}
       </div>
+
+      {props.allowInsertSection && (
+        <div
+          onClick={() => {
+            props.addBar(BarType.section);
+          }}
+          style={buttonStyle}
+        >
+          📄{props.expanded ? ' section' : ''}
+        </div>
+      )}
     </div>
   );
 };

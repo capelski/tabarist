@@ -1,22 +1,28 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
-import {
-  AddBar,
-  ChordBarComponent,
-  ChordBarProps,
-  PickingBarComponent,
-  PickingBarProps,
-} from '../components';
 import { BarType, stringHeight } from '../constants';
-import { Bar, ChordBar, PickingBar, StrummingPattern } from '../types';
+import {
+  createChordBar,
+  createPickingBar,
+  createReferenceBar,
+  createSectionBar,
+  sectionService,
+  tabService,
+} from '../logic';
+import { Bar, ChordBar, NonSectionBar, PickingBar, Section, Tab } from '../types';
+import { AddBar } from './add-bar';
+import { ChordBarComponent } from './chord-bar';
+import { PickingBarComponent } from './picking-bar';
+import { ReferenceBarComponent } from './reference-bar';
+import { SectionBarComponent } from './section-bar';
 
 export type BarGroupProps = {
-  addBar: (index: number, type: BarType.chord | BarType.picking) => void;
+  addStrummingPattern: () => void;
   bars: Bar[];
-  getChordBarHandlers: (bar: Bar) => ChordBarProps['handlers'];
-  getPickingBarHandlers: (bar: Bar) => PickingBarProps['handlers'];
   isEditMode: boolean;
-  strummingPatterns: StrummingPattern[];
+  inSection?: Section;
+  tab: Tab;
+  updateTab: (tab: Tab) => void;
 };
 
 export const BarGroup: React.FC<BarGroupProps> = (props) => {
@@ -24,46 +30,189 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
   const barWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
 
+  const addBar = (index: number, type: BarType.chord | BarType.picking | BarType.section) => {
+    const bar =
+      type === BarType.chord
+        ? createChordBar(index, props.tab.strummingPatterns[0])
+        : type === BarType.picking
+        ? createPickingBar(index)
+        : createSectionBar(index, props.tab.sections[0]);
+
+    const nextTab = props.inSection
+      ? sectionService.addBar(props.tab, props.inSection.index, bar as NonSectionBar)
+      : tabService.addBar(props.tab, bar);
+
+    props.updateTab(nextTab);
+  };
+
   return (
     <div
       className="bars"
       style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
     >
       {props.bars.map((bar) => {
-        const actualBar =
-          bar.type === BarType.reference
-            ? (props.bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar)
-            : bar;
+        const copyBar = () => {
+          const newBar = createReferenceBar(bar);
 
-        return actualBar.type === BarType.picking ? (
-          <PickingBarComponent
-            addBar={(type) => props.addBar(bar.index, type)}
-            backgroundColor={actualBar.index !== bar.index && props.isEditMode ? '#ddd' : 'white'}
-            bar={actualBar}
-            currentIndex={bar.index}
-            handlers={props.getPickingBarHandlers(bar)}
-            isEditMode={props.isEditMode}
-            key={bar.index}
-            width={barWidth}
-          />
-        ) : (
-          <ChordBarComponent
-            addBar={(type) => props.addBar(bar.index, type)}
-            backgroundColor={actualBar.index !== bar.index && props.isEditMode ? '#ddd' : 'white'}
-            bar={actualBar}
-            currentIndex={bar.index}
-            handlers={props.getChordBarHandlers(bar)}
-            isEditMode={props.isEditMode}
-            key={bar.index}
-            strummingPatterns={props.strummingPatterns}
-            width={barWidth}
-          />
+          const nextTab = props.inSection
+            ? sectionService.addBar(props.tab, props.inSection.index, newBar)
+            : tabService.addBar(props.tab, newBar);
+
+          props.updateTab(nextTab);
+        };
+
+        const removeBar = () => {
+          const nextTab = props.inSection
+            ? sectionService.removeBar(props.tab, props.inSection.index, bar.index)
+            : tabService.removeBar(props.tab, bar.index);
+
+          props.updateTab(nextTab);
+        };
+
+        const baseProps = {
+          addBar: (type: BarType.chord | BarType.picking | BarType.section) => {
+            addBar(bar.index, type);
+          },
+          isEditMode: props.isEditMode,
+          removeBar,
+          width: barWidth,
+        };
+
+        const nonSectionProps = {
+          ...baseProps,
+          copyBar,
+          inSection: props.inSection,
+        };
+
+        const section = props.tab.sections.find(
+          (section) =>
+            section.index ===
+            (bar.type === BarType.section ? bar.sectionIndex : bar.inSectionIndex),
+        );
+
+        return (
+          <React.Fragment key={bar.index}>
+            {bar.type === BarType.chord ? (
+              <ChordBarComponent
+                {...nonSectionProps}
+                addStrummingPattern={props.addStrummingPattern}
+                bar={bar}
+                rebase={(sPatternIndex) => {
+                  const nextTab = props.inSection
+                    ? sectionService.rebaseChordBar(
+                        props.tab,
+                        props.inSection.index,
+                        bar.index,
+                        sPatternIndex,
+                      )
+                    : tabService.rebaseChordBar(props.tab, bar.index, sPatternIndex);
+
+                  props.updateTab(nextTab);
+                }}
+                strummingPatterns={props.tab.strummingPatterns}
+                updateFrame={(frameIndex, value) => {
+                  const nextTab = props.inSection
+                    ? sectionService.updateChordFrame(
+                        props.tab,
+                        props.inSection.index,
+                        bar.index,
+                        frameIndex,
+                        value,
+                      )
+                    : tabService.updateChordFrame(props.tab, bar.index, frameIndex, value);
+
+                  props.updateTab(nextTab);
+                }}
+              />
+            ) : bar.type === BarType.picking ? (
+              <PickingBarComponent
+                {...nonSectionProps}
+                bar={bar}
+                rebase={(framesNumber) => {
+                  const nextTab = props.inSection
+                    ? sectionService.rebasePickingBar(
+                        props.tab,
+                        props.inSection.index,
+                        bar.index,
+                        framesNumber,
+                      )
+                    : tabService.rebasePickingBar(props.tab, bar.index, framesNumber);
+
+                  props.updateTab(nextTab);
+                }}
+                updateFrame={(frameIndex, stringIndex, value) => {
+                  const nextTab = props.inSection
+                    ? sectionService.updatePickingFrame(
+                        props.tab,
+                        props.inSection.index,
+                        bar.index,
+                        frameIndex,
+                        stringIndex,
+                        value,
+                      )
+                    : tabService.updatePickingFrame(
+                        props.tab,
+                        bar.index,
+                        frameIndex,
+                        stringIndex,
+                        value,
+                      );
+
+                  props.updateTab(nextTab);
+                }}
+              />
+            ) : bar.type === BarType.reference ? (
+              <ReferenceBarComponent
+                {...nonSectionProps}
+                bar={bar}
+                referencedBar={
+                  props.bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar
+                }
+                strummingPatterns={props.tab.strummingPatterns}
+              />
+            ) : bar.type === BarType.section && section ? (
+              <React.Fragment key={bar.index}>
+                {section.bars.map((nonSectionBar) => {
+                  return (
+                    <SectionBarComponent
+                      {...baseProps}
+                      addBar={(type: BarType.chord | BarType.picking | BarType.section) => {
+                        addBar(bar.index, type);
+                      }}
+                      changeSection={(sectionIndex) => {
+                        const nextTab = tabService.changeSection(
+                          props.tab,
+                          bar.index,
+                          sectionIndex,
+                        );
+                        props.updateTab(nextTab);
+                      }}
+                      bar={bar}
+                      isFirst={nonSectionBar.index === 0}
+                      key={nonSectionBar.index}
+                      referencedBar={nonSectionBar}
+                      removeBar={() => {
+                        const nextTab = tabService.removeBar(props.tab, bar.index);
+                        props.updateTab(nextTab);
+                      }}
+                      section={section}
+                      sections={props.tab.sections}
+                      strummingPatterns={props.tab.strummingPatterns}
+                    />
+                  );
+                })}
+              </React.Fragment>
+            ) : undefined}
+          </React.Fragment>
         );
       })}
 
       {props.isEditMode && (
         <AddBar
-          addBar={(type) => props.addBar(props.bars.length, type)}
+          addBar={(type) => {
+            addBar(props.bars.length, type);
+          }}
+          allowInsertSection={props.inSection === undefined}
           expanded={true}
           style={{
             boxSizing: 'border-box',

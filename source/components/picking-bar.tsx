@@ -1,85 +1,36 @@
 import React from 'react';
-import { framesNumberOptions } from '../constants';
-import { PickingBar } from '../types';
-import { AddBar, AddBarProps } from './add-bar';
-import { BarControls, BarControlsProps } from './bar-controls';
-import { PickingFrameComponent } from './picking-frame';
+import { PickingBar, Section } from '../types';
+import { AddBarPropsHandlers } from './add-bar';
+import { BarControlsHandlers } from './bar-controls';
+import { BaseBarComponent } from './base-bar';
+import { getPickingBarCore } from './picking-bar-core';
 
-export interface PickingBarProps {
-  addBar: AddBarProps['addBar'];
-  backgroundColor: string;
-  bar: PickingBar;
-  currentIndex: number;
-  handlers: BarControlsProps['handlers'] & {
-    rebase: (framesNumber: number) => void;
-    updateFrame: (frameIndex: number, stringIndex: number, value: string) => void;
+export type PickingBarProps = AddBarPropsHandlers &
+  BarControlsHandlers & {
+    bar: PickingBar;
+    isEditMode: boolean;
+    inSection?: Section;
+    rebase?: (framesNumber: number) => void;
+    updateFrame?: (frameIndex: number, stringIndex: number, value: string) => void;
+    width: number;
   };
-  isEditMode: boolean;
-  width: number;
-}
 
 export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
-  const framesWidth = Math.floor(10000 / props.bar.frames.length) / 100;
-  const isReference = props.bar.index !== props.currentIndex;
+  const { additionalControls, coreComponent } = getPickingBarCore({
+    ...props,
+    backgroundColor: 'white',
+    borderLeft: '1px solid black',
+    displayPickingRebase: props.isEditMode,
+  });
 
   return (
-    <div
-      className="bar"
-      style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
-        {props.isEditMode && <AddBar addBar={props.addBar} style={{ minHeight: 60 }} />}
-
-        <div
-          className="frames"
-          style={{
-            backgroundColor: props.backgroundColor,
-            borderLeft: '1px solid black',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'row',
-            flexGrow: 1,
-          }}
-        >
-          {props.bar.frames.map((frame) => {
-            return (
-              <PickingFrameComponent
-                backgroundColor={props.backgroundColor}
-                frame={frame}
-                isEditMode={props.isEditMode}
-                isReference={isReference}
-                key={frame.index}
-                update={(stringIndex, value) => {
-                  props.handlers.updateFrame(frame.index, stringIndex, value);
-                }}
-                width={framesWidth}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {props.isEditMode && (
-        <BarControls bar={props.bar} currentIndex={props.currentIndex} handlers={props.handlers}>
-          {!isReference && (
-            <select
-              onChange={(event) => {
-                props.handlers.rebase(parseInt(event.target.value));
-              }}
-              style={{ marginRight: 8 }}
-              value={props.bar.framesNumber}
-            >
-              {framesNumberOptions.map((option) => {
-                return (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                );
-              })}
-            </select>
-          )}
-        </BarControls>
-      )}
-    </div>
+    <BaseBarComponent
+      {...props}
+      additionalControls={additionalControls}
+      allowInsertSection={!props.inSection}
+      canAddBar={props.isEditMode}
+      coreComponent={coreComponent}
+      displayBarControls={props.isEditMode}
+    />
   );
 };

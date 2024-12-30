@@ -1,18 +1,28 @@
 import { BarType, framesNumberDefault } from '../constants';
-import { Bar, ChordBar, PickingBar, PickingFrame, ReferenceBar, StrummingPattern } from '../types';
+import {
+  Bar,
+  ChordBar,
+  NonSectionBar,
+  PickingBar,
+  PickingFrame,
+  ReferenceBar,
+  Section,
+  SectionBar,
+  StrummingPattern,
+} from '../types';
 import {
   createIndexedValuesArray,
   getIndexDecrease,
   getIndexIncrease,
 } from './indexed-value.logic';
 
-const addBar = (bars: Bar[], newBar: Bar): Bar[] => {
+const addBar = <TBar extends Bar | NonSectionBar>(bars: TBar[], newBar: TBar): TBar[] => {
   return bars.length === 0
     ? [newBar]
     : bars.reduce((reduced, bar) => {
         const isLastBar = bar.index === bars.length - 1;
 
-        const nextBar: Bar = {
+        const nextBar: TBar = {
           ...bar,
           index: getIndexIncrease(bar.index, newBar.index),
           ...(bar.type === BarType.reference
@@ -63,7 +73,17 @@ export const createReferenceBar = (bar: Bar): ReferenceBar => ({
   type: BarType.reference,
 });
 
-const rebaseChordBar = (bars: Bar[], barIndex: number, sPattern: StrummingPattern): Bar[] => {
+export const createSectionBar = (index: number, section: Section | undefined): SectionBar => ({
+  index,
+  sectionIndex: section?.index,
+  type: BarType.section,
+});
+
+const rebaseChordBar = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
+  barIndex: number,
+  sPattern: StrummingPattern,
+): TBar[] => {
   return bars.map((bar) => {
     return bar.type !== BarType.chord || bar.index !== barIndex
       ? bar
@@ -78,7 +98,11 @@ const rebaseChordBar = (bars: Bar[], barIndex: number, sPattern: StrummingPatter
   });
 };
 
-const rebasePickingBar = (bars: Bar[], barIndex: number, framesNumber: number): Bar[] => {
+const rebasePickingBar = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
+  barIndex: number,
+  framesNumber: number,
+): TBar[] => {
   return bars.map((bar) => {
     return bar.type !== BarType.picking || bar.index !== barIndex
       ? bar
@@ -93,7 +117,10 @@ const rebasePickingBar = (bars: Bar[], barIndex: number, framesNumber: number): 
   });
 };
 
-const removeBar = (bars: Bar[], deletionIndex: number): Bar[] => {
+const removeBar = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
+  deletionIndex: number,
+): TBar[] => {
   const { nextBars } = bars.reduce(
     (reduced, bar) => {
       if (
@@ -106,7 +133,7 @@ const removeBar = (bars: Bar[], deletionIndex: number): Bar[] => {
         };
       }
 
-      const nextBar: Bar = {
+      const nextBar: TBar = {
         ...bar,
         index: getIndexDecrease(bar.index, deletionIndex, reduced.deletedCount),
         ...(bar.type === BarType.reference
@@ -127,11 +154,11 @@ const removeBar = (bars: Bar[], deletionIndex: number): Bar[] => {
   return nextBars;
 };
 
-const setStrummingPattern = (
-  bars: Bar[],
+const setStrummingPattern = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
   sPattern: StrummingPattern,
   matchingIndex: number | undefined,
-): Bar[] => {
+): TBar[] => {
   return bars.map((bar) => {
     return bar.type === BarType.chord && bar.sPatternIndex === matchingIndex
       ? {
@@ -146,12 +173,12 @@ const setStrummingPattern = (
   });
 };
 
-const updateChordFrame = (
-  bars: Bar[],
+const updateChordFrame = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
   barIndex: number,
   frameIndex: number,
   value: string,
-): Bar[] => {
+): TBar[] => {
   return bars.map((bar) => {
     return bar.type !== BarType.chord || bar.index !== barIndex
       ? bar
@@ -164,13 +191,13 @@ const updateChordFrame = (
   });
 };
 
-const updatePickingFrame = (
-  bars: Bar[],
+const updatePickingFrame = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
   barIndex: number,
   frameIndex: number,
   stringIndex: number,
   value: string,
-): Bar[] => {
+): TBar[] => {
   return bars.map((bar) => {
     return bar.type !== BarType.picking || bar.index !== barIndex
       ? bar

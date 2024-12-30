@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { BarType } from '../constants';
 import { Bar, Tab } from '../types';
 import { barService } from './bar.logic';
 import { sectionService } from './section.logic';
@@ -31,6 +32,20 @@ const addStrummingPattern = (tab: Tab): Tab => {
       ...section,
       bars: barService.setStrummingPattern(section.bars, sPattern, undefined),
     })),
+  };
+};
+
+const changeSection = (tab: Tab, barIndex: number, sectionIndex: number): Tab => {
+  return {
+    ...tab,
+    bars: tab.bars.map((bar) => {
+      return bar.type === BarType.section && bar.index === barIndex
+        ? {
+            ...bar,
+            sectionIndex,
+          }
+        : bar;
+    }),
   };
 };
 
@@ -99,6 +114,7 @@ export const tabService = {
   addBar,
   addSection,
   addStrummingPattern,
+  changeSection,
   create,
   rebaseChordBar,
   rebasePickingBar,

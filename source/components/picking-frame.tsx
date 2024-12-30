@@ -4,9 +4,9 @@ import { PickingFrame } from '../types';
 
 export interface PickingFrameProps {
   backgroundColor: string;
+  disabled?: boolean;
   frame: PickingFrame;
   isEditMode: boolean;
-  isReference: boolean;
   update: (stringIndex: number, value: string) => void;
   width: number;
 }
@@ -27,7 +27,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
           >
             {props.isEditMode ? (
               <input
-                disabled={props.isReference}
+                disabled={props.disabled}
                 maxLength={3}
                 onChange={(event) => {
                   props.update(string.index, event.target.value);

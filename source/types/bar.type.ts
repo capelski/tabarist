@@ -1,9 +1,10 @@
 import { BarType } from '../constants';
 import { IndexedValue } from './indexed-value.type';
 
-export type Bar = ChordBar | PickingBar | ReferenceBar;
+export type NonSectionBar = ChordBar | PickingBar | ReferenceBar;
+export type Bar = NonSectionBar | SectionBar;
 
-export type BarBase = { index: number };
+export type BarBase = { index: number; inSectionIndex?: number };
 
 export type ChordBar = BarBase & {
   frames: IndexedValue[];
@@ -26,4 +27,10 @@ export type PickingFrame = {
 export type ReferenceBar = BarBase & {
   barIndex: number;
   type: BarType.reference;
+};
+
+export type SectionBar = {
+  index: number;
+  sectionIndex?: number;
+  type: BarType.section;
 };

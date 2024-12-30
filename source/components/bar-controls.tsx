@@ -1,21 +1,19 @@
-import React from 'react';
-import { removeSymbol } from '../constants';
+import React, { PropsWithChildren } from 'react';
+import { BarType, removeSymbol } from '../constants';
 import { getIndexDisplayValue } from '../logic';
-import { ChordBar, PickingBar } from '../types';
+import { Bar } from '../types';
 
-export interface BarControlsProps {
-  bar: ChordBar | PickingBar;
-  children?: React.ReactNode;
-  currentIndex: number;
-  handlers: {
-    copyBar: () => void;
-    removeBar: () => void;
-  };
-}
+export type BarControlsHandlers = {
+  copyBar?: () => void;
+  removeBar: () => void;
+};
+
+export type BarControlsProps = BarControlsHandlers &
+  PropsWithChildren<{
+    currentBar: Bar;
+  }>;
 
 export const BarControls: React.FC<BarControlsProps> = (props) => {
-  const isReference = props.bar.index !== props.currentIndex;
-
   return (
     <div
       className="bar-controls"
@@ -26,22 +24,24 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         width: '100%',
       }}
     >
-      <span style={{ marginRight: 8 }}>{getIndexDisplayValue(props.currentIndex)}</span>
-      {isReference && (
-        <span style={{ marginRight: 8 }}>
-          ={'>'} {getIndexDisplayValue(props.bar.index)}
-        </span>
-      )}
-
       {props.children}
 
-      <button onClick={() => props.handlers.copyBar()} style={{ marginRight: 8 }} type="button">
-        =
-      </button>
+      {props.copyBar && (
+        <button onClick={props.copyBar} style={{ marginRight: 8 }} type="button">
+          =
+        </button>
+      )}
 
-      <button onClick={() => props.handlers.removeBar()} type="button">
+      <button onClick={() => props.removeBar()} type="button">
         {removeSymbol}
       </button>
+
+      <span style={{ marginLeft: 8 }}>{getIndexDisplayValue(props.currentBar.index)}</span>
+      {props.currentBar.type === BarType.reference && (
+        <span style={{ marginLeft: 8 }}>
+          ={'>'} {getIndexDisplayValue(props.currentBar.barIndex)}
+        </span>
+      )}
     </div>
   );
 };
