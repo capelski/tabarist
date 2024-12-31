@@ -7,7 +7,6 @@ import { getChordBarCore } from './chord-bar-core';
 
 export type ChordBarProps = AddBarPropsHandlers &
   BarControlsHandlers & {
-    addStrummingPattern?: () => void;
     bar: ChordBar;
     isEditMode: boolean;
     inSection?: Section;

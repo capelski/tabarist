@@ -1,10 +1,8 @@
 import React from 'react';
-import { addSymbol } from '../constants';
 import { ChordBar, StrummingPattern } from '../types';
 import { ChordFrame } from './chord-frame';
 
 export type ChordBarCoreProps = {
-  addStrummingPattern?: () => void;
   backgroundColor: string;
   bar: ChordBar;
   borderLeft?: string;
@@ -69,34 +67,23 @@ export const getChordBarCore = (props: ChordBarCoreProps) => {
         {props.displayStrummingPatternPicker && (
           <div style={{ marginTop: 16, textAlign: 'center' }}>
             Strumming pattern:
-            {props.strummingPatterns.length === 0 ? (
-              <button
-                disabled={props.disabled}
-                onClick={props.addStrummingPattern}
-                style={{ marginLeft: 8 }}
-                type="button"
-              >
-                {addSymbol}
-              </button>
-            ) : (
-              <select
-                disabled={props.strummingPatterns.length < 2 || props.disabled}
-                onChange={(event) => {
-                  const sPatternIndex = parseInt(event.target.value);
-                  props.rebase?.(sPatternIndex);
-                }}
-                style={{ marginLeft: 8, minWidth: 40 }}
-                value={props.bar.sPatternIndex}
-              >
-                {props.strummingPatterns.map((sPattern) => {
-                  return (
-                    <option key={sPattern.index} value={sPattern.index}>
-                      {sPattern.name}
-                    </option>
-                  );
-                })}
-              </select>
-            )}
+            <select
+              disabled={props.strummingPatterns.length < 2 || props.disabled}
+              onChange={(event) => {
+                const sPatternIndex = parseInt(event.target.value);
+                props.rebase?.(sPatternIndex);
+              }}
+              style={{ marginLeft: 8, minWidth: 40 }}
+              value={props.bar.sPatternIndex}
+            >
+              {props.strummingPatterns.map((sPattern) => {
+                return (
+                  <option key={sPattern.index} value={sPattern.index}>
+                    {sPattern.name}
+                  </option>
+                );
+              })}
+            </select>
           </div>
         )}
       </div>

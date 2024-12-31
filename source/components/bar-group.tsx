@@ -1,15 +1,8 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { BarType, stringHeight } from '../constants';
-import {
-  createChordBar,
-  createPickingBar,
-  createReferenceBar,
-  createSectionBar,
-  sectionOperations,
-  tabOperations,
-} from '../operations';
-import { Bar, ChordBar, NonSectionBar, PickingBar, Section, Tab } from '../types';
+import { sectionOperations, tabOperations } from '../operations';
+import { Bar, ChordBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
 import { ChordBarComponent } from './chord-bar';
 import { PickingBarComponent } from './picking-bar';
@@ -17,7 +10,6 @@ import { ReferenceBarComponent } from './reference-bar';
 import { SectionBarComponent } from './section-bar';
 
 export type BarGroupProps = {
-  addStrummingPattern: () => void;
   bars: Bar[];
   isEditMode: boolean;
   inSection?: Section;
@@ -30,17 +22,10 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
   const barWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
 
-  const addBar = (index: number, type: BarType.chord | BarType.picking | BarType.section) => {
-    const bar =
-      type === BarType.chord
-        ? createChordBar(index, props.tab.strummingPatterns[0])
-        : type === BarType.picking
-        ? createPickingBar(index)
-        : createSectionBar(index, props.tab.sections[0]);
-
+  const addBar = (index: number, type: BarType) => {
     const nextTab = props.inSection
-      ? sectionOperations.addBar(props.tab, props.inSection.index, bar as NonSectionBar)
-      : tabOperations.addBar(props.tab, bar);
+      ? sectionOperations.addBar(props.tab, props.inSection.index, index, type as BarType.chord)
+      : tabOperations.addBar(props.tab, index, type);
 
     props.updateTab(nextTab);
   };
@@ -51,36 +36,26 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
     >
       {props.bars.map((bar) => {
-        const copyBar = () => {
-          const newBar = createReferenceBar(bar);
-
-          const nextTab = props.inSection
-            ? sectionOperations.addBar(props.tab, props.inSection.index, newBar)
-            : tabOperations.addBar(props.tab, newBar);
-
-          props.updateTab(nextTab);
-        };
-
-        const removeBar = () => {
-          const nextTab = props.inSection
-            ? sectionOperations.removeBar(props.tab, props.inSection.index, bar.index)
-            : tabOperations.removeBar(props.tab, bar.index);
-
-          props.updateTab(nextTab);
-        };
-
         const baseProps = {
           addBar: (type: BarType.chord | BarType.picking | BarType.section) => {
             addBar(bar.index, type);
           },
           isEditMode: props.isEditMode,
-          removeBar,
+          removeBar: () => {
+            const nextTab = props.inSection
+              ? sectionOperations.removeBar(props.tab, props.inSection.index, bar.index)
+              : tabOperations.removeBar(props.tab, bar.index);
+
+            props.updateTab(nextTab);
+          },
           width: barWidth,
         };
 
         const nonSectionProps = {
           ...baseProps,
-          copyBar,
+          copyBar: () => {
+            addBar(bar.index, BarType.reference);
+          },
           inSection: props.inSection,
         };
 
@@ -95,7 +70,6 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
             {bar.type === BarType.chord ? (
               <ChordBarComponent
                 {...nonSectionProps}
-                addStrummingPattern={props.addStrummingPattern}
                 bar={bar}
                 rebase={(sPatternIndex) => {
                   const nextTab = props.inSection

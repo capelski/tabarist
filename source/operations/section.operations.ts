@@ -1,10 +1,33 @@
-import { NonSectionBar, Section, Tab } from '../types';
-import { barOperations } from './bar.operations';
+import { BarType } from '../constants';
+import { Section, Tab } from '../types';
+import {
+  barOperations,
+  createChordBar,
+  createPickingBar,
+  createReferenceBar,
+} from './bar.operations';
+import { sPatternOperations } from './strumming-pattern.operations';
 
-const addBar = (tab: Tab, sectionIndex: number, newBar: NonSectionBar): Tab => {
-  newBar.inSectionIndex = sectionIndex;
+const addBar = (
+  tab: Tab,
+  sectionIndex: number,
+  index: number,
+  type: BarType.chord | BarType.picking | BarType.reference,
+): Tab => {
+  const nextTab = { ...tab };
 
-  return modifySection(tab, sectionIndex, (section) => ({
+  if (type === BarType.chord && tab.strummingPatterns.length === 0) {
+    nextTab.strummingPatterns = [sPatternOperations.create(0)];
+  }
+
+  const newBar =
+    type === BarType.chord
+      ? createChordBar(index, nextTab.strummingPatterns[0])
+      : type === BarType.picking
+      ? createPickingBar(index)
+      : createReferenceBar(tab.bars[index]);
+
+  return modifySection(nextTab, sectionIndex, (section) => ({
     ...section,
     bars: barOperations.addBar(section.bars, newBar),
   }));

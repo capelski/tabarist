@@ -1,15 +1,37 @@
 import { nanoid } from 'nanoid';
 import { BarType } from '../constants';
-import { Bar, Tab } from '../types';
-import { barOperations } from './bar.operations';
+import { Tab } from '../types';
+import {
+  barOperations,
+  createChordBar,
+  createPickingBar,
+  createReferenceBar,
+  createSectionBar,
+} from './bar.operations';
 import { sectionOperations } from './section.operations';
 import { sPatternOperations } from './strumming-pattern.operations';
 
-const addBar = (tab: Tab, newBar: Bar): Tab => {
-  return {
-    ...tab,
-    bars: barOperations.addBar(tab.bars, newBar),
-  };
+const addBar = (tab: Tab, index: number, type: BarType): Tab => {
+  const nextTab = { ...tab };
+
+  if (type === BarType.chord && tab.strummingPatterns.length === 0) {
+    nextTab.strummingPatterns = [sPatternOperations.create(0)];
+  } else if (type === BarType.section && tab.sections.length === 0) {
+    nextTab.sections = [sectionOperations.create(0)];
+  }
+
+  const newBar =
+    type === BarType.chord
+      ? createChordBar(index, nextTab.strummingPatterns[0])
+      : type === BarType.picking
+      ? createPickingBar(index)
+      : type === BarType.reference
+      ? createReferenceBar(tab.bars[index])
+      : createSectionBar(index, nextTab.sections[0]);
+
+  nextTab.bars = barOperations.addBar(tab.bars, newBar);
+
+  return nextTab;
 };
 
 const addSection = (tab: Tab): Tab => {

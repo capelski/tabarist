@@ -114,13 +114,7 @@ export const TabView: React.FC<TabProps> = (props) => {
         </div>
       </div>
 
-      <BarGroup
-        addStrummingPattern={addStrummingPattern}
-        bars={tab.bars}
-        isEditMode={isEditMode}
-        tab={tab}
-        updateTab={setTab}
-      />
+      <BarGroup bars={tab.bars} isEditMode={isEditMode} tab={tab} updateTab={setTab} />
 
       {isEditMode && (
         <React.Fragment>
@@ -158,7 +152,6 @@ export const TabView: React.FC<TabProps> = (props) => {
           {tab.sections.map((section) => {
             return (
               <SectionComponent
-                addStrummingPattern={addStrummingPattern}
                 isEditMode={isEditMode}
                 key={section.index}
                 section={section}

@@ -4,7 +4,6 @@ import { tabOperations } from '../operations';
 import { Section, Tab } from '../types';
 
 export type SectionProps = {
-  addStrummingPattern: () => void;
   isEditMode: boolean;
   section: Section;
   tab: Tab;
