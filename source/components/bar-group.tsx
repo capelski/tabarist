@@ -172,35 +172,61 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
               />
             ) : bar.type === BarType.section && section ? (
               <React.Fragment key={bar.index}>
-                {section.bars.map((nonSectionBar) => {
-                  return (
-                    <SectionBarComponent
-                      {...baseProps}
-                      addBar={(type: BarType.chord | BarType.picking | BarType.section) => {
-                        addBar(bar.index, type);
-                      }}
-                      changeSection={(sectionIndex) => {
-                        const nextTab = tabOperations.changeSection(
-                          props.tab,
-                          bar.index,
-                          sectionIndex,
-                        );
-                        props.updateTab(nextTab);
-                      }}
-                      bar={bar}
-                      isFirst={nonSectionBar.index === 0}
-                      key={nonSectionBar.index}
-                      referencedBar={nonSectionBar}
-                      removeBar={() => {
-                        const nextTab = tabOperations.removeBar(props.tab, bar.index);
-                        props.updateTab(nextTab);
-                      }}
-                      section={section}
-                      sections={props.tab.sections}
-                      strummingPatterns={props.tab.strummingPatterns}
-                    />
-                  );
-                })}
+                {section.bars.length
+                  ? section.bars.map((nonSectionBar) => {
+                      return (
+                        <SectionBarComponent
+                          {...baseProps}
+                          addBar={(type: BarType.chord | BarType.picking | BarType.section) => {
+                            addBar(bar.index, type);
+                          }}
+                          changeSection={(sectionIndex) => {
+                            const nextTab = tabOperations.changeSection(
+                              props.tab,
+                              bar.index,
+                              sectionIndex,
+                            );
+                            props.updateTab(nextTab);
+                          }}
+                          bar={bar}
+                          isFirst={nonSectionBar.index === 0}
+                          key={nonSectionBar.index}
+                          referencedBar={nonSectionBar}
+                          removeBar={() => {
+                            const nextTab = tabOperations.removeBar(props.tab, bar.index);
+                            props.updateTab(nextTab);
+                          }}
+                          section={section}
+                          sections={props.tab.sections}
+                          strummingPatterns={props.tab.strummingPatterns}
+                        />
+                      );
+                    })
+                  : props.isEditMode && (
+                      <SectionBarComponent
+                        {...baseProps}
+                        addBar={(type: BarType.chord | BarType.picking | BarType.section) => {
+                          addBar(bar.index, type);
+                        }}
+                        changeSection={(sectionIndex) => {
+                          const nextTab = tabOperations.changeSection(
+                            props.tab,
+                            bar.index,
+                            sectionIndex,
+                          );
+                          props.updateTab(nextTab);
+                        }}
+                        bar={bar}
+                        isFirst={true}
+                        removeBar={() => {
+                          const nextTab = tabOperations.removeBar(props.tab, bar.index);
+                          props.updateTab(nextTab);
+                        }}
+                        section={section}
+                        sections={props.tab.sections}
+                        strummingPatterns={props.tab.strummingPatterns}
+                      />
+                    )}
               </React.Fragment>
             ) : undefined}
           </React.Fragment>

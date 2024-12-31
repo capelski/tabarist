@@ -23,7 +23,7 @@ export type SectionBarProps = AddBarPropsHandlers &
     changeSection: (sectionIndex: number) => void;
     isEditMode: boolean;
     isFirst: boolean;
-    referencedBar: NonSectionBar;
+    referencedBar?: NonSectionBar;
     section: Section;
     sections: Section[];
     strummingPatterns: StrummingPattern[];
@@ -37,28 +37,37 @@ export const SectionBarComponent: React.FC<SectionBarProps> = (props) => {
     isEditMode: props.isEditMode,
   };
 
-  const { additionalControls, coreComponent } =
-    props.referencedBar.type === BarType.chord
-      ? getChordBarCore({
-          ...baseProps,
-          bar: props.referencedBar,
-          disabled: true,
-          strummingPatterns: props.strummingPatterns,
-        })
-      : props.referencedBar.type === BarType.picking
-      ? getPickingBarCore({
-          ...baseProps,
-          bar: props.referencedBar,
-          disabled: true,
-        })
-      : getReferenceBarCore({
-          ...baseProps,
-          bar: props.referencedBar,
-          referencedBar: props.section.bars.find(
-            (b) => b.index === (props.referencedBar as ReferenceBar).barIndex,
-          ) as ChordBar | PickingBar,
-          strummingPatterns: props.strummingPatterns,
-        });
+  const { additionalControls, coreComponent } = !props.referencedBar
+    ? {
+        coreComponent: (
+          <div
+            style={{ alignItems: 'center', display: 'flex', flexGrow: 1, justifyContent: 'center' }}
+          >
+            Empty section
+          </div>
+        ),
+      }
+    : props.referencedBar.type === BarType.chord
+    ? getChordBarCore({
+        ...baseProps,
+        bar: props.referencedBar,
+        disabled: true,
+        strummingPatterns: props.strummingPatterns,
+      })
+    : props.referencedBar.type === BarType.picking
+    ? getPickingBarCore({
+        ...baseProps,
+        bar: props.referencedBar,
+        disabled: true,
+      })
+    : getReferenceBarCore({
+        ...baseProps,
+        bar: props.referencedBar,
+        referencedBar: props.section.bars.find(
+          (b) => b.index === (props.referencedBar as ReferenceBar).barIndex,
+        ) as ChordBar | PickingBar,
+        strummingPatterns: props.strummingPatterns,
+      });
 
   return (
     <React.Fragment>

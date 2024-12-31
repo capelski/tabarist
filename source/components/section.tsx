@@ -14,17 +14,19 @@ export type SectionProps = {
 export const SectionComponent: React.FC<SectionProps> = (props) => {
   return (
     <React.Fragment>
-      <input
-        onChange={(event) => {
-          const nextTab = tabOperations.renameSection(
-            props.tab,
-            props.section.index,
-            event.target.value,
-          );
-          props.updateTab(nextTab);
-        }}
-        value={props.section.name}
-      />
+      <p>
+        <input
+          onChange={(event) => {
+            const nextTab = tabOperations.renameSection(
+              props.tab,
+              props.section.index,
+              event.target.value,
+            );
+            props.updateTab(nextTab);
+          }}
+          value={props.section.name}
+        />
+      </p>
 
       <BarGroup {...props} bars={props.section.bars} inSection={props.section} />
     </React.Fragment>
