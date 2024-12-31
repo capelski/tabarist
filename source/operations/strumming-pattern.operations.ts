@@ -1,9 +1,20 @@
-import { framesNumberDefault } from '../constants';
-import { StrummingPattern, Tab } from '../types';
+import { BarType, framesNumberDefault } from '../constants';
+import { Bar, StrummingPattern, Tab } from '../types';
 import { barOperations } from './bar.operations';
 import { createIndexedValuesArray } from './indexed-value.operations';
 
 export const sPatternOperations = {
+  canDelete: (tab: Tab, sPatternIndex: number) => {
+    const isBarUsingSPattern = (bar: Bar) => {
+      return bar.type === BarType.chord && bar.sPatternIndex === sPatternIndex;
+    };
+
+    return (
+      !tab.bars.some(isBarUsingSPattern) &&
+      !tab.sections.some((section) => section.bars.some(isBarUsingSPattern))
+    );
+  },
+
   create: (index: number): StrummingPattern => ({
     frames: createIndexedValuesArray(framesNumberDefault, ''),
     framesNumber: framesNumberDefault,

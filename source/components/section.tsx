@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarGroup } from '.';
-import { tabOperations } from '../operations';
+import { removeSymbol } from '../constants';
+import { getIndexDisplayValue, sectionOperations, tabOperations } from '../operations';
 import { Section, Tab } from '../types';
 
 export type SectionProps = {
@@ -14,6 +15,7 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
   return (
     <React.Fragment>
       <p>
+        <span style={{ marginRight: 8 }}>{getIndexDisplayValue(props.section.index)}</span>
         <input
           onChange={(event) => {
             const nextTab = tabOperations.renameSection(
@@ -25,6 +27,17 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
           }}
           value={props.section.name}
         />
+        <button
+          disabled={!sectionOperations.canDelete(props.tab, props.section.index)}
+          onClick={() => {
+            const nextTab = tabOperations.removeSection(props.tab, props.section.index);
+            props.updateTab(nextTab);
+          }}
+          style={{ marginLeft: 8 }}
+          type="button"
+        >
+          {removeSymbol}
+        </button>
       </p>
 
       <BarGroup {...props} bars={props.section.bars} inSection={props.section} />

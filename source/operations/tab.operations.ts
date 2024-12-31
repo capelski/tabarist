@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { BarType } from '../constants';
-import { Tab } from '../types';
+import { Bar, NonSectionBar, Tab } from '../types';
 import {
   barOperations,
   createChordBar,
@@ -8,6 +8,7 @@ import {
   createReferenceBar,
   createSectionBar,
 } from './bar.operations';
+import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
 import { sPatternOperations } from './strumming-pattern.operations';
 
@@ -103,6 +104,65 @@ export const tabOperations = {
     return {
       ...tab,
       bars: barOperations.removeBar(tab.bars, deletionIndex),
+    };
+  },
+
+  removeSection: (tab: Tab, deletionIndex: number): Tab => {
+    if (!sectionOperations.canDelete(tab, deletionIndex)) {
+      return tab;
+    }
+
+    return {
+      ...tab,
+      bars: tab.bars.map((bar) => {
+        return bar.type === BarType.section
+          ? { ...bar, sectionIndex: getIndexDecrease(bar.sectionIndex, deletionIndex, 1) }
+          : bar;
+      }),
+      sections: tab.sections.reduce((reduced, section) => {
+        return section.index === deletionIndex
+          ? reduced
+          : [
+              ...reduced,
+              {
+                ...section,
+                index: getIndexDecrease(section.index, deletionIndex, 1),
+              },
+            ];
+      }, []),
+    };
+  },
+
+  removeSPattern: (tab: Tab, deletionIndex: number): Tab => {
+    if (!sPatternOperations.canDelete(tab, deletionIndex)) {
+      return tab;
+    }
+
+    const processBars = <TBar extends Bar | NonSectionBar>(bars: TBar[]): TBar[] => {
+      return bars.map((bar) => {
+        return bar.type === BarType.chord
+          ? { ...bar, sPatternIndex: getIndexDecrease(bar.sPatternIndex, deletionIndex, 1) }
+          : bar;
+      });
+    };
+
+    return {
+      ...tab,
+      bars: processBars(tab.bars),
+      sections: tab.sections.map((section) => {
+        return { ...section, bars: processBars(section.bars) };
+      }),
+      strummingPatterns: tab.strummingPatterns.reduce((reduced, sPattern) => {
+        return sPattern.index === deletionIndex
+          ? reduced
+          : [
+              ...reduced,
+              {
+                ...sPattern,
+                index: getIndexDecrease(sPattern.index, deletionIndex, 1),
+              },
+            ];
+      }, []),
     };
   },
 

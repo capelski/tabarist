@@ -16,13 +16,10 @@ import {
   getIndexIncrease,
 } from './indexed-value.operations';
 
-export const createChordBar = (
-  index: number,
-  strummingPattern: StrummingPattern | undefined,
-): ChordBar => ({
+export const createChordBar = (index: number, strummingPattern: StrummingPattern): ChordBar => ({
   frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
   index,
-  sPatternIndex: strummingPattern?.index,
+  sPatternIndex: strummingPattern.index,
   type: BarType.chord,
 });
 
@@ -44,9 +41,9 @@ export const createReferenceBar = (bar: Bar): ReferenceBar => ({
   type: BarType.reference,
 });
 
-export const createSectionBar = (index: number, section: Section | undefined): SectionBar => ({
+export const createSectionBar = (index: number, section: Section): SectionBar => ({
   index,
-  sectionIndex: section?.index,
+  sectionIndex: section.index,
   type: BarType.section,
 });
 

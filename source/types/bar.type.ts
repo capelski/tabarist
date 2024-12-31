@@ -9,7 +9,7 @@ export type BarBase = { index: number; inSectionIndex?: number };
 export type ChordBar = BarBase & {
   frames: IndexedValue[];
   /** Strumming pattern index */
-  sPatternIndex?: number;
+  sPatternIndex: number;
   type: BarType.chord;
 };
 
@@ -31,6 +31,6 @@ export type ReferenceBar = BarBase & {
 
 export type SectionBar = {
   index: number;
-  sectionIndex?: number;
+  sectionIndex: number;
   type: BarType.section;
 };

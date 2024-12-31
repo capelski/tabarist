@@ -1,6 +1,6 @@
 import React from 'react';
-import { framesNumberOptions, stringHeight } from '../constants';
-import { tabOperations } from '../operations';
+import { framesNumberOptions, removeSymbol, stringHeight } from '../constants';
+import { getIndexDisplayValue, sPatternOperations, tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
 
 export type StrummingPatternProps = {
@@ -15,6 +15,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
   return (
     <div style={{ marginBottom: 16 }}>
       <p>
+        <span style={{ marginRight: 8 }}>{getIndexDisplayValue(props.strummingPattern.index)}</span>
         <input
           onChange={(event) => {
             const nextTab = tabOperations.renameStrummingPattern(
@@ -26,6 +27,17 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
           }}
           value={props.strummingPattern.name}
         />
+        <button
+          disabled={!sPatternOperations.canDelete(props.tab, props.strummingPattern.index)}
+          onClick={() => {
+            const nextTab = tabOperations.removeSPattern(props.tab, props.strummingPattern.index);
+            props.updateTab(nextTab);
+          }}
+          style={{ marginLeft: 8 }}
+          type="button"
+        >
+          {removeSymbol}
+        </button>
       </p>
       <div style={{ display: 'flex' }}>
         {props.strummingPattern.frames.map((frame) => {
