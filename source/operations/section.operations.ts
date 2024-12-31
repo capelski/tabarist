@@ -1,12 +1,12 @@
 import { NonSectionBar, Section, Tab } from '../types';
-import { barService } from './bar.logic';
+import { barOperations } from './bar.operations';
 
 const addBar = (tab: Tab, sectionIndex: number, newBar: NonSectionBar): Tab => {
   newBar.inSectionIndex = sectionIndex;
 
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: barService.addBar(section.bars, newBar),
+    bars: barOperations.addBar(section.bars, newBar),
   }));
 };
 
@@ -49,7 +49,7 @@ const rebaseChordBar = (
 
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: barService.rebaseChordBar(section.bars, barIndex, sPattern),
+    bars: barOperations.rebaseChordBar(section.bars, barIndex, sPattern),
   }));
 };
 
@@ -61,14 +61,14 @@ const rebasePickingBar = (
 ): Tab => {
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: barService.rebasePickingBar(section.bars, barIndex, framesNumber),
+    bars: barOperations.rebasePickingBar(section.bars, barIndex, framesNumber),
   }));
 };
 
 const removeBar = (tab: Tab, sectionIndex: number, deletionIndex: number): Tab => {
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: barService.removeBar(section.bars, deletionIndex),
+    bars: barOperations.removeBar(section.bars, deletionIndex),
   }));
 };
 
@@ -81,7 +81,7 @@ const updateChordFrame = (
 ): Tab => {
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: barService.updateChordFrame(section.bars, barIndex, frameIndex, value),
+    bars: barOperations.updateChordFrame(section.bars, barIndex, frameIndex, value),
   }));
 };
 
@@ -95,11 +95,11 @@ const updatePickingFrame = (
 ): Tab => {
   return modifySection(tab, sectionIndex, (section) => ({
     ...section,
-    bars: barService.updatePickingFrame(section.bars, barIndex, frameIndex, stringIndex, value),
+    bars: barOperations.updatePickingFrame(section.bars, barIndex, frameIndex, stringIndex, value),
   }));
 };
 
-export const sectionService = {
+export const sectionOperations = {
   addBar,
   create,
   rebaseChordBar,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { framesNumberOptions, stringHeight } from '../constants';
-import { tabService } from '../logic';
+import { tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
 
 export type StrummingPatternProps = {
@@ -17,7 +17,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
       <p>
         <input
           onChange={(event) => {
-            const nextTab = tabService.renameStrummingPattern(
+            const nextTab = tabOperations.renameStrummingPattern(
               props.tab,
               props.strummingPattern.index,
               event.target.value,

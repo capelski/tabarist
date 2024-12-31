@@ -1,9 +1,9 @@
 - Strumming pattern picker
-- Rename logic to services
 - Move handlers inside the Chord/Picking/Reference/Section components
 - Sections
     - Create by default with first chord bar
     - Delete 
+    - Empty section to render placeholder
 - Strumming patterns
     - Create by default with first chord bar. Remove addSPattern dependency
     - Delete

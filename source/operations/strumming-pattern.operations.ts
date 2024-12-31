@@ -1,7 +1,7 @@
 import { framesNumberDefault } from '../constants';
 import { StrummingPattern, Tab } from '../types';
-import { barService } from './bar.logic';
-import { createIndexedValuesArray } from './indexed-value.logic';
+import { barOperations } from './bar.operations';
+import { createIndexedValuesArray } from './indexed-value.operations';
 
 const create = (index: number): StrummingPattern => ({
   frames: createIndexedValuesArray(framesNumberDefault, ''),
@@ -24,13 +24,13 @@ const rebase = (tab: Tab, sPatternIndex: number, framesNumber: number): Tab => {
 
   return {
     ...tab,
-    bars: barService.setStrummingPattern(tab.bars, nextStrummingPattern, sPatternIndex),
+    bars: barOperations.setStrummingPattern(tab.bars, nextStrummingPattern, sPatternIndex),
     strummingPatterns: tab.strummingPatterns.map((sPattern) => {
       return sPattern.index !== sPatternIndex ? sPattern : nextStrummingPattern;
     }),
     sections: tab.sections.map((section) => ({
       ...section,
-      bars: barService.setStrummingPattern(section.bars, nextStrummingPattern, sPatternIndex),
+      bars: barOperations.setStrummingPattern(section.bars, nextStrummingPattern, sPatternIndex),
     })),
   };
 };
@@ -51,7 +51,7 @@ const update = (tab: Tab, sPatternIndex: number, frameIndex: number, value: stri
   };
 };
 
-export const sPatternService = {
+export const sPatternOperations = {
   create,
   rebase,
   update,

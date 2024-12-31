@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { addSymbol, removeSymbol } from '../constants';
-import { getTabRelativeUrl } from '../logic';
+import { getTabRelativeUrl } from '../operations';
 import { TabRegistry } from '../types';
 
 export type TabRegistryProps = {

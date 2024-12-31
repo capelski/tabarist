@@ -1,19 +1,19 @@
 import { nanoid } from 'nanoid';
 import { BarType } from '../constants';
 import { Bar, Tab } from '../types';
-import { barService } from './bar.logic';
-import { sectionService } from './section.logic';
-import { sPatternService } from './strumming-pattern.logic';
+import { barOperations } from './bar.operations';
+import { sectionOperations } from './section.operations';
+import { sPatternOperations } from './strumming-pattern.operations';
 
 const addBar = (tab: Tab, newBar: Bar): Tab => {
   return {
     ...tab,
-    bars: barService.addBar(tab.bars, newBar),
+    bars: barOperations.addBar(tab.bars, newBar),
   };
 };
 
 const addSection = (tab: Tab): Tab => {
-  const section = sectionService.create(tab.sections.length);
+  const section = sectionOperations.create(tab.sections.length);
 
   return {
     ...tab,
@@ -22,15 +22,15 @@ const addSection = (tab: Tab): Tab => {
 };
 
 const addStrummingPattern = (tab: Tab): Tab => {
-  const sPattern = sPatternService.create(tab.strummingPatterns.length);
+  const sPattern = sPatternOperations.create(tab.strummingPatterns.length);
 
   return {
     ...tab,
     strummingPatterns: [...tab.strummingPatterns, sPattern],
-    bars: barService.setStrummingPattern(tab.bars, sPattern, undefined),
+    bars: barOperations.setStrummingPattern(tab.bars, sPattern, undefined),
     sections: tab.sections.map((section) => ({
       ...section,
-      bars: barService.setStrummingPattern(section.bars, sPattern, undefined),
+      bars: barOperations.setStrummingPattern(section.bars, sPattern, undefined),
     })),
   };
 };
@@ -65,21 +65,21 @@ const rebaseChordBar = (tab: Tab, barIndex: number, sPatternIndex: number): Tab 
 
   return {
     ...tab,
-    bars: barService.rebaseChordBar(tab.bars, barIndex, sPattern),
+    bars: barOperations.rebaseChordBar(tab.bars, barIndex, sPattern),
   };
 };
 
 const rebasePickingBar = (tab: Tab, barIndex: number, framesNumber: number): Tab => {
   return {
     ...tab,
-    bars: barService.rebasePickingBar(tab.bars, barIndex, framesNumber),
+    bars: barOperations.rebasePickingBar(tab.bars, barIndex, framesNumber),
   };
 };
 
 const removeBar = (tab: Tab, deletionIndex: number): Tab => {
   return {
     ...tab,
-    bars: barService.removeBar(tab.bars, deletionIndex),
+    bars: barOperations.removeBar(tab.bars, deletionIndex),
   };
 };
 
@@ -104,7 +104,7 @@ const renameStrummingPattern = (tab: Tab, sPatternIndex: number, name: string): 
 const updateChordFrame = (tab: Tab, barIndex: number, frameIndex: number, value: string): Tab => {
   return {
     ...tab,
-    bars: barService.updateChordFrame(tab.bars, barIndex, frameIndex, value),
+    bars: barOperations.updateChordFrame(tab.bars, barIndex, frameIndex, value),
   };
 };
 
@@ -117,7 +117,7 @@ const updatePickingFrame = (
 ): Tab => {
   return {
     ...tab,
-    bars: barService.updatePickingFrame(tab.bars, barIndex, frameIndex, stringIndex, value),
+    bars: barOperations.updatePickingFrame(tab.bars, barIndex, frameIndex, stringIndex, value),
   };
 };
 
@@ -128,7 +128,7 @@ const updateTitle = (tab: Tab, title: string): Tab => {
   };
 };
 
-export const tabService = {
+export const tabOperations = {
   addBar,
   addSection,
   addStrummingPattern,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarGroup } from '.';
-import { tabService } from '../logic';
+import { tabOperations } from '../operations';
 import { Section, Tab } from '../types';
 
 export type SectionProps = {
@@ -16,7 +16,7 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
     <React.Fragment>
       <input
         onChange={(event) => {
-          const nextTab = tabService.renameSection(
+          const nextTab = tabOperations.renameSection(
             props.tab,
             props.section.index,
             event.target.value,

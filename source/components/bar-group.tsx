@@ -6,9 +6,9 @@ import {
   createPickingBar,
   createReferenceBar,
   createSectionBar,
-  sectionService,
-  tabService,
-} from '../logic';
+  sectionOperations,
+  tabOperations,
+} from '../operations';
 import { Bar, ChordBar, NonSectionBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
 import { ChordBarComponent } from './chord-bar';
@@ -39,8 +39,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
         : createSectionBar(index, props.tab.sections[0]);
 
     const nextTab = props.inSection
-      ? sectionService.addBar(props.tab, props.inSection.index, bar as NonSectionBar)
-      : tabService.addBar(props.tab, bar);
+      ? sectionOperations.addBar(props.tab, props.inSection.index, bar as NonSectionBar)
+      : tabOperations.addBar(props.tab, bar);
 
     props.updateTab(nextTab);
   };
@@ -55,16 +55,16 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           const newBar = createReferenceBar(bar);
 
           const nextTab = props.inSection
-            ? sectionService.addBar(props.tab, props.inSection.index, newBar)
-            : tabService.addBar(props.tab, newBar);
+            ? sectionOperations.addBar(props.tab, props.inSection.index, newBar)
+            : tabOperations.addBar(props.tab, newBar);
 
           props.updateTab(nextTab);
         };
 
         const removeBar = () => {
           const nextTab = props.inSection
-            ? sectionService.removeBar(props.tab, props.inSection.index, bar.index)
-            : tabService.removeBar(props.tab, bar.index);
+            ? sectionOperations.removeBar(props.tab, props.inSection.index, bar.index)
+            : tabOperations.removeBar(props.tab, bar.index);
 
           props.updateTab(nextTab);
         };
@@ -99,27 +99,27 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 bar={bar}
                 rebase={(sPatternIndex) => {
                   const nextTab = props.inSection
-                    ? sectionService.rebaseChordBar(
+                    ? sectionOperations.rebaseChordBar(
                         props.tab,
                         props.inSection.index,
                         bar.index,
                         sPatternIndex,
                       )
-                    : tabService.rebaseChordBar(props.tab, bar.index, sPatternIndex);
+                    : tabOperations.rebaseChordBar(props.tab, bar.index, sPatternIndex);
 
                   props.updateTab(nextTab);
                 }}
                 strummingPatterns={props.tab.strummingPatterns}
                 updateFrame={(frameIndex, value) => {
                   const nextTab = props.inSection
-                    ? sectionService.updateChordFrame(
+                    ? sectionOperations.updateChordFrame(
                         props.tab,
                         props.inSection.index,
                         bar.index,
                         frameIndex,
                         value,
                       )
-                    : tabService.updateChordFrame(props.tab, bar.index, frameIndex, value);
+                    : tabOperations.updateChordFrame(props.tab, bar.index, frameIndex, value);
 
                   props.updateTab(nextTab);
                 }}
@@ -130,19 +130,19 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 bar={bar}
                 rebase={(framesNumber) => {
                   const nextTab = props.inSection
-                    ? sectionService.rebasePickingBar(
+                    ? sectionOperations.rebasePickingBar(
                         props.tab,
                         props.inSection.index,
                         bar.index,
                         framesNumber,
                       )
-                    : tabService.rebasePickingBar(props.tab, bar.index, framesNumber);
+                    : tabOperations.rebasePickingBar(props.tab, bar.index, framesNumber);
 
                   props.updateTab(nextTab);
                 }}
                 updateFrame={(frameIndex, stringIndex, value) => {
                   const nextTab = props.inSection
-                    ? sectionService.updatePickingFrame(
+                    ? sectionOperations.updatePickingFrame(
                         props.tab,
                         props.inSection.index,
                         bar.index,
@@ -150,7 +150,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                         stringIndex,
                         value,
                       )
-                    : tabService.updatePickingFrame(
+                    : tabOperations.updatePickingFrame(
                         props.tab,
                         bar.index,
                         frameIndex,
@@ -180,7 +180,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                         addBar(bar.index, type);
                       }}
                       changeSection={(sectionIndex) => {
-                        const nextTab = tabService.changeSection(
+                        const nextTab = tabOperations.changeSection(
                           props.tab,
                           bar.index,
                           sectionIndex,
@@ -192,7 +192,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                       key={nonSectionBar.index}
                       referencedBar={nonSectionBar}
                       removeBar={() => {
-                        const nextTab = tabService.removeBar(props.tab, bar.index);
+                        const nextTab = tabOperations.removeBar(props.tab, bar.index);
                         props.updateTab(nextTab);
                       }}
                       section={section}

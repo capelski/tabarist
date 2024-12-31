@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { BarType, removeSymbol } from '../constants';
-import { getIndexDisplayValue } from '../logic';
+import { getIndexDisplayValue } from '../operations';
 import { Bar } from '../types';
 
 export type BarControlsHandlers = {

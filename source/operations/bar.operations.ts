@@ -14,7 +14,7 @@ import {
   createIndexedValuesArray,
   getIndexDecrease,
   getIndexIncrease,
-} from './indexed-value.logic';
+} from './indexed-value.operations';
 
 const addBar = <TBar extends Bar | NonSectionBar>(bars: TBar[], newBar: TBar): TBar[] => {
   return bars.length === 0
@@ -217,7 +217,7 @@ const updatePickingFrame = <TBar extends Bar | NonSectionBar>(
   });
 };
 
-export const barService = {
+export const barOperations = {
   addBar,
   rebaseChordBar,
   rebasePickingBar,

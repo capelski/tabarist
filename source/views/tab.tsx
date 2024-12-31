@@ -9,7 +9,7 @@ import {
   RouteNames,
   saveSymbol,
 } from '../constants';
-import { getTabLocalStorageKey, sPatternService, tabService } from '../logic';
+import { getTabLocalStorageKey, sPatternOperations, tabOperations } from '../operations';
 import { Tab } from '../types';
 
 export type TabProps = {
@@ -57,11 +57,11 @@ export const TabView: React.FC<TabProps> = (props) => {
   }
 
   const addSection = () => {
-    setTab(tabService.addSection(tab));
+    setTab(tabOperations.addSection(tab));
   };
 
   const addStrummingPattern = () => {
-    setTab(tabService.addStrummingPattern(tab));
+    setTab(tabOperations.addStrummingPattern(tab));
   };
 
   const toggleEditMode = () => {
@@ -89,7 +89,7 @@ export const TabView: React.FC<TabProps> = (props) => {
             <input
               value={tab.title}
               onChange={(event) => {
-                setTab(tabService.updateTitle(tab, event.target.value));
+                setTab(tabOperations.updateTitle(tab, event.target.value));
               }}
             />
           ) : (
@@ -136,12 +136,12 @@ export const TabView: React.FC<TabProps> = (props) => {
               <StrummingPatternComponent
                 key={sPattern.index}
                 rebase={(framesNumber) => {
-                  setTab(sPatternService.rebase(tab, sPattern.index, framesNumber));
+                  setTab(sPatternOperations.rebase(tab, sPattern.index, framesNumber));
                 }}
                 strummingPattern={sPattern}
                 tab={tab}
                 update={(frameIndex, value) => {
-                  setTab(sPatternService.update(tab, sPattern.index, frameIndex, value));
+                  setTab(sPatternOperations.update(tab, sPattern.index, frameIndex, value));
                 }}
                 updateTab={setTab}
               />
