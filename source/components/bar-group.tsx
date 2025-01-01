@@ -60,9 +60,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
         };
 
         const section = props.tab.sections.find(
-          (section) =>
-            section.index ===
-            (bar.type === BarType.section ? bar.sectionIndex : bar.inSectionIndex),
+          (section) => bar.type === BarType.section && bar.sectionIndex === section.index,
         );
 
         return (

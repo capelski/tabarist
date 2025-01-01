@@ -4,7 +4,7 @@ import { IndexedValue } from './indexed-value.type';
 export type NonSectionBar = ChordBar | PickingBar | ReferenceBar;
 export type Bar = NonSectionBar | SectionBar;
 
-export type BarBase = { index: number; inSectionIndex?: number };
+export type BarBase = { index: number };
 
 export type ChordBar = BarBase & {
   frames: IndexedValue[];
@@ -29,8 +29,7 @@ export type ReferenceBar = BarBase & {
   type: BarType.reference;
 };
 
-export type SectionBar = {
-  index: number;
+export type SectionBar = BarBase & {
   sectionIndex: number;
   type: BarType.section;
 };
