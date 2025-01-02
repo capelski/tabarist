@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { BarType } from '../constants';
-import { Bar, NonSectionBar, Tab } from '../types';
+import { Bar, NonSectionBar, Section, Tab } from '../types';
 import {
   barOperations,
   createChordBar,
@@ -12,9 +12,32 @@ import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
 import { sPatternOperations } from './strumming-pattern.operations';
 
+const applyBarsOperation = (
+  tab: Tab,
+  barsModifier: <TBar extends Bar | NonSectionBar>(bars: TBar[]) => TBar[],
+  inSection?: Section,
+): Tab => {
+  return inSection
+    ? {
+        ...tab,
+        sections: tab.sections.map((section) =>
+          section.index === inSection.index
+            ? {
+                ...section,
+                bars: barsModifier(section.bars),
+              }
+            : section,
+        ),
+      }
+    : {
+        ...tab,
+        bars: barsModifier(tab.bars),
+      };
+};
+
 export const tabOperations = {
-  addBar: (tab: Tab, index: number, type: BarType): Tab => {
-    const nextTab = { ...tab };
+  addBar: (tab: Tab, index: number, type: BarType, inSection?: Section): Tab => {
+    let nextTab = { ...tab };
 
     if (type === BarType.chord && tab.strummingPatterns.length === 0) {
       nextTab.strummingPatterns = [sPatternOperations.create(0)];
@@ -31,9 +54,11 @@ export const tabOperations = {
         ? createReferenceBar(tab.bars[index])
         : createSectionBar(index, nextTab.sections[0]);
 
-    nextTab.bars = barOperations.addBar(tab.bars, newBar);
-
-    return nextTab;
+    return applyBarsOperation(
+      nextTab,
+      (bars) => barOperations.addBar(bars, newBar as any),
+      inSection,
+    );
   },
 
   addSection: (tab: Tab): Tab => {
@@ -81,30 +106,38 @@ export const tabOperations = {
     title: 'Unnamed tab',
   }),
 
-  rebaseChordBar: (tab: Tab, barIndex: number, sPatternIndex: number): Tab => {
+  rebaseChordBar: (tab: Tab, barIndex: number, sPatternIndex: number, inSection?: Section): Tab => {
     const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
     if (!sPattern) {
       return tab;
     }
 
-    return {
-      ...tab,
-      bars: barOperations.rebaseChordBar(tab.bars, barIndex, sPattern),
-    };
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.rebaseChordBar(bars, barIndex, sPattern),
+      inSection,
+    );
   },
 
-  rebasePickingBar: (tab: Tab, barIndex: number, framesNumber: number): Tab => {
-    return {
-      ...tab,
-      bars: barOperations.rebasePickingBar(tab.bars, barIndex, framesNumber),
-    };
+  rebasePickingBar: (
+    tab: Tab,
+    barIndex: number,
+    framesNumber: number,
+    inSection?: Section,
+  ): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.rebasePickingBar(bars, barIndex, framesNumber),
+      inSection,
+    );
   },
 
-  removeBar: (tab: Tab, deletionIndex: number): Tab => {
-    return {
-      ...tab,
-      bars: barOperations.removeBar(tab.bars, deletionIndex),
-    };
+  removeBar: (tab: Tab, deletionIndex: number, inSection?: Section): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.removeBar(bars, deletionIndex),
+      inSection,
+    );
   },
 
   removeSection: (tab: Tab, deletionIndex: number): Tab => {
@@ -184,11 +217,18 @@ export const tabOperations = {
     };
   },
 
-  updateChordFrame: (tab: Tab, barIndex: number, frameIndex: number, value: string): Tab => {
-    return {
-      ...tab,
-      bars: barOperations.updateChordFrame(tab.bars, barIndex, frameIndex, value),
-    };
+  updateChordFrame: (
+    tab: Tab,
+    barIndex: number,
+    frameIndex: number,
+    value: string,
+    inSection?: Section,
+  ): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.updateChordFrame(bars, barIndex, frameIndex, value),
+      inSection,
+    );
   },
 
   updatePickingFrame: (
@@ -197,11 +237,13 @@ export const tabOperations = {
     frameIndex: number,
     stringIndex: number,
     value: string,
+    inSection?: Section,
   ): Tab => {
-    return {
-      ...tab,
-      bars: barOperations.updatePickingFrame(tab.bars, barIndex, frameIndex, stringIndex, value),
-    };
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.updatePickingFrame(bars, barIndex, frameIndex, stringIndex, value),
+      inSection,
+    );
   },
 
   updateTitle: (tab: Tab, title: string): Tab => {

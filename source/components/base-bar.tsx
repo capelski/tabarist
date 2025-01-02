@@ -5,11 +5,11 @@ import { BarControls, BarControlsHandlers } from './bar-controls';
 
 export type BaseBarProps = BarControlsHandlers & {
   addBar: AddBarProps['addBar'];
-  bar: Bar;
   additionalControls?: React.ReactNode;
   allowInsertSection?: boolean;
-  coreComponent: React.ReactNode;
+  bar: Bar;
   canAddBar: boolean;
+  coreComponent: React.ReactNode;
   displayBarControls: boolean;
   width: number;
 };

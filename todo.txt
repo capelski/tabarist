@@ -1,4 +1,3 @@
-- Move handlers inside the Chord/Picking/Reference/Section components
 - Strumming pattern picker
 - Strumming patterns
     - 1 &, 2 &, etc.

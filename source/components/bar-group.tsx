@@ -1,10 +1,11 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { BarType, stringHeight } from '../constants';
-import { sectionOperations, tabOperations } from '../operations';
+import { tabOperations } from '../operations';
 import { Bar, ChordBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
 import { ChordBarComponent } from './chord-bar';
+import { addBar } from './common-handlers';
 import { PickingBarComponent } from './picking-bar';
 import { ReferenceBarComponent } from './reference-bar';
 import { SectionBarComponent } from './section-bar';
@@ -22,43 +23,12 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
   const isMediumScreen = useMediaQuery({ minWidth: 600 });
   const barWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
 
-  const addBar = (index: number, type: BarType) => {
-    const nextTab = props.inSection
-      ? sectionOperations.addBar(props.tab, props.inSection.index, index, type as BarType.chord)
-      : tabOperations.addBar(props.tab, index, type);
-
-    props.updateTab(nextTab);
-  };
-
   return (
     <div
       className="bars"
       style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
     >
       {props.bars.map((bar) => {
-        const baseProps = {
-          addBar: (type: BarType.chord | BarType.picking | BarType.section) => {
-            addBar(bar.index, type);
-          },
-          isEditMode: props.isEditMode,
-          removeBar: () => {
-            const nextTab = props.inSection
-              ? sectionOperations.removeBar(props.tab, props.inSection.index, bar.index)
-              : tabOperations.removeBar(props.tab, bar.index);
-
-            props.updateTab(nextTab);
-          },
-          width: barWidth,
-        };
-
-        const nonSectionProps = {
-          ...baseProps,
-          copyBar: () => {
-            addBar(bar.index, BarType.reference);
-          },
-          inSection: props.inSection,
-        };
-
         const section = props.tab.sections.find(
           (section) => bar.type === BarType.section && bar.sectionIndex === section.index,
         );
@@ -67,80 +37,33 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           <React.Fragment key={bar.index}>
             {bar.type === BarType.chord ? (
               <ChordBarComponent
-                {...nonSectionProps}
                 bar={bar}
-                rebase={(sPatternIndex) => {
-                  const nextTab = props.inSection
-                    ? sectionOperations.rebaseChordBar(
-                        props.tab,
-                        props.inSection.index,
-                        bar.index,
-                        sPatternIndex,
-                      )
-                    : tabOperations.rebaseChordBar(props.tab, bar.index, sPatternIndex);
-
-                  props.updateTab(nextTab);
-                }}
-                strummingPatterns={props.tab.strummingPatterns}
-                updateFrame={(frameIndex, value) => {
-                  const nextTab = props.inSection
-                    ? sectionOperations.updateChordFrame(
-                        props.tab,
-                        props.inSection.index,
-                        bar.index,
-                        frameIndex,
-                        value,
-                      )
-                    : tabOperations.updateChordFrame(props.tab, bar.index, frameIndex, value);
-
-                  props.updateTab(nextTab);
-                }}
+                isEditMode={props.isEditMode}
+                inSection={props.inSection}
+                tab={props.tab}
+                updateTab={props.updateTab}
+                width={barWidth}
               />
             ) : bar.type === BarType.picking ? (
               <PickingBarComponent
-                {...nonSectionProps}
                 bar={bar}
-                rebase={(framesNumber) => {
-                  const nextTab = props.inSection
-                    ? sectionOperations.rebasePickingBar(
-                        props.tab,
-                        props.inSection.index,
-                        bar.index,
-                        framesNumber,
-                      )
-                    : tabOperations.rebasePickingBar(props.tab, bar.index, framesNumber);
-
-                  props.updateTab(nextTab);
-                }}
-                updateFrame={(frameIndex, stringIndex, value) => {
-                  const nextTab = props.inSection
-                    ? sectionOperations.updatePickingFrame(
-                        props.tab,
-                        props.inSection.index,
-                        bar.index,
-                        frameIndex,
-                        stringIndex,
-                        value,
-                      )
-                    : tabOperations.updatePickingFrame(
-                        props.tab,
-                        bar.index,
-                        frameIndex,
-                        stringIndex,
-                        value,
-                      );
-
-                  props.updateTab(nextTab);
-                }}
+                isEditMode={props.isEditMode}
+                inSection={props.inSection}
+                tab={props.tab}
+                updateTab={props.updateTab}
+                width={barWidth}
               />
             ) : bar.type === BarType.reference ? (
               <ReferenceBarComponent
-                {...nonSectionProps}
                 bar={bar}
+                isEditMode={props.isEditMode}
+                inSection={props.inSection}
                 referencedBar={
                   props.bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar
                 }
-                strummingPatterns={props.tab.strummingPatterns}
+                tab={props.tab}
+                updateTab={props.updateTab}
+                width={barWidth}
               />
             ) : bar.type === BarType.section && section ? (
               <React.Fragment key={bar.index}>
@@ -148,9 +71,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                   ? section.bars.map((nonSectionBar) => {
                       return (
                         <SectionBarComponent
-                          {...baseProps}
-                          addBar={(type: BarType.chord | BarType.picking | BarType.section) => {
-                            addBar(bar.index, type);
+                          addBar={(type) => {
+                            addBar(props.tab, props.updateTab, bar.index, type);
                           }}
                           changeSection={(sectionIndex) => {
                             const nextTab = tabOperations.changeSection(
@@ -161,6 +83,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                             props.updateTab(nextTab);
                           }}
                           bar={bar}
+                          isEditMode={props.isEditMode}
                           isFirst={nonSectionBar.index === 0}
                           key={nonSectionBar.index}
                           referencedBar={nonSectionBar}
@@ -171,14 +94,14 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                           section={section}
                           sections={props.tab.sections}
                           strummingPatterns={props.tab.strummingPatterns}
+                          width={barWidth}
                         />
                       );
                     })
                   : props.isEditMode && (
                       <SectionBarComponent
-                        {...baseProps}
-                        addBar={(type: BarType.chord | BarType.picking | BarType.section) => {
-                          addBar(bar.index, type);
+                        addBar={(type) => {
+                          addBar(props.tab, props.updateTab, bar.index, type);
                         }}
                         changeSection={(sectionIndex) => {
                           const nextTab = tabOperations.changeSection(
@@ -189,6 +112,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                           props.updateTab(nextTab);
                         }}
                         bar={bar}
+                        isEditMode={props.isEditMode}
                         isFirst={true}
                         removeBar={() => {
                           const nextTab = tabOperations.removeBar(props.tab, bar.index);
@@ -197,6 +121,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                         section={section}
                         sections={props.tab.sections}
                         strummingPatterns={props.tab.strummingPatterns}
+                        width={barWidth}
                       />
                     )}
               </React.Fragment>
@@ -208,7 +133,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       {props.isEditMode && (
         <AddBar
           addBar={(type) => {
-            addBar(props.bars.length, type);
+            addBar(props.tab, props.updateTab, props.bars.length, type, props.inSection);
           }}
           allowInsertSection={props.inSection === undefined}
           expanded={true}
