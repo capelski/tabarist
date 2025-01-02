@@ -55,10 +55,14 @@ export const getPickingBarCore = (props: PickingBarCoreProps) => {
               frame={frame}
               isEditMode={props.isEditMode}
               key={frame.index}
+              style={{
+                borderLeft: frame.index > 0 ? '1px solid #ccc' : undefined,
+                boxSizing: 'border-box',
+                width: `${framesWidth}%`,
+              }}
               update={(stringIndex, value) => {
                 props.updateFrame?.(frame.index, stringIndex, value);
               }}
-              width={framesWidth}
             />
           );
         })}

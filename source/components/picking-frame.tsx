@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { stringHeight } from '../constants';
 import { PickingFrame } from '../types';
 
@@ -7,13 +7,13 @@ export interface PickingFrameProps {
   disabled?: boolean;
   frame: PickingFrame;
   isEditMode: boolean;
+  style?: CSSProperties;
   update: (stringIndex: number, value: string) => void;
-  width: number;
 }
 
 export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
   return (
-    <div className="frame" style={{ width: `${props.width}%` }}>
+    <div className="frame" style={props.style}>
       {props.frame.strings.map((string) => {
         return (
           <div

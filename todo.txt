@@ -1,8 +1,9 @@
+- Bar repeats
+- Section component core. Allow copying sections
 - Strumming pattern picker
 - Strumming patterns
     - 1 &, 2 &, etc.
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
-- Grey marks for the beats in a picking bar
 - Move bars around
 - Line breaks
