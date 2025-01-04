@@ -44,6 +44,7 @@ export const SectionBarComponent: React.FC<SectionBarProps> = (props) => {
     isFirstBarInSectionBar: props.isFirst,
     isLastBarInSectionBar: props.isLast,
     repeats: props.bar.repeats,
+    sectionName: props.section.name,
     updateRepeats: props.isFirst
       ? (repeats?: number) => updateRepeats(props.tab, props.updateTab, props.bar.index, repeats)
       : undefined,

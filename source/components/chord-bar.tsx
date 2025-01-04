@@ -47,6 +47,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
     isLastBarInSectionBar: false,
     rebase,
     repeats: props.bar.repeats,
+    sectionName: undefined,
     strummingPatterns: props.tab.strummingPatterns,
     updateFrame,
     updateRepeats(repeats) {

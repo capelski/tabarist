@@ -25,6 +25,7 @@ export const ReferenceBarComponent: React.FC<ReferenceBarProps> = (props) => {
     isLastBarInSectionBar: false,
     referencedBar: props.referencedBar,
     repeats: props.referencedBar.repeats,
+    sectionName: undefined,
     strummingPatterns: props.tab.strummingPatterns,
     updateRepeats: undefined,
   });

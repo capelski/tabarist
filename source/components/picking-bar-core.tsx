@@ -50,6 +50,7 @@ export const getPickingBarCore = (props: PickingBarCoreProps) => {
             isFirstBarInSectionBar={props.isFirstBarInSectionBar}
             isLastBarInSectionBar={props.isLastBarInSectionBar}
             repeats={props.repeats}
+            sectionName={props.sectionName}
             updateRepeats={props.updateRepeats}
           />
         )}

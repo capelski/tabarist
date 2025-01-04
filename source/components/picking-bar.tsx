@@ -48,6 +48,7 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
     isLastBarInSectionBar: false,
     rebase,
     repeats: props.bar.repeats,
+    sectionName: undefined,
     updateFrame,
     updateRepeats(repeats) {
       updateRepeats(props.tab, props.updateTab, props.bar.index, repeats, props.inSection);
