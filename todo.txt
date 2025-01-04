@@ -1,5 +1,5 @@
-- Bar repeats
-- Section component core. Allow copying sections
+- Section component core. Handlers. Allow copying sections
+- Move handlers to base bar component?
 - Strumming pattern picker
 - Strumming patterns
     - 1 &, 2 &, etc.
