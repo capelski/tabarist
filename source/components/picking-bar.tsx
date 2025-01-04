@@ -2,14 +2,14 @@ import React from 'react';
 import { BarType } from '../constants';
 import { tabOperations } from '../operations';
 import { PickingBar, Section, Tab } from '../types';
+import { addBar, removeBar, updateRepeats } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
-import { addBar, removeBar } from './common-handlers';
 import { getPickingBarCore, PickingBarCoreProps } from './picking-bar-core';
 
 export type PickingBarProps = {
   bar: PickingBar;
+  inSection: Section | undefined;
   isEditMode: boolean;
-  inSection?: Section;
   tab: Tab;
   updateTab: (tab: Tab) => void;
   width: number;
@@ -39,13 +39,19 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
   };
 
   const { additionalControls, coreComponent } = getPickingBarCore({
-    backgroundColor: 'white',
     bar: props.bar,
-    borderLeft: '1px solid black',
     displayPickingRebase: props.isEditMode,
+    inSection: props.inSection,
+    inSectionBar: undefined,
     isEditMode: props.isEditMode,
+    isFirstBarInSectionBar: false,
+    isLastBarInSectionBar: false,
     rebase,
+    repeats: props.bar.repeats,
     updateFrame,
+    updateRepeats(repeats) {
+      updateRepeats(props.tab, props.updateTab, props.bar.index, repeats, props.inSection);
+    },
   });
 
   return (
@@ -59,7 +65,8 @@ export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
         addBar(props.tab, props.updateTab, props.bar.index, BarType.reference, props.inSection)
       }
       coreComponent={coreComponent}
-      displayBarControls={props.isEditMode}
+      inSection={props.inSection}
+      isEditMode={props.isEditMode}
       removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index, props.inSection)}
       width={props.width}
     />

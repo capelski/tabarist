@@ -1,31 +1,25 @@
 import { BarType } from '../constants';
 import { ChordBar, PickingBar, ReferenceBar, StrummingPattern } from '../types';
+import { CommonCoreProps } from './bar-commons';
 import { getChordBarCore } from './chord-bar-core';
 import { getPickingBarCore } from './picking-bar-core';
 
-export interface ReferenceBarCoreProps {
-  backgroundColor: string;
+export type ReferenceBarCoreProps = CommonCoreProps & {
   bar: ReferenceBar;
-  borderLeft?: string;
-  isEditMode: boolean;
   referencedBar: ChordBar | PickingBar;
   strummingPatterns: StrummingPattern[];
-}
+};
 
 export const getReferenceBarCore = (props: ReferenceBarCoreProps) => {
-  const baseProps = {
-    ...props,
-    disabled: true,
-  };
-
   return props.referencedBar.type === BarType.chord
     ? getChordBarCore({
-        ...baseProps,
+        ...props,
         bar: props.referencedBar,
-        strummingPatterns: props.strummingPatterns,
+        disabled: true,
       })
     : getPickingBarCore({
-        ...baseProps,
+        ...props,
         bar: props.referencedBar,
+        disabled: true,
       });
 };

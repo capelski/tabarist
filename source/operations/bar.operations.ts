@@ -211,4 +211,19 @@ export const barOperations = {
           };
     });
   },
+
+  updateRepeats: <TBar extends Bar | NonSectionBar>(
+    bars: TBar[],
+    barIndex: number,
+    repeats?: number,
+  ): TBar[] => {
+    return bars.map((bar) => {
+      return bar.index !== barIndex
+        ? bar
+        : {
+            ...bar,
+            repeats,
+          };
+    });
+  },
 };

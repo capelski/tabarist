@@ -2,14 +2,14 @@ import React from 'react';
 import { BarType } from '../constants';
 import { tabOperations } from '../operations';
 import { ChordBar, Section, Tab } from '../types';
+import { addBar, removeBar, updateRepeats } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
 import { ChordBarCoreProps, getChordBarCore } from './chord-bar-core';
-import { addBar, removeBar } from './common-handlers';
 
 export type ChordBarProps = {
   bar: ChordBar;
+  inSection: Section | undefined;
   isEditMode: boolean;
-  inSection?: Section;
   tab: Tab;
   updateTab: (tab: Tab) => void;
   width: number;
@@ -38,14 +38,20 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
   };
 
   const { coreComponent } = getChordBarCore({
-    backgroundColor: 'white',
     bar: props.bar,
-    borderLeft: '1px solid black',
     displayStrummingPatternPicker: props.isEditMode,
+    inSection: props.inSection,
+    inSectionBar: undefined,
     isEditMode: props.isEditMode,
+    isFirstBarInSectionBar: false,
+    isLastBarInSectionBar: false,
     rebase,
+    repeats: props.bar.repeats,
     strummingPatterns: props.tab.strummingPatterns,
     updateFrame,
+    updateRepeats(repeats) {
+      updateRepeats(props.tab, props.updateTab, props.bar.index, repeats, props.inSection);
+    },
   });
 
   return (
@@ -58,7 +64,8 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
         addBar(props.tab, props.updateTab, props.bar.index, BarType.reference, props.inSection)
       }
       coreComponent={coreComponent}
-      displayBarControls={props.isEditMode}
+      inSection={props.inSection}
+      isEditMode={props.isEditMode}
       removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index, props.inSection)}
       width={props.width}
     />

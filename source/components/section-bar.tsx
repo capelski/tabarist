@@ -8,8 +8,10 @@ import {
   Section,
   SectionBar,
   StrummingPattern,
+  Tab,
 } from '../types';
 import { AddBarPropsHandlers } from './add-bar';
+import { CommonCoreProps, updateRepeats } from './bar-commons';
 import { BarControlsHandlers } from './bar-controls';
 import { BaseBarComponent } from './base-bar';
 import { getChordBarCore } from './chord-bar-core';
@@ -23,18 +25,28 @@ export type SectionBarProps = AddBarPropsHandlers &
     changeSection: (sectionIndex: number) => void;
     isEditMode: boolean;
     isFirst: boolean;
+    isLast: boolean;
     referencedBar?: NonSectionBar;
     section: Section;
     sections: Section[];
     strummingPatterns: StrummingPattern[];
+    tab: Tab;
+    updateRepeats?: (repeats?: number) => void;
+    updateTab: (tab: Tab) => void;
     width: number;
   };
 
 export const SectionBarComponent: React.FC<SectionBarProps> = (props) => {
-  const baseProps = {
-    backgroundColor: props.isEditMode ? '#ddd' : 'white',
-    borderLeft: props.isEditMode && !props.isFirst ? undefined : '1px solid black',
+  const baseProps: CommonCoreProps = {
+    inSection: undefined,
+    inSectionBar: props.bar,
     isEditMode: props.isEditMode,
+    isFirstBarInSectionBar: props.isFirst,
+    isLastBarInSectionBar: props.isLast,
+    repeats: props.bar.repeats,
+    updateRepeats: props.isFirst
+      ? (repeats?: number) => updateRepeats(props.tab, props.updateTab, props.bar.index, repeats)
+      : undefined,
   };
 
   const { additionalControls, coreComponent } = !props.referencedBar
@@ -70,26 +82,28 @@ export const SectionBarComponent: React.FC<SectionBarProps> = (props) => {
       });
 
   return (
-    <React.Fragment>
-      <BaseBarComponent
-        {...props}
-        additionalControls={
-          <React.Fragment>
-            {props.isEditMode && props.isFirst && (
-              <SectionPicker
-                changeSection={props.changeSection}
-                section={props.section}
-                sections={props.sections}
-              />
-            )}
-            {additionalControls}
-          </React.Fragment>
-        }
-        allowInsertSection={props.isFirst}
-        canAddBar={props.isEditMode && props.isFirst}
-        coreComponent={coreComponent}
-        displayBarControls={props.isEditMode && props.isFirst}
-      />
-    </React.Fragment>
+    <BaseBarComponent
+      addBar={props.addBar}
+      additionalControls={
+        <React.Fragment>
+          {props.isEditMode && props.isFirst && (
+            <SectionPicker
+              changeSection={props.changeSection}
+              section={props.section}
+              sections={props.sections}
+            />
+          )}
+          {additionalControls}
+        </React.Fragment>
+      }
+      allowInsertSection={props.isFirst}
+      bar={props.bar}
+      canAddBar={props.isEditMode && props.isFirst}
+      coreComponent={coreComponent}
+      inSection={undefined}
+      isEditMode={props.isEditMode && props.isFirst}
+      removeBar={props.removeBar}
+      width={props.width}
+    />
   );
 };

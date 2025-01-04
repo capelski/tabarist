@@ -1,6 +1,11 @@
 import { BarType } from '../constants';
 import { tabOperations } from '../operations';
 import { Section, Tab } from '../types';
+import { RepeatsProps } from './repeats';
+
+export type CommonCoreProps = RepeatsProps & {
+  inSection: Section | undefined;
+};
 
 export const addBar = (
   tab: Tab,
@@ -20,5 +25,16 @@ export const removeBar = (
   inSection?: Section,
 ) => {
   const nextTab = tabOperations.removeBar(tab, barIndex, inSection);
+  updateTab(nextTab);
+};
+
+export const updateRepeats = (
+  tab: Tab,
+  updateTab: (tab: Tab) => void,
+  barIndex: number,
+  repeats?: number,
+  inSection?: Section,
+) => {
+  const nextTab = tabOperations.updateRepeats(tab, barIndex, repeats, inSection);
   updateTab(nextTab);
 };

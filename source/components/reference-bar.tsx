@@ -1,14 +1,14 @@
 import React from 'react';
 import { BarType } from '../constants';
 import { ChordBar, PickingBar, ReferenceBar, Section, Tab } from '../types';
+import { addBar, removeBar } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
-import { addBar, removeBar } from './common-handlers';
 import { getReferenceBarCore } from './reference-bar-core';
 
 export type ReferenceBarProps = {
   bar: ReferenceBar;
+  inSection: Section | undefined;
   isEditMode: boolean;
-  inSection?: Section;
   referencedBar: ChordBar | PickingBar;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -17,12 +17,16 @@ export type ReferenceBarProps = {
 
 export const ReferenceBarComponent: React.FC<ReferenceBarProps> = (props) => {
   const { additionalControls, coreComponent } = getReferenceBarCore({
-    backgroundColor: props.isEditMode ? '#ddd' : 'white',
     bar: props.bar,
-    borderLeft: '1px solid black',
+    inSection: props.inSection,
+    inSectionBar: undefined,
     isEditMode: props.isEditMode,
+    isFirstBarInSectionBar: false,
+    isLastBarInSectionBar: false,
     referencedBar: props.referencedBar,
+    repeats: props.referencedBar.repeats,
     strummingPatterns: props.tab.strummingPatterns,
+    updateRepeats: undefined,
   });
 
   return (
@@ -36,7 +40,8 @@ export const ReferenceBarComponent: React.FC<ReferenceBarProps> = (props) => {
         addBar(props.tab, props.updateTab, props.bar.index, BarType.reference, props.inSection)
       }
       coreComponent={coreComponent}
-      displayBarControls={props.isEditMode}
+      inSection={props.inSection}
+      isEditMode={props.isEditMode}
       removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index, props.inSection)}
       width={props.width}
     />

@@ -34,7 +34,7 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
                 }}
                 style={{
                   boxSizing: 'border-box',
-                  height: stringHeight,
+                  maxHeight: stringHeight,
                   maxWidth: 30,
                   padding: 0,
                   textAlign: 'center',

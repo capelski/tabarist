@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import { BarType } from '../constants';
+import { BarType, stringHeight } from '../constants';
 
 export type AddBarPropsHandlers = {
   addBar: (type: BarType.chord | BarType.picking | BarType.section) => void;
@@ -28,6 +28,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
       style={{
         display: 'flex',
         flexDirection: 'column',
+        height: stringHeight * 6,
         ...props.style,
       }}
     >

@@ -246,6 +246,14 @@ export const tabOperations = {
     );
   },
 
+  updateRepeats: (tab: Tab, barIndex: number, repeats?: number, inSection?: Section): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.updateRepeats(bars, barIndex, repeats),
+      inSection,
+    );
+  },
+
   updateTitle: (tab: Tab, title: string): Tab => {
     return {
       ...tab,

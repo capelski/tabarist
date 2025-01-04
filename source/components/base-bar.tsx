@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bar } from '../types';
+import { repeatsHeight } from '../constants';
+import { Bar, Section } from '../types';
 import { AddBar, AddBarProps } from './add-bar';
 import { BarControls, BarControlsHandlers } from './bar-controls';
 
@@ -10,7 +11,8 @@ export type BaseBarProps = BarControlsHandlers & {
   bar: Bar;
   canAddBar: boolean;
   coreComponent: React.ReactNode;
-  displayBarControls: boolean;
+  inSection: Section | undefined;
+  isEditMode: boolean;
   width: number;
 };
 
@@ -25,14 +27,16 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
           <AddBar
             addBar={props.addBar}
             allowInsertSection={props.allowInsertSection}
-            style={{ minHeight: 60 }}
+            style={{
+              marginTop: props.inSection ? undefined : repeatsHeight,
+            }}
           />
         )}
 
         {props.coreComponent}
       </div>
 
-      {props.displayBarControls && (
+      {props.isEditMode && (
         <BarControls currentBar={props.bar} copyBar={props.copyBar} removeBar={props.removeBar}>
           {props.additionalControls}
         </BarControls>

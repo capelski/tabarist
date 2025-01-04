@@ -1,11 +1,11 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
-import { BarType, stringHeight } from '../constants';
+import { BarType, repeatsHeight } from '../constants';
 import { tabOperations } from '../operations';
 import { Bar, ChordBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
+import { addBar } from './bar-commons';
 import { ChordBarComponent } from './chord-bar';
-import { addBar } from './common-handlers';
 import { PickingBarComponent } from './picking-bar';
 import { ReferenceBarComponent } from './reference-bar';
 import { SectionBarComponent } from './section-bar';
@@ -85,6 +85,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                           bar={bar}
                           isEditMode={props.isEditMode}
                           isFirst={nonSectionBar.index === 0}
+                          isLast={nonSectionBar.index === section.bars.length - 1}
                           key={nonSectionBar.index}
                           referencedBar={nonSectionBar}
                           removeBar={() => {
@@ -94,6 +95,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                           section={section}
                           sections={props.tab.sections}
                           strummingPatterns={props.tab.strummingPatterns}
+                          tab={props.tab}
+                          updateTab={props.updateTab}
                           width={barWidth}
                         />
                       );
@@ -114,6 +117,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                         bar={bar}
                         isEditMode={props.isEditMode}
                         isFirst={true}
+                        isLast={true}
                         removeBar={() => {
                           const nextTab = tabOperations.removeBar(props.tab, bar.index);
                           props.updateTab(nextTab);
@@ -121,6 +125,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                         section={section}
                         sections={props.tab.sections}
                         strummingPatterns={props.tab.strummingPatterns}
+                        tab={props.tab}
+                        updateTab={props.updateTab}
                         width={barWidth}
                       />
                     )}
@@ -140,7 +146,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           style={{
             boxSizing: 'border-box',
             flexBasis: `${barWidth}%`,
-            height: stringHeight * 6,
+            marginTop: props.inSection ? undefined : repeatsHeight,
             padding: '0 8px',
           }}
         />
