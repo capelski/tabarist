@@ -1,7 +1,6 @@
-- Strumming pattern picker
+- Move bars around
+- Line breaks
 - Strumming patterns
     - 1 &, 2 &, etc.
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
-- Move bars around
-- Line breaks

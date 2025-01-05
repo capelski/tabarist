@@ -3,6 +3,7 @@ import { stringHeight } from '../constants';
 import { ChordBar, StrummingPattern } from '../types';
 import { CommonCoreProps, CoreComponent } from './bar-commons';
 import { ChordFrame } from './chord-frame';
+import { PatternPicker } from './pattern-picker';
 import { Repeats } from './repeats';
 
 export type ChordBarCoreProps = CommonCoreProps & {
@@ -21,26 +22,13 @@ export const getChordBarCore = (props: ChordBarCoreProps): CoreComponent => {
   );
 
   return {
-    additionalControls: props.displayStrummingPatternPicker && (
+    additionalControls: props.displayStrummingPatternPicker && props.rebase && (
       <div style={{ marginRight: 8 }}>
-        Pattern:
-        <select
-          disabled={props.strummingPatterns.length < 2 || props.disabled}
-          onChange={(event) => {
-            const sPatternIndex = parseInt(event.target.value);
-            props.rebase?.(sPatternIndex);
-          }}
-          style={{ marginLeft: 8 }}
-          value={props.bar.sPatternIndex}
-        >
-          {props.strummingPatterns.map((sPattern) => {
-            return (
-              <option key={sPattern.index} value={sPattern.index}>
-                {sPattern.name}
-              </option>
-            );
-          })}
-        </select>
+        <PatternPicker
+          rebase={props.rebase}
+          sPatternIndex={props.bar.sPatternIndex}
+          strummingPatterns={props.strummingPatterns}
+        />
       </div>
     ),
     coreComponent: (
