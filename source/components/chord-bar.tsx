@@ -1,8 +1,7 @@
 import React from 'react';
-import { BarType } from '../constants';
 import { tabOperations } from '../operations';
 import { ChordBar } from '../types';
-import { addBar, CommonNonSectionBarProps, removeBar, updateRepeats } from './bar-commons';
+import { CommonNonSectionBarProps, updateRepeats } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
 import { ChordBarCoreProps, getChordBarCore } from './chord-bar-core';
 
@@ -50,20 +49,11 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
 
   return (
     <BaseBarComponent
-      addBar={(type) => addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection)}
+      {...props}
       additionalControls={additionalControls}
-      allowInsertSection={!props.inSection}
-      bar={props.bar}
       canAddBar={true}
-      copyBar={() =>
-        addBar(props.tab, props.updateTab, props.bar.index, BarType.reference, props.inSection)
-      }
       coreComponent={coreComponent}
       displayBarControls={true}
-      inSection={props.inSection}
-      isEditMode={props.isEditMode}
-      removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index, props.inSection)}
-      width={props.width}
     />
   );
 };

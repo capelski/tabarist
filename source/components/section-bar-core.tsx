@@ -12,13 +12,14 @@ import { CommonCoreProps, CoreComponent } from './bar-commons';
 import { getChordBarCore } from './chord-bar-core';
 import { getPickingBarCore } from './picking-bar-core';
 import { getReferenceBarCore } from './reference-bar-core';
+import { RepeatsProps } from './repeats';
 
 export type SectionBarCoreProps = {
   bar: SectionBar;
   isEditMode: boolean;
   section: Section;
   strummingPatterns: StrummingPattern[];
-  updateRepeats: ((repeats?: number) => void) | undefined;
+  updateRepeats: RepeatsProps['updateRepeats'];
 };
 
 export const getSectionBarCore = (props: SectionBarCoreProps): CoreComponent[] => {

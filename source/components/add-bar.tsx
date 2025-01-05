@@ -1,13 +1,14 @@
 import React, { CSSProperties } from 'react';
 import { BarType, stringHeight } from '../constants';
+import { Section } from '../types';
 
 export type AddBarPropsHandlers = {
   addBar: (type: BarType.chord | BarType.picking | BarType.section) => void;
 };
 
 export type AddBarProps = AddBarPropsHandlers & {
-  allowInsertSection?: boolean;
   expanded?: boolean;
+  inSection: Section | undefined;
   style?: CSSProperties;
 };
 
@@ -50,7 +51,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
         🎵{props.expanded ? ' chord bar' : ''}
       </div>
 
-      {props.allowInsertSection && (
+      {props.inSection && (
         <div
           onClick={() => {
             props.addBar(BarType.section);

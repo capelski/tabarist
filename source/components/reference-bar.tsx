@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarType } from '../constants';
 import { ChordBar, PickingBar, ReferenceBar, SectionBar } from '../types';
-import { addBar, CommonNonSectionBarProps, removeBar } from './bar-commons';
+import { CommonNonSectionBarProps } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
 import { getReferenceBarCore } from './reference-bar-core';
 
@@ -38,22 +38,11 @@ export const ReferenceBarComponent: React.FC<ReferenceBarProps> = (props) => {
 
     return (
       <BaseBarComponent
-        addBar={(type) =>
-          addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection)
-        }
-        allowInsertSection={!props.inSection}
-        bar={props.bar}
+        {...props}
         canAddBar={isEditableBar}
-        copyBar={() =>
-          addBar(props.tab, props.updateTab, props.bar.index, BarType.reference, props.inSection)
-        }
         coreComponent={coreComponent}
         displayBarControls={isEditableBar}
-        inSection={props.inSection}
-        isEditMode={props.isEditMode}
         key={index}
-        removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index, props.inSection)}
-        width={props.width}
       />
     );
   });

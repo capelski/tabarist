@@ -1,23 +1,28 @@
 import React from 'react';
-import { repeatsHeight } from '../constants';
-import { Bar, Section } from '../types';
-import { AddBar, AddBarProps } from './add-bar';
-import { BarControls, BarControlsHandlers } from './bar-controls';
+import { BarType, repeatsHeight } from '../constants';
+import { tabOperations } from '../operations';
+import { Bar } from '../types';
+import { AddBar } from './add-bar';
+import { addBar, CommonNonSectionBarProps } from './bar-commons';
+import { BarControls } from './bar-controls';
 
-export type BaseBarProps = BarControlsHandlers & {
-  addBar: AddBarProps['addBar'];
+export type BaseBarProps = CommonNonSectionBarProps<Bar> & {
   additionalControls?: React.ReactNode;
-  allowInsertSection?: boolean;
-  bar: Bar;
   canAddBar: boolean;
   coreComponent: React.ReactNode;
   displayBarControls: boolean;
-  inSection: Section | undefined;
-  isEditMode: boolean;
-  width: number;
 };
 
 export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
+  const addBarHandler = (type: BarType) => {
+    addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection);
+  };
+
+  const removeBar = () => {
+    const nextTab = tabOperations.removeBar(props.tab, props.bar.index, props.inSection);
+    props.updateTab(nextTab);
+  };
+
   return (
     <div
       className="bar"
@@ -26,8 +31,8 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
         {props.isEditMode && props.canAddBar && (
           <AddBar
-            addBar={props.addBar}
-            allowInsertSection={props.allowInsertSection}
+            addBar={addBarHandler}
+            inSection={props.inSection}
             style={{
               marginTop: props.inSection ? undefined : repeatsHeight,
             }}
@@ -38,7 +43,13 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
       </div>
 
       {props.isEditMode && props.displayBarControls && (
-        <BarControls currentBar={props.bar} copyBar={props.copyBar} removeBar={props.removeBar}>
+        <BarControls
+          bar={props.bar}
+          copyBar={() => {
+            addBarHandler(BarType.reference);
+          }}
+          removeBar={removeBar}
+        >
           {props.additionalControls}
         </BarControls>
       )}

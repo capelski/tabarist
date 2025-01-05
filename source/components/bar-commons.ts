@@ -35,16 +35,6 @@ export const addBar = (
   updateTab(nextTab);
 };
 
-export const removeBar = (
-  tab: Tab,
-  updateTab: (tab: Tab) => void,
-  barIndex: number,
-  inSection?: Section,
-) => {
-  const nextTab = tabOperations.removeBar(tab, barIndex, inSection);
-  updateTab(nextTab);
-};
-
 export const updateRepeats = (
   tab: Tab,
   updateTab: (tab: Tab) => void,

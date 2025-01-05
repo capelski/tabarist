@@ -83,8 +83,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           addBar={(type) => {
             addBar(props.tab, props.updateTab, props.bars.length, type, props.inSection);
           }}
-          allowInsertSection={props.inSection === undefined}
           expanded={true}
+          inSection={props.inSection}
           style={{
             boxSizing: 'border-box',
             flexBasis: `${barWidth}%`,

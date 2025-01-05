@@ -3,15 +3,11 @@ import { BarType, removeSymbol } from '../constants';
 import { getIndexDisplayValue } from '../operations';
 import { Bar } from '../types';
 
-export type BarControlsHandlers = {
+export type BarControlsProps = PropsWithChildren<{
+  bar: Bar;
   copyBar: () => void;
   removeBar: () => void;
-};
-
-export type BarControlsProps = BarControlsHandlers &
-  PropsWithChildren<{
-    currentBar: Bar;
-  }>;
+}>;
 
 export const BarControls: React.FC<BarControlsProps> = (props) => {
   return (
@@ -34,10 +30,10 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         {removeSymbol}
       </button>
 
-      <span style={{ marginLeft: 8 }}>{getIndexDisplayValue(props.currentBar.index)}</span>
-      {props.currentBar.type === BarType.reference && (
+      <span style={{ marginLeft: 8 }}>{getIndexDisplayValue(props.bar.index)}</span>
+      {props.bar.type === BarType.reference && (
         <span style={{ marginLeft: 8 }}>
-          ={'>'} {getIndexDisplayValue(props.currentBar.barIndex)}
+          ={'>'} {getIndexDisplayValue(props.bar.barIndex)}
         </span>
       )}
     </div>
