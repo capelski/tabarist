@@ -69,7 +69,6 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 bar={bar}
                 isEditMode={props.isEditMode}
                 section={section}
-                sections={props.tab.sections}
                 tab={props.tab}
                 updateTab={props.updateTab}
                 width={barWidth}

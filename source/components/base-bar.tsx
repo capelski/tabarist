@@ -11,6 +11,7 @@ export type BaseBarProps = BarControlsHandlers & {
   bar: Bar;
   canAddBar: boolean;
   coreComponent: React.ReactNode;
+  displayBarControls: boolean;
   inSection: Section | undefined;
   isEditMode: boolean;
   width: number;
@@ -23,7 +24,7 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
       style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
     >
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
-        {props.canAddBar && (
+        {props.isEditMode && props.canAddBar && (
           <AddBar
             addBar={props.addBar}
             allowInsertSection={props.allowInsertSection}
@@ -36,7 +37,7 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
         {props.coreComponent}
       </div>
 
-      {props.isEditMode && (
+      {props.isEditMode && props.displayBarControls && (
         <BarControls currentBar={props.bar} copyBar={props.copyBar} removeBar={props.removeBar}>
           {props.additionalControls}
         </BarControls>

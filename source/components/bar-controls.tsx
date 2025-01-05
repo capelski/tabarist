@@ -4,7 +4,7 @@ import { getIndexDisplayValue } from '../operations';
 import { Bar } from '../types';
 
 export type BarControlsHandlers = {
-  copyBar?: () => void;
+  copyBar: () => void;
   removeBar: () => void;
 };
 
@@ -26,11 +26,9 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     >
       {props.children}
 
-      {props.copyBar && (
-        <button onClick={props.copyBar} style={{ marginRight: 8 }} type="button">
-          =
-        </button>
-      )}
+      <button onClick={props.copyBar} style={{ marginRight: 8 }} type="button">
+        =
+      </button>
 
       <button onClick={() => props.removeBar()} type="button">
         {removeSymbol}

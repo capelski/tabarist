@@ -54,11 +54,12 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
       additionalControls={additionalControls}
       allowInsertSection={!props.inSection}
       bar={props.bar}
-      canAddBar={props.isEditMode}
+      canAddBar={true}
       copyBar={() =>
         addBar(props.tab, props.updateTab, props.bar.index, BarType.reference, props.inSection)
       }
       coreComponent={coreComponent}
+      displayBarControls={true}
       inSection={props.inSection}
       isEditMode={props.isEditMode}
       removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index, props.inSection)}
