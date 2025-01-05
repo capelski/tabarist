@@ -1,7 +1,8 @@
 import React from 'react';
-import { framesNumberOptions, removeSymbol, stringHeight } from '../constants';
+import { removeSymbol, stringHeight } from '../constants';
 import { getIndexDisplayValue, sPatternOperations, tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
+import { TempoPicker } from './tempo-picker';
 
 export type StrummingPatternProps = {
   rebase: (framesNumber: number) => void;
@@ -77,22 +78,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
         })}
       </div>
       <p>
-        Tempo:
-        <select
-          onChange={(event) => {
-            props.rebase(parseInt(event.target.value));
-          }}
-          style={{ marginLeft: 8 }}
-          value={props.strummingPattern.framesNumber}
-        >
-          {framesNumberOptions.map((option) => {
-            return (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            );
-          })}
-        </select>
+        <TempoPicker framesNumber={props.strummingPattern.framesNumber} rebase={props.rebase} />
       </p>
     </div>
   );

@@ -1,9 +1,9 @@
 import React from 'react';
-import { framesNumberOptions } from '../constants';
 import { PickingBar } from '../types';
 import { CommonCoreProps, CoreComponent } from './bar-commons';
 import { PickingFrameComponent } from './picking-frame';
 import { Repeats } from './repeats';
+import { TempoPicker } from './tempo-picker';
 
 export type PickingBarCoreProps = CommonCoreProps & {
   bar: PickingBar;
@@ -18,24 +18,9 @@ export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => 
   const backgroundColor = props.isEditMode && props.disabled ? '#ddd' : 'white';
 
   return {
-    additionalControls: props.displayPickingRebase && (
+    additionalControls: props.displayPickingRebase && props.rebase && (
       <div style={{ marginRight: 8 }}>
-        Tempo:
-        <select
-          onChange={(event) => {
-            props.rebase?.(parseInt(event.target.value));
-          }}
-          style={{ marginLeft: 8 }}
-          value={props.bar.framesNumber}
-        >
-          {framesNumberOptions.map((option) => {
-            return (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            );
-          })}
-        </select>
+        <TempoPicker framesNumber={props.bar.framesNumber} rebase={props.rebase} />
       </div>
     ),
     coreComponent: (
