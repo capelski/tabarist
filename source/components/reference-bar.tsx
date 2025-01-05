@@ -1,18 +1,12 @@
 import React from 'react';
 import { BarType } from '../constants';
-import { ChordBar, PickingBar, ReferenceBar, Section, Tab } from '../types';
-import { addBar, removeBar } from './bar-commons';
+import { ChordBar, PickingBar, ReferenceBar } from '../types';
+import { addBar, CommonNonSectionBarProps, removeBar } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
 import { getReferenceBarCore } from './reference-bar-core';
 
-export type ReferenceBarProps = {
-  bar: ReferenceBar;
-  inSection: Section | undefined;
-  isEditMode: boolean;
+export type ReferenceBarProps = CommonNonSectionBarProps<ReferenceBar> & {
   referencedBar: ChordBar | PickingBar;
-  tab: Tab;
-  updateTab: (tab: Tab) => void;
-  width: number;
 };
 
 export const ReferenceBarComponent: React.FC<ReferenceBarProps> = (props) => {

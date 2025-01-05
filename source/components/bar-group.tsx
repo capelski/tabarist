@@ -1,7 +1,6 @@
 import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { BarType, repeatsHeight } from '../constants';
-import { tabOperations } from '../operations';
 import { Bar, ChordBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
 import { addBar } from './bar-commons';
@@ -66,71 +65,15 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 width={barWidth}
               />
             ) : bar.type === BarType.section && section ? (
-              <React.Fragment key={bar.index}>
-                {section.bars.length
-                  ? section.bars.map((nonSectionBar) => {
-                      return (
-                        <SectionBarComponent
-                          addBar={(type) => {
-                            addBar(props.tab, props.updateTab, bar.index, type);
-                          }}
-                          changeSection={(sectionIndex) => {
-                            const nextTab = tabOperations.changeSection(
-                              props.tab,
-                              bar.index,
-                              sectionIndex,
-                            );
-                            props.updateTab(nextTab);
-                          }}
-                          bar={bar}
-                          isEditMode={props.isEditMode}
-                          isFirst={nonSectionBar.index === 0}
-                          isLast={nonSectionBar.index === section.bars.length - 1}
-                          key={nonSectionBar.index}
-                          referencedBar={nonSectionBar}
-                          removeBar={() => {
-                            const nextTab = tabOperations.removeBar(props.tab, bar.index);
-                            props.updateTab(nextTab);
-                          }}
-                          section={section}
-                          sections={props.tab.sections}
-                          strummingPatterns={props.tab.strummingPatterns}
-                          tab={props.tab}
-                          updateTab={props.updateTab}
-                          width={barWidth}
-                        />
-                      );
-                    })
-                  : props.isEditMode && (
-                      <SectionBarComponent
-                        addBar={(type) => {
-                          addBar(props.tab, props.updateTab, bar.index, type);
-                        }}
-                        changeSection={(sectionIndex) => {
-                          const nextTab = tabOperations.changeSection(
-                            props.tab,
-                            bar.index,
-                            sectionIndex,
-                          );
-                          props.updateTab(nextTab);
-                        }}
-                        bar={bar}
-                        isEditMode={props.isEditMode}
-                        isFirst={true}
-                        isLast={true}
-                        removeBar={() => {
-                          const nextTab = tabOperations.removeBar(props.tab, bar.index);
-                          props.updateTab(nextTab);
-                        }}
-                        section={section}
-                        sections={props.tab.sections}
-                        strummingPatterns={props.tab.strummingPatterns}
-                        tab={props.tab}
-                        updateTab={props.updateTab}
-                        width={barWidth}
-                      />
-                    )}
-              </React.Fragment>
+              <SectionBarComponent
+                bar={bar}
+                isEditMode={props.isEditMode}
+                section={section}
+                sections={props.tab.sections}
+                tab={props.tab}
+                updateTab={props.updateTab}
+                width={barWidth}
+              />
             ) : undefined}
           </React.Fragment>
         );

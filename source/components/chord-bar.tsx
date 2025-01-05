@@ -1,19 +1,12 @@
 import React from 'react';
 import { BarType } from '../constants';
 import { tabOperations } from '../operations';
-import { ChordBar, Section, Tab } from '../types';
-import { addBar, removeBar, updateRepeats } from './bar-commons';
+import { ChordBar } from '../types';
+import { addBar, CommonNonSectionBarProps, removeBar, updateRepeats } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
 import { ChordBarCoreProps, getChordBarCore } from './chord-bar-core';
 
-export type ChordBarProps = {
-  bar: ChordBar;
-  inSection: Section | undefined;
-  isEditMode: boolean;
-  tab: Tab;
-  updateTab: (tab: Tab) => void;
-  width: number;
-};
+export type ChordBarProps = CommonNonSectionBarProps<ChordBar>;
 
 export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
   const rebase: ChordBarCoreProps['rebase'] = (sPatternIndex) => {

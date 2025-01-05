@@ -1,110 +1,105 @@
 import React from 'react';
-import { BarType } from '../constants';
-import {
-  ChordBar,
-  NonSectionBar,
-  PickingBar,
-  ReferenceBar,
-  Section,
-  SectionBar,
-  StrummingPattern,
-  Tab,
-} from '../types';
-import { AddBarPropsHandlers } from './add-bar';
-import { CommonCoreProps, updateRepeats } from './bar-commons';
-import { BarControlsHandlers } from './bar-controls';
+import { tabOperations } from '../operations';
+import { Section, SectionBar } from '../types';
+import { addBar, CommonBarProps, removeBar, updateRepeats } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
-import { getChordBarCore } from './chord-bar-core';
-import { getPickingBarCore } from './picking-bar-core';
-import { getReferenceBarCore } from './reference-bar-core';
-import { SectionPicker } from './section-picker';
+import { getSectionBarComponent } from './section-bar-core';
+import { SectionPicker, SectionPickerProps } from './section-picker';
 
-export type SectionBarProps = AddBarPropsHandlers &
-  BarControlsHandlers & {
-    bar: SectionBar;
-    changeSection: (sectionIndex: number) => void;
-    isEditMode: boolean;
-    isFirst: boolean;
-    isLast: boolean;
-    referencedBar?: NonSectionBar;
-    section: Section;
-    sections: Section[];
-    strummingPatterns: StrummingPattern[];
-    tab: Tab;
-    updateRepeats?: (repeats?: number) => void;
-    updateTab: (tab: Tab) => void;
-    width: number;
-  };
+export type SectionBarProps = CommonBarProps<SectionBar> & {
+  section: Section;
+  sections: Section[];
+};
 
 export const SectionBarComponent: React.FC<SectionBarProps> = (props) => {
-  const baseProps: CommonCoreProps = {
-    inSection: undefined,
-    inSectionBar: props.bar,
-    isEditMode: props.isEditMode,
-    isFirstBarInSectionBar: props.isFirst,
-    isLastBarInSectionBar: props.isLast,
-    repeats: props.bar.repeats,
-    sectionName: props.section.name,
-    updateRepeats: props.isFirst
-      ? (repeats?: number) => updateRepeats(props.tab, props.updateTab, props.bar.index, repeats)
-      : undefined,
+  const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
+    const nextTab = tabOperations.changeSection(props.tab, props.bar.index, sectionIndex);
+    props.updateTab(nextTab);
   };
 
-  const { additionalControls, coreComponent } = !props.referencedBar
-    ? {
-        coreComponent: (
-          <div
-            style={{ alignItems: 'center', display: 'flex', flexGrow: 1, justifyContent: 'center' }}
-          >
-            Empty section
-          </div>
-        ),
-      }
-    : props.referencedBar.type === BarType.chord
-    ? getChordBarCore({
-        ...baseProps,
-        bar: props.referencedBar,
-        disabled: true,
-        strummingPatterns: props.strummingPatterns,
-      })
-    : props.referencedBar.type === BarType.picking
-    ? getPickingBarCore({
-        ...baseProps,
-        bar: props.referencedBar,
-        disabled: true,
-      })
-    : getReferenceBarCore({
-        ...baseProps,
-        bar: props.referencedBar,
-        referencedBar: props.section.bars.find(
-          (b) => b.index === (props.referencedBar as ReferenceBar).barIndex,
-        ) as ChordBar | PickingBar,
-        strummingPatterns: props.strummingPatterns,
+  if (props.section.bars.length > 0) {
+    return props.section.bars.map((nonSectionBar) => {
+      const isFirst = nonSectionBar.index === 0;
+
+      const { coreComponent } = getSectionBarComponent({
+        bar: props.bar,
+        isEditMode: props.isEditMode,
+        isFirstBarInSectionBar: isFirst,
+        isLastBarInSectionBar: nonSectionBar.index === props.section.bars.length - 1,
+        referencedBar: nonSectionBar,
+        repeats: props.bar.repeats,
+        section: props.section,
+        strummingPatterns: props.tab.strummingPatterns,
+        updateRepeats: isFirst
+          ? (repeats?: number) =>
+              updateRepeats(props.tab, props.updateTab, props.bar.index, repeats)
+          : undefined,
       });
 
+      return (
+        <BaseBarComponent
+          addBar={(type) => addBar(props.tab, props.updateTab, props.bar.index, type)}
+          additionalControls={
+            <React.Fragment>
+              {props.isEditMode && isFirst && (
+                <SectionPicker
+                  changeSection={changeSection}
+                  section={props.section}
+                  sections={props.sections}
+                />
+              )}
+            </React.Fragment>
+          }
+          allowInsertSection={isFirst}
+          bar={props.bar}
+          canAddBar={props.isEditMode && isFirst}
+          coreComponent={coreComponent}
+          inSection={undefined}
+          isEditMode={props.isEditMode && isFirst}
+          key={nonSectionBar.index}
+          removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index)}
+          width={props.width}
+        />
+      );
+    });
+  }
+
+  const isFirst = true;
+  const { coreComponent } = getSectionBarComponent({
+    bar: props.bar,
+    isEditMode: props.isEditMode,
+    isFirstBarInSectionBar: isFirst,
+    isLastBarInSectionBar: true,
+    repeats: undefined,
+    section: props.section,
+    strummingPatterns: props.tab.strummingPatterns,
+    updateRepeats: undefined,
+  });
+
   return (
-    <BaseBarComponent
-      addBar={props.addBar}
-      additionalControls={
-        <React.Fragment>
-          {props.isEditMode && props.isFirst && (
-            <SectionPicker
-              changeSection={props.changeSection}
-              section={props.section}
-              sections={props.sections}
-            />
-          )}
-          {additionalControls}
-        </React.Fragment>
-      }
-      allowInsertSection={props.isFirst}
-      bar={props.bar}
-      canAddBar={props.isEditMode && props.isFirst}
-      coreComponent={coreComponent}
-      inSection={undefined}
-      isEditMode={props.isEditMode && props.isFirst}
-      removeBar={props.removeBar}
-      width={props.width}
-    />
+    props.isEditMode && (
+      <BaseBarComponent
+        addBar={(type) => addBar(props.tab, props.updateTab, props.bar.index, type)}
+        additionalControls={
+          <React.Fragment>
+            {props.isEditMode && isFirst && (
+              <SectionPicker
+                changeSection={changeSection}
+                section={props.section}
+                sections={props.sections}
+              />
+            )}
+          </React.Fragment>
+        }
+        allowInsertSection={isFirst}
+        bar={props.bar}
+        canAddBar={props.isEditMode && isFirst}
+        coreComponent={coreComponent}
+        inSection={undefined}
+        isEditMode={props.isEditMode && isFirst}
+        removeBar={() => removeBar(props.tab, props.updateTab, props.bar.index)}
+        width={props.width}
+      />
+    )
   );
 };

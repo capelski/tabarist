@@ -1,19 +1,12 @@
 import React from 'react';
 import { BarType } from '../constants';
 import { tabOperations } from '../operations';
-import { PickingBar, Section, Tab } from '../types';
-import { addBar, removeBar, updateRepeats } from './bar-commons';
+import { PickingBar } from '../types';
+import { addBar, CommonNonSectionBarProps, removeBar, updateRepeats } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
 import { getPickingBarCore, PickingBarCoreProps } from './picking-bar-core';
 
-export type PickingBarProps = {
-  bar: PickingBar;
-  inSection: Section | undefined;
-  isEditMode: boolean;
-  tab: Tab;
-  updateTab: (tab: Tab) => void;
-  width: number;
-};
+export type PickingBarProps = CommonNonSectionBarProps<PickingBar>;
 
 export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
   const rebase: PickingBarCoreProps['rebase'] = (framesNumber) => {

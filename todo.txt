@@ -1,5 +1,5 @@
-- Section component core. Handlers. Allow copying sections
-- Move handlers to base bar component?
+- Allow copying sections ?
+- Move handlers to base bar component. Add canUpdateRepeats
 - Strumming pattern picker
 - Strumming patterns
     - 1 &, 2 &, etc.

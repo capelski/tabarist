@@ -1,9 +1,21 @@
 import { BarType } from '../constants';
 import { tabOperations } from '../operations';
-import { Section, Tab } from '../types';
+import { Bar, Section, Tab } from '../types';
 import { RepeatsProps } from './repeats';
 
 export type CommonCoreProps = RepeatsProps & {
+  inSection: Section | undefined;
+};
+
+export type CommonBarProps<TBar extends Bar> = {
+  bar: TBar;
+  isEditMode: boolean;
+  tab: Tab;
+  updateTab: (tab: Tab) => void;
+  width: number;
+};
+
+export type CommonNonSectionBarProps<TBar extends Bar> = CommonBarProps<TBar> & {
   inSection: Section | undefined;
 };
 
