@@ -1,7 +1,7 @@
 import React from 'react';
 import { framesNumberOptions } from '../constants';
 import { PickingBar } from '../types';
-import { CommonCoreProps } from './bar-commons';
+import { CommonCoreProps, CoreComponent } from './bar-commons';
 import { PickingFrameComponent } from './picking-frame';
 import { Repeats } from './repeats';
 
@@ -13,27 +13,30 @@ export type PickingBarCoreProps = CommonCoreProps & {
   updateFrame?: (frameIndex: number, stringIndex: number, value: string) => void;
 };
 
-export const getPickingBarCore = (props: PickingBarCoreProps) => {
+export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => {
   const framesWidth = Math.floor(10000 / props.bar.frames.length) / 100;
   const backgroundColor = props.isEditMode && props.disabled ? '#ddd' : 'white';
 
   return {
     additionalControls: props.displayPickingRebase && (
-      <select
-        onChange={(event) => {
-          props.rebase?.(parseInt(event.target.value));
-        }}
-        style={{ marginRight: 8 }}
-        value={props.bar.framesNumber}
-      >
-        {framesNumberOptions.map((option) => {
-          return (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          );
-        })}
-      </select>
+      <div style={{ marginRight: 8 }}>
+        Tempo:
+        <select
+          onChange={(event) => {
+            props.rebase?.(parseInt(event.target.value));
+          }}
+          style={{ marginLeft: 8 }}
+          value={props.bar.framesNumber}
+        >
+          {framesNumberOptions.map((option) => {
+            return (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            );
+          })}
+        </select>
+      </div>
     ),
     coreComponent: (
       <div

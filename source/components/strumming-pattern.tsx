@@ -76,21 +76,24 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
           );
         })}
       </div>
-
-      <select
-        onChange={(event) => {
-          props.rebase(parseInt(event.target.value));
-        }}
-        value={props.strummingPattern.framesNumber}
-      >
-        {framesNumberOptions.map((option) => {
-          return (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          );
-        })}
-      </select>
+      <p>
+        Tempo:
+        <select
+          onChange={(event) => {
+            props.rebase(parseInt(event.target.value));
+          }}
+          style={{ marginLeft: 8 }}
+          value={props.strummingPattern.framesNumber}
+        >
+          {framesNumberOptions.map((option) => {
+            return (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            );
+          })}
+        </select>
+      </p>
     </div>
   );
 };

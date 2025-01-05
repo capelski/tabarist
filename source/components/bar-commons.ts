@@ -7,6 +7,11 @@ export type CommonCoreProps = RepeatsProps & {
   inSection: Section | undefined;
 };
 
+export type CoreComponent = {
+  additionalControls?: React.ReactNode;
+  coreComponent: React.ReactNode;
+};
+
 export type CommonBarProps<TBar extends Bar> = {
   bar: TBar;
   isEditMode: boolean;

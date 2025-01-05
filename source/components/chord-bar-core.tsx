@@ -1,7 +1,7 @@
 import React from 'react';
 import { stringHeight } from '../constants';
 import { ChordBar, StrummingPattern } from '../types';
-import { CommonCoreProps } from './bar-commons';
+import { CommonCoreProps, CoreComponent } from './bar-commons';
 import { ChordFrame } from './chord-frame';
 import { Repeats } from './repeats';
 
@@ -14,14 +14,35 @@ export type ChordBarCoreProps = CommonCoreProps & {
   updateFrame?: (frameIndex: number, value: string) => void;
 };
 
-export const getChordBarCore = (props: ChordBarCoreProps) => {
+export const getChordBarCore = (props: ChordBarCoreProps): CoreComponent => {
   const framesWidth = Math.floor(10000 / props.bar.frames.length) / 100;
   const strummingPattern = props.strummingPatterns.find(
     (sPattern) => sPattern.index === props.bar.sPatternIndex,
   );
 
   return {
-    additionalControls: undefined,
+    additionalControls: props.displayStrummingPatternPicker && (
+      <div style={{ marginRight: 8 }}>
+        Pattern:
+        <select
+          disabled={props.strummingPatterns.length < 2 || props.disabled}
+          onChange={(event) => {
+            const sPatternIndex = parseInt(event.target.value);
+            props.rebase?.(sPatternIndex);
+          }}
+          style={{ marginLeft: 8 }}
+          value={props.bar.sPatternIndex}
+        >
+          {props.strummingPatterns.map((sPattern) => {
+            return (
+              <option key={sPattern.index} value={sPattern.index}>
+                {sPattern.name}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    ),
     coreComponent: (
       <div
         style={{
@@ -84,29 +105,6 @@ export const getChordBarCore = (props: ChordBarCoreProps) => {
               );
             })}
           </div>
-
-          {props.displayStrummingPatternPicker && (
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
-              Strumming pattern:
-              <select
-                disabled={props.strummingPatterns.length < 2 || props.disabled}
-                onChange={(event) => {
-                  const sPatternIndex = parseInt(event.target.value);
-                  props.rebase?.(sPatternIndex);
-                }}
-                style={{ marginLeft: 8, minWidth: 40 }}
-                value={props.bar.sPatternIndex}
-              >
-                {props.strummingPatterns.map((sPattern) => {
-                  return (
-                    <option key={sPattern.index} value={sPattern.index}>
-                      {sPattern.name}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          )}
         </div>
       </div>
     ),

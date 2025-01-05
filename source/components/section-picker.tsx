@@ -9,7 +9,7 @@ export interface SectionPickerProps {
 
 export const SectionPicker: React.FC<SectionPickerProps> = (props) => {
   return (
-    <div>
+    <div style={{ marginRight: 8 }}>
       Section:
       <select
         disabled={props.sections.length < 2}
@@ -17,8 +17,8 @@ export const SectionPicker: React.FC<SectionPickerProps> = (props) => {
           const nextSectionIndex = parseInt(event.target.value);
           props.changeSection(nextSectionIndex);
         }}
+        style={{ marginLeft: 8 }}
         value={props.section.index}
-        style={{ marginRight: 8 }}
       >
         {props.sections.map((section) => {
           return (

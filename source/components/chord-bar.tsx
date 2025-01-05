@@ -30,7 +30,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
     props.updateTab(nextTab);
   };
 
-  const { coreComponent } = getChordBarCore({
+  const { additionalControls, coreComponent } = getChordBarCore({
     bar: props.bar,
     displayStrummingPatternPicker: props.isEditMode,
     inSection: props.inSection,
@@ -51,6 +51,7 @@ export const ChordBarComponent: React.FC<ChordBarProps> = (props) => {
   return (
     <BaseBarComponent
       addBar={(type) => addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection)}
+      additionalControls={additionalControls}
       allowInsertSection={!props.inSection}
       bar={props.bar}
       canAddBar={props.isEditMode}
