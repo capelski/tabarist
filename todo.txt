@@ -1,4 +1,6 @@
 - Move bars around
+- Add capacitor and build APP bundle
+- Play in non-edit mode
 - Line breaks
 - Strumming patterns
     - 1 &, 2 &, etc.

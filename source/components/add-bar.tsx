@@ -51,7 +51,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
         🎵{props.expanded ? ' chord bar' : ''}
       </div>
 
-      {props.inSection && (
+      {!props.inSection && (
         <div
           onClick={() => {
             props.addBar(BarType.section);
