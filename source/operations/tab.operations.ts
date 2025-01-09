@@ -45,13 +45,15 @@ export const tabOperations = {
       nextTab.sections = [sectionOperations.create(0)];
     }
 
+    const targetBars = inSection ? inSection.bars : nextTab.bars;
+
     const newBar =
       type === BarType.chord
         ? createChordBar(index, nextTab.strummingPatterns[0])
         : type === BarType.picking
         ? createPickingBar(index)
         : type === BarType.reference
-        ? createReferenceBar(tab.bars[index])
+        ? createReferenceBar(targetBars[index])
         : createSectionBar(index, nextTab.sections[0]);
 
     return applyBarsOperation(
