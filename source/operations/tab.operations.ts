@@ -45,20 +45,20 @@ export const tabOperations = {
       nextTab.sections = [sectionOperations.create(0)];
     }
 
-    const targetBars = inSection ? inSection.bars : nextTab.bars;
-
-    const newBar =
-      type === BarType.chord
-        ? createChordBar(index, nextTab.strummingPatterns[0])
-        : type === BarType.picking
-        ? createPickingBar(index)
-        : type === BarType.reference
-        ? createReferenceBar(targetBars[index])
-        : createSectionBar(index, nextTab.sections[0]);
-
     return applyBarsOperation(
       nextTab,
-      (bars) => barOperations.addBar(bars, newBar as any),
+      (bars) => {
+        const newBar =
+          type === BarType.chord
+            ? createChordBar(index, nextTab.strummingPatterns[0])
+            : type === BarType.picking
+            ? createPickingBar(index)
+            : type === BarType.reference
+            ? createReferenceBar(bars[index])
+            : createSectionBar(index, nextTab.sections[0]);
+
+        return barOperations.addBar(bars, newBar as any);
+      },
       inSection,
     );
   },
