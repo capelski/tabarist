@@ -8,23 +8,28 @@
   "scripts": {
     "build": "npm run clean && webpack --config webpack/production.config.js",
     "clean": "rm -rf docs",
-    "dev": "webpack serve --config webpack/development.config.js"
+    "dev": "webpack serve --config webpack/development.config.js",
+    "test": "cucumber-js --require-module ts-node/register --require 'source/**/*.cucumber.ts' source/**/*.feature"
   },
   "dependencies": {
-    "nanoid": "^5.0.9",
+    "nanoid": "^3.3.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-responsive": "^10.0.0",
     "react-router": "^7.1.0"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^11.2.0",
+    "@types/chai": "^4.3.20",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "chai": "^4.5.0",
     "css-loader": "^7.1.2",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.3",
     "mini-css-extract-plugin": "^2.9.2",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
     "webpack": "^5.96.1",
     "webpack-cli": "^5.1.4",
