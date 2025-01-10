@@ -1,7 +1,8 @@
 
 Feature: Remove bar
 
-   Removes a bar from a list of bars and re-indexes the rest of bars accordingly
+   Removes a bar from a list of bars, shifting to the right and reindexing the bars that
+   come after
 
    Scenario: Removing a bar from a tab shifts bars to the right and reindexes them
       Given a tab "T"
