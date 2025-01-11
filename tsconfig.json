@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "rootDir": "./source",
     "skipLibCheck": true,
+    "strict": true,
     "strictNullChecks": true,
     "target": "es2016"
   }

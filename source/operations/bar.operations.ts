@@ -63,7 +63,7 @@ export const barOperations = {
     const nextBars =
       bars.length === 0
         ? [newBar]
-        : bars.reduce((reduced, bar) => {
+        : bars.reduce<TBar[]>((reduced, bar) => {
             const isLastBar = bar.index === bars.length - 1;
 
             const nextBar: TBar = {
@@ -207,7 +207,7 @@ export const barOperations = {
       { deletedCounts: {}, total: 0 },
     );
 
-    const nextBars = bars.reduce((reduced, bar) => {
+    const nextBars = bars.reduce<TBar[]>((reduced, bar) => {
       if (deletedCounts[bar.index].isBarBeingDeleted) {
         return reduced;
       }

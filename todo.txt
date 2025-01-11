@@ -1,8 +1,8 @@
 - Add capacitor and build APP bundle
+- Different disabled color for reference and sections
 - Play in non-edit mode
 - Line breaks
 - Strumming patterns
     - 1 &, 2 &, etc.
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
-- Use strict in tsconfig.json

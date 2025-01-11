@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { BarType } from '../constants';
-import { Bar, NonSectionBar, Section, Tab } from '../types';
+import { Bar, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
 import {
   barOperations,
   createChordBar,
@@ -189,7 +189,7 @@ export const tabOperations = {
           ? { ...bar, sectionIndex: getIndexDecrease(bar.sectionIndex, deletionIndex, 1) }
           : bar;
       }),
-      sections: tab.sections.reduce((reduced, section) => {
+      sections: tab.sections.reduce<Section[]>((reduced, section) => {
         return section.index === deletionIndex
           ? reduced
           : [
@@ -222,7 +222,7 @@ export const tabOperations = {
       sections: tab.sections.map((section) => {
         return { ...section, bars: processBars(section.bars) };
       }),
-      strummingPatterns: tab.strummingPatterns.reduce((reduced, sPattern) => {
+      strummingPatterns: tab.strummingPatterns.reduce<StrummingPattern[]>((reduced, sPattern) => {
         return sPattern.index === deletionIndex
           ? reduced
           : [
