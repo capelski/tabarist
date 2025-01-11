@@ -24,7 +24,7 @@ Given(/^a reference bar in tab "(.*)" pointing at the previous bar/, function (t
 });
 
 Then(
-  /^the bar at position (\d+) in (section "(.*)" of )?tab "(.*)" is a (chord|picking|reference|section) bar/,
+  /^the bar in position (\d+) in (section "(.*)" of )?tab "(.*)" is a (chord|picking|reference|section) bar/,
   function (position: number, sectionName: string, tabName: string, type: BarType) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
     const bars = section?.bars ?? globals.tabs[tabName].bars;
@@ -34,7 +34,7 @@ Then(
 );
 
 Then(
-  /^the bar at position (\d+) in (section "(.*)" of )?tab "(.*)" has index (\d+)/,
+  /^the bar in position (\d+) in (section "(.*)" of )?tab "(.*)" has index (\d+)/,
   function (position: number, sectionName: string, tabName: string, index: number) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
     const bars = section?.bars ?? globals.tabs[tabName].bars;
@@ -44,7 +44,7 @@ Then(
 );
 
 Then(
-  /^the chord bar at position (\d+) in tab "(.*)" uses the strumming pattern (\d+)/,
+  /^the chord bar in position (\d+) in tab "(.*)" uses the strumming pattern (\d+)/,
   function (position: number, tabName: string, sPatternPosition: number) {
     const bar = globals.tabs[tabName].bars[position - 1];
     expect(bar.type).to.equal(BarType.chord);
@@ -53,7 +53,7 @@ Then(
 );
 
 Then(
-  /^the reference bar at position (\d+) in tab "(.*)" points to index (\d+)/,
+  /^the reference bar in position (\d+) in tab "(.*)" points to index (\d+)/,
   function (position: number, tabName: string, referredIndex: number) {
     const bar = globals.tabs[tabName].bars[position - 1];
     expect(bar.type).to.equal(BarType.reference);
@@ -62,7 +62,7 @@ Then(
 );
 
 Then(
-  /^the section bar at position (\d+) in tab "(.*)" uses the section (\d+)/,
+  /^the section bar in position (\d+) in tab "(.*)" uses the section (\d+)/,
   function (position: number, tabName: string, sectionPosition: number) {
     const bar = globals.tabs[tabName].bars[position - 1];
     expect(bar.type).to.equal(BarType.section);

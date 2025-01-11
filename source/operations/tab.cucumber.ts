@@ -44,11 +44,29 @@ When(
 );
 
 When(
-  /^removing from (section "(.*)" of )?tab "(.*)" the bar at position (\d+)/,
+  /^removing from (section "(.*)" of )?tab "(.*)" the bar in position (\d+)/,
   function (sectionName: string, tabName: string, position: number) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
 
     globals.tabs[tabName] = tabOperations.removeBar(globals.tabs[tabName], position - 1, section);
+  },
+);
+
+When(
+  /^moving in (section "(.*)" of )?tab "(.*)" the bar in position (\d+) to position (\d+)/,
+  function (sectionName: string, tabName: string, startPosition: number, endPosition: number) {
+    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+
+    globals.tabs[tabName] = tabOperations.moveBarStart(
+      globals.tabs[tabName],
+      startPosition - 1,
+      section?.index,
+    );
+    globals.tabs[tabName] = tabOperations.moveBarEnd(
+      globals.tabs[tabName],
+      endPosition - 1,
+      section,
+    );
   },
 );
 

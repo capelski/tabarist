@@ -3,7 +3,7 @@ import { BarType, repeatsHeight } from '../constants';
 import { tabOperations } from '../operations';
 import { Bar } from '../types';
 import { AddBar } from './add-bar';
-import { addBar, CommonNonSectionBarProps } from './bar-commons';
+import { addBar, CommonNonSectionBarProps, moveBarEnd } from './bar-commons';
 import { BarControls } from './bar-controls';
 
 export type BaseBarProps = CommonNonSectionBarProps<Bar> & {
@@ -16,6 +16,20 @@ export type BaseBarProps = CommonNonSectionBarProps<Bar> & {
 export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
   const addBarHandler = (type: BarType) => {
     addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection);
+  };
+
+  const moveBarEndHandler = () => {
+    moveBarEnd(props.tab, props.updateTab, props.bar.index, props.inSection);
+  };
+
+  const moveBarCancel = () => {
+    const nextTab = tabOperations.moveBarCancel(props.tab);
+    props.updateTab(nextTab);
+  };
+
+  const moveBarStart = () => {
+    const nextTab = tabOperations.moveBarStart(props.tab, props.bar.index, props.inSection?.index);
+    props.updateTab(nextTab);
   };
 
   const removeBar = () => {
@@ -32,7 +46,10 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
         {props.isEditMode && props.canAddBar && (
           <AddBar
             addBar={addBarHandler}
+            barIndex={props.bar.index}
             inSection={props.inSection}
+            moveBarEnd={moveBarEndHandler}
+            movement={props.tab.movement}
             style={{
               marginTop: props.inSection ? undefined : repeatsHeight,
             }}
@@ -48,6 +65,10 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
           copyBar={() => {
             addBarHandler(BarType.reference);
           }}
+          inSection={props.inSection}
+          moveBarCancel={moveBarCancel}
+          moveBarStart={moveBarStart}
+          movement={props.tab.movement}
           removeBar={removeBar}
         >
           {props.additionalControls}

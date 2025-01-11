@@ -20,6 +20,7 @@ const applyBarsOperation = (
   return inSection
     ? {
         ...tab,
+        movement: undefined,
         sections: tab.sections.map((section) =>
           section.index === inSection.index
             ? {
@@ -31,6 +32,7 @@ const applyBarsOperation = (
       }
     : {
         ...tab,
+        movement: undefined,
         bars: barsModifier(tab.bars),
       };
 };
@@ -103,10 +105,43 @@ export const tabOperations = {
   create: (): Tab => ({
     bars: [],
     id: nanoid(),
+    movement: undefined,
     sections: [],
     strummingPatterns: [],
     title: 'Unnamed tab',
   }),
+
+  moveBarCancel: (tab: Tab): Tab => {
+    return {
+      ...tab,
+      movement: undefined,
+    };
+  },
+
+  moveBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {
+    if (!tab.movement || tab.movement.sectionIndex !== inSection?.index) {
+      return tab;
+    }
+
+    const { movement } = tab;
+    const nextTab = { ...tab, movement: undefined };
+
+    return applyBarsOperation(
+      nextTab,
+      (bars) => barOperations.moveBar(bars, movement.startIndex, endIndex),
+      inSection,
+    );
+  },
+
+  moveBarStart: (tab: Tab, startIndex: number, sectionIndex: number | undefined): Tab => {
+    return {
+      ...tab,
+      movement: {
+        sectionIndex,
+        startIndex,
+      },
+    };
+  },
 
   rebaseChordBar: (tab: Tab, barIndex: number, sPatternIndex: number, inSection?: Section): Tab => {
     const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);

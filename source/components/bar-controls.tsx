@@ -1,11 +1,15 @@
 import React, { PropsWithChildren } from 'react';
-import { BarType, removeSymbol } from '../constants';
+import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../constants';
 import { getIndexDisplayValue } from '../operations';
-import { Bar } from '../types';
+import { Bar, Movement, Section } from '../types';
 
 export type BarControlsProps = PropsWithChildren<{
   bar: Bar;
   copyBar: () => void;
+  inSection: Section | undefined;
+  moveBarCancel: () => void;
+  moveBarStart: () => void;
+  movement: Movement | undefined;
   removeBar: () => void;
 }>;
 
@@ -21,6 +25,18 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       }}
     >
       {props.children}
+
+      {props.movement &&
+      props.movement.sectionIndex === props.inSection?.index &&
+      props.movement.startIndex === props.bar.index ? (
+        <button onClick={() => props.moveBarCancel()} style={{ marginRight: 8 }} type="button">
+          {cancelSymbol}
+        </button>
+      ) : (
+        <button onClick={() => props.moveBarStart()} style={{ marginRight: 8 }} type="button">
+          {moveStartSymbol}
+        </button>
+      )}
 
       <button onClick={props.copyBar} style={{ marginRight: 8 }} type="button">
         =

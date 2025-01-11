@@ -3,7 +3,7 @@ import { useMediaQuery } from 'react-responsive';
 import { BarType, repeatsHeight } from '../constants';
 import { Bar, ChordBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
-import { addBar } from './bar-commons';
+import { addBar, moveBarEnd } from './bar-commons';
 import { ChordBarComponent } from './chord-bar';
 import { PickingBarComponent } from './picking-bar';
 import { ReferenceBarComponent } from './reference-bar';
@@ -83,8 +83,13 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           addBar={(type) => {
             addBar(props.tab, props.updateTab, props.bars.length, type, props.inSection);
           }}
+          barIndex={props.bars.length}
           expanded={true}
           inSection={props.inSection}
+          moveBarEnd={() => {
+            moveBarEnd(props.tab, props.updateTab, props.bars.length, props.inSection);
+          }}
+          movement={props.tab.movement}
           style={{
             boxSizing: 'border-box',
             flexBasis: `${barWidth}%`,

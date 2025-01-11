@@ -1,14 +1,15 @@
 import React, { CSSProperties } from 'react';
-import { BarType, stringHeight } from '../constants';
-import { Section } from '../types';
+import { BarType, moveEndSymbol, stringHeight } from '../constants';
+import { barOperations } from '../operations';
+import { Movement, Section } from '../types';
 
-export type AddBarPropsHandlers = {
+export type AddBarProps = {
   addBar: (type: BarType.chord | BarType.picking | BarType.section) => void;
-};
-
-export type AddBarProps = AddBarPropsHandlers & {
+  barIndex: number;
   expanded?: boolean;
   inSection: Section | undefined;
+  moveBarEnd: () => void;
+  movement: Movement | undefined;
   style?: CSSProperties;
 };
 
@@ -33,33 +34,48 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
         ...props.style,
       }}
     >
-      <div
-        onClick={() => {
-          props.addBar(BarType.picking);
-        }}
-        style={buttonStyle}
-      >
-        🎼{props.expanded ? ' picking bar' : ''}
-      </div>
-
-      <div
-        onClick={() => {
-          props.addBar(BarType.chord);
-        }}
-        style={buttonStyle}
-      >
-        🎵{props.expanded ? ' chord bar' : ''}
-      </div>
-
-      {!props.inSection && (
+      {props.movement &&
+      props.movement.sectionIndex === props.inSection?.index &&
+      barOperations.canMoveBarToPosition(props.movement.startIndex, props.barIndex) ? (
         <div
           onClick={() => {
-            props.addBar(BarType.section);
+            props.moveBarEnd();
           }}
-          style={buttonStyle}
+          style={{ ...buttonStyle, backgroundColor: 'lightblue' }}
         >
-          📄{props.expanded ? ' section' : ''}
+          {moveEndSymbol}
         </div>
+      ) : (
+        <React.Fragment>
+          <div
+            onClick={() => {
+              props.addBar(BarType.picking);
+            }}
+            style={buttonStyle}
+          >
+            🎼{props.expanded ? ' picking bar' : ''}
+          </div>
+
+          <div
+            onClick={() => {
+              props.addBar(BarType.chord);
+            }}
+            style={buttonStyle}
+          >
+            🎵{props.expanded ? ' chord bar' : ''}
+          </div>
+
+          {!props.inSection && (
+            <div
+              onClick={() => {
+                props.addBar(BarType.section);
+              }}
+              style={buttonStyle}
+            >
+              📄{props.expanded ? ' section' : ''}
+            </div>
+          )}
+        </React.Fragment>
       )}
     </div>
   );

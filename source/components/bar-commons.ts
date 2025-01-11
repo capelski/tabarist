@@ -35,6 +35,16 @@ export const addBar = (
   updateTab(nextTab);
 };
 
+export const moveBarEnd = (
+  tab: Tab,
+  updateTab: (tab: Tab) => void,
+  destinationIndex: number,
+  inSection?: Section,
+) => {
+  const nextTab = tabOperations.moveBarEnd(tab, destinationIndex, inSection);
+  updateTab(nextTab);
+};
+
 export const updateRepeats = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
