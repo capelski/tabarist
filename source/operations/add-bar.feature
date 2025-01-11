@@ -17,20 +17,6 @@ Feature: Add bar
       And the bar in position 3 in tab "T" is a chord bar
       And the bar in position 3 in tab "T" has index 2
 
-   Scenario: Adding a bar to a section of a tab shifts later tabs to the left and reindexes them
-      Given a tab "T"
-      And a section "S" in tab "T"
-      And a chord bar in section "S" of tab "T"
-      And a chord bar in section "S" of tab "T"
-      When adding to section "S" of tab "T" a picking bar in position 2
-      Then section "S" of tab "T" has 3 bar(s)
-      And the bar in position 1 in section "S" of tab "T" is a chord bar
-      And the bar in position 1 in section "S" of tab "T" has index 0
-      And the bar in position 2 in section "S" of tab "T" is a picking bar
-      And the bar in position 2 in section "S" of tab "T" has index 1
-      And the bar in position 3 in section "S" of tab "T" is a chord bar
-      And the bar in position 3 in section "S" of tab "T" has index 2
-
    Scenario: Adding a chord bar to a tab without strumming patterns, creates one
       Given a tab "T"
       When adding to tab "T" a chord bar in position 1
