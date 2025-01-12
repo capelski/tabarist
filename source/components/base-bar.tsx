@@ -1,9 +1,9 @@
 import React from 'react';
-import { BarType, repeatsHeight } from '../constants';
+import { repeatsHeight } from '../constants';
 import { tabOperations } from '../operations';
 import { Bar } from '../types';
 import { AddBar } from './add-bar';
-import { addBar, CommonNonSectionBarProps, moveBarEnd } from './bar-commons';
+import { addBar, CommonNonSectionBarProps, copyBarEnd, moveBarEnd } from './bar-commons';
 import { BarControls } from './bar-controls';
 
 export type BaseBarProps = CommonNonSectionBarProps<Bar> & {
@@ -14,17 +14,22 @@ export type BaseBarProps = CommonNonSectionBarProps<Bar> & {
 };
 
 export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
-  const addBarHandler = (type: BarType) => {
-    addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection);
+  const cancelPositionOperation = () => {
+    const nextTab = tabOperations.cancelPositionOperation(props.tab);
+    props.updateTab(nextTab);
+  };
+
+  const copyBarEndHandler = () => {
+    copyBarEnd(props.tab, props.updateTab, props.bar.index, props.inSection);
+  };
+
+  const copyBarStart = () => {
+    const nextTab = tabOperations.copyBarStart(props.tab, props.bar.index, props.inSection?.index);
+    props.updateTab(nextTab);
   };
 
   const moveBarEndHandler = () => {
     moveBarEnd(props.tab, props.updateTab, props.bar.index, props.inSection);
-  };
-
-  const moveBarCancel = () => {
-    const nextTab = tabOperations.moveBarCancel(props.tab);
-    props.updateTab(nextTab);
   };
 
   const moveBarStart = () => {
@@ -45,11 +50,15 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
       <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
         {props.isEditMode && props.canAddBar && (
           <AddBar
-            addBar={addBarHandler}
+            addBar={(type) => {
+              addBar(props.tab, props.updateTab, props.bar.index, type, props.inSection);
+            }}
             barIndex={props.bar.index}
+            copyBarEnd={copyBarEndHandler}
+            copying={props.tab.copying}
             inSection={props.inSection}
             moveBarEnd={moveBarEndHandler}
-            movement={props.tab.movement}
+            moving={props.tab.moving}
             style={{
               marginTop: props.inSection ? undefined : repeatsHeight,
             }}
@@ -62,13 +71,12 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
       {props.isEditMode && props.displayBarControls && (
         <BarControls
           bar={props.bar}
-          copyBar={() => {
-            addBarHandler(BarType.reference);
-          }}
+          cancelPositionOperation={cancelPositionOperation}
+          copyBarStart={copyBarStart}
+          copying={props.tab.copying}
           inSection={props.inSection}
-          moveBarCancel={moveBarCancel}
           moveBarStart={moveBarStart}
-          movement={props.tab.movement}
+          moving={props.tab.moving}
           removeBar={removeBar}
         >
           {props.additionalControls}

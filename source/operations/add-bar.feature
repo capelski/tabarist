@@ -42,19 +42,3 @@ Feature: Add bar
       When adding to tab "T" a section bar in position 1
       Then tab "T" has 1 section(s)
       And the section bar in position 1 in tab "T" uses the section 1
-
-   Scenario: Adding a reference bar earlier than the pointed bar updates the referenced indexes
-      Given a tab "T"
-      And a chord bar in tab "T"
-      And a reference bar in tab "T" pointing at the previous bar
-      When moving in tab "T" the bar in position 2 to position 1
-      And adding to tab "T" a reference bar in position 1
-      Then tab "T" has 3 bar(s)
-      And the bar in position 1 in tab "T" is a reference bar
-      And the bar in position 1 in tab "T" has index 0
-      And the reference bar in position 1 in tab "T" points to index 2
-      And the bar in position 2 in tab "T" is a reference bar
-      And the bar in position 2 in tab "T" has index 1
-      And the reference bar in position 2 in tab "T" points to index 2
-      And the bar in position 3 in tab "T" is a chord bar
-      And the bar in position 3 in tab "T" has index 2

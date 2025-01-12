@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BarType } from '../constants';
+import { NonRefefenceBarType } from '../constants';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
@@ -30,14 +30,32 @@ Given(
 );
 
 When(
-  /^adding to (section "(.*)" of )?tab "(.*)" a (chord|picking|reference|section) bar in position (\d+)/,
-  function (sectionName: string, tabName: string, type: BarType, position: number) {
+  /^adding to (section "(.*)" of )?tab "(.*)" a (chord|picking|section) bar in position (\d+)/,
+  function (sectionName: string, tabName: string, type: NonRefefenceBarType, position: number) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
 
     globals.tabs[tabName] = tabOperations.addBar(
       globals.tabs[tabName],
       position - 1,
       type,
+      section,
+    );
+  },
+);
+
+When(
+  /^copying in (section "(.*)" of )?tab "(.*)" the bar in position (\d+) to position (\d+)/,
+  function (sectionName: string, tabName: string, startPosition: number, endPosition: number) {
+    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+
+    globals.tabs[tabName] = tabOperations.copyBarStart(
+      globals.tabs[tabName],
+      startPosition - 1,
+      section?.index,
+    );
+    globals.tabs[tabName] = tabOperations.copyBarEnd(
+      globals.tabs[tabName],
+      endPosition - 1,
       section,
     );
   },

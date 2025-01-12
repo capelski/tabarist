@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { BarType } from '../constants';
+import { BarType, NonRefefenceBarType } from '../constants';
 import { Bar, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
 import {
   barOperations,
@@ -20,7 +20,8 @@ const applyBarsOperation = (
   return inSection
     ? {
         ...tab,
-        movement: undefined,
+        copying: undefined,
+        moving: undefined,
         sections: tab.sections.map((section) =>
           section.index === inSection.index
             ? {
@@ -32,13 +33,14 @@ const applyBarsOperation = (
       }
     : {
         ...tab,
-        movement: undefined,
+        copying: undefined,
+        moving: undefined,
         bars: barsModifier(tab.bars),
       };
 };
 
 export const tabOperations = {
-  addBar: (tab: Tab, index: number, type: BarType, inSection?: Section): Tab => {
+  addBar: (tab: Tab, index: number, type: NonRefefenceBarType, inSection?: Section): Tab => {
     let nextTab = { ...tab };
 
     if (type === BarType.chord && tab.strummingPatterns.length === 0) {
@@ -55,8 +57,6 @@ export const tabOperations = {
             ? createChordBar(index, nextTab.strummingPatterns[0])
             : type === BarType.picking
             ? createPickingBar(index)
-            : type === BarType.reference
-            ? createReferenceBar(bars[index])
             : createSectionBar(index, nextTab.sections[0]);
 
         return barOperations.addBar(bars, newBar as any);
@@ -88,6 +88,14 @@ export const tabOperations = {
     };
   },
 
+  cancelPositionOperation: (tab: Tab): Tab => {
+    return {
+      ...tab,
+      copying: undefined,
+      moving: undefined,
+    };
+  },
+
   changeSection: (tab: Tab, barIndex: number, sectionIndex: number): Tab => {
     return {
       ...tab,
@@ -102,33 +110,55 @@ export const tabOperations = {
     };
   },
 
+  copyBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {
+    if (!tab.copying || tab.copying.sectionIndex !== inSection?.index) {
+      return tab;
+    }
+
+    const { copying } = tab;
+    const nextTab = { ...tab, copying: undefined };
+
+    return applyBarsOperation(
+      nextTab,
+      (bars) => {
+        const newBar = createReferenceBar(bars[copying.startIndex], endIndex);
+        return barOperations.addBar(bars, newBar as any);
+      },
+      inSection,
+    );
+  },
+
+  copyBarStart: (tab: Tab, startIndex: number, sectionIndex: number | undefined): Tab => {
+    return {
+      ...tab,
+      copying: {
+        sectionIndex,
+        startIndex,
+      },
+    };
+  },
+
   create: (): Tab => ({
     bars: [],
+    copying: undefined,
     id: nanoid(),
-    movement: undefined,
+    moving: undefined,
     sections: [],
     strummingPatterns: [],
     title: 'Unnamed tab',
   }),
 
-  moveBarCancel: (tab: Tab): Tab => {
-    return {
-      ...tab,
-      movement: undefined,
-    };
-  },
-
   moveBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {
-    if (!tab.movement || tab.movement.sectionIndex !== inSection?.index) {
+    if (!tab.moving || tab.moving.sectionIndex !== inSection?.index) {
       return tab;
     }
 
-    const { movement } = tab;
+    const { moving } = tab;
     const nextTab = { ...tab, movement: undefined };
 
     return applyBarsOperation(
       nextTab,
-      (bars) => barOperations.moveBar(bars, movement.startIndex, endIndex),
+      (bars) => barOperations.moveBar(bars, moving.startIndex, endIndex),
       inSection,
     );
   },
@@ -136,7 +166,7 @@ export const tabOperations = {
   moveBarStart: (tab: Tab, startIndex: number, sectionIndex: number | undefined): Tab => {
     return {
       ...tab,
-      movement: {
+      moving: {
         sectionIndex,
         startIndex,
       },

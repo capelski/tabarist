@@ -1,13 +1,13 @@
 import { Given, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BarType } from '../constants';
+import { BarType, NonRefefenceBarType } from '../constants';
 import { ChordBar, ReferenceBar, SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
 Given(
   /^a (chord|picking|section) bar in (section "(.*)" of )?tab "(.*)"/,
-  function (type: BarType, sectionName: string, tabName: string) {
+  function (type: NonRefefenceBarType, sectionName: string, tabName: string) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
     const bars = section?.bars ?? globals.tabs[tabName].bars;
 
@@ -16,10 +16,14 @@ Given(
 );
 
 Given(/^a reference bar in tab "(.*)" pointing at the previous bar/, function (tabName: string) {
-  globals.tabs[tabName] = tabOperations.addBar(
+  globals.tabs[tabName] = tabOperations.copyBarStart(
     globals.tabs[tabName],
     globals.tabs[tabName].bars.length - 1,
-    BarType.reference,
+    undefined,
+  );
+  globals.tabs[tabName] = tabOperations.copyBarEnd(
+    globals.tabs[tabName],
+    globals.tabs[tabName].bars.length,
   );
 });
 

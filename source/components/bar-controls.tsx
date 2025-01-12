@@ -1,15 +1,16 @@
 import React, { PropsWithChildren } from 'react';
 import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../constants';
 import { getIndexDisplayValue } from '../operations';
-import { Bar, Movement, Section } from '../types';
+import { Bar, PositionOperation, Section } from '../types';
 
 export type BarControlsProps = PropsWithChildren<{
   bar: Bar;
-  copyBar: () => void;
+  cancelPositionOperation: () => void;
+  copyBarStart: () => void;
+  copying: PositionOperation | undefined;
   inSection: Section | undefined;
-  moveBarCancel: () => void;
   moveBarStart: () => void;
-  movement: Movement | undefined;
+  moving: PositionOperation | undefined;
   removeBar: () => void;
 }>;
 
@@ -26,23 +27,31 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     >
       {props.children}
 
-      {props.movement &&
-      props.movement.sectionIndex === props.inSection?.index &&
-      props.movement.startIndex === props.bar.index ? (
-        <button onClick={() => props.moveBarCancel()} style={{ marginRight: 8 }} type="button">
+      {props.moving &&
+      props.moving.sectionIndex === props.inSection?.index &&
+      props.moving.startIndex === props.bar.index ? (
+        <button onClick={props.cancelPositionOperation} style={{ marginRight: 8 }} type="button">
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={() => props.moveBarStart()} style={{ marginRight: 8 }} type="button">
+        <button onClick={props.moveBarStart} style={{ marginRight: 8 }} type="button">
           {moveStartSymbol}
         </button>
       )}
 
-      <button onClick={props.copyBar} style={{ marginRight: 8 }} type="button">
-        =
-      </button>
+      {props.copying &&
+      props.copying.sectionIndex === props.inSection?.index &&
+      props.copying.startIndex === props.bar.index ? (
+        <button onClick={props.cancelPositionOperation} style={{ marginRight: 8 }} type="button">
+          {cancelSymbol}
+        </button>
+      ) : (
+        <button onClick={props.copyBarStart} style={{ marginRight: 8 }} type="button">
+          =
+        </button>
+      )}
 
-      <button onClick={() => props.removeBar()} type="button">
+      <button onClick={props.removeBar} type="button">
         {removeSymbol}
       </button>
 

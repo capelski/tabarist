@@ -1,26 +1,37 @@
 import React, { CSSProperties } from 'react';
-import { BarType, moveEndSymbol, stringHeight } from '../constants';
+import { BarType, moveEndSymbol, NonRefefenceBarType, stringHeight } from '../constants';
 import { barOperations } from '../operations';
-import { Movement, Section } from '../types';
+import { PositionOperation, Section } from '../types';
 
 export type AddBarProps = {
-  addBar: (type: BarType.chord | BarType.picking | BarType.section) => void;
+  addBar: (type: NonRefefenceBarType) => void;
   barIndex: number;
+  copyBarEnd: () => void;
+  copying: PositionOperation | undefined;
   expanded?: boolean;
   inSection: Section | undefined;
   moveBarEnd: () => void;
-  movement: Movement | undefined;
+  moving: PositionOperation | undefined;
   style?: CSSProperties;
 };
 
-const buttonStyle: CSSProperties = {
+const buttonStyleBase: CSSProperties = {
   alignItems: 'center',
-  backgroundColor: '#eee',
   cursor: 'pointer',
   display: 'flex',
   flexGrow: 1,
   justifyContent: 'center',
   padding: '0 4px',
+};
+
+const addButtonStyle: CSSProperties = {
+  ...buttonStyleBase,
+  backgroundColor: '#eee',
+};
+
+const moveButtonStyle: CSSProperties = {
+  ...buttonStyleBase,
+  backgroundColor: 'lightblue',
 };
 
 export const AddBar: React.FC<AddBarProps> = (props) => {
@@ -34,15 +45,14 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
         ...props.style,
       }}
     >
-      {props.movement &&
-      props.movement.sectionIndex === props.inSection?.index &&
-      barOperations.canMoveBarToPosition(props.movement.startIndex, props.barIndex) ? (
-        <div
-          onClick={() => {
-            props.moveBarEnd();
-          }}
-          style={{ ...buttonStyle, backgroundColor: 'lightblue' }}
-        >
+      {props.moving &&
+      props.moving.sectionIndex === props.inSection?.index &&
+      barOperations.canMoveBarToPosition(props.moving.startIndex, props.barIndex) ? (
+        <div onClick={props.moveBarEnd} style={moveButtonStyle}>
+          {moveEndSymbol}
+        </div>
+      ) : props.copying && props.copying.sectionIndex === props.inSection?.index ? (
+        <div onClick={props.copyBarEnd} style={moveButtonStyle}>
           {moveEndSymbol}
         </div>
       ) : (
@@ -51,7 +61,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
             onClick={() => {
               props.addBar(BarType.picking);
             }}
-            style={buttonStyle}
+            style={addButtonStyle}
           >
             🎼{props.expanded ? ' picking bar' : ''}
           </div>
@@ -60,7 +70,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
             onClick={() => {
               props.addBar(BarType.chord);
             }}
-            style={buttonStyle}
+            style={addButtonStyle}
           >
             🎵{props.expanded ? ' chord bar' : ''}
           </div>
@@ -70,7 +80,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
               onClick={() => {
                 props.addBar(BarType.section);
               }}
-              style={buttonStyle}
+              style={addButtonStyle}
             >
               📄{props.expanded ? ' section' : ''}
             </div>

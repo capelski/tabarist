@@ -1,6 +1,8 @@
 - Add capacitor and build APP bundle
+- Firebase app
+- Capo bar
+- Support chord mentions in picking bars
 - Comments section
-- When copying, allow selecting the destination like when moving
 - Different disabled color for reference and sections
 - Modal for deletions
 - Play in non-edit mode

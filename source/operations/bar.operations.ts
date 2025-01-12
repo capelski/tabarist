@@ -36,18 +36,19 @@ export const createPickingFrame = (index: number): PickingFrame => ({
   strings: createIndexedValuesArray(6, ''),
 });
 
-export const createReferenceBar = (bar: Bar): ReferenceBar => {
-  // If the bar we are copying is a referenceBar pointing to a later position, the new reference bar
-  // will shift the pointed bar one position to the right; increasing the effective barIndex
-  const isReferenceToLaterPosition = bar.type === BarType.reference && bar.index < bar.barIndex;
+export const createReferenceBar = (targetBar: Bar, index: number): ReferenceBar => {
+  // If we are creating a copy in an earlier position, the new reference bar will shift the
+  // pointed bar one position to the right; increasing the effective barIndex
+  const isPointingToLaterPosition =
+    index <= (targetBar.type === BarType.reference ? targetBar.barIndex : targetBar.index);
+
   const barIndex =
-    bar.type !== BarType.reference
-      ? bar.index
-      : bar.barIndex + (isReferenceToLaterPosition ? 1 : 0);
+    (targetBar.type === BarType.reference ? targetBar.barIndex : targetBar.index) +
+    +isPointingToLaterPosition;
 
   return {
     barIndex,
-    index: bar.index + 1,
+    index,
     type: BarType.reference,
   };
 };

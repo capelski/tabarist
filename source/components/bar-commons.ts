@@ -1,4 +1,4 @@
-import { BarType } from '../constants';
+import { NonRefefenceBarType } from '../constants';
 import { tabOperations } from '../operations';
 import { Bar, Section, Tab } from '../types';
 import { RepeatsProps } from './repeats';
@@ -28,10 +28,20 @@ export const addBar = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
   barIndex: number,
-  type: BarType,
+  type: NonRefefenceBarType,
   inSection?: Section,
 ) => {
   const nextTab = tabOperations.addBar(tab, barIndex, type, inSection);
+  updateTab(nextTab);
+};
+
+export const copyBarEnd = (
+  tab: Tab,
+  updateTab: (tab: Tab) => void,
+  destinationIndex: number,
+  inSection?: Section,
+) => {
+  const nextTab = tabOperations.copyBarEnd(tab, destinationIndex, inSection);
   updateTab(nextTab);
 };
 
