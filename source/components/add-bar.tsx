@@ -1,17 +1,17 @@
 import React, { CSSProperties } from 'react';
 import { BarType, moveEndSymbol, NonRefefenceBarType, stringHeight } from '../constants';
-import { barOperations } from '../operations';
-import { PositionOperation, Section } from '../types';
+import { barOperations, sectionOperations } from '../operations';
+import { Section, Tab } from '../types';
 
 export type AddBarProps = {
   addBar: (type: NonRefefenceBarType) => void;
   barIndex: number;
   copyBarEnd: () => void;
-  copying: PositionOperation | undefined;
+  copying: Tab['copying'];
   expanded?: boolean;
   inSection: Section | undefined;
   moveBarEnd: () => void;
-  moving: PositionOperation | undefined;
+  moving: Tab['moving'];
   style?: CSSProperties;
 };
 
@@ -46,12 +46,13 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
       }}
     >
       {props.moving &&
-      props.moving.sectionIndex === props.inSection?.index &&
+      sectionOperations.isOperationInSection(props.moving, props.inSection) &&
       barOperations.canMoveBarToPosition(props.moving.startIndex, props.barIndex) ? (
         <div onClick={props.moveBarEnd} style={moveButtonStyle}>
           {moveEndSymbol}
         </div>
-      ) : props.copying && props.copying.sectionIndex === props.inSection?.index ? (
+      ) : props.copying &&
+        sectionOperations.isOperationInSection(props.copying, props.inSection) ? (
         <div onClick={props.copyBarEnd} style={moveButtonStyle}>
           {moveEndSymbol}
         </div>

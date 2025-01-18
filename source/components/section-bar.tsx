@@ -16,8 +16,7 @@ export const SectionBarComponent: React.FC<SectionBarProps> = (props) => {
     isEditMode: props.isEditMode,
     section: props.section,
     strummingPatterns: props.tab.strummingPatterns,
-    updateRepeats: (repeats?: number) =>
-      updateRepeats(props.tab, props.updateTab, props.bar.index, repeats),
+    updateRepeats: (repeats) => updateRepeats(props.tab, props.updateTab, props.bar.index, repeats),
   });
 
   const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {

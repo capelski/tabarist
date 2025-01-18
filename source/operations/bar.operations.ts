@@ -1,6 +1,7 @@
 import { BarType, framesNumberDefault } from '../constants';
 import {
   Bar,
+  BarBase,
   ChordBar,
   NonSectionBar,
   PickingBar,
@@ -295,7 +296,7 @@ export const barOperations = {
   updateRepeats: <TBar extends Bar | NonSectionBar>(
     bars: TBar[],
     barIndex: number,
-    repeats?: number,
+    repeats: BarBase['repeats'],
   ): TBar[] => {
     return bars.map((bar) => {
       return bar.index !== barIndex

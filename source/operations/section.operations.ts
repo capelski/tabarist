@@ -1,5 +1,5 @@
 import { BarType } from '../constants';
-import { Section, Tab } from '../types';
+import { PositionOperation, Section, Tab } from '../types';
 
 export const sectionOperations = {
   canDelete: (tab: Tab, sectionIndex: number) => {
@@ -14,5 +14,9 @@ export const sectionOperations = {
       index,
       name: 'Unnamed section',
     };
+  },
+
+  isOperationInSection: (positionOperation: PositionOperation, inSection: Section | undefined) => {
+    return positionOperation.sectionIndex === inSection?.index;
   },
 };

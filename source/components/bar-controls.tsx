@@ -1,16 +1,16 @@
 import React, { PropsWithChildren } from 'react';
 import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../constants';
-import { getIndexDisplayValue } from '../operations';
-import { Bar, PositionOperation, Section } from '../types';
+import { getIndexDisplayValue, sectionOperations } from '../operations';
+import { Bar, Section, Tab } from '../types';
 
 export type BarControlsProps = PropsWithChildren<{
   bar: Bar;
   cancelPositionOperation: () => void;
   copyBarStart: () => void;
-  copying: PositionOperation | undefined;
+  copying: Tab['copying'];
   inSection: Section | undefined;
   moveBarStart: () => void;
-  moving: PositionOperation | undefined;
+  moving: Tab['moving'];
   removeBar: () => void;
 }>;
 
@@ -28,7 +28,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       {props.children}
 
       {props.moving &&
-      props.moving.sectionIndex === props.inSection?.index &&
+      sectionOperations.isOperationInSection(props.moving, props.inSection) &&
       props.moving.startIndex === props.bar.index ? (
         <button onClick={props.cancelPositionOperation} style={{ marginRight: 8 }} type="button">
           {cancelSymbol}
@@ -40,7 +40,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       )}
 
       {props.copying &&
-      props.copying.sectionIndex === props.inSection?.index &&
+      sectionOperations.isOperationInSection(props.copying, props.inSection) &&
       props.copying.startIndex === props.bar.index ? (
         <button onClick={props.cancelPositionOperation} style={{ marginRight: 8 }} type="button">
           {cancelSymbol}

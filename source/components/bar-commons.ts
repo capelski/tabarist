@@ -1,6 +1,6 @@
 import { NonRefefenceBarType } from '../constants';
 import { tabOperations } from '../operations';
-import { Bar, Section, Tab } from '../types';
+import { Bar, BarBase, Section, Tab } from '../types';
 import { RepeatsProps } from './repeats';
 
 export type CommonCoreProps = RepeatsProps & {
@@ -59,7 +59,7 @@ export const updateRepeats = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
   barIndex: number,
-  repeats?: number,
+  repeats: BarBase['repeats'],
   inSection?: Section,
 ) => {
   const nextTab = tabOperations.updateRepeats(tab, barIndex, repeats, inSection);

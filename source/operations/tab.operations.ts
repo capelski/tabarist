@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { BarType, NonRefefenceBarType } from '../constants';
-import { Bar, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
+import { Bar, BarBase, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
 import {
   barOperations,
   createChordBar,
@@ -111,7 +111,7 @@ export const tabOperations = {
   },
 
   copyBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {
-    if (!tab.copying || tab.copying.sectionIndex !== inSection?.index) {
+    if (!tab.copying || !sectionOperations.isOperationInSection(tab.copying, inSection)) {
       return tab;
     }
 
@@ -149,7 +149,7 @@ export const tabOperations = {
   }),
 
   moveBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {
-    if (!tab.moving || tab.moving.sectionIndex !== inSection?.index) {
+    if (!tab.moving || !sectionOperations.isOperationInSection(tab.moving, inSection)) {
       return tab;
     }
 
@@ -313,7 +313,12 @@ export const tabOperations = {
     );
   },
 
-  updateRepeats: (tab: Tab, barIndex: number, repeats?: number, inSection?: Section): Tab => {
+  updateRepeats: (
+    tab: Tab,
+    barIndex: number,
+    repeats: BarBase['repeats'],
+    inSection?: Section,
+  ): Tab => {
     return applyBarsOperation(
       tab,
       (bars) => barOperations.updateRepeats(bars, barIndex, repeats),
