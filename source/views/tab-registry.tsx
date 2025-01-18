@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { addSymbol, removeSymbol } from '../constants';
 import { getTabRelativeUrl } from '../operations';
-import { TabRegistry } from '../types';
+import { Tab, TabRegistry } from '../types';
 
 export type TabRegistryProps = {
-  createTab: () => string;
+  createTab: () => Promise<Tab>;
   removeTab: (tabId: string) => void;
   tabRegistry: TabRegistry;
-  tabRegistrySetter: (tabRegistry: TabRegistry) => void;
 };
 
 export const TabRegistryView: React.FC<TabRegistryProps> = (props) => {
@@ -16,17 +15,15 @@ export const TabRegistryView: React.FC<TabRegistryProps> = (props) => {
 
   const navigate = useNavigate();
 
+  const createTab = async () => {
+    const tab = await props.createTab();
+    navigate(getTabRelativeUrl(tab.id, true));
+  };
+
   return (
     <div className="tab-registry">
       <p>
-        <button
-          onClick={() => {
-            const tabId = props.createTab();
-            navigate(getTabRelativeUrl(tabId, true));
-          }}
-          style={{ marginRight: 16 }}
-          type="button"
-        >
+        <button onClick={createTab} style={{ marginRight: 16 }} type="button">
           {addSymbol} tab
         </button>
 
@@ -44,20 +41,25 @@ export const TabRegistryView: React.FC<TabRegistryProps> = (props) => {
         )}
       </p>
       {Object.entries(props.tabRegistry)
-        .filter(([_, title]) => {
+        .filter(([_, { title }]) => {
           return title.toLowerCase().includes(filter.toLocaleLowerCase());
         })
-        .map(([id, title]) => {
+        .map(([id, record]) => {
           return (
             <div
               key={id}
               style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
             >
               <div>
-                {title}
+                {record.title}
                 <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(id)}>
                   ➡️
                 </NavLink>
+                {WEBPACK_USE_FIREBASE && (
+                  <span style={{ marginLeft: 8 }}>
+                    {!record.synced ? '📵' : record.hasUnsyncedChange ? '⌛️' : '🛜'}
+                  </span>
+                )}
               </div>
               <div>
                 <button onClick={() => props.removeTab(id)} type="button">

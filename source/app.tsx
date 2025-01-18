@@ -1,81 +1,127 @@
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
-import { localStorageKey_tabRegistry, RouteNames } from './constants';
-import { getTabLocalStorageKey, tabOperations } from './operations';
+import { NavBar } from './components';
+import { RouteNames } from './constants';
+import { getFirebaseAuth, User } from './firebase';
+import { tabOperations } from './operations';
+import { tabFirestoreRepository, tabLocalRepository, tabRegistryRepository } from './repositories';
 import { Tab, TabRegistry } from './types';
 import { TabRegistryView, TabView } from './views';
 
 export const App: React.FC = () => {
   const [tabRegistry, setTabRegistry] = useState<TabRegistry>({});
-  const [selectedTab, setSelectedTab] = useState<Tab>();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const stringifiedTabRegistry = localStorage.getItem(localStorageKey_tabRegistry);
-    if (stringifiedTabRegistry) {
-      try {
-        const nextTabRegistry = JSON.parse(stringifiedTabRegistry);
-        setTabRegistry(nextTabRegistry);
-      } catch (error) {
-        console.error('Error retrieving the local tabs', error);
-      }
+    if (WEBPACK_USE_FIREBASE) {
+      getFirebaseAuth().onAuthStateChanged(setUser, (error) => {
+        console.log(error);
+      });
+    }
+
+    const nextTabRegistry = tabRegistryRepository.get();
+    if (nextTabRegistry) {
+      setTabRegistry(nextTabRegistry);
     }
   }, []);
 
-  const createNewTab = () => {
+  useEffect(() => {
+    if (user) {
+      tabFirestoreRepository.getMany(user.uid).then((tabs) => {
+        const nextTabRegistry: TabRegistry = { ...tabRegistry };
+
+        tabs
+          .filter((tab) => !tabRegistry[tab.id]?.hasUnsyncedChange)
+          .forEach((tab) => {
+            tabLocalRepository.set(tab);
+            return (nextTabRegistry[tab.id] = {
+              hasUnsyncedChange: false,
+              synced: true,
+              title: tab.title,
+            });
+          });
+
+        updateTabRegistry(nextTabRegistry);
+      });
+    }
+  }, [user]);
+
+  const createTab = async () => {
     const newTab = tabOperations.create();
-    updateTab(newTab);
 
-    const nextTabRegistry = { ...tabRegistry, [newTab.id]: newTab.title };
-    updateTabRegistry(nextTabRegistry);
-
-    return newTab.id;
-  };
-
-  const removeTab = (tabId: string) => {
-    const nextTabRegistry = Object.entries(tabRegistry)
-      .filter(([id]) => id !== tabId)
-      .reduce<TabRegistry>((reduced, [id, title]) => ({ ...reduced, [id]: title }), {});
-
-    updateTabRegistry(nextTabRegistry);
-
-    if (tabId === selectedTab?.id) {
-      setSelectedTab(undefined);
+    tabLocalRepository.set(newTab);
+    if (user) {
+      await tabFirestoreRepository.set(newTab, user.uid);
     }
 
-    localStorage.removeItem(getTabLocalStorageKey(tabId));
+    const nextTabRegistry: TabRegistry = {
+      ...tabRegistry,
+      [newTab.id]: { hasUnsyncedChange: false, synced: !!user, title: newTab.title },
+    };
+    updateTabRegistry(nextTabRegistry);
+
+    return newTab;
   };
 
-  const updateTab = (updatedTab: Tab) => {
-    localStorage.setItem(getTabLocalStorageKey(updatedTab.id), JSON.stringify(updatedTab));
-    setSelectedTab(updatedTab);
+  const getTabById = (tabId: string) => {
+    return tabLocalRepository.getById(tabId);
+  };
 
-    const nextTabRegistry = { ...tabRegistry, [updatedTab.id]: updatedTab.title };
+  const removeTab = async (tabId: string) => {
+    tabLocalRepository.remove(tabId);
+    if (user) {
+      await tabFirestoreRepository.remove(tabId, user.uid);
+    }
+
+    const nextTabRegistry: TabRegistry = { ...tabRegistry };
+    delete nextTabRegistry[tabId];
+
     updateTabRegistry(nextTabRegistry);
   };
 
-  const updateTabRegistry = (tabRegistry: TabRegistry) => {
-    setTabRegistry(tabRegistry);
-    localStorage.setItem(localStorageKey_tabRegistry, JSON.stringify(tabRegistry));
+  const updateTab = async (tab: Tab) => {
+    tabLocalRepository.set(tab);
+    if (user) {
+      await tabFirestoreRepository.set(tab, user!.uid);
+    }
+
+    const nextTabRegistry: TabRegistry = {
+      ...tabRegistry,
+      [tab.id]: {
+        hasUnsyncedChange: user ? false : true,
+        synced: user ? true : tabRegistry[tab.id].synced,
+        title: tab.title,
+      },
+    };
+    updateTabRegistry(nextTabRegistry);
+
+    return tab;
+  };
+
+  const updateTabRegistry = (nextTabRegistry: TabRegistry) => {
+    const sortedRegistry = tabRegistryRepository.sort(nextTabRegistry);
+    tabRegistryRepository.update(sortedRegistry);
+    setTabRegistry(sortedRegistry);
   };
 
   return (
     <HashRouter>
+      <NavBar user={user} />
       <Routes>
         <Route
           path={RouteNames.home}
           element={
             <TabRegistryView
-              createTab={createNewTab}
+              createTab={createTab}
               removeTab={removeTab}
               tabRegistry={tabRegistry}
-              tabRegistrySetter={updateTabRegistry}
             />
           }
         />
 
         <Route
           path={RouteNames.tabDetails}
-          element={<TabView removeTab={removeTab} updateTab={updateTab} />}
+          element={<TabView getTabById={getTabById} removeTab={removeTab} updateTab={updateTab} />}
         />
       </Routes>
     </HashRouter>

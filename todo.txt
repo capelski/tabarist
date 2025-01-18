@@ -1,6 +1,6 @@
+- Firebase. Listen to changes on documents?
 - Add capacitor and build APP bundle
-- Firebase app
-- Capo bar
+- Capo property
 - Support chord mentions in picking bars
 - Comments section
 - Different disabled color for reference and sections
@@ -11,3 +11,4 @@
     - 1 &, 2 &, etc.
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
+- Firebase. Sign in with redirect?

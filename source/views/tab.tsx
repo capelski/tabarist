@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate, useParams, useSearchParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { BarGroup, SectionComponent, StrummingPatternComponent } from '../components';
 import {
   addSymbol,
@@ -9,12 +9,13 @@ import {
   RouteNames,
   saveSymbol,
 } from '../constants';
-import { getTabLocalStorageKey, sPatternOperations, tabOperations } from '../operations';
+import { sPatternOperations, tabOperations } from '../operations';
 import { Tab } from '../types';
 
 export type TabProps = {
-  removeTab: (tabId: string) => void;
-  updateTab: (updatedTab: Tab) => void;
+  getTabById: (tabId: string) => Tab | undefined;
+  removeTab: (tabId: string) => Promise<void>;
+  updateTab: (updatedTab: Tab) => Promise<Tab>;
 };
 
 export const TabView: React.FC<TabProps> = (props) => {
@@ -26,15 +27,7 @@ export const TabView: React.FC<TabProps> = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stringifiedTab = localStorage.getItem(getTabLocalStorageKey(tabId!));
-    if (stringifiedTab) {
-      try {
-        const nextSelectedTab = JSON.parse(stringifiedTab);
-        setTab(nextSelectedTab);
-      } catch (error) {
-        console.error('Error retrieving the selected tab', error);
-      }
-    }
+    setTab(props.getTabById(tabId!));
   }, [tabId]);
 
   useEffect(() => {
@@ -46,14 +39,7 @@ export const TabView: React.FC<TabProps> = (props) => {
   }, [searchParams]);
 
   if (!tab) {
-    return (
-      <div style={{ alignItems: 'center', display: 'flex' }}>
-        <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
-          ⬅️
-        </NavLink>
-        <h3>Couldn't load tab</h3>
-      </div>
-    );
+    return <h3>Couldn't load tab</h3>;
   }
 
   const addSection = () => {
@@ -64,11 +50,11 @@ export const TabView: React.FC<TabProps> = (props) => {
     setTab(tabOperations.addStrummingPattern(tab));
   };
 
-  const toggleEditMode = () => {
+  const toggleEditMode = async () => {
     const nextSearchParams = new URLSearchParams(searchParams);
 
     if (isEditMode) {
-      props.updateTab(tab);
+      await props.updateTab(tab);
       nextSearchParams.delete(queryParameters.editMode);
     } else {
       nextSearchParams.set(queryParameters.editMode, 'true');
@@ -80,9 +66,6 @@ export const TabView: React.FC<TabProps> = (props) => {
 
   return (
     <div className="tab">
-      <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
-        ⬅️ Home page
-      </NavLink>
       <div style={{ alignItems: 'center', display: 'flex' }}>
         <h3>
           {isEditMode ? (
@@ -103,8 +86,8 @@ export const TabView: React.FC<TabProps> = (props) => {
         </div>
         <div style={{ marginLeft: 8 }}>
           <button
-            onClick={() => {
-              props.removeTab(tab.id);
+            onClick={async () => {
+              await props.removeTab(tab.id);
               navigate(RouteNames.home);
             }}
             type="button"

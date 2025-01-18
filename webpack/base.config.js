@@ -28,8 +28,7 @@ module.exports = {
     ],
   },
   output: {
-    path: resolve(__dirname, '..', 'docs'),
-    publicPath: '/tabarist/',
+    path: resolve(__dirname, '..', 'dist'),
   },
   plugins: [
     new MiniCssExtractPlugin(),

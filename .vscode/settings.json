@@ -8,5 +8,6 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.unstable": {
     "organizeImportsIgnoreCase": true
-  }
+  },
+  "cSpell.words": ["Firestore"]
 }

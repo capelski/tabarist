@@ -4,11 +4,7 @@ const firebaseConfig = require('../firebase-config.json');
 const baseConfig = require('./base.config');
 
 module.exports = merge(baseConfig, {
-  mode: 'development',
-  devServer: {
-    historyApiFallback: true,
-    open: true,
-  },
+  mode: 'production',
   plugins: [
     new webpack.DefinePlugin({
       WEBPACK_USE_FIREBASE: true,
