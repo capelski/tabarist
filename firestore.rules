@@ -1,0 +1,14 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	// Allow only authenticated content owners access
+    match /tabs/{userId}/{documents=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId
+    }
+    // Reject the rest of documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
