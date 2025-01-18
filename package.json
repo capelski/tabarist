@@ -8,6 +8,7 @@
   "scripts": {
     "build:firebase": "rm -rf dist && webpack --config webpack/firebase.config.js",
     "build:github": "rm -rf docs && webpack --config webpack/github.config.js",
+    "deploy:firebase": "firebase deploy",
     "dev": "webpack serve --config webpack/development.config.js",
     "test": "cucumber-js --require-module ts-node/register --require 'source/**/*.cucumber.ts' source/**/*.feature"
   },
