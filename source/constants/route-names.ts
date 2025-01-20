@@ -1,5 +1,6 @@
 export enum RouteNames {
   home = '/',
+  myTabs = '/my-tabs',
   tabDetails = '/tab/:tabId',
 }
 

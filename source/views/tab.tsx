@@ -9,16 +9,16 @@ import {
   RouteNames,
   saveSymbol,
 } from '../constants';
+import { User } from '../firebase';
 import { sPatternOperations, tabOperations } from '../operations';
+import { tabRepository } from '../repositories';
 import { Tab } from '../types';
 
-export type TabProps = {
-  getTabById: (tabId: string) => Tab | undefined;
-  removeTab: (tabId: string) => Promise<void>;
-  updateTab: (updatedTab: Tab) => Promise<Tab>;
+export type TabViewProps = {
+  user: User | null;
 };
 
-export const TabView: React.FC<TabProps> = (props) => {
+export const TabView: React.FC<TabViewProps> = (props) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [tab, setTab] = useState<Tab>();
 
@@ -27,7 +27,9 @@ export const TabView: React.FC<TabProps> = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTab(props.getTabById(tabId!));
+    if (tabId) {
+      tabRepository.getById(tabId).then(setTab);
+    }
   }, [tabId]);
 
   useEffect(() => {
@@ -42,6 +44,8 @@ export const TabView: React.FC<TabProps> = (props) => {
     return <h3>Couldn't load tab</h3>;
   }
 
+  const isTabOwner = props.user && props.user.uid === tab.ownerId;
+
   const addSection = () => {
     setTab(tabOperations.addSection(tab));
   };
@@ -50,11 +54,25 @@ export const TabView: React.FC<TabProps> = (props) => {
     setTab(tabOperations.addStrummingPattern(tab));
   };
 
+  const removeTab = async () => {
+    if (!isTabOwner) {
+      return;
+    }
+
+    await tabRepository.remove(tab.id);
+    navigate(RouteNames.myTabs);
+  };
+
   const toggleEditMode = async () => {
+    if (!isTabOwner) {
+      return;
+    }
+
     const nextSearchParams = new URLSearchParams(searchParams);
 
     if (isEditMode) {
-      await props.updateTab(tab);
+      await tabRepository.set(tab, props.user!.uid);
+
       nextSearchParams.delete(queryParameters.editMode);
     } else {
       nextSearchParams.set(queryParameters.editMode, 'true');
@@ -79,22 +97,16 @@ export const TabView: React.FC<TabProps> = (props) => {
             tab.title
           )}
         </h3>
-        <div style={{ marginLeft: 8 }}>
-          <button onClick={toggleEditMode} type="button">
-            {isEditMode ? saveSymbol : editSymbol}
-          </button>
-        </div>
-        <div style={{ marginLeft: 8 }}>
-          <button
-            onClick={async () => {
-              await props.removeTab(tab.id);
-              navigate(RouteNames.home);
-            }}
-            type="button"
-          >
-            {removeSymbol}
-          </button>
-        </div>
+        {isTabOwner && (
+          <React.Fragment>
+            <button onClick={toggleEditMode} style={{ marginLeft: 8 }} type="button">
+              {isEditMode ? saveSymbol : editSymbol}
+            </button>
+            <button onClick={removeTab} style={{ marginLeft: 8 }} type="button">
+              {removeSymbol}
+            </button>
+          </React.Fragment>
+        )}
       </div>
 
       <BarGroup bars={tab.bars} isEditMode={isEditMode} tab={tab} updateTab={setTab} />

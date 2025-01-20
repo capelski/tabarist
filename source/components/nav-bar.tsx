@@ -17,7 +17,10 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   return (
     <div>
       <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
-        Home page
+        Home
+      </NavLink>
+      <NavLink style={{ marginRight: 8 }} to={RouteNames.myTabs}>
+        My tabs
       </NavLink>
       {WEBPACK_USE_FIREBASE &&
         (props.user ? (

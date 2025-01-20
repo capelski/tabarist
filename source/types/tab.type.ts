@@ -8,6 +8,7 @@ export type Tab = {
   copying: PositionOperation | undefined;
   id: string;
   moving: PositionOperation | undefined;
+  ownerId: string;
   sections: Section[];
   strummingPatterns: StrummingPattern[];
   title: string;

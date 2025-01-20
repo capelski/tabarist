@@ -5,7 +5,7 @@ import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
 Given(/^a tab "(.*)"/, function (tabName: string) {
-  globals.tabs[tabName] = tabOperations.create();
+  globals.tabs[tabName] = tabOperations.create('owner');
 });
 
 Given(/^a section "(.*)" in tab "(.*)"/, function (sectionName: string, tabName: string) {

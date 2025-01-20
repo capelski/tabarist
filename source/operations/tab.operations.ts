@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 import { BarType, NonRefefenceBarType } from '../constants';
+import { User } from '../firebase';
 import { Bar, BarBase, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
 import {
   barOperations,
@@ -138,11 +139,12 @@ export const tabOperations = {
     };
   },
 
-  create: (): Tab => ({
+  create: (ownerId: User['uid']): Tab => ({
     bars: [],
     copying: undefined,
     id: nanoid(),
     moving: undefined,
+    ownerId,
     sections: [],
     strummingPatterns: [],
     title: 'Unnamed tab',
