@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { TextFilter } from '../components';
+import { Modal } from '../components/modal';
 import { addSymbol, removeSymbol } from '../constants';
 import { User } from '../firebase';
 import { getTabRelativeUrl, tabOperations } from '../operations';
@@ -12,6 +13,7 @@ export type MyTabsViewProps = {
 };
 
 export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
+  const [deletingTab, setDeletingTab] = useState('');
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [titleFilter, setTitleFilter] = useState('');
 
@@ -22,6 +24,21 @@ export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
       tabRepository.getUserTabs(props.user.uid, titleFilter).then(setTabs);
     }
   }, [props.user, titleFilter]);
+
+  const cancelDelete = () => {
+    setDeletingTab('');
+  };
+
+  const confirmDelete = async () => {
+    if (!props.user) {
+      return;
+    }
+
+    await tabRepository.remove(deletingTab);
+    const nextTabs = await tabRepository.getUserTabs(props.user.uid, titleFilter);
+    setTabs(nextTabs);
+    cancelDelete();
+  };
 
   const createTab = async () => {
     if (!props.user) {
@@ -34,18 +51,26 @@ export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
     navigate(getTabRelativeUrl(tab.id, true));
   };
 
-  const removeTab = async (tabId: string) => {
-    if (!props.user) {
-      return;
-    }
-
-    await tabRepository.remove(tabId);
-    const nextTabs = await tabRepository.getUserTabs(props.user.uid, titleFilter);
-    setTabs(nextTabs);
+  const removeTab = (tabId: string) => {
+    setDeletingTab(tabId);
   };
 
   return (
     <div className="tab-registry">
+      {deletingTab && (
+        <Modal closeHandler={cancelDelete}>
+          <p>Are you sure you want to delete this tab?</p>
+          <div>
+            <button onClick={confirmDelete} style={{ marginRight: 8 }} type="button">
+              Delete
+            </button>
+            <button onClick={cancelDelete} type="button">
+              Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
+
       <p>
         <TextFilter text={titleFilter} textSetter={setTitleFilter} />
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { BarGroup, SectionComponent, StrummingPatternComponent } from '../components';
+import { Modal } from '../components/modal';
 import {
   addSymbol,
   editSymbol,
@@ -19,6 +20,7 @@ export type TabViewProps = {
 };
 
 export const TabView: React.FC<TabViewProps> = (props) => {
+  const [deletingTab, setDeletingTab] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [tab, setTab] = useState<Tab>();
 
@@ -54,13 +56,22 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     setTab(tabOperations.addStrummingPattern(tab));
   };
 
-  const removeTab = async () => {
+  const cancelDelete = () => {
+    setDeletingTab('');
+  };
+
+  const confirmDelete = async () => {
     if (!isTabOwner) {
       return;
     }
 
-    await tabRepository.remove(tab.id);
+    await tabRepository.remove(deletingTab);
+    cancelDelete();
     navigate(RouteNames.myTabs);
+  };
+
+  const removeTab = () => {
+    setDeletingTab(tab.id);
   };
 
   const toggleEditMode = async () => {
@@ -84,6 +95,20 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   return (
     <div className="tab">
+      {deletingTab && (
+        <Modal closeHandler={cancelDelete}>
+          <p>Are you sure you want to delete this tab?</p>
+          <div>
+            <button onClick={confirmDelete} style={{ marginRight: 8 }} type="button">
+              Delete
+            </button>
+            <button onClick={cancelDelete} type="button">
+              Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
+
       <div style={{ alignItems: 'center', display: 'flex' }}>
         <h3>
           {isEditMode ? (
