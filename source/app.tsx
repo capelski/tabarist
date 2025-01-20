@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
+import { toast, ToastContainer } from 'react-toastify';
 import { NavBar } from './components';
 import { RouteNames } from './constants';
 import { getFirebaseAuth, User } from './firebase';
@@ -12,6 +13,7 @@ export const App: React.FC = () => {
     if (WEBPACK_USE_FIREBASE) {
       getFirebaseAuth().onAuthStateChanged(setUser, (error) => {
         console.log(error);
+        toast(error.message, { type: 'error' });
       });
     } else {
       // For demonstration purposes, pretend there's a signed in user when not using Firebase
@@ -21,6 +23,7 @@ export const App: React.FC = () => {
 
   return (
     <HashRouter>
+      <ToastContainer position="bottom-center" />
       <NavBar user={user} />
       <Routes>
         <Route path={RouteNames.home} element={<HomeView />} />

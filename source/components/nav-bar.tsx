@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router';
+import { toast } from 'react-toastify';
 import { RouteNames } from '../constants';
 import { signInWithGoogle, signOut, User } from '../firebase';
 
@@ -11,6 +12,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   const signIn = () => {
     return signInWithGoogle().catch((error) => {
       console.log(error);
+      toast(error.message, { type: 'error', autoClose: 5000 });
     });
   };
 
