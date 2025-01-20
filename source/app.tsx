@@ -13,7 +13,7 @@ export const App: React.FC = () => {
     if (WEBPACK_USE_FIREBASE) {
       getFirebaseAuth().onAuthStateChanged(setUser, (error) => {
         console.log(error);
-        toast(error.message, { type: 'error' });
+        toast('Could not reach the user account', { type: 'error' });
       });
     } else {
       // For demonstration purposes, pretend there's a signed in user when not using Firebase

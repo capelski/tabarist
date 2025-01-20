@@ -12,7 +12,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   const signIn = () => {
     return signInWithGoogle().catch((error) => {
       console.log(error);
-      toast(error.message, { type: 'error', autoClose: 5000 });
+      toast('The sign in was not completed', { type: 'error', autoClose: 5000 });
     });
   };
 
