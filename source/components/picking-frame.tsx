@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
-import { stringHeight } from '../constants';
 import { PickingFrame } from '../types';
+import { FrameValue } from './frame-input';
 
 export interface PickingFrameProps {
   backgroundColor: string;
@@ -13,7 +13,7 @@ export interface PickingFrameProps {
 
 export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
   return (
-    <div className="frame" style={props.style}>
+    <div className="frame" style={{ flexGrow: 1, ...props.style }}>
       {props.frame.strings.map((string) => {
         return (
           <div
@@ -22,36 +22,20 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
             style={{
               background:
                 'linear-gradient(180deg, transparent calc(50% - 1px), black calc(50%), transparent calc(50% + 1px)',
-              textAlign: 'center',
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
             }}
           >
-            {props.isEditMode ? (
-              <input
-                disabled={props.disabled}
-                maxLength={3}
-                onChange={(event) => {
-                  props.update(string.index, event.target.value);
-                }}
-                style={{
-                  boxSizing: 'border-box',
-                  maxHeight: stringHeight,
-                  maxWidth: 30,
-                  padding: 0,
-                  textAlign: 'center',
-                  width: '100%',
-                }}
-                value={string.value || ''}
-              />
-            ) : (
-              <div
-                style={{
-                  height: stringHeight,
-                  padding: '0 4px',
-                }}
-              >
-                <span style={{ backgroundColor: props.backgroundColor }}>{string.value}</span>
-              </div>
-            )}
+            <FrameValue
+              backgroundColor={props.backgroundColor}
+              disabled={props.disabled}
+              isEditMode={props.isEditMode}
+              update={(value) => {
+                props.update(string.index, value);
+              }}
+              value={string.value}
+            />
           </div>
         );
       })}

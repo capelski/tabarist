@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import { stringHeight } from '../constants';
+import { FrameValue } from './frame-input';
 
 export interface ChordFrameProps {
   disabled?: boolean;
@@ -18,38 +18,12 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
         alignItems: 'center',
         display: 'flex',
         flexDirection: 'column',
+        flexGrow: 1,
         ...props.style,
       }}
     >
-      <div className="chord">
-        {props.isEditMode ? (
-          <input
-            disabled={props.disabled}
-            maxLength={3}
-            onChange={(event) => {
-              props.update(event.target.value);
-            }}
-            style={{
-              boxSizing: 'border-box',
-              height: stringHeight,
-              maxWidth: 30,
-              padding: 0,
-              textAlign: 'center',
-              width: '100%',
-            }}
-            value={props.value || ''}
-          />
-        ) : (
-          <div
-            style={{
-              height: stringHeight,
-              minWidth: 25,
-              textAlign: 'center',
-            }}
-          >
-            <span>{props.value}</span>
-          </div>
-        )}
+      <div className="chord" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+        <FrameValue {...props} />
       </div>
 
       <div className="strumming">{props.strumming}</div>

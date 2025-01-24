@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { BarGroup, SectionComponent, StrummingPatternComponent } from '../components';
 import { Modal } from '../components/modal';
@@ -9,6 +9,7 @@ import {
   removeSymbol,
   RouteNames,
   saveSymbol,
+  ViewMode,
 } from '../constants';
 import { User } from '../firebase';
 import { sPatternOperations, tabOperations } from '../operations';
@@ -23,6 +24,16 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const [deletingTab, setDeletingTab] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
   const [tab, setTab] = useState<Tab>();
+  const [viewMode, setViewMode] = useState(ViewMode.adaptive);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useLayoutEffect(() => {
+    function updateSize() {
+      setWindowWidth(window.innerWidth);
+    }
+    window.addEventListener('resize', updateSize);
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { tabId } = useParams();
@@ -46,6 +57,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     return <h3>Couldn't load tab</h3>;
   }
 
+  const barWidth = `${tabOperations.getLongestBarWidth(tab, windowWidth, viewMode)}px`;
   const isTabOwner = props.user && props.user.uid === tab.ownerId;
 
   const addSection = () => {
@@ -132,9 +144,33 @@ export const TabView: React.FC<TabViewProps> = (props) => {
             </button>
           </React.Fragment>
         )}
+        {
+          <select
+            onChange={(event) => {
+              const nextViewMode = event.target.value as ViewMode;
+              setViewMode(nextViewMode);
+            }}
+            style={{ marginLeft: 8 }}
+            value={viewMode}
+          >
+            {Object.values(ViewMode).map((viewMode) => {
+              return (
+                <option key={viewMode} value={viewMode}>
+                  {viewMode}
+                </option>
+              );
+            })}
+          </select>
+        }
       </div>
 
-      <BarGroup bars={tab.bars} isEditMode={isEditMode} tab={tab} updateTab={setTab} />
+      <BarGroup
+        bars={tab.bars}
+        barWidth={barWidth}
+        isEditMode={isEditMode}
+        tab={tab}
+        updateTab={setTab}
+      />
 
       {isEditMode && (
         <React.Fragment>
@@ -172,6 +208,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
           {tab.sections.map((section) => {
             return (
               <SectionComponent
+                barWidth={barWidth}
                 isEditMode={isEditMode}
                 key={section.index}
                 section={section}

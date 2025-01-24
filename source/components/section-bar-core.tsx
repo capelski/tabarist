@@ -72,7 +72,7 @@ export const getSectionBarCore = (props: SectionBarCoreProps): CoreComponent[] =
               style={{
                 alignItems: 'center',
                 display: 'flex',
-                flexGrow: 1,
+                width: '100%',
                 justifyContent: 'center',
               }}
             >

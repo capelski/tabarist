@@ -23,7 +23,7 @@ export const getChordBarCore = (props: ChordBarCoreProps): CoreComponent => {
 
   return {
     additionalControls: props.displayStrummingPatternPicker && props.rebase && (
-      <div style={{ marginRight: 8 }}>
+      <div style={{ marginRight: 8, textAlign: 'center' }}>
         <PatternPicker
           rebase={props.rebase}
           sPatternIndex={props.bar.sPatternIndex}
@@ -36,7 +36,7 @@ export const getChordBarCore = (props: ChordBarCoreProps): CoreComponent => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          flexGrow: 1,
+          width: '100%',
         }}
       >
         {!props.inSection && (
@@ -83,7 +83,7 @@ export const getChordBarCore = (props: ChordBarCoreProps): CoreComponent => {
                   style={{
                     borderLeft: frame.index > 0 ? '1px solid #ccc' : undefined,
                     boxSizing: 'border-box',
-                    width: `${framesWidth}%`,
+                    flexBasis: `${framesWidth}%`,
                   }}
                   update={(value) => {
                     props.updateFrame?.(frame.index, value);

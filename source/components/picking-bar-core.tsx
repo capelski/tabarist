@@ -28,7 +28,7 @@ export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => 
         style={{
           display: 'flex',
           flexDirection: 'column',
-          flexGrow: 1,
+          width: '100%',
         }}
       >
         {!props.inSection && (
@@ -67,7 +67,7 @@ export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => 
                 style={{
                   borderLeft: frame.index > 0 ? '1px solid #ccc' : undefined,
                   boxSizing: 'border-box',
-                  width: `${framesWidth}%`,
+                  flexBasis: `${framesWidth}%`,
                 }}
                 update={(stringIndex, value) => {
                   props.updateFrame?.(frame.index, stringIndex, value);

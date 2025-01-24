@@ -17,7 +17,7 @@ export type CommonBarProps<TBar extends Bar> = {
   isEditMode: boolean;
   tab: Tab;
   updateTab: (tab: Tab) => void;
-  width: number;
+  width: string;
 };
 
 export type CommonNonSectionBarProps<TBar extends Bar> = CommonBarProps<TBar> & {

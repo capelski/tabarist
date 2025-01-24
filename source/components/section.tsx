@@ -5,6 +5,7 @@ import { getIndexDisplayValue, sectionOperations, tabOperations } from '../opera
 import { Section, Tab } from '../types';
 
 export type SectionProps = {
+  barWidth: string;
   isEditMode: boolean;
   section: Section;
   tab: Tab;

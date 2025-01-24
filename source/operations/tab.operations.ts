@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { BarType, NonRefefenceBarType } from '../constants';
+import { BarType, bodyMargin, characterWidth, NonRefefenceBarType, ViewMode } from '../constants';
 import { User } from '../firebase';
 import { Bar, BarBase, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
 import {
@@ -12,6 +12,15 @@ import {
 import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
 import { sPatternOperations } from './strumming-pattern.operations';
+
+type FrameAggregation = {
+  longestFrame: number;
+  totalLength: number;
+};
+
+const getValueLength = (value: string) => {
+  return value.length || 1;
+};
 
 const applyBarsOperation = (
   tab: Tab,
@@ -149,6 +158,57 @@ export const tabOperations = {
     strummingPatterns: [],
     title: 'Unnamed tab',
   }),
+
+  getLongestBarWidth: (tab: Tab, windowWidth: number, viewMode: ViewMode) => {
+    const bars = [
+      ...tab.bars,
+      ...tab.sections.map((s) => s.bars).reduce((reduced, bars) => [...reduced, ...bars], []),
+    ].filter((b) => b.type === BarType.chord || b.type === BarType.picking);
+
+    const minimumWidth = 140; // Used on empty bars and tabs with no bars
+
+    const longestBarWidth = bars.reduce((maxLength, bar) => {
+      const { longestFrame, totalLength } = (
+        bar.type === BarType.chord
+          ? bar.frames.map((frame) => {
+              const strummingPattern = tab.strummingPatterns.find(
+                (sp) => sp.index === bar.sPatternIndex,
+              );
+              const strummingFrame = strummingPattern?.frames[frame.index].value ?? '';
+              const effectiveValue =
+                strummingFrame.length > frame.value.length ? strummingFrame : frame.value;
+              return getValueLength(effectiveValue);
+            })
+          : bar.frames.map((frame) => {
+              return frame.strings.reduce((stringLength, string) => {
+                return Math.max(stringLength, getValueLength(string.value));
+              }, 0);
+            })
+      ).reduce<FrameAggregation>(
+        (reduced, currentLength) => {
+          return {
+            longestFrame: Math.max(reduced.longestFrame, currentLength),
+            totalLength: reduced.totalLength + currentLength,
+          };
+        },
+        { longestFrame: 0, totalLength: 0 },
+      );
+
+      const barLength =
+        characterWidth *
+        (viewMode === ViewMode.adaptive ? totalLength : longestFrame * bar.frames.length);
+
+      return Math.max(maxLength, barLength);
+    }, minimumWidth);
+
+    const effectiveWindowWidth = windowWidth - bodyMargin * 2;
+    const maxBars = Math.max(1, Math.floor(effectiveWindowWidth / longestBarWidth));
+    const barsPerLine =
+      maxBars >= 16 ? 16 : maxBars >= 8 ? 8 : maxBars >= 4 ? 4 : maxBars >= 2 ? 2 : 1;
+
+    const barWidth = Math.floor((effectiveWindowWidth * 100) / barsPerLine) / 100;
+    return barWidth;
+  },
 
   moveBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {
     if (!tab.moving || !sectionOperations.isOperationInSection(tab.moving, inSection)) {

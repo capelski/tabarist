@@ -43,11 +43,8 @@ export const BaseBarComponent: React.FC<BaseBarProps> = (props) => {
   };
 
   return (
-    <div
-      className="bar"
-      style={{ display: 'flex', flexDirection: 'column', width: `${props.width}%` }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'row', flexGrow: 1, marginBottom: 8 }}>
+    <div className="bar" style={{ display: 'flex', flexDirection: 'column', width: props.width }}>
+      <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
         {props.isEditMode && props.canAddBar && (
           <AddBar
             addBar={(type) => {

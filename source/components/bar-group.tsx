@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMediaQuery } from 'react-responsive';
 import { BarType, repeatsHeight } from '../constants';
 import { Bar, ChordBar, PickingBar, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
@@ -11,6 +10,7 @@ import { SectionBarComponent } from './section-bar';
 
 export type BarGroupProps = {
   bars: Bar[];
+  barWidth: string;
   isEditMode: boolean;
   inSection?: Section;
   tab: Tab;
@@ -18,10 +18,6 @@ export type BarGroupProps = {
 };
 
 export const BarGroup: React.FC<BarGroupProps> = (props) => {
-  const isBigScreen = useMediaQuery({ minWidth: 1000 });
-  const isMediumScreen = useMediaQuery({ minWidth: 600 });
-  const barWidth = isBigScreen ? 25 : isMediumScreen ? 50 : 100;
-
   return (
     <div
       className="bars"
@@ -41,7 +37,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 inSection={props.inSection}
                 tab={props.tab}
                 updateTab={props.updateTab}
-                width={barWidth}
+                width={props.barWidth}
               />
             ) : bar.type === BarType.picking ? (
               <PickingBarComponent
@@ -50,7 +46,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 inSection={props.inSection}
                 tab={props.tab}
                 updateTab={props.updateTab}
-                width={barWidth}
+                width={props.barWidth}
               />
             ) : bar.type === BarType.reference ? (
               <ReferenceBarComponent
@@ -62,7 +58,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 }
                 tab={props.tab}
                 updateTab={props.updateTab}
-                width={barWidth}
+                width={props.barWidth}
               />
             ) : bar.type === BarType.section && section ? (
               <SectionBarComponent
@@ -71,7 +67,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 section={section}
                 tab={props.tab}
                 updateTab={props.updateTab}
-                width={barWidth}
+                width={props.barWidth}
               />
             ) : undefined}
           </React.Fragment>
@@ -96,9 +92,9 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           moving={props.tab.moving}
           style={{
             boxSizing: 'border-box',
-            flexBasis: `${barWidth}%`,
             marginTop: props.inSection ? undefined : repeatsHeight,
             padding: '0 8px',
+            width: props.barWidth,
           }}
         />
       )}

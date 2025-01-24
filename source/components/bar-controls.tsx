@@ -20,21 +20,36 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       className="bar-controls"
       style={{
         display: 'flex',
-        justifyContent: 'end',
-        marginBottom: 24,
+        flexWrap: 'wrap',
+        justifyContent: 'center',
         width: '100%',
       }}
     >
-      {props.children}
+      <span style={{ marginBottom: 16, marginRight: 8 }}>
+        {getIndexDisplayValue(props.bar.index)}
+        {props.bar.type === BarType.reference && (
+          <span style={{ marginLeft: 8 }}>
+            ={'>'} {getIndexDisplayValue(props.bar.barIndex)}
+          </span>
+        )}
+      </span>
 
       {props.moving &&
       sectionOperations.isOperationInSection(props.moving, props.inSection) &&
       props.moving.startIndex === props.bar.index ? (
-        <button onClick={props.cancelPositionOperation} style={{ marginRight: 8 }} type="button">
+        <button
+          onClick={props.cancelPositionOperation}
+          style={{ marginBottom: 16, marginRight: 8 }}
+          type="button"
+        >
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={props.moveBarStart} style={{ marginRight: 8 }} type="button">
+        <button
+          onClick={props.moveBarStart}
+          style={{ marginBottom: 16, marginRight: 8 }}
+          type="button"
+        >
           {moveStartSymbol}
         </button>
       )}
@@ -42,25 +57,30 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       {props.copying &&
       sectionOperations.isOperationInSection(props.copying, props.inSection) &&
       props.copying.startIndex === props.bar.index ? (
-        <button onClick={props.cancelPositionOperation} style={{ marginRight: 8 }} type="button">
+        <button
+          onClick={props.cancelPositionOperation}
+          style={{ marginBottom: 16, marginRight: 8 }}
+          type="button"
+        >
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={props.copyBarStart} style={{ marginRight: 8 }} type="button">
+        <button
+          onClick={props.copyBarStart}
+          style={{ marginBottom: 16, marginRight: 8 }}
+          type="button"
+        >
           =
         </button>
       )}
 
-      <button onClick={props.removeBar} type="button">
+      <button onClick={props.removeBar} style={{ marginBottom: 16 }} type="button">
         {removeSymbol}
       </button>
 
-      <span style={{ marginLeft: 8 }}>{getIndexDisplayValue(props.bar.index)}</span>
-      {props.bar.type === BarType.reference && (
-        <span style={{ marginLeft: 8 }}>
-          ={'>'} {getIndexDisplayValue(props.bar.barIndex)}
-        </span>
-      )}
+      <div style={{ display: 'inline-block', marginBottom: 16, marginLeft: 8 }}>
+        {props.children}
+      </div>
     </div>
   );
 };
