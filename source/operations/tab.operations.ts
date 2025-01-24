@@ -13,6 +13,11 @@ import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
 import { sPatternOperations } from './strumming-pattern.operations';
 
+type BarAggregation = {
+  longestBarAdaptive: number;
+  longestBarUniform: number;
+};
+
 type FrameAggregation = {
   longestFrame: number;
   totalLength: number;
@@ -167,47 +172,77 @@ export const tabOperations = {
 
     const minimumWidth = 140; // Used on empty bars and tabs with no bars
 
-    const longestBarWidth = bars.reduce((maxLength, bar) => {
-      const { longestFrame, totalLength } = (
-        bar.type === BarType.chord
-          ? bar.frames.map((frame) => {
-              const strummingPattern = tab.strummingPatterns.find(
-                (sp) => sp.index === bar.sPatternIndex,
-              );
-              const strummingFrame = strummingPattern?.frames[frame.index].value ?? '';
-              const effectiveValue =
-                strummingFrame.length > frame.value.length ? strummingFrame : frame.value;
-              return getValueLength(effectiveValue);
-            })
-          : bar.frames.map((frame) => {
-              return frame.strings.reduce((stringLength, string) => {
-                return Math.max(stringLength, getValueLength(string.value));
-              }, 0);
-            })
-      ).reduce<FrameAggregation>(
-        (reduced, currentLength) => {
-          return {
-            longestFrame: Math.max(reduced.longestFrame, currentLength),
-            totalLength: reduced.totalLength + currentLength,
-          };
-        },
-        { longestFrame: 0, totalLength: 0 },
-      );
+    const { longestBarAdaptive, longestBarUniform } = bars.reduce<BarAggregation>(
+      (barsReduced, bar) => {
+        const { longestFrame, totalLength } = (
+          bar.type === BarType.chord
+            ? bar.frames.map((frame) => {
+                const strummingPattern = tab.strummingPatterns.find(
+                  (sp) => sp.index === bar.sPatternIndex,
+                );
+                const strummingFrame = strummingPattern?.frames[frame.index].value ?? '';
+                const effectiveValue =
+                  strummingFrame.length > frame.value.length ? strummingFrame : frame.value;
+                return getValueLength(effectiveValue);
+              })
+            : bar.frames.map((frame) => {
+                return frame.strings.reduce((stringLength, string) => {
+                  return Math.max(stringLength, getValueLength(string.value));
+                }, 0);
+              })
+        ).reduce<FrameAggregation>(
+          (lengthsReduced, currentLength) => {
+            return {
+              longestFrame: Math.max(lengthsReduced.longestFrame, currentLength),
+              totalLength: lengthsReduced.totalLength + currentLength,
+            };
+          },
+          { longestFrame: 0, totalLength: 0 },
+        );
 
-      const barLength =
-        characterWidth *
-        (viewMode === ViewMode.adaptive ? totalLength : longestFrame * bar.frames.length);
+        const barLengthAdaptive = characterWidth * totalLength;
+        const barLengthUniform = characterWidth * longestFrame * bar.frames.length;
 
-      return Math.max(maxLength, barLength);
-    }, minimumWidth);
+        return {
+          longestBarAdaptive: Math.max(barsReduced.longestBarAdaptive, barLengthAdaptive),
+          longestBarUniform: Math.max(barsReduced.longestBarUniform, barLengthUniform),
+        };
+      },
+      { longestBarAdaptive: minimumWidth, longestBarUniform: minimumWidth },
+    );
 
     const effectiveWindowWidth = windowWidth - bodyMargin * 2;
-    const maxBars = Math.max(1, Math.floor(effectiveWindowWidth / longestBarWidth));
-    const barsPerLine =
-      maxBars >= 16 ? 16 : maxBars >= 8 ? 8 : maxBars >= 4 ? 4 : maxBars >= 2 ? 2 : 1;
 
-    const barWidth = Math.floor((effectiveWindowWidth * 100) / barsPerLine) / 100;
-    return barWidth;
+    const maxBarsAdaptive = Math.max(1, Math.floor(effectiveWindowWidth / longestBarAdaptive));
+    const barsPerLineAdaptive =
+      maxBarsAdaptive >= 16
+        ? 16
+        : maxBarsAdaptive >= 8
+        ? 8
+        : maxBarsAdaptive >= 4
+        ? 4
+        : maxBarsAdaptive >= 2
+        ? 2
+        : 1;
+
+    const maxBarsUniform = Math.max(1, Math.floor(effectiveWindowWidth / longestBarUniform));
+    const barsPerLineUniform =
+      maxBarsUniform >= 16
+        ? 16
+        : maxBarsUniform >= 8
+        ? 8
+        : maxBarsUniform >= 4
+        ? 4
+        : maxBarsUniform >= 2
+        ? 2
+        : 1;
+
+    const barWidth =
+      Math.floor(
+        (effectiveWindowWidth * 100) /
+          (viewMode === ViewMode.adaptive ? barsPerLineAdaptive : barsPerLineUniform),
+      ) / 100;
+    return { areModesEquivalent: barsPerLineAdaptive === barsPerLineUniform, barWidth };
   },
 
   moveBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {

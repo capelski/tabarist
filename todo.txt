@@ -1,10 +1,9 @@
-- Firebase. Listen to changes on documents?
-- Add capacitor and build APP bundle
-- Capo property
-- Support chord mentions in picking bars
-- Comments section
 - Different disabled color for reference and sections
-- Modal for deletions
+- Allow copying a tab from another user
+- Capo property
+- Comments section
+- Support chord mentions in picking bars
+- Support lyrics underneath the bars
 - Play in non-edit mode
 - Line breaks
 - Strumming patterns
@@ -12,3 +11,4 @@
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
 - Firebase. Sign in with redirect?
+- Add capacitor and build APP bundle
