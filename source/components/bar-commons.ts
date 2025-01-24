@@ -1,4 +1,4 @@
-import { NonRefefenceBarType } from '../constants';
+import { NonReferenceBarType } from '../constants';
 import { tabOperations } from '../operations';
 import { Bar, BarBase, Section, Tab } from '../types';
 import { RepeatsProps } from './repeats';
@@ -28,7 +28,7 @@ export const addBar = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
   barIndex: number,
-  type: NonRefefenceBarType,
+  type: NonReferenceBarType,
   inSection?: Section,
 ) => {
   const nextTab = tabOperations.addBar(tab, barIndex, type, inSection);

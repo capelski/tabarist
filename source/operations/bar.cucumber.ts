@@ -1,13 +1,13 @@
 import { Given, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BarType, NonRefefenceBarType } from '../constants';
+import { BarType, NonReferenceBarType } from '../constants';
 import { ChordBar, ReferenceBar, SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
 Given(
   /^a (chord|picking|section) bar in (section "(.*)" of )?tab "(.*)"/,
-  function (type: NonRefefenceBarType, sectionName: string, tabName: string) {
+  function (type: NonReferenceBarType, sectionName: string, tabName: string) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
     const bars = section?.bars ?? globals.tabs[tabName].bars;
 

@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { BarType, bodyMargin, characterWidth, NonRefefenceBarType, ViewMode } from '../constants';
+import { BarType, bodyMargin, characterWidth, NonReferenceBarType, ViewMode } from '../constants';
 import { User } from '../firebase';
 import { Bar, BarBase, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
 import {
@@ -50,7 +50,7 @@ const applyBarsOperation = (
 };
 
 export const tabOperations = {
-  addBar: (tab: Tab, index: number, type: NonRefefenceBarType, inSection?: Section): Tab => {
+  addBar: (tab: Tab, index: number, type: NonReferenceBarType, inSection?: Section): Tab => {
     let nextTab = { ...tab };
 
     if (type === BarType.chord && tab.strummingPatterns.length === 0) {

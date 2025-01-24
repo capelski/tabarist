@@ -1,10 +1,10 @@
 import React, { CSSProperties } from 'react';
-import { BarType, moveEndSymbol, NonRefefenceBarType, stringHeight } from '../constants';
+import { BarType, moveEndSymbol, NonReferenceBarType, stringHeight } from '../constants';
 import { barOperations, sectionOperations } from '../operations';
 import { Section, Tab } from '../types';
 
 export type AddBarProps = {
-  addBar: (type: NonRefefenceBarType) => void;
+  addBar: (type: NonReferenceBarType) => void;
   barIndex: number;
   copyBarEnd: () => void;
   copying: Tab['copying'];

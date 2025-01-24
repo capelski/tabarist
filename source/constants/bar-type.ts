@@ -5,4 +5,4 @@ export enum BarType {
   section = 'section',
 }
 
-export type NonRefefenceBarType = BarType.chord | BarType.picking | BarType.section;
+export type NonReferenceBarType = BarType.chord | BarType.picking | BarType.section;

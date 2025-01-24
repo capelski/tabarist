@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { NonRefefenceBarType } from '../constants';
+import { NonReferenceBarType } from '../constants';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
@@ -31,7 +31,7 @@ Given(
 
 When(
   /^adding to (section "(.*)" of )?tab "(.*)" a (chord|picking|section) bar in position (\d+)/,
-  function (sectionName: string, tabName: string, type: NonRefefenceBarType, position: number) {
+  function (sectionName: string, tabName: string, type: NonReferenceBarType, position: number) {
     const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
 
     globals.tabs[tabName] = tabOperations.addBar(
