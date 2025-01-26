@@ -1,4 +1,4 @@
-import { BarType, framesNumberDefault } from '../constants';
+import { BarType, framesNumberDefault, stringsNumber } from '../constants';
 import {
   Bar,
   BarBase,
@@ -28,6 +28,7 @@ export const createChordBar = (index: number, strummingPattern: StrummingPattern
   frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
   index,
   sPatternIndex: strummingPattern.index,
+  repeats: undefined,
   type: BarType.chord,
 });
 
@@ -35,12 +36,14 @@ export const createPickingBar = (index: number): PickingBar => ({
   frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
   framesNumber: framesNumberDefault,
   index,
+  repeats: undefined,
   type: BarType.picking,
 });
 
 export const createPickingFrame = (index: number): PickingFrame => ({
+  chordSupport: undefined,
   index,
-  strings: createIndexedValuesArray(6, ''),
+  strings: createIndexedValuesArray(stringsNumber, ''),
 });
 
 export const createReferenceBar = (targetBar: Bar, index: number): ReferenceBar => {
@@ -56,6 +59,7 @@ export const createReferenceBar = (targetBar: Bar, index: number): ReferenceBar 
   return {
     barIndex,
     index,
+    repeats: undefined,
     type: BarType.reference,
   };
 };
@@ -63,6 +67,7 @@ export const createReferenceBar = (targetBar: Bar, index: number): ReferenceBar 
 export const createSectionBar = (index: number, section: Section): SectionBar => ({
   index,
   sectionIndex: section.index,
+  repeats: undefined,
   type: BarType.section,
 });
 
@@ -86,6 +91,7 @@ export const augmentBar = <TDiminishedBar extends DiminishedBar | DiminishedNonS
       ...diminishedBar,
       frames: diminishedBar.frames.map((frame, frameIndex) => {
         return {
+          ...frame,
           index: frameIndex,
           strings: frame.strings.map((string, stringIndex) => {
             return { index: stringIndex, value: string };
@@ -118,13 +124,15 @@ export const diminishBar = <TBar extends Bar | NonSectionBar>(
   }
 
   if (bar.type === BarType.picking) {
-    const { frames, framesNumber, index, ...rest } = bar as PickingBar;
+    const { frames, framesNumber, index, ...barRest } = bar as PickingBar;
 
     const diminishedPickingBar: DiminishedPickingBar = {
-      ...rest,
+      ...barRest,
       frames: frames.map((frame) => {
+        const { index, strings, ...frameRest } = frame;
         return {
-          strings: frame.strings.map((string) => {
+          ...frameRest,
+          strings: strings.map((string) => {
             return string.value;
           }),
         };
@@ -361,6 +369,7 @@ export const barOperations = {
                 ? frame
                 : {
                     ...frame,
+                    chordSupport: stringIndex === frame.strings.length ? value : frame.chordSupport,
                     strings: frame.strings.map((string) => {
                       return string.index !== stringIndex ? string : { ...string, value };
                     }),

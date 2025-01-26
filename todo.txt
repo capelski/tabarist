@@ -2,7 +2,6 @@
 - Allow copying a tab from another user
 - Capo property
 - Comments section
-- Support chord mentions in picking bars
 - Support lyrics underneath the bars
 - Play in non-edit mode
 - Line breaks

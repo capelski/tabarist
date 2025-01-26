@@ -16,6 +16,7 @@ export type PickingBarCoreProps = CommonCoreProps & {
 export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => {
   const framesWidth = Math.floor(10000 / props.bar.frames.length) / 100;
   const backgroundColor = props.isEditMode && props.disabled ? '#ddd' : 'white';
+  const displayChordSupport = props.bar.frames.some((frame) => frame.chordSupport);
 
   return {
     additionalControls: props.displayPickingRebase && props.rebase && (
@@ -61,6 +62,7 @@ export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => 
               <PickingFrameComponent
                 backgroundColor={backgroundColor}
                 disabled={props.disabled}
+                displayChordSupport={displayChordSupport}
                 frame={frame}
                 isEditMode={props.isEditMode}
                 key={frame.index}

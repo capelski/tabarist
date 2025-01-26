@@ -7,7 +7,7 @@ export type DiminishedNonSectionBar =
 export type DiminishedBar = DiminishedNonSectionBar | DiminishedSectionBar;
 
 export type DiminishedBarBase = {
-  repeats?: number;
+  repeats: number | undefined;
 };
 
 export type DiminishedChordBar = DiminishedBarBase & {
@@ -18,8 +18,13 @@ export type DiminishedChordBar = DiminishedBarBase & {
 };
 
 export type DiminishedPickingBar = DiminishedBarBase & {
-  frames: { strings: string[] }[];
+  frames: DiminishedPickingFrame[];
   type: BarType.picking;
+};
+
+export type DiminishedPickingFrame = {
+  chordSupport: string | undefined;
+  strings: string[];
 };
 
 export type DiminishedReferenceBar = DiminishedBarBase & {

@@ -2,6 +2,7 @@ import {
   DiminishedBarBase,
   DiminishedChordBar,
   DiminishedPickingBar,
+  DiminishedPickingFrame,
   DiminishedReferenceBar,
   DiminishedSectionBar,
 } from './diminished-bar.type';
@@ -25,7 +26,7 @@ export type PickingBar = BarBase &
     frames: PickingFrame[];
   };
 
-export type PickingFrame = {
+export type PickingFrame = Omit<DiminishedPickingFrame, 'strings'> & {
   index: number;
   strings: IndexedValue[];
 };
