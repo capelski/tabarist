@@ -4,6 +4,7 @@ import { Bar, BarBase, Section, Tab } from '../types';
 import { RepeatsProps } from './repeats';
 
 export type CommonCoreProps = RepeatsProps & {
+  backgroundColor?: string;
   inSection: Section | undefined;
 };
 

@@ -1,5 +1,12 @@
 import React, { CSSProperties } from 'react';
-import { BarType, moveEndSymbol, NonReferenceBarType, stringHeight } from '../constants';
+import {
+  addBarColor,
+  BarType,
+  moveEndSymbol,
+  NonReferenceBarType,
+  operationColor,
+  stringHeight,
+} from '../constants';
 import { barOperations, sectionOperations } from '../operations';
 import { Section, Tab } from '../types';
 
@@ -26,12 +33,12 @@ const buttonStyleBase: CSSProperties = {
 
 const addButtonStyle: CSSProperties = {
   ...buttonStyleBase,
-  backgroundColor: '#eee',
+  backgroundColor: addBarColor,
 };
 
-const moveButtonStyle: CSSProperties = {
+const operationButtonStyle: CSSProperties = {
   ...buttonStyleBase,
-  backgroundColor: 'lightblue',
+  backgroundColor: operationColor,
 };
 
 export const AddBar: React.FC<AddBarProps> = (props) => {
@@ -48,12 +55,12 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
       {props.moving &&
       sectionOperations.isOperationInSection(props.moving, props.inSection) &&
       barOperations.canMoveBarToPosition(props.moving.startIndex, props.barIndex) ? (
-        <div onClick={props.moveBarEnd} style={moveButtonStyle}>
+        <div onClick={props.moveBarEnd} style={operationButtonStyle}>
           {moveEndSymbol}
         </div>
       ) : props.copying &&
         sectionOperations.isOperationInSection(props.copying, props.inSection) ? (
-        <div onClick={props.copyBarEnd} style={moveButtonStyle}>
+        <div onClick={props.copyBarEnd} style={operationButtonStyle}>
           {moveEndSymbol}
         </div>
       ) : (

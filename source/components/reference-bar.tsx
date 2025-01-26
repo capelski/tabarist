@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarType } from '../constants';
+import { BarType, referenceColor } from '../constants';
 import { ChordBar, PickingBar, ReferenceBar, SectionBar } from '../types';
 import { CommonNonSectionBarProps } from './bar-commons';
 import { BaseBarComponent } from './base-bar';
@@ -11,6 +11,7 @@ export type ReferenceBarProps = CommonNonSectionBarProps<ReferenceBar> & {
 
 export const ReferenceBarComponent: React.FC<ReferenceBarProps> = (props) => {
   const components = getReferenceBarCore({
+    backgroundColor: referenceColor,
     bar: props.bar,
     inSection: props.inSection,
     inSectionBar: undefined,

@@ -15,7 +15,7 @@ export type PickingBarCoreProps = CommonCoreProps & {
 
 export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => {
   const framesWidth = Math.floor(10000 / props.bar.frames.length) / 100;
-  const backgroundColor = props.isEditMode && props.disabled ? '#ddd' : 'white';
+  const backgroundColor = (props.isEditMode && props.disabled && props.backgroundColor) || 'white';
   const displayChordSupport = props.bar.frames.some((frame) => frame.chordSupport);
 
   return {
@@ -48,10 +48,7 @@ export const getPickingBarCore = (props: PickingBarCoreProps): CoreComponent => 
           className="frames"
           style={{
             backgroundColor,
-            borderLeft:
-              !props.isEditMode || !props.inSectionBar || props.isFirstBarInSectionBar
-                ? '1px solid black'
-                : undefined,
+            borderLeft: '1px solid black',
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'row',

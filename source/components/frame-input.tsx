@@ -10,9 +10,8 @@ export interface FrameInputProps {
 }
 
 export const FrameValue: React.FC<FrameInputProps> = (props) => {
-  return props.isEditMode ? (
+  return props.isEditMode && !props.disabled ? (
     <input
-      disabled={props.disabled}
       maxLength={3}
       onChange={(event) => {
         props.update(event.target.value);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { repeatsHeight } from '../constants';
+import { repeatsHeight, sectionColor } from '../constants';
 import { SectionBar } from '../types';
 
 export type RepeatsProps = {
@@ -19,7 +19,7 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
     <div style={{ height: repeatsHeight }}>
       <div
         style={{
-          backgroundColor: props.inSectionBar ? 'lightgrey' : undefined,
+          backgroundColor: props.inSectionBar ? sectionColor : undefined,
           height: 20,
           marginRight: props.isLastBarInSectionBar ? 8 : undefined,
           paddingLeft: 8,

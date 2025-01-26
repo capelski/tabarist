@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarType } from '../constants';
+import { BarType, sectionColor } from '../constants';
 import {
   ChordBar,
   PickingBar,
@@ -27,6 +27,7 @@ export const getSectionBarCore = (props: SectionBarCoreProps): CoreComponent[] =
     ? props.section.bars
         .map((nonSectionBar) => {
           const baseProps: CommonCoreProps = {
+            backgroundColor: sectionColor,
             inSection: undefined,
             inSectionBar: props.bar,
             isEditMode: props.isEditMode,
@@ -71,6 +72,7 @@ export const getSectionBarCore = (props: SectionBarCoreProps): CoreComponent[] =
             <div
               style={{
                 alignItems: 'center',
+                backgroundColor: sectionColor,
                 display: 'flex',
                 width: '100%',
                 justifyContent: 'center',

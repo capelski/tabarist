@@ -53,11 +53,8 @@ export const getChordBarCore = (props: ChordBarCoreProps): CoreComponent => {
 
         <div
           style={{
-            backgroundColor: props.isEditMode && props.disabled ? '#ddd' : 'white',
-            borderLeft:
-              !props.isEditMode || !props.inSectionBar || props.isFirstBarInSectionBar
-                ? '1px solid black'
-                : undefined,
+            backgroundColor: props.isEditMode && props.disabled ? props.backgroundColor : 'white',
+            borderLeft: '1px solid black',
             boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',

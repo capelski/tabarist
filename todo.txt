@@ -1,4 +1,4 @@
-- Different disabled color for reference and sections
+- Cancel button to discard changes + Modal
 - Allow copying a tab from another user
 - Capo property
 - Comments section
