@@ -1,38 +1,35 @@
-import { BarType } from '../constants';
+import {
+  DiminishedBarBase,
+  DiminishedChordBar,
+  DiminishedPickingBar,
+  DiminishedReferenceBar,
+  DiminishedSectionBar,
+} from './diminished-bar.type';
 import { IndexedValue } from './indexed-value.type';
 
 export type NonSectionBar = ChordBar | PickingBar | ReferenceBar;
 export type Bar = NonSectionBar | SectionBar;
 
-export type BarBase = {
+export type BarBase = DiminishedBarBase & {
   index: number;
-  repeats?: number;
 };
 
-export type ChordBar = BarBase & {
-  frames: IndexedValue[];
-  /** Strumming pattern index */
-  sPatternIndex: number;
-  type: BarType.chord;
-};
+export type ChordBar = BarBase &
+  Omit<DiminishedChordBar, 'frames'> & {
+    frames: IndexedValue[];
+  };
 
-export type PickingBar = BarBase & {
-  frames: PickingFrame[];
-  framesNumber: number;
-  type: BarType.picking;
-};
+export type PickingBar = BarBase &
+  Omit<DiminishedPickingBar, 'frames'> & {
+    framesNumber: number;
+    frames: PickingFrame[];
+  };
 
 export type PickingFrame = {
   index: number;
   strings: IndexedValue[];
 };
 
-export type ReferenceBar = BarBase & {
-  barIndex: number;
-  type: BarType.reference;
-};
+export type ReferenceBar = BarBase & DiminishedReferenceBar;
 
-export type SectionBar = BarBase & {
-  sectionIndex: number;
-  type: BarType.section;
-};
+export type SectionBar = BarBase & DiminishedSectionBar;

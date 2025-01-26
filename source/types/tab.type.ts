@@ -1,15 +1,10 @@
 import { Bar } from './bar.type';
-import { PositionOperation } from './position-operation.type';
+import { DiminishedTab } from './diminished-tab.type';
 import { Section } from './section.type';
 import { StrummingPattern } from './strumming-pattern.type';
 
-export type Tab = {
+export type Tab = Omit<DiminishedTab, 'bars' | 'sections' | 'strummingPatterns'> & {
   bars: Bar[];
-  copying: PositionOperation | undefined;
-  id: string;
-  moving: PositionOperation | undefined;
-  ownerId: string;
   sections: Section[];
   strummingPatterns: StrummingPattern[];
-  title: string;
 };

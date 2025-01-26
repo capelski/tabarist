@@ -2,12 +2,15 @@ import { nanoid } from 'nanoid';
 import { BarType, bodyMargin, characterWidth, NonReferenceBarType, ViewMode } from '../constants';
 import { User } from '../firebase';
 import { Bar, BarBase, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
+import { DiminishedTab } from '../types/diminished-tab.type';
 import {
+  augmentBar,
   barOperations,
   createChordBar,
   createPickingBar,
   createReferenceBar,
   createSectionBar,
+  diminishBar,
 } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
@@ -25,6 +28,55 @@ type FrameAggregation = {
 
 const getValueLength = (value: string) => {
   return value.length || 1;
+};
+
+export const augmentTab = (diminishedTab: DiminishedTab): Tab => {
+  return {
+    ...diminishedTab,
+    bars: diminishedTab.bars.map((bar, index) => augmentBar(bar, index)),
+    sections: diminishedTab.sections.map((section, index) => {
+      return {
+        ...section,
+        bars: section.bars.map((bar, index) => augmentBar(bar, index)),
+        index,
+      };
+    }),
+    strummingPatterns: diminishedTab.strummingPatterns.map((sPattern, index) => {
+      return {
+        ...sPattern,
+        frames: sPattern.frames.map((frame, index) => {
+          return { index, value: frame };
+        }),
+        framesNumber: sPattern.frames.length,
+        index,
+      };
+    }),
+  };
+};
+
+export const diminishTab = (tab: Tab): DiminishedTab => {
+  return {
+    ...tab,
+    bars: tab.bars.map(diminishBar),
+    sections: tab.sections.map((section) => {
+      const { bars, index, ...rest } = section;
+
+      return {
+        ...rest,
+        bars: bars.map(diminishBar),
+      };
+    }),
+    strummingPatterns: tab.strummingPatterns.map((sPattern) => {
+      const { frames, framesNumber, index, ...rest } = sPattern;
+
+      return {
+        ...rest,
+        frames: frames.map((frame) => {
+          return frame.value;
+        }),
+      };
+    }),
+  };
 };
 
 const applyBarsOperation = (
