@@ -10,6 +10,7 @@ export const characterWidth = 12;
 export const repeatsHeight = 24;
 export const stringHeight = 20;
 
+export const activeColor = '#fff2cc';
 export const addBarColor = '#fff8e5';
 export const operationColor = 'lightblue';
 export const referenceColor = '#e4ecfb';

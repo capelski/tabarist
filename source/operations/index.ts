@@ -1,3 +1,4 @@
+export * from './bar-container.operations';
 export * from './bar.operations';
 export * from './indexed-value.operations';
 export * from './routes.operations';

@@ -1,20 +1,82 @@
-import React, { PropsWithChildren } from 'react';
+import React from 'react';
 import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../constants';
-import { getIndexDisplayValue, sectionOperations } from '../operations';
-import { Bar, Section, Tab } from '../types';
+import { getIndexDisplayValue, sectionOperations, tabOperations } from '../operations';
+import { BarContainer, Section, Tab } from '../types';
+import { PatternPicker, PatternPickerProps } from './pattern-picker';
+import { SectionPicker, SectionPickerProps } from './section-picker';
+import { TempoPicker, TempoPickerProps } from './tempo-picker';
 
-export type BarControlsProps = PropsWithChildren<{
-  bar: Bar;
-  cancelPositionOperation: () => void;
-  copyBarStart: () => void;
-  copying: Tab['copying'];
+export type BarControlsProps = {
+  canChangeSection: boolean;
+  canRebase: boolean;
+  container: BarContainer;
   inSection: Section | undefined;
-  moveBarStart: () => void;
-  moving: Tab['moving'];
-  removeBar: () => void;
-}>;
+  tab: Tab;
+  updateTab: (tab: Tab) => void;
+};
 
 export const BarControls: React.FC<BarControlsProps> = (props) => {
+  const cancelPositionOperation = () => {
+    const nextTab = tabOperations.cancelPositionOperation(props.tab);
+    props.updateTab(nextTab);
+  };
+
+  const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
+    const nextTab = tabOperations.changeSection(
+      props.tab,
+      props.container.originalBar.index,
+      sectionIndex,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const copyBarStart = () => {
+    const nextTab = tabOperations.copyBarStart(
+      props.tab,
+      props.container.originalBar.index,
+      props.container.inSection?.index,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const moveBarStart = () => {
+    const nextTab = tabOperations.moveBarStart(
+      props.tab,
+      props.container.originalBar.index,
+      props.container.inSection?.index,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const rebaseChord: PatternPickerProps['rebase'] = (sPatternIndex) => {
+    const nextTab = tabOperations.rebaseChordBar(
+      props.tab,
+      props.container.originalBar.index,
+      sPatternIndex,
+      props.container.inSection,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const rebasePicking: TempoPickerProps['rebase'] = (framesNumber) => {
+    const nextTab = tabOperations.rebasePickingBar(
+      props.tab,
+      props.container.originalBar.index,
+      framesNumber,
+      props.container.inSection,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const removeBar = () => {
+    const nextTab = tabOperations.removeBar(
+      props.tab,
+      props.container.originalBar.index,
+      props.container.inSection,
+    );
+    props.updateTab(nextTab);
+  };
+
   return (
     <div
       className="bar-controls"
@@ -26,60 +88,77 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       }}
     >
       <span style={{ marginBottom: 16, marginRight: 8 }}>
-        {getIndexDisplayValue(props.bar.index)}
-        {props.bar.type === BarType.reference && (
+        {getIndexDisplayValue(props.container.originalBar.index)}
+        {props.container.originalBar.type === BarType.reference && (
           <span style={{ marginLeft: 8 }}>
-            ={'>'} {getIndexDisplayValue(props.bar.barIndex)}
+            ={'>'} {getIndexDisplayValue(props.container.originalBar.barIndex)}
           </span>
         )}
       </span>
 
-      {props.moving &&
-      sectionOperations.isOperationInSection(props.moving, props.inSection) &&
-      props.moving.startIndex === props.bar.index ? (
+      {props.tab.moving &&
+      sectionOperations.isOperationInSection(props.tab.moving, props.inSection) &&
+      props.tab.moving.startIndex === props.container.originalBar.index ? (
         <button
-          onClick={props.cancelPositionOperation}
+          onClick={cancelPositionOperation}
           style={{ marginBottom: 16, marginRight: 8 }}
           type="button"
         >
           {cancelSymbol}
         </button>
       ) : (
-        <button
-          onClick={props.moveBarStart}
-          style={{ marginBottom: 16, marginRight: 8 }}
-          type="button"
-        >
+        <button onClick={moveBarStart} style={{ marginBottom: 16, marginRight: 8 }} type="button">
           {moveStartSymbol}
         </button>
       )}
 
-      {props.copying &&
-      sectionOperations.isOperationInSection(props.copying, props.inSection) &&
-      props.copying.startIndex === props.bar.index ? (
+      {props.tab.copying &&
+      sectionOperations.isOperationInSection(props.tab.copying, props.inSection) &&
+      props.tab.copying.startIndex === props.container.originalBar.index ? (
         <button
-          onClick={props.cancelPositionOperation}
+          onClick={cancelPositionOperation}
           style={{ marginBottom: 16, marginRight: 8 }}
           type="button"
         >
           {cancelSymbol}
         </button>
       ) : (
-        <button
-          onClick={props.copyBarStart}
-          style={{ marginBottom: 16, marginRight: 8 }}
-          type="button"
-        >
+        <button onClick={copyBarStart} style={{ marginBottom: 16, marginRight: 8 }} type="button">
           =
         </button>
       )}
 
-      <button onClick={props.removeBar} style={{ marginBottom: 16 }} type="button">
+      <button onClick={removeBar} style={{ marginBottom: 16 }} type="button">
         {removeSymbol}
       </button>
 
       <div style={{ display: 'inline-block', marginBottom: 16, marginLeft: 8 }}>
-        {props.children}
+        {props.canRebase && (
+          <div style={{ marginRight: 8, textAlign: 'center' }}>
+            {props.container.originalBar.type === BarType.chord && (
+              <PatternPicker
+                rebase={rebaseChord}
+                sPatternIndex={props.container.originalBar.sPatternIndex}
+                strummingPatterns={props.tab.strummingPatterns}
+              />
+            )}
+            {props.container.originalBar.type === BarType.picking && (
+              <TempoPicker
+                framesNumber={props.container.originalBar.framesNumber}
+                rebase={rebasePicking}
+              />
+            )}
+          </div>
+        )}
+        {props.canChangeSection && (
+          <div style={{ marginRight: 8, textAlign: 'center' }}>
+            <SectionPicker
+              changeSection={changeSection}
+              section={props.container.inSectionBar!.referredSection}
+              sections={props.tab.sections}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,7 +1,12 @@
 import React from 'react';
 import { BarGroup } from '.';
 import { removeSymbol } from '../constants';
-import { getIndexDisplayValue, sectionOperations, tabOperations } from '../operations';
+import {
+  barsToBarContainers,
+  getIndexDisplayValue,
+  sectionOperations,
+  tabOperations,
+} from '../operations';
 import { Section, Tab } from '../types';
 
 export type SectionProps = {
@@ -41,7 +46,14 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
         </button>
       </p>
 
-      <BarGroup {...props} bars={props.section.bars} inSection={props.section} />
+      <BarGroup
+        {...props}
+        barContainers={barsToBarContainers(props.tab, props.section.bars, {
+          inSection: props.section,
+        })}
+        barsNumber={props.section.bars.length}
+        inSection={props.section}
+      />
     </React.Fragment>
   );
 };

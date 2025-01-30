@@ -1,15 +1,14 @@
 import React from 'react';
 import { repeatsHeight, sectionColor } from '../constants';
-import { SectionBar } from '../types';
+import { BarContainer } from '../types';
 
 export type RepeatsProps = {
-  inSectionBar: SectionBar | undefined;
+  canRepeat: boolean;
+  inSectionBar: BarContainer['inSectionBar'];
   isEditMode: boolean;
-  isFirstBarInSectionBar: boolean;
   isLastBarInSectionBar: boolean;
   repeats: number | undefined;
-  sectionName: string | undefined;
-  updateRepeats: ((repeats?: number) => void) | undefined;
+  updateRepeats: (repeats?: number) => void;
 };
 
 export const Repeats: React.FC<RepeatsProps> = (props) => {
@@ -25,15 +24,14 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
           paddingLeft: 8,
         }}
       >
-        {(!props.inSectionBar || props.isFirstBarInSectionBar) && (
+        {props.canRepeat && (
           <React.Fragment>
             {props.isEditMode ? (
               <React.Fragment>
                 <input
-                  disabled={!props.updateRepeats}
                   onChange={(event) => {
                     const nextRepeats = parseInt(event.target.value);
-                    props.updateRepeats!(isNaN(nextRepeats) ? undefined : nextRepeats);
+                    props.updateRepeats(isNaN(nextRepeats) ? undefined : nextRepeats);
                   }}
                   style={{ boxSizing: 'border-box', marginRight: 4, maxHeight: 20, maxWidth: 30 }}
                   value={props.repeats ?? ''}
@@ -43,7 +41,7 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
             ) : (
               <span>{hasRepeats && `${props.repeats}x`}</span>
             )}
-            <span style={{ marginLeft: 8 }}>{props.sectionName}</span>
+            <span style={{ marginLeft: 8 }}>{props.inSectionBar?.referredSection.name}</span>
           </React.Fragment>
         )}
       </div>

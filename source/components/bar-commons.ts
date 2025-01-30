@@ -1,28 +1,13 @@
-import { NonReferenceBarType } from '../constants';
+import { activeColor, NonReferenceBarType } from '../constants';
 import { tabOperations } from '../operations';
-import { Bar, BarBase, Section, Tab } from '../types';
-import { RepeatsProps } from './repeats';
+import { Section, Tab } from '../types';
 
-export type CommonCoreProps = RepeatsProps & {
-  backgroundColor?: string;
-  inSection: Section | undefined;
-};
-
-export type CoreComponent = {
-  additionalControls?: React.ReactNode;
-  coreComponent: React.ReactNode;
-};
-
-export type CommonBarProps<TBar extends Bar> = {
-  bar: TBar;
+export type BarComponentBaseProps = {
+  backgroundColor: string;
+  canUpdate: boolean;
   isEditMode: boolean;
   tab: Tab;
   updateTab: (tab: Tab) => void;
-  width: string;
-};
-
-export type CommonNonSectionBarProps<TBar extends Bar> = CommonBarProps<TBar> & {
-  inSection: Section | undefined;
 };
 
 export const addBar = (
@@ -46,6 +31,17 @@ export const copyBarEnd = (
   updateTab(nextTab);
 };
 
+export const getFrameBackgroundColor = (
+  isEditMode: boolean,
+  activeFrame: Tab['activeFrame'],
+  position: number,
+  frameIndex: number,
+) => {
+  return !isEditMode && activeFrame?.position === position && activeFrame?.frameIndex === frameIndex
+    ? activeColor
+    : undefined;
+};
+
 export const moveBarEnd = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
@@ -53,16 +49,5 @@ export const moveBarEnd = (
   inSection?: Section,
 ) => {
   const nextTab = tabOperations.moveBarEnd(tab, destinationIndex, inSection);
-  updateTab(nextTab);
-};
-
-export const updateRepeats = (
-  tab: Tab,
-  updateTab: (tab: Tab) => void,
-  barIndex: number,
-  repeats: BarBase['repeats'],
-  inSection?: Section,
-) => {
-  const nextTab = tabOperations.updateRepeats(tab, barIndex, repeats, inSection);
   updateTab(nextTab);
 };

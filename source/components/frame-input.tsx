@@ -2,15 +2,15 @@ import React from 'react';
 import { characterWidth, stringHeight } from '../constants';
 
 export interface FrameInputProps {
-  backgroundColor?: string;
-  disabled?: boolean;
+  backgroundColor: string;
+  canUpdate: boolean;
   isEditMode: boolean;
   update: (value: string) => void;
   value: string;
 }
 
 export const FrameValue: React.FC<FrameInputProps> = (props) => {
-  return props.isEditMode && !props.disabled ? (
+  return props.isEditMode && props.canUpdate ? (
     <input
       maxLength={3}
       onChange={(event) => {
@@ -32,7 +32,9 @@ export const FrameValue: React.FC<FrameInputProps> = (props) => {
         height: stringHeight,
       }}
     >
-      <span style={{ backgroundColor: props.backgroundColor }}>{props.value}</span>
+      <span style={{ backgroundColor: props.backgroundColor, transition: 'background-color 0.2s' }}>
+        {props.value}
+      </span>
     </div>
   );
 };

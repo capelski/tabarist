@@ -1,15 +1,16 @@
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import { IndexedValue, PickingFrame } from '../types';
 import { FrameValue } from './frame-input';
 
 export interface PickingFrameProps {
   backgroundColor: string;
-  disabled?: boolean;
+  canUpdate: boolean;
   displayChordSupport: boolean;
   frame: PickingFrame;
   isEditMode: boolean;
-  style?: CSSProperties;
+  isFirstFrame: boolean;
   update: (stringIndex: number, value: string) => void;
+  width: string;
 }
 
 export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
@@ -27,7 +28,15 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
   }
 
   return (
-    <div className="frame" style={{ flexGrow: 1, ...props.style }}>
+    <div
+      className="frame"
+      style={{
+        borderLeft: props.isFirstFrame ? undefined : '1px solid #ccc',
+        boxSizing: 'border-box',
+        flexBasis: props.width,
+        flexGrow: 1,
+      }}
+    >
       {parts.map((part) => {
         return (
           <div
@@ -35,17 +44,18 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
             key={part.index}
             style={{
               background: part.isString
-                ? 'linear-gradient(180deg, transparent calc(50% - 1px), black calc(50%), transparent calc(50% + 1px)'
-                : undefined,
+                ? `linear-gradient(180deg, ${props.backgroundColor} calc(50% - 1px), black calc(50%), ${props.backgroundColor} calc(50% + 1px)`
+                : props.backgroundColor,
               display: 'flex',
               justifyContent: 'center',
               marginTop: part.isString ? undefined : 8,
+              transition: 'background-color 0.2s',
               width: '100%',
             }}
           >
             <FrameValue
               backgroundColor={props.backgroundColor}
-              disabled={props.disabled}
+              canUpdate={props.canUpdate}
               isEditMode={props.isEditMode}
               update={(value) => {
                 props.update(part.index, value);

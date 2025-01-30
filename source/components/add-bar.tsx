@@ -1,25 +1,16 @@
 import React, { CSSProperties } from 'react';
-import {
-  addBarColor,
-  BarType,
-  moveEndSymbol,
-  NonReferenceBarType,
-  operationColor,
-  stringHeight,
-} from '../constants';
+import { addBarColor, BarType, moveEndSymbol, operationColor, stringHeight } from '../constants';
 import { barOperations, sectionOperations } from '../operations';
 import { Section, Tab } from '../types';
+import { addBar, copyBarEnd, moveBarEnd } from './bar-commons';
 
 export type AddBarProps = {
-  addBar: (type: NonReferenceBarType) => void;
   barIndex: number;
-  copyBarEnd: () => void;
-  copying: Tab['copying'];
   expanded?: boolean;
   inSection: Section | undefined;
-  moveBarEnd: () => void;
-  moving: Tab['moving'];
   style?: CSSProperties;
+  tab: Tab;
+  updateTab: (tab: Tab) => void;
 };
 
 const buttonStyleBase: CSSProperties = {
@@ -42,6 +33,10 @@ const operationButtonStyle: CSSProperties = {
 };
 
 export const AddBar: React.FC<AddBarProps> = (props) => {
+  const addBarHandler = (barType: BarType) => {
+    addBar(props.tab, props.updateTab, props.barIndex, BarType.picking, props.inSection);
+  };
+
   return (
     <div
       className="add-bar"
@@ -52,22 +47,32 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
         ...props.style,
       }}
     >
-      {props.moving &&
-      sectionOperations.isOperationInSection(props.moving, props.inSection) &&
-      barOperations.canMoveBarToPosition(props.moving.startIndex, props.barIndex) ? (
-        <div onClick={props.moveBarEnd} style={operationButtonStyle}>
+      {props.tab.moving &&
+      sectionOperations.isOperationInSection(props.tab.moving, props.inSection) &&
+      barOperations.canMoveBarToPosition(props.tab.moving.startIndex, props.barIndex) ? (
+        <div
+          onClick={() => {
+            moveBarEnd(props.tab, props.updateTab, props.barIndex, props.inSection);
+          }}
+          style={operationButtonStyle}
+        >
           {moveEndSymbol}
         </div>
-      ) : props.copying &&
-        sectionOperations.isOperationInSection(props.copying, props.inSection) ? (
-        <div onClick={props.copyBarEnd} style={operationButtonStyle}>
+      ) : props.tab.copying &&
+        sectionOperations.isOperationInSection(props.tab.copying, props.inSection) ? (
+        <div
+          onClick={() => {
+            copyBarEnd(props.tab, props.updateTab, props.barIndex, props.inSection);
+          }}
+          style={operationButtonStyle}
+        >
           {moveEndSymbol}
         </div>
       ) : (
         <React.Fragment>
           <div
             onClick={() => {
-              props.addBar(BarType.picking);
+              addBarHandler(BarType.picking);
             }}
             style={addButtonStyle}
           >
@@ -76,7 +81,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
 
           <div
             onClick={() => {
-              props.addBar(BarType.chord);
+              addBarHandler(BarType.chord);
             }}
             style={addButtonStyle}
           >
@@ -86,7 +91,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
           {!props.inSection && (
             <div
               onClick={() => {
-                props.addBar(BarType.section);
+                addBarHandler(BarType.section);
               }}
               style={addButtonStyle}
             >

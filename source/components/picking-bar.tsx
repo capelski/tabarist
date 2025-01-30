@@ -1,59 +1,64 @@
 import React from 'react';
 import { tabOperations } from '../operations';
-import { PickingBar } from '../types';
-import { CommonNonSectionBarProps, updateRepeats } from './bar-commons';
-import { BaseBarComponent } from './base-bar';
-import { getPickingBarCore, PickingBarCoreProps } from './picking-bar-core';
+import { BarContainer, PickingBar } from '../types';
+import { BarComponentBaseProps, getFrameBackgroundColor } from './bar-commons';
+import { PickingFrameComponent } from './picking-frame';
 
-export type PickingBarProps = CommonNonSectionBarProps<PickingBar>;
+export type PickingBarComponentProps = BarComponentBaseProps & {
+  container: BarContainer<PickingBar>;
+};
 
-export const PickingBarComponent: React.FC<PickingBarProps> = (props) => {
-  const rebase: PickingBarCoreProps['rebase'] = (framesNumber) => {
-    const nextTab = tabOperations.rebasePickingBar(
-      props.tab,
-      props.bar.index,
-      framesNumber,
-      props.inSection,
-    );
-    props.updateTab(nextTab);
-  };
-
-  const updateFrame: PickingBarCoreProps['updateFrame'] = (frameIndex, stringIndex, value) => {
-    const nextTab = tabOperations.updatePickingFrame(
-      props.tab,
-      props.bar.index,
-      frameIndex,
-      stringIndex,
-      value,
-      props.inSection,
-    );
-    props.updateTab(nextTab);
-  };
-
-  const { additionalControls, coreComponent } = getPickingBarCore({
-    bar: props.bar,
-    displayPickingRebase: props.isEditMode,
-    inSection: props.inSection,
-    inSectionBar: undefined,
-    isEditMode: props.isEditMode,
-    isFirstBarInSectionBar: false,
-    isLastBarInSectionBar: false,
-    rebase,
-    repeats: props.bar.repeats,
-    sectionName: undefined,
-    updateFrame,
-    updateRepeats(repeats) {
-      updateRepeats(props.tab, props.updateTab, props.bar.index, repeats, props.inSection);
-    },
-  });
+export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) => {
+  const framesWidth = Math.floor(10000 / props.container.renderedBar.frames.length) / 100;
+  const displayChordSupport = props.container.renderedBar.frames.some(
+    (frame) => frame.chordSupport,
+  );
 
   return (
-    <BaseBarComponent
-      {...props}
-      additionalControls={additionalControls}
-      canAddBar={true}
-      coreComponent={coreComponent}
-      displayBarControls={true}
-    />
+    <div
+      className="frames"
+      style={{
+        borderLeft: '1px solid black',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'row',
+      }}
+    >
+      {props.container.renderedBar.frames.map((frame) => {
+        const backgroundColor =
+          getFrameBackgroundColor(
+            props.isEditMode,
+            props.tab.activeFrame,
+            props.container.position,
+            frame.index,
+          ) ?? props.backgroundColor;
+
+        const updateFrame = (stringIndex: number, value: string) => {
+          const nextTab = tabOperations.updatePickingFrame(
+            props.tab,
+            props.container.originalBar!.index,
+            frame.index,
+            stringIndex,
+            value,
+            props.container.inSection,
+          );
+          props.updateTab(nextTab);
+        };
+
+        return (
+          <PickingFrameComponent
+            backgroundColor={backgroundColor}
+            canUpdate={props.canUpdate}
+            displayChordSupport={displayChordSupport}
+            frame={frame}
+            isEditMode={props.isEditMode}
+            isFirstFrame={frame.index === 0}
+            key={frame.index}
+            update={updateFrame}
+            width={`${framesWidth}%`}
+          />
+        );
+      })}
+    </div>
   );
 };

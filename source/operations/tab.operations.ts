@@ -33,6 +33,7 @@ const getValueLength = (value: string) => {
 export const augmentTab = (diminishedTab: DiminishedTab): Tab => {
   return {
     ...diminishedTab,
+    activeFrame: undefined,
     bars: diminishedTab.bars.map((bar, index) => augmentBar(bar, index)),
     sections: diminishedTab.sections.map((section, index) => {
       return {
@@ -188,7 +189,14 @@ export const tabOperations = {
     return applyBarsOperation(
       nextTab,
       (bars) => {
-        const newBar = createReferenceBar(bars[copying.startIndex], endIndex);
+        const targetBar = bars[copying.startIndex];
+        const newBar =
+          targetBar.type === BarType.section
+            ? createSectionBar(
+                endIndex,
+                tab.sections.find((s) => targetBar.sectionIndex === s.index)!,
+              )
+            : createReferenceBar(targetBar, endIndex);
         return barOperations.addBar(bars, newBar as any);
       },
       inSection,
@@ -206,6 +214,7 @@ export const tabOperations = {
   },
 
   create: (ownerId: User['uid']): Tab => ({
+    activeFrame: undefined,
     bars: [],
     copying: undefined,
     id: nanoid(),

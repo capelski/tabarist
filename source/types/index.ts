@@ -1,3 +1,4 @@
+export * from './bar-container.type';
 export * from './bar.type';
 export * from './indexed-value.type';
 export * from './position-operation.type';

@@ -1,7 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
-import { BarGroup, SectionComponent, StrummingPatternComponent } from '../components';
-import { Modal } from '../components/modal';
+import { BarGroup, Modal, SectionComponent, StrummingPatternComponent } from '../components';
 import {
   addSymbol,
   editSymbol,
@@ -12,7 +11,7 @@ import {
   ViewMode,
 } from '../constants';
 import { User } from '../firebase';
-import { sPatternOperations, tabOperations } from '../operations';
+import { barsToBarContainers, sPatternOperations, tabOperations } from '../operations';
 import { tabRepository } from '../repositories';
 import { Tab } from '../types';
 
@@ -48,6 +47,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     if (searchParams.get(queryParameters.editMode) === 'true') {
       setIsEditMode(true);
+      // TODO Reset active frame
     } else {
       setIsEditMode(false);
     }
@@ -109,6 +109,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     setSearchParams(nextSearchParams);
   };
 
+  const barContainers = barsToBarContainers(tab, tab.bars);
+
   return (
     <div className="tab">
       {deletingTab && (
@@ -148,6 +150,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
             </button>
           </React.Fragment>
         )}
+
         {!areModesEquivalent && (
           <React.Fragment>
             <span style={{ marginLeft: 8 }}>👁️</span>
@@ -172,8 +175,10 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       </div>
 
       <BarGroup
-        bars={tab.bars}
+        barContainers={barContainers}
+        barsNumber={tab.bars.length}
         barWidth={`${barWidth}px`}
+        inSection={undefined}
         isEditMode={isEditMode}
         tab={tab}
         updateTab={setTab}

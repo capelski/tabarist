@@ -1,9 +1,12 @@
+- Play in non-edit mode
+- Move add button to the end of sections/sPatterns
+- Turn tempo into divisions
+- Collapsible sections
 - Cancel button to discard changes + Modal
 - Allow copying a tab from another user
 - Capo property
 - Comments section
 - Support lyrics underneath the bars
-- Play in non-edit mode
 - Line breaks
 - Strumming patterns
     - 1 &, 2 &, etc.

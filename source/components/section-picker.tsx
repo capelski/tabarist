@@ -9,7 +9,7 @@ export interface SectionPickerProps {
 
 export const SectionPicker: React.FC<SectionPickerProps> = (props) => {
   return (
-    <div style={{ marginRight: 8 }}>
+    <React.Fragment>
       Section:
       <select
         disabled={props.sections.length < 2}
@@ -28,6 +28,6 @@ export const SectionPicker: React.FC<SectionPickerProps> = (props) => {
           );
         })}
       </select>
-    </div>
+    </React.Fragment>
   );
 };
