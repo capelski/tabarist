@@ -32,9 +32,7 @@ export const FrameValue: React.FC<FrameInputProps> = (props) => {
         height: stringHeight,
       }}
     >
-      <span style={{ backgroundColor: props.backgroundColor, transition: 'background-color 0.2s' }}>
-        {props.value}
-      </span>
+      <span style={{ backgroundColor: props.backgroundColor }}>{props.value}</span>
     </div>
   );
 };

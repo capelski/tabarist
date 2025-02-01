@@ -14,6 +14,7 @@ export type BarContainer<
   isFirstInSectionBar: boolean;
   isLastInSectionBar: boolean;
   isReference: boolean;
+  omitStrummingPattern: boolean;
   originalBar: Bar;
   position: number;
   /** Used to find the position of the first bar of a section when repeating the active frame */

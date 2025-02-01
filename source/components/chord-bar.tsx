@@ -58,7 +58,12 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
               isEditMode={props.isEditMode}
               isFirstFrame={frame.index === 0}
               key={frame.index}
-              strumming={strummingPattern?.frames[frame.index]?.value ?? ''}
+              strumming={
+                ((!props.container.omitStrummingPattern &&
+                  strummingPattern?.frames[frame.index]?.value) ??
+                  '') ||
+                ''
+              }
               update={updateFrame}
               value={frame.value}
               width={`${framesWidth}%`}
