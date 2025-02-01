@@ -45,7 +45,9 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
             style={{
               background: part.isString
                 ? `linear-gradient(180deg, ${props.backgroundColor} calc(50% - 1px), black calc(50%), ${props.backgroundColor} calc(50% + 1px)`
-                : props.backgroundColor,
+                : props.isEditMode
+                ? props.backgroundColor
+                : undefined,
               display: 'flex',
               justifyContent: 'center',
               marginTop: part.isString ? undefined : 8,
@@ -54,7 +56,13 @@ export const PickingFrameComponent: React.FC<PickingFrameProps> = (props) => {
             }}
           >
             <FrameValue
-              backgroundColor={props.backgroundColor}
+              backgroundColor={
+                part.isString
+                  ? props.backgroundColor
+                  : props.isEditMode
+                  ? props.backgroundColor
+                  : 'white'
+              }
               canUpdate={props.canUpdate}
               isEditMode={props.isEditMode}
               update={(value) => {

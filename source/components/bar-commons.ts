@@ -32,12 +32,11 @@ export const copyBarEnd = (
 };
 
 export const getFrameBackgroundColor = (
-  isEditMode: boolean,
   activeFrame: Tab['activeFrame'],
   position: number,
   frameIndex: number,
 ) => {
-  return !isEditMode && activeFrame?.position === position && activeFrame?.frameIndex === frameIndex
+  return activeFrame?.position === position && activeFrame?.frameIndex === frameIndex
     ? activeColor
     : undefined;
 };

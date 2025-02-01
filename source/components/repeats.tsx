@@ -1,26 +1,48 @@
 import React from 'react';
 import { repeatsHeight, sectionColor } from '../constants';
-import { BarContainer } from '../types';
+import { tabOperations } from '../operations';
+import { BarContainer, Tab } from '../types';
+import { SectionPicker, SectionPickerProps } from './section-picker';
 
 export type RepeatsProps = {
+  canChangeSection: boolean;
   canRepeat: boolean;
-  inSectionBar: BarContainer['inSectionBar'];
+  container: BarContainer;
   isEditMode: boolean;
-  isLastBarInSectionBar: boolean;
-  repeats: number | undefined;
-  updateRepeats: (repeats?: number) => void;
+  tab: Tab;
+  updateTab: (tab: Tab) => void;
 };
 
 export const Repeats: React.FC<RepeatsProps> = (props) => {
-  const hasRepeats = props.repeats && props.repeats > 1;
+  const { repeats } = props.container.originalBar;
+  const hasRepeats = repeats && repeats > 1;
+
+  const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
+    const nextTab = tabOperations.changeSection(
+      props.tab,
+      props.container.originalBar.index,
+      sectionIndex,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const updateRepeats = (nextRepeats?: number) => {
+    const nextTab = tabOperations.updateRepeats(
+      props.tab,
+      props.container.originalBar.index,
+      nextRepeats,
+      props.container.inSection,
+    );
+    props.updateTab(nextTab);
+  };
 
   return (
     <div style={{ height: repeatsHeight }}>
       <div
         style={{
-          backgroundColor: props.inSectionBar ? sectionColor : undefined,
+          backgroundColor: props.container.inSectionBar ? sectionColor : undefined,
           height: 20,
-          marginRight: props.isLastBarInSectionBar ? 8 : undefined,
+          marginRight: props.container.isLastInSectionBar ? 8 : undefined,
           paddingLeft: 8,
         }}
       >
@@ -31,17 +53,26 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
                 <input
                   onChange={(event) => {
                     const nextRepeats = parseInt(event.target.value);
-                    props.updateRepeats(isNaN(nextRepeats) ? undefined : nextRepeats);
+                    updateRepeats(isNaN(nextRepeats) ? undefined : nextRepeats);
                   }}
                   style={{ boxSizing: 'border-box', marginRight: 4, maxHeight: 20, maxWidth: 30 }}
-                  value={props.repeats ?? ''}
+                  value={repeats ?? ''}
                 />
                 x
+                {props.canChangeSection && (
+                  <SectionPicker
+                    changeSection={changeSection}
+                    section={props.container.inSectionBar!.referredSection}
+                    sections={props.tab.sections}
+                  />
+                )}
               </React.Fragment>
             ) : (
-              <span>{hasRepeats && `${props.repeats}x`}</span>
+              <span>
+                {hasRepeats && `${repeats}x `}
+                {props.container.inSectionBar?.referredSection.name}
+              </span>
             )}
-            <span style={{ marginLeft: 8 }}>{props.inSectionBar?.referredSection.name}</span>
           </React.Fragment>
         )}
       </div>

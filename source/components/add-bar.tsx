@@ -1,5 +1,12 @@
 import React, { CSSProperties } from 'react';
-import { addBarColor, BarType, moveEndSymbol, operationColor, stringHeight } from '../constants';
+import {
+  addBarColor,
+  BarType,
+  moveEndSymbol,
+  NonReferenceBarType,
+  operationColor,
+  stringHeight,
+} from '../constants';
 import { barOperations, sectionOperations } from '../operations';
 import { Section, Tab } from '../types';
 import { addBar, copyBarEnd, moveBarEnd } from './bar-commons';
@@ -33,8 +40,8 @@ const operationButtonStyle: CSSProperties = {
 };
 
 export const AddBar: React.FC<AddBarProps> = (props) => {
-  const addBarHandler = (barType: BarType) => {
-    addBar(props.tab, props.updateTab, props.barIndex, BarType.picking, props.inSection);
+  const addBarHandler = (barType: NonReferenceBarType) => {
+    addBar(props.tab, props.updateTab, props.barIndex, barType, props.inSection);
   };
 
   return (

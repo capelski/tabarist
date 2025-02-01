@@ -1,13 +1,12 @@
 import React from 'react';
 import { BarType, referenceColor, repeatsHeight, sectionColor, stringHeight } from '../constants';
-import { tabOperations } from '../operations';
 import { BarContainer, ChordBar, PickingBar, Tab } from '../types';
 import { AddBar } from './add-bar';
 import { BarComponentBaseProps } from './bar-commons';
 import { BarControls } from './bar-controls';
 import { ChordBarComponent } from './chord-bar';
 import { PickingBarComponent } from './picking-bar';
-import { Repeats, RepeatsProps } from './repeats';
+import { Repeats } from './repeats';
 
 export type BarContainerComponentProps = {
   barWidth: string;
@@ -37,16 +36,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
   const canRepeat = !props.container.inSectionBar || props.container.isFirstInSectionBar;
   const displayBarControls = !props.container.inSectionBar || props.container.isFirstInSectionBar;
 
-  const updateRepeats: RepeatsProps['updateRepeats'] = (repeats) => {
-    const nextTab = tabOperations.updateRepeats(
-      props.tab,
-      props.container.originalBar.index,
-      repeats,
-      props.container.inSection,
-    );
-    props.updateTab(nextTab);
-  };
-
   return (
     <div
       className="bar"
@@ -74,12 +63,12 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         >
           {!props.container.inSection && (
             <Repeats
+              canChangeSection={canChangeSection}
               canRepeat={canRepeat}
-              inSectionBar={props.container.inSectionBar}
+              container={props.container}
               isEditMode={props.isEditMode}
-              isLastBarInSectionBar={props.container.isLastInSectionBar}
-              repeats={props.container.originalBar.repeats}
-              updateRepeats={updateRepeats}
+              tab={props.tab}
+              updateTab={props.updateTab}
             />
           )}
 
@@ -111,7 +100,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
 
       {props.isEditMode && displayBarControls && (
         <BarControls
-          canChangeSection={canChangeSection}
           canRebase={canRebase}
           container={props.container}
           inSection={props.container.inSection}

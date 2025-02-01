@@ -3,11 +3,9 @@ import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../constan
 import { getIndexDisplayValue, sectionOperations, tabOperations } from '../operations';
 import { BarContainer, Section, Tab } from '../types';
 import { PatternPicker, PatternPickerProps } from './pattern-picker';
-import { SectionPicker, SectionPickerProps } from './section-picker';
 import { TempoPicker, TempoPickerProps } from './tempo-picker';
 
 export type BarControlsProps = {
-  canChangeSection: boolean;
   canRebase: boolean;
   container: BarContainer;
   inSection: Section | undefined;
@@ -18,15 +16,6 @@ export type BarControlsProps = {
 export const BarControls: React.FC<BarControlsProps> = (props) => {
   const cancelPositionOperation = () => {
     const nextTab = tabOperations.cancelPositionOperation(props.tab);
-    props.updateTab(nextTab);
-  };
-
-  const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
-    const nextTab = tabOperations.changeSection(
-      props.tab,
-      props.container.originalBar.index,
-      sectionIndex,
-    );
     props.updateTab(nextTab);
   };
 
@@ -148,15 +137,6 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
                 rebase={rebasePicking}
               />
             )}
-          </div>
-        )}
-        {props.canChangeSection && (
-          <div style={{ marginRight: 8, textAlign: 'center' }}>
-            <SectionPicker
-              changeSection={changeSection}
-              section={props.container.inSectionBar!.referredSection}
-              sections={props.tab.sections}
-            />
           </div>
         )}
       </div>

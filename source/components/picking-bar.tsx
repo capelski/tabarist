@@ -26,12 +26,8 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
     >
       {props.container.renderedBar.frames.map((frame) => {
         const backgroundColor =
-          getFrameBackgroundColor(
-            props.isEditMode,
-            props.tab.activeFrame,
-            props.container.position,
-            frame.index,
-          ) ?? props.backgroundColor;
+          getFrameBackgroundColor(props.tab.activeFrame, props.container.position, frame.index) ??
+          props.backgroundColor;
 
         const updateFrame = (stringIndex: number, value: string) => {
           const nextTab = tabOperations.updatePickingFrame(

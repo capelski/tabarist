@@ -37,12 +37,8 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
       >
         {props.container.renderedBar.frames.map((frame) => {
           const backgroundColor =
-            getFrameBackgroundColor(
-              props.isEditMode,
-              props.tab.activeFrame,
-              props.container.position,
-              frame.index,
-            ) ?? props.backgroundColor;
+            getFrameBackgroundColor(props.tab.activeFrame, props.container.position, frame.index) ??
+            props.backgroundColor;
 
           const updateFrame = (value: string) => {
             const nextTab = tabOperations.updateChordFrame(
