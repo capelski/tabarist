@@ -1,5 +1,5 @@
 import React from 'react';
-import { characterWidth, stringHeight } from '../constants';
+import { characterWidth, frameMaxCharacters, stringHeight } from '../constants';
 
 export interface FrameInputProps {
   backgroundColor: string;
@@ -12,7 +12,7 @@ export interface FrameInputProps {
 export const FrameValue: React.FC<FrameInputProps> = (props) => {
   return props.isEditMode && props.canUpdate ? (
     <input
-      maxLength={3}
+      maxLength={frameMaxCharacters}
       onChange={(event) => {
         props.update(event.target.value);
       }}

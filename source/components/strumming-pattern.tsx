@@ -1,5 +1,5 @@
 import React from 'react';
-import { removeSymbol, stringHeight } from '../constants';
+import { frameMaxCharacters, removeSymbol, stringHeight } from '../constants';
 import { getIndexDisplayValue, sPatternOperations, tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
 import { TempoPicker } from './tempo-picker';
@@ -59,7 +59,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
                 }}
               >
                 <input
-                  maxLength={3}
+                  maxLength={frameMaxCharacters}
                   onChange={(event) => {
                     props.update(frame.index, event.target.value);
                   }}
