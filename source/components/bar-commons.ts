@@ -36,7 +36,7 @@ export const getFrameBackgroundColor = (
   position: number,
   frameIndex: number,
 ) => {
-  return activeFrame?.position === position && activeFrame?.frameIndex === frameIndex
+  return activeFrame?.barContainer.position === position && activeFrame?.frameIndex === frameIndex
     ? activeColor
     : undefined;
 };

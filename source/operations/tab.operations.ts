@@ -1,7 +1,24 @@
 import { nanoid } from 'nanoid';
-import { BarType, bodyMargin, characterWidth, NonReferenceBarType, ViewMode } from '../constants';
+import {
+  BarType,
+  bodyMargin,
+  characterWidth,
+  defaultTempo,
+  NonReferenceBarType,
+  ViewMode,
+} from '../constants';
 import { User } from '../firebase';
-import { Bar, BarBase, NonSectionBar, Section, StrummingPattern, Tab } from '../types';
+import {
+  Bar,
+  BarBase,
+  BarContainer,
+  ChordBar,
+  NonSectionBar,
+  PickingBar,
+  Section,
+  StrummingPattern,
+  Tab,
+} from '../types';
 import { DiminishedTab } from '../types/diminished-tab.type';
 import {
   augmentBar,
@@ -30,6 +47,27 @@ const getValueLength = (value: string) => {
   return value.length || 1;
 };
 
+const getNextActiveFrame = (
+  barContainers: BarContainer[],
+  startingPosition: number,
+  repeats?: number,
+): Tab['activeFrame'] | undefined => {
+  return barContainers
+    .slice(startingPosition)
+    .reduce<Tab['activeFrame'] | undefined>((reduced, barContainer) => {
+      return (
+        reduced ||
+        (barContainer.renderedBar
+          ? {
+              barContainer: barContainer as BarContainer<ChordBar | PickingBar>,
+              frameIndex: 0,
+              repeats: repeats ?? barContainer.originalBar.repeats ?? 0,
+            }
+          : undefined)
+      );
+    }, undefined);
+};
+
 export const augmentTab = (diminishedTab: DiminishedTab): Tab => {
   return {
     ...diminishedTab,
@@ -52,6 +90,7 @@ export const augmentTab = (diminishedTab: DiminishedTab): Tab => {
         index,
       };
     }),
+    tempo: diminishedTab.tempo ?? defaultTempo,
   };
 };
 
@@ -222,6 +261,7 @@ export const tabOperations = {
     ownerId,
     sections: [],
     strummingPatterns: [],
+    tempo: defaultTempo,
     title: 'Unnamed tab',
   }),
 
@@ -442,6 +482,63 @@ export const tabOperations = {
     };
   },
 
+  resetActiveFrame(tab: Tab): Tab {
+    return {
+      ...tab,
+      activeFrame: undefined,
+    };
+  },
+
+  updateActiveFrame(tab: Tab, barContainers: BarContainer[]): Tab {
+    if (tab.bars.length === 0) {
+      return tab;
+    }
+
+    if (tab.activeFrame === undefined) {
+      return {
+        ...tab,
+        activeFrame: getNextActiveFrame(barContainers, 0),
+      };
+    }
+
+    const { inSectionBar, isLastInSectionBar, position, positionOfFirstBar, renderedBar } =
+      tab.activeFrame.barContainer;
+
+    const isLastFrame = tab.activeFrame.frameIndex === renderedBar.frames.length - 1;
+    if (!isLastFrame) {
+      return {
+        ...tab,
+        activeFrame: {
+          ...tab.activeFrame,
+          frameIndex: tab.activeFrame.frameIndex + 1,
+        },
+      };
+    }
+
+    const mustRepeat = tab.activeFrame.repeats > 1 && (!inSectionBar || isLastInSectionBar);
+    if (mustRepeat) {
+      return {
+        ...tab,
+        activeFrame: getNextActiveFrame(
+          barContainers,
+          positionOfFirstBar || position,
+          tab.activeFrame.repeats - 1,
+        ),
+      };
+    }
+
+    console.log('Repeats', tab.activeFrame.repeats);
+    return {
+      ...tab,
+      activeFrame: getNextActiveFrame(
+        barContainers,
+        position + 1,
+        // Keep the existing repeats when moving to the next bar in a section bar
+        inSectionBar && tab.activeFrame.repeats,
+      ),
+    };
+  },
+
   updateBackingTrack: (tab: Tab, backingTrack: string | undefined): Tab => {
     return {
       ...tab,
@@ -489,6 +586,13 @@ export const tabOperations = {
       (bars) => barOperations.updateRepeats(bars, barIndex, repeats),
       inSection,
     );
+  },
+
+  updateTempo: (tab: Tab, tempo: number): Tab => {
+    return {
+      ...tab,
+      tempo,
+    };
   },
 
   updateTitle: (tab: Tab, title: string): Tab => {

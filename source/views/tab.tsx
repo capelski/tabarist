@@ -1,9 +1,11 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { BarGroup, Modal, SectionComponent, StrummingPatternComponent } from '../components';
 import {
   addSymbol,
   editSymbol,
+  maxTempo,
+  minTempo,
   queryParameters,
   removeSymbol,
   RouteNames,
@@ -18,6 +20,8 @@ import { Tab } from '../types';
 export type TabViewProps = {
   user: User | null;
 };
+
+let activeFrameLastTimeout = 0;
 
 export const TabView: React.FC<TabViewProps> = (props) => {
   const [deletingTab, setDeletingTab] = useState('');
@@ -47,21 +51,45 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     if (searchParams.get(queryParameters.editMode) === 'true') {
       setIsEditMode(true);
-      // TODO Reset active frame
+      if (tab) {
+        setTab(tabOperations.resetActiveFrame(tab));
+      }
     } else {
       setIsEditMode(false);
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    if (tab?.activeFrame) {
+      const msPerBeat = 60_000 / tab.tempo;
+      const msPerBar = msPerBeat * 4;
+      const msPerFrame = msPerBar / tab.activeFrame.barContainer.renderedBar.frames.length;
+
+      activeFrameLastTimeout = window.setTimeout(() => {
+        setTab(tabOperations.updateActiveFrame(tab, barContainers));
+      }, msPerFrame);
+    }
+  }, [tab?.activeFrame]);
+
+  const { areModesEquivalent, barWidth, barContainers } = useMemo(() => {
+    if (tab?.bars) {
+      const { areModesEquivalent, barWidth } = tabOperations.getLongestBarWidth(
+        tab,
+        windowWidth,
+        viewMode,
+      );
+      const barContainers = barsToBarContainers(tab, tab.bars);
+
+      return { areModesEquivalent, barWidth, barContainers };
+    }
+
+    return { areModesEquivalent: true, barWidth: -1, barContainers: [] };
+  }, [tab?.bars, viewMode, windowWidth]);
+
   if (!tab) {
     return <h3>Couldn't load tab</h3>;
   }
 
-  const { areModesEquivalent, barWidth } = tabOperations.getLongestBarWidth(
-    tab,
-    windowWidth,
-    viewMode,
-  );
   const isTabOwner = props.user && props.user.uid === tab.ownerId;
 
   const addSection = () => {
@@ -109,8 +137,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     setSearchParams(nextSearchParams);
   };
 
-  const barContainers = barsToBarContainers(tab, tab.bars);
-
   return (
     <div className="tab">
       {deletingTab && (
@@ -149,6 +175,41 @@ export const TabView: React.FC<TabViewProps> = (props) => {
               {removeSymbol}
             </button>
           </React.Fragment>
+        )}
+
+        <span style={{ marginLeft: 8 }}>♫</span>
+        <input
+          onBlur={() => {
+            const validTempo = Math.max(Math.min(tab.tempo, maxTempo), minTempo);
+            if (validTempo !== tab.tempo) {
+              setTab(tabOperations.updateTempo(tab, validTempo));
+            }
+          }}
+          onChange={(event) => {
+            const nextTempo = parseInt(event.target.value);
+            setTab(tabOperations.updateTempo(tab, nextTempo));
+          }}
+          value={tab.tempo}
+          style={{ marginLeft: 8, maxWidth: 40 }}
+          type="number"
+        />
+
+        {!isEditMode && (
+          <button
+            onClick={() => {
+              const nextTab =
+                tab.activeFrame === undefined
+                  ? tabOperations.updateActiveFrame(tab, barContainers)
+                  : tabOperations.resetActiveFrame(tab);
+              clearTimeout(activeFrameLastTimeout);
+
+              setTab(nextTab);
+            }}
+            style={{ marginLeft: 8 }}
+            type="button"
+          >
+            {tab.activeFrame !== undefined ? 'Stop' : 'Play'}
+          </button>
         )}
 
         {!areModesEquivalent && (
@@ -207,11 +268,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       {isEditMode && (
         <React.Fragment>
           <h3>Strumming patterns</h3>
-          <p>
-            <button onClick={addStrummingPattern} type="button">
-              {addSymbol} strumming pattern
-            </button>
-          </p>
 
           {tab.strummingPatterns.map((sPattern) => {
             return (
@@ -230,12 +286,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
             );
           })}
 
-          <h3>Sections</h3>
           <p>
-            <button onClick={addSection} type="button">
-              {addSymbol} section
+            <button onClick={addStrummingPattern} type="button">
+              {addSymbol} strumming pattern
             </button>
           </p>
+
+          <h3>Sections</h3>
 
           {tab.sections.map((section) => {
             return (
@@ -249,6 +306,12 @@ export const TabView: React.FC<TabViewProps> = (props) => {
               />
             );
           })}
+
+          <p>
+            <button onClick={addSection} type="button">
+              {addSymbol} section
+            </button>
+          </p>
         </React.Fragment>
       )}
     </div>

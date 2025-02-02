@@ -12,5 +12,6 @@ export type DiminishedTab = {
   ownerId: string;
   sections: DiminishedSection[];
   strummingPatterns: DiminishedStrummingPattern[];
+  tempo: number | undefined;
   title: string;
 };
