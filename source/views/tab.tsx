@@ -174,6 +174,26 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         )}
       </div>
 
+      {(isEditMode || tab.backingTrack) && (
+        <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
+          <span style={{ marginRight: 8 }}>Backing track: </span>
+          {isEditMode ? (
+            <input
+              onChange={(event) => {
+                const nextTab = tabOperations.updateBackingTrack(tab, event.target.value);
+                setTab(nextTab);
+              }}
+              style={{ flexGrow: 1 }}
+              value={tab.backingTrack ?? ''}
+            />
+          ) : (
+            <a style={{ flexGrow: 1 }} href="tab.backingTrack">
+              {tab.backingTrack}
+            </a>
+          )}
+        </div>
+      )}
+
       <BarGroup
         barContainers={barContainers}
         barsNumber={tab.bars.length}

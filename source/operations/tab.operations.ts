@@ -442,6 +442,13 @@ export const tabOperations = {
     };
   },
 
+  updateBackingTrack: (tab: Tab, backingTrack: string | undefined): Tab => {
+    return {
+      ...tab,
+      backingTrack,
+    };
+  },
+
   updateChordFrame: (
     tab: Tab,
     barIndex: number,
