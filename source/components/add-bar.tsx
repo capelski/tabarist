@@ -9,7 +9,7 @@ import {
 } from '../constants';
 import { barOperations, sectionOperations } from '../operations';
 import { Section, Tab } from '../types';
-import { addBar, copyBarEnd, moveBarEnd } from './bar-commons';
+import { addBar, copyBarEnd, moveBarEnd } from './commons';
 
 export type AddBarProps = {
   barIndex: number;

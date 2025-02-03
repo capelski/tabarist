@@ -1,8 +1,8 @@
 import React from 'react';
 import { tabOperations } from '../operations';
 import { BarContainer, ChordBar, StrummingPattern } from '../types';
-import { BarComponentBaseProps, getFrameBackgroundColor } from './bar-commons';
 import { ChordFrame } from './chord-frame';
+import { BarComponentBaseProps, getFrameBackgroundColor } from './commons';
 
 export type ChordBarCoreProps = BarComponentBaseProps & {
   container: BarContainer<ChordBar>;

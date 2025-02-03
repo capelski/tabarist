@@ -4,6 +4,7 @@
 - Long section names get cut in the repeats section
 - Turn tempo into divisions
 - Collapsible sections
+- Pagination
 - Option to not display unused strings?
 - Cancel button to discard changes + Modal
 - Allow copying a tab from another user
