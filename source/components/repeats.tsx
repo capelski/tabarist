@@ -16,6 +16,9 @@ export type RepeatsProps = {
 export const Repeats: React.FC<RepeatsProps> = (props) => {
   const { repeats } = props.container.originalBar;
   const hasRepeats = repeats && repeats > 1;
+  const remainingRepeats =
+    props.tab.activeFrame?.barContainer.positionOfFirstBar === props.container.positionOfFirstBar &&
+    props.tab.activeFrame?.repeats;
 
   const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
     const nextTab = tabOperations.changeSection(
@@ -69,7 +72,11 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
               </React.Fragment>
             ) : (
               <span>
-                {hasRepeats && `${repeats}x `}
+                {remainingRepeats ? (
+                  <span style={{ fontWeight: 'bold' }}>{remainingRepeats}x </span>
+                ) : (
+                  hasRepeats && <span>{repeats}x </span>
+                )}
                 {props.container.inSectionBar?.referredSection.name}
               </span>
             )}
