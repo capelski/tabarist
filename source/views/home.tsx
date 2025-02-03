@@ -1,45 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router';
-import { TextFilter } from '../components';
-import { getTabRelativeUrl } from '../operations';
+import React from 'react';
+import { User } from '../firebase';
 import { tabRepository } from '../repositories';
-import { Tab } from '../types';
+import { TabListView } from './tab-list';
 
-export type HomeViewProps = {};
+export type HomeViewProps = {
+  user: User | null;
+};
 
-export const HomeView: React.FC<HomeViewProps> = () => {
-  const [tabs, setTabs] = useState<Tab[]>([]);
-  const [titleFilter, setTitleFilter] = useState('');
-
-  useEffect(() => {
-    tabRepository.getPublicTabs(titleFilter).then(setTabs);
-  }, [titleFilter]);
-
+export const HomeView: React.FC<HomeViewProps> = (props) => {
   return (
-    <div className="tab-registry">
-      <p>
-        <TextFilter text={titleFilter} textSetter={setTitleFilter} />
-      </p>
-      {tabs.length === 0 && <p>No tabs to display</p>}
-      {tabs
-        .filter((tab) => {
-          return tab.title.toLowerCase().includes(titleFilter.toLocaleLowerCase());
-        })
-        .map((tab) => {
-          return (
-            <div
-              key={tab.id}
-              style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
-            >
-              <div>
-                {tab.title}
-                <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(tab.id)}>
-                  ➡️
-                </NavLink>
-              </div>
-            </div>
-          );
-        })}
-    </div>
+    <TabListView
+      getTabs={(titleFilter) => tabRepository.getPublicTabs(titleFilter)}
+      user={props.user}
+    />
   );
 };

@@ -5,6 +5,7 @@
 - Turn tempo into divisions
 - Collapsible sections
 - Pagination
+- Offer ↓ ↑ ↓ ↑ characters in new strumming patter
 - Option to not display unused strings?
 - Cancel button to discard changes + Modal
 - Allow copying a tab from another user

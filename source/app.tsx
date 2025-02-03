@@ -26,7 +26,7 @@ export const App: React.FC = () => {
       <ToastContainer position="bottom-center" />
       <NavBar user={user} />
       <Routes>
-        <Route path={RouteNames.home} element={<HomeView />} />
+        <Route path={RouteNames.home} element={<HomeView user={user} />} />
 
         <Route path={RouteNames.myTabs} element={<MyTabsView user={user} />} />
 
