@@ -1,5 +1,3 @@
-- Play in non-edit mode
-    window.scrollTo smooth to the current frame
 - Capo property
 - Long section names get cut in the repeats section
 - Turn tempo into divisions

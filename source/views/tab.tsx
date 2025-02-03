@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import React, { RefObject, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { BarGroup, Modal, SectionComponent, StrummingPatternComponent } from '../components';
 import {
@@ -19,6 +19,7 @@ import { Tab } from '../types';
 
 export type TabViewProps = {
   user: User | null;
+  scrollView: RefObject<HTMLDivElement>;
 };
 
 let activeFrameLastTimeout = 0;
@@ -177,41 +178,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
           </React.Fragment>
         )}
 
-        <span style={{ marginLeft: 8 }}>♫</span>
-        <input
-          onBlur={() => {
-            const validTempo = Math.max(Math.min(tab.tempo, maxTempo), minTempo);
-            if (validTempo !== tab.tempo) {
-              setTab(tabOperations.updateTempo(tab, validTempo));
-            }
-          }}
-          onChange={(event) => {
-            const nextTempo = parseInt(event.target.value);
-            setTab(tabOperations.updateTempo(tab, nextTempo));
-          }}
-          value={tab.tempo}
-          style={{ marginLeft: 8, maxWidth: 40 }}
-          type="number"
-        />
-
-        {!isEditMode && (
-          <button
-            onClick={() => {
-              const nextTab =
-                tab.activeFrame === undefined
-                  ? tabOperations.updateActiveFrame(tab, barContainers)
-                  : tabOperations.resetActiveFrame(tab);
-              clearTimeout(activeFrameLastTimeout);
-
-              setTab(nextTab);
-            }}
-            style={{ marginLeft: 8 }}
-            type="button"
-          >
-            {tab.activeFrame !== undefined ? 'Stop' : 'Play'}
-          </button>
-        )}
-
         {!areModesEquivalent && (
           <React.Fragment>
             <span style={{ marginLeft: 8 }}>👁️</span>
@@ -261,6 +227,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         barWidth={`${barWidth}px`}
         inSection={undefined}
         isEditMode={isEditMode}
+        scrollView={props.scrollView}
         tab={tab}
         updateTab={setTab}
       />
@@ -314,6 +281,43 @@ export const TabView: React.FC<TabViewProps> = (props) => {
           </p>
         </React.Fragment>
       )}
+
+      <div style={{ backgroundColor: 'white', bottom: 0, paddingTop: 8, position: 'sticky' }}>
+        <span style={{ marginLeft: 8 }}>♫</span>
+        <input
+          onBlur={() => {
+            const validTempo = Math.max(Math.min(tab.tempo, maxTempo), minTempo);
+            if (validTempo !== tab.tempo) {
+              setTab(tabOperations.updateTempo(tab, validTempo));
+            }
+          }}
+          onChange={(event) => {
+            const nextTempo = parseInt(event.target.value);
+            setTab(tabOperations.updateTempo(tab, nextTempo));
+          }}
+          value={tab.tempo}
+          style={{ marginLeft: 8, maxWidth: 40 }}
+          type="number"
+        />
+
+        {!isEditMode && (
+          <button
+            onClick={() => {
+              const nextTab =
+                tab.activeFrame === undefined
+                  ? tabOperations.updateActiveFrame(tab, barContainers)
+                  : tabOperations.resetActiveFrame(tab);
+              clearTimeout(activeFrameLastTimeout);
+
+              setTab(nextTab);
+            }}
+            style={{ marginLeft: 8 }}
+            type="button"
+          >
+            {tab.activeFrame !== undefined ? 'Stop' : 'Play'}
+          </button>
+        )}
+      </div>
     </div>
   );
 };

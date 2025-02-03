@@ -17,7 +17,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   };
 
   return (
-    <div>
+    <div style={{ paddingBottom: 8 }}>
       <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
         Home
       </NavLink>

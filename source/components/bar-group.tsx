@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { RefObject } from 'react';
 import { repeatsHeight } from '../constants';
 import { BarContainer, Section, Tab } from '../types';
 import { AddBar } from './add-bar';
@@ -10,6 +10,7 @@ export type BarGroupProps = {
   barWidth: string;
   isEditMode: boolean;
   inSection: Section | undefined;
+  scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };

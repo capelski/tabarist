@@ -53,6 +53,7 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
         })}
         barsNumber={props.section.bars.length}
         inSection={props.section}
+        scrollView={undefined}
       />
     </React.Fragment>
   );

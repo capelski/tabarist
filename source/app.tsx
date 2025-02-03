@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { NavBar } from './components';
@@ -8,6 +8,7 @@ import { HomeView, MyTabsView, TabView } from './views';
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const scrollViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (WEBPACK_USE_FIREBASE) {
@@ -25,13 +26,18 @@ export const App: React.FC = () => {
     <HashRouter>
       <ToastContainer position="bottom-center" />
       <NavBar user={user} />
-      <Routes>
-        <Route path={RouteNames.home} element={<HomeView user={user} />} />
+      <div ref={scrollViewRef} style={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
+        <Routes>
+          <Route path={RouteNames.home} element={<HomeView user={user} />} />
 
-        <Route path={RouteNames.myTabs} element={<MyTabsView user={user} />} />
+          <Route path={RouteNames.myTabs} element={<MyTabsView user={user} />} />
 
-        <Route path={RouteNames.tabDetails} element={<TabView user={user} />} />
-      </Routes>
+          <Route
+            path={RouteNames.tabDetails}
+            element={<TabView scrollView={scrollViewRef} user={user} />}
+          />
+        </Routes>
+      </div>
     </HashRouter>
   );
 };

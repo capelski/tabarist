@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { RefObject, useEffect, useRef } from 'react';
 import { BarType, referenceColor, repeatsHeight, sectionColor } from '../constants';
 import { BarContainer, ChordBar, PickingBar, Tab } from '../types';
 import { AddBar } from './add-bar';
@@ -12,6 +12,7 @@ export type BarContainerComponentProps = {
   barWidth: string;
   container: BarContainer;
   isEditMode: boolean;
+  scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -41,10 +42,11 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
   useEffect(() => {
     if (
       props.tab.activeFrame?.barContainer.position === props.container.position &&
+      props.scrollView?.current &&
       divRef.current
     ) {
-      window.scrollTo({
-        top: divRef.current.offsetTop - window.innerHeight / 2,
+      props.scrollView.current.scrollTo({
+        top: divRef.current.offsetTop - props.scrollView.current.clientHeight * 0.4,
         behavior: 'smooth',
       });
     }

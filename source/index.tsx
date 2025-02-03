@@ -9,7 +9,16 @@ const root = createRoot(container);
 Modal.setAppElement(container);
 
 root.render(
-  <div style={{ margin: bodyMargin }}>
+  <div
+    style={{
+      boxSizing: 'border-box',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      overflow: 'hidden',
+      padding: bodyMargin,
+    }}
+  >
     <App />
   </div>,
 );
