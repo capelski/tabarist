@@ -37,7 +37,7 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
   };
 
   return (
-    <div style={{ height: repeatsHeight }}>
+    <div className="repeats" style={{ height: repeatsHeight }}>
       <div
         style={{
           backgroundColor: props.container.inSectionBar ? sectionColor : undefined,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarType, referenceColor, repeatsHeight, sectionColor, stringHeight } from '../constants';
+import { BarType, referenceColor, repeatsHeight, sectionColor } from '../constants';
 import { BarContainer, ChordBar, PickingBar, Tab } from '../types';
 import { AddBar } from './add-bar';
 import { BarComponentBaseProps } from './bar-commons';
@@ -38,10 +38,18 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
 
   return (
     <div
-      className="bar"
-      style={{ display: 'flex', flexDirection: 'column', width: props.barWidth }}
+      className="bar-container"
+      style={{
+        alignSelf: 'stretch', // So chord bars next to picking bars have the same height
+        display: 'flex',
+        flexDirection: 'column',
+        width: props.barWidth,
+      }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
+      <div
+        className="bar-content"
+        style={{ display: 'flex', flexGrow: 1, flexDirection: 'row', marginBottom: 8 }}
+      >
         {props.isEditMode && canAddBar && (
           <AddBar
             barIndex={props.container.originalBar.index}
@@ -55,10 +63,11 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         )}
 
         <div
+          className="bar-core"
           style={{
             display: 'flex',
             flexDirection: 'column',
-            width: '100%',
+            flexGrow: 1,
           }}
         >
           {!props.container.inSection && (
@@ -77,8 +86,8 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
               style={{
                 alignItems: 'center',
                 display: 'flex',
+                flexGrow: 1,
                 justifyContent: 'center',
-                height: stringHeight * 6,
               }}
             >
               Empty section

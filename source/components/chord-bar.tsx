@@ -1,5 +1,4 @@
 import React from 'react';
-import { stringHeight } from '../constants';
 import { tabOperations } from '../operations';
 import { BarContainer, ChordBar, StrummingPattern } from '../types';
 import { BarComponentBaseProps, getFrameBackgroundColor } from './bar-commons';
@@ -18,12 +17,13 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
 
   return (
     <div
+      className="chord-bar"
       style={{
         borderLeft: '1px solid black',
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        height: stringHeight * 6,
+        flexGrow: 1,
         justifyContent: 'center',
       }}
     >
@@ -32,7 +32,6 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
         style={{
           display: 'flex',
           flexDirection: 'row',
-          width: '100%',
         }}
       >
         {props.container.renderedBar.frames.map((frame) => {

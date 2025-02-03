@@ -32,7 +32,7 @@ export const ChordFrame: React.FC<ChordFrameProps> = (props) => {
         <FrameValue {...props} />
       </div>
 
-      <div className="strumming">{props.strumming}</div>
+      <div className="strumming">{props.strumming || '\u00A0'}</div>
     </div>
   );
 };

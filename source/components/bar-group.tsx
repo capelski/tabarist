@@ -16,10 +16,7 @@ export type BarGroupProps = {
 
 export const BarGroup: React.FC<BarGroupProps> = (props) => {
   return (
-    <div
-      className="bars"
-      style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', maxWidth: '100%' }}
-    >
+    <div className="bars" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
       {props.barContainers.map((barContainer) => {
         return (
           <BarContainerComponent {...props} container={barContainer} key={barContainer.position} />

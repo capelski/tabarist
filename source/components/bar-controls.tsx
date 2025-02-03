@@ -73,7 +73,6 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        width: '100%',
       }}
     >
       <span style={{ marginBottom: 16, marginRight: 8 }}>

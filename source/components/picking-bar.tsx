@@ -16,7 +16,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
 
   return (
     <div
-      className="frames"
+      className="picking-bar"
       style={{
         borderLeft: '1px solid black',
         boxSizing: 'border-box',
