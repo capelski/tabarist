@@ -248,7 +248,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
               value={tab.backingTrack ?? ''}
             />
           ) : (
-            <a style={{ flexGrow: 1 }} href={tab.backingTrack}>
+            <a href={tab.backingTrack} style={{ flexGrow: 1 }} target="_blank">
               {tab.backingTrack}
             </a>
           )}
