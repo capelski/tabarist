@@ -1,7 +1,10 @@
 - Play in non-edit mode
-- Move add button to the end of sections/sPatterns
+    Highlight slightly the bar after current one
+    window.scrollTo smooth to the current frame
+- Long section names get cut in the repeats section
 - Turn tempo into divisions
 - Collapsible sections
+- Option to not display unused strings?
 - Cancel button to discard changes + Modal
 - Allow copying a tab from another user
 - Capo property
