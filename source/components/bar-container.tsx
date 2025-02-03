@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BarType, referenceColor, repeatsHeight, sectionColor } from '../constants';
 import { BarContainer, ChordBar, PickingBar, Tab } from '../types';
 import { AddBar } from './add-bar';
@@ -17,6 +17,8 @@ export type BarContainerComponentProps = {
 };
 
 export const BarContainerComponent: React.FC<BarContainerComponentProps> = (props) => {
+  const divRef = useRef<HTMLDivElement>(null);
+
   const barBaseProps: BarComponentBaseProps = {
     backgroundColor: props.isEditMode
       ? props.container.inSectionBar
@@ -36,9 +38,22 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
   const canRepeat = !props.container.inSectionBar || props.container.isFirstInSectionBar;
   const displayBarControls = !props.container.inSectionBar || props.container.isFirstInSectionBar;
 
+  useEffect(() => {
+    if (
+      props.tab.activeFrame?.barContainer.position === props.container.position &&
+      divRef.current
+    ) {
+      window.scrollTo({
+        top: divRef.current.offsetTop - window.innerHeight / 2,
+        behavior: 'smooth',
+      });
+    }
+  }, [props.tab.activeFrame]);
+
   return (
     <div
       className="bar-container"
+      ref={divRef}
       style={{
         alignSelf: 'stretch', // So chord bars next to picking bars have the same height
         display: 'flex',
