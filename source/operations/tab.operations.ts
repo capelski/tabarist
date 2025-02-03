@@ -515,27 +515,23 @@ export const tabOperations = {
       };
     }
 
-    const mustRepeat = tab.activeFrame.repeats > 1 && (!inSectionBar || isLastInSectionBar);
+    const hasRemainingRepeats = tab.activeFrame.repeats > 1;
+    const mustRepeat = hasRemainingRepeats && (!inSectionBar || isLastInSectionBar);
     if (mustRepeat) {
+      const repeatPosition = positionOfFirstBar ?? position;
       return {
         ...tab,
-        activeFrame: getNextActiveFrame(
-          barContainers,
-          positionOfFirstBar || position,
-          tab.activeFrame.repeats - 1,
-        ),
+        activeFrame: getNextActiveFrame(barContainers, repeatPosition, tab.activeFrame.repeats - 1),
       };
     }
 
-    console.log('Repeats', tab.activeFrame.repeats);
+    const nextRepeats =
+      inSectionBar && (!isLastInSectionBar || hasRemainingRepeats)
+        ? tab.activeFrame.repeats
+        : undefined;
     return {
       ...tab,
-      activeFrame: getNextActiveFrame(
-        barContainers,
-        position + 1,
-        // Keep the existing repeats when moving to the next bar in a section bar
-        inSectionBar && tab.activeFrame.repeats,
-      ),
+      activeFrame: getNextActiveFrame(barContainers, position + 1, nextRepeats),
     };
   },
 
