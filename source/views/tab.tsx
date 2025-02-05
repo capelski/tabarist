@@ -85,7 +85,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
 
     return { areModesEquivalent: true, barWidth: -1, barContainers: [] };
-  }, [tab?.bars, viewMode, windowWidth]);
+  }, [tab?.bars, tab?.sections, tab?.strummingPatterns, viewMode, windowWidth]);
 
   if (!tab) {
     return <h3>Couldn't load tab</h3>;
