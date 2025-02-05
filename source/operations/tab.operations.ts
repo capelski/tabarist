@@ -245,8 +245,10 @@ export const tabOperations = {
   },
 
   create: (ownerId: User['uid']): Tab => ({
+    backingTrack: undefined,
     activeFrame: undefined,
     bars: [],
+    capo: undefined,
     copying: undefined,
     id: nanoid(),
     moving: undefined,
@@ -531,6 +533,13 @@ export const tabOperations = {
     return {
       ...tab,
       backingTrack,
+    };
+  },
+
+  updateCapo: (tab: Tab, capo: number | undefined): Tab => {
+    return {
+      ...tab,
+      capo,
     };
   },
 

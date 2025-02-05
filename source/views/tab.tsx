@@ -201,6 +201,28 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         )}
       </div>
 
+      {(isEditMode || tab.capo) && (
+        <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
+          <span style={{ marginRight: 8 }}>Capo: </span>
+          {isEditMode ? (
+            <input
+              onChange={(event) => {
+                const nextCapo = parseInt(event.target.value);
+                const nextTab = tabOperations.updateCapo(
+                  tab,
+                  isNaN(nextCapo) ? undefined : nextCapo,
+                );
+                setTab(nextTab);
+              }}
+              type="number"
+              value={tab.capo ?? ''}
+            />
+          ) : (
+            <span>{tab.capo}</span>
+          )}
+        </div>
+      )}
+
       {(isEditMode || tab.backingTrack) && (
         <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
           <span style={{ marginRight: 8 }}>Backing track: </span>
