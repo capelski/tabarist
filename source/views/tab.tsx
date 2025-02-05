@@ -61,7 +61,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   }, [searchParams]);
 
   useEffect(() => {
-    if (tab?.activeFrame) {
+    if (tab?.tempo && tab.activeFrame) {
       const msPerBeat = 60_000 / tab.tempo;
       const msPerBar = msPerBeat * 4;
       const msPerFrame = msPerBar / tab.activeFrame.barContainer.renderedBar.frames.length;
@@ -286,22 +286,26 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         <span style={{ marginLeft: 8 }}>♫</span>
         <input
           onBlur={() => {
-            const validTempo = Math.max(Math.min(tab.tempo, maxTempo), minTempo);
-            if (validTempo !== tab.tempo) {
-              setTab(tabOperations.updateTempo(tab, validTempo));
+            if (tab.tempo) {
+              const validTempo = Math.max(Math.min(tab.tempo, maxTempo), minTempo);
+              if (validTempo !== tab.tempo) {
+                setTab(tabOperations.updateTempo(tab, validTempo));
+              }
             }
           }}
           onChange={(event) => {
-            const nextTempo = parseInt(event.target.value);
+            const parsedTempo = parseInt(event.target.value);
+            const nextTempo = isNaN(parsedTempo) ? undefined : parsedTempo;
             setTab(tabOperations.updateTempo(tab, nextTempo));
           }}
-          value={tab.tempo}
+          value={tab.tempo ?? ''}
           style={{ marginLeft: 8, maxWidth: 40 }}
           type="number"
         />
 
         {!isEditMode && (
           <button
+            disabled={!tab.tempo}
             onClick={() => {
               const nextTab =
                 tab.activeFrame === undefined

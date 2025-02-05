@@ -1,12 +1,5 @@
 import { nanoid } from 'nanoid';
-import {
-  BarType,
-  bodyMargin,
-  characterWidth,
-  defaultTempo,
-  NonReferenceBarType,
-  ViewMode,
-} from '../constants';
+import { BarType, bodyMargin, characterWidth, NonReferenceBarType, ViewMode } from '../constants';
 import { User } from '../firebase';
 import {
   Bar,
@@ -90,7 +83,6 @@ export const augmentTab = (diminishedTab: DiminishedTab): Tab => {
         index,
       };
     }),
-    tempo: diminishedTab.tempo ?? defaultTempo,
   };
 };
 
@@ -261,7 +253,7 @@ export const tabOperations = {
     ownerId,
     sections: [],
     strummingPatterns: [],
-    tempo: defaultTempo,
+    tempo: undefined,
     title: 'Unnamed tab',
   }),
 
@@ -584,7 +576,7 @@ export const tabOperations = {
     );
   },
 
-  updateTempo: (tab: Tab, tempo: number): Tab => {
+  updateTempo: (tab: Tab, tempo: number | undefined): Tab => {
     return {
       ...tab,
       tempo,

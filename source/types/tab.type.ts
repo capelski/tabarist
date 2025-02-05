@@ -4,7 +4,7 @@ import { DiminishedTab } from './diminished-tab.type';
 import { Section } from './section.type';
 import { StrummingPattern } from './strumming-pattern.type';
 
-export type Tab = Omit<DiminishedTab, 'bars' | 'sections' | 'strummingPatterns' | 'tempo'> & {
+export type Tab = Omit<DiminishedTab, 'bars' | 'sections' | 'strummingPatterns'> & {
   activeFrame:
     | undefined
     | {
@@ -15,5 +15,4 @@ export type Tab = Omit<DiminishedTab, 'bars' | 'sections' | 'strummingPatterns' 
   bars: Bar[];
   sections: Section[];
   strummingPatterns: StrummingPattern[];
-  tempo: number;
 };
