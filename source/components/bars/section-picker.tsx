@@ -1,5 +1,5 @@
 import React from 'react';
-import { Section } from '../types';
+import { Section } from '../../types';
 
 export interface SectionPickerProps {
   changeSection: (sectionIndex: number) => void;

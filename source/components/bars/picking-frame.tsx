@@ -1,5 +1,5 @@
 import React from 'react';
-import { IndexedValue, PickingFrame } from '../types';
+import { IndexedValue, PickingFrame } from '../../types';
 import { FrameValue } from './frame-input';
 
 export interface PickingFrameProps {

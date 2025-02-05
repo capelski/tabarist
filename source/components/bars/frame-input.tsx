@@ -1,5 +1,5 @@
 import React from 'react';
-import { characterWidth, frameMaxCharacters, stringHeight } from '../constants';
+import { characterWidth, frameMaxCharacters, stringHeight } from '../../constants';
 
 export interface FrameInputProps {
   backgroundColor: string;

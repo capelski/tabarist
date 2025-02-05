@@ -1,7 +1,7 @@
 import React from 'react';
-import { repeatsHeight, sectionColor } from '../constants';
-import { tabOperations } from '../operations';
-import { BarContainer, Tab } from '../types';
+import { repeatsHeight, sectionColor } from '../../constants';
+import { tabOperations } from '../../operations';
+import { BarContainer, Tab } from '../../types';
 import { SectionPicker, SectionPickerProps } from './section-picker';
 
 export type RepeatsProps = {

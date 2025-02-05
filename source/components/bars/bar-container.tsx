@@ -1,10 +1,10 @@
 import React, { RefObject, useEffect, useRef } from 'react';
-import { BarType, referenceColor, repeatsHeight, sectionColor } from '../constants';
-import { BarContainer, ChordBar, PickingBar, Tab } from '../types';
-import { AddBar } from './add-bar';
+import { BarType, referenceColor, repeatsHeight, sectionColor } from '../../constants';
+import { BarContainer, ChordBar, PickingBar, Tab } from '../../types';
+import { AddBar } from '../add-bar';
+import { BarComponentBaseProps } from '../commons';
 import { BarControls } from './bar-controls';
 import { ChordBarComponent } from './chord-bar';
-import { BarComponentBaseProps } from './commons';
 import { PickingBarComponent } from './picking-bar';
 import { Repeats } from './repeats';
 
