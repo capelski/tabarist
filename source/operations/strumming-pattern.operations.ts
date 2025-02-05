@@ -16,7 +16,9 @@ export const sPatternOperations = {
   },
 
   create: (index: number): StrummingPattern => ({
-    frames: createIndexedValuesArray(framesNumberDefault, ''),
+    frames: createIndexedValuesArray(framesNumberDefault, (index) =>
+      index === 0 ? '↓' : index === 1 ? '↑' : '',
+    ),
     framesNumber: framesNumberDefault,
     index,
     name: 'Unnamed pattern',

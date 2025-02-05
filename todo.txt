@@ -1,16 +1,13 @@
 - Capo property
 - Long section names get cut in the repeats section
-- Collapsible sections
+- Collapsible sections and patterns
 - Pagination
-- Offer ↓ ↑ ↓ ↑ characters in new strumming patter
 - Option to not display unused strings?
 - Cancel button to discard changes + Modal
 - Allow copying a tab from another user
 - Comments section
 - Support lyrics underneath the bars
 - Line breaks
-- Strumming patterns
-    - 1 &, 2 &, etc.
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
 - Firebase. Sign in with redirect?

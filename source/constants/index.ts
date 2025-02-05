@@ -1,6 +1,6 @@
 export const frameMaxCharacters = 6; // E.g. Cmadd9
-export const framesNumberOptions = [4, 8];
-export const framesNumberDefault = framesNumberOptions[0];
+export const framesNumberOptions = [4, 8, 16];
+export const framesNumberDefault = framesNumberOptions[1];
 export const maxTempo = 200;
 export const minTempo = 30;
 export const stringsNumber = 6;
