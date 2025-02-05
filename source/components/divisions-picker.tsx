@@ -1,15 +1,15 @@
 import React from 'react';
 import { framesNumberOptions } from '../constants';
 
-export type TempoPickerProps = {
+export type DivisionsPickerProps = {
   framesNumber: number;
   rebase: (framesNumber: number) => void;
 };
 
-export const TempoPicker: React.FC<TempoPickerProps> = (props) => {
+export const DivisionsPicker: React.FC<DivisionsPickerProps> = (props) => {
   return (
     <React.Fragment>
-      Tempo:
+      Divisions:
       <select
         onChange={(event) => {
           props.rebase(parseInt(event.target.value));

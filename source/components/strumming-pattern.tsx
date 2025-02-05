@@ -2,7 +2,7 @@ import React from 'react';
 import { frameMaxCharacters, removeSymbol, stringHeight } from '../constants';
 import { sPatternOperations, tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
-import { TempoPicker } from './tempo-picker';
+import { DivisionsPicker } from './divisions-picker';
 
 export type StrummingPatternProps = {
   rebase: (framesNumber: number) => void;
@@ -77,7 +77,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
         })}
       </div>
       <p>
-        <TempoPicker framesNumber={props.strummingPattern.framesNumber} rebase={props.rebase} />
+        <DivisionsPicker framesNumber={props.strummingPattern.framesNumber} rebase={props.rebase} />
       </p>
     </div>
   );

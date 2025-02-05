@@ -1,6 +1,5 @@
 - Capo property
 - Long section names get cut in the repeats section
-- Turn tempo into divisions
 - Collapsible sections
 - Pagination
 - Offer ↓ ↑ ↓ ↑ characters in new strumming patter

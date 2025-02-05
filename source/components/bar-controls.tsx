@@ -2,8 +2,8 @@ import React from 'react';
 import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../constants';
 import { getIndexDisplayValue, sectionOperations, tabOperations } from '../operations';
 import { BarContainer, Section, Tab } from '../types';
+import { DivisionsPicker, DivisionsPickerProps } from './divisions-picker';
 import { PatternPicker, PatternPickerProps } from './pattern-picker';
-import { TempoPicker, TempoPickerProps } from './tempo-picker';
 
 export type BarControlsProps = {
   canRebase: boolean;
@@ -47,7 +47,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     props.updateTab(nextTab);
   };
 
-  const rebasePicking: TempoPickerProps['rebase'] = (framesNumber) => {
+  const rebasePicking: DivisionsPickerProps['rebase'] = (framesNumber) => {
     const nextTab = tabOperations.rebasePickingBar(
       props.tab,
       props.container.originalBar.index,
@@ -131,7 +131,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
               />
             )}
             {props.container.originalBar.type === BarType.picking && (
-              <TempoPicker
+              <DivisionsPicker
                 framesNumber={props.container.originalBar.framesNumber}
                 rebase={rebasePicking}
               />
