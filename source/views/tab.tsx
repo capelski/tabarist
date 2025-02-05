@@ -26,10 +26,12 @@ let activeFrameLastTimeout = 0;
 
 export const TabView: React.FC<TabViewProps> = (props) => {
   const [deletingTab, setDeletingTab] = useState('');
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [discardingChanges, setDiscardingChanges] = useState(false);
+  const [editingCopy, setEditingCopy] = useState('');
   const [tab, setTab] = useState<Tab>();
   const [viewMode, setViewMode] = useState(ViewMode.adaptive);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const isEditMode = !!editingCopy;
 
   useLayoutEffect(() => {
     function updateSize() {
@@ -45,20 +47,14 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   useEffect(() => {
     if (tabId) {
-      tabRepository.getById(tabId).then(setTab);
+      tabRepository.getById(tabId).then((tab) => {
+        setTab(tab);
+        if (searchParams.get(queryParameters.editMode) === 'true') {
+          setEditingCopy(JSON.stringify(tab));
+        }
+      });
     }
   }, [tabId]);
-
-  useEffect(() => {
-    if (searchParams.get(queryParameters.editMode) === 'true') {
-      setIsEditMode(true);
-      if (tab) {
-        setTab(tabOperations.resetActiveFrame(tab));
-      }
-    } else {
-      setIsEditMode(false);
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     if (tab?.tempo && tab.activeFrame) {
@@ -105,6 +101,10 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     setDeletingTab('');
   };
 
+  const cancelExitEditMode = () => {
+    setDiscardingChanges(false);
+  };
+
   const confirmDelete = async () => {
     if (!isTabOwner) {
       return;
@@ -115,26 +115,54 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     navigate(RouteNames.myTabs);
   };
 
-  const removeTab = () => {
-    setDeletingTab(tab.id);
+  const confirmExitEditMode = () => {
+    setDiscardingChanges(false);
+    setEditingCopy('');
+    setTab(JSON.parse(editingCopy));
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete(queryParameters.editMode);
+    setSearchParams(nextSearchParams);
   };
 
-  const toggleEditMode = async () => {
+  const enterEditMode = () => {
     if (!isTabOwner) {
       return;
     }
 
+    setEditingCopy(JSON.stringify(tab));
+    exitPlayMode();
+
     const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.set(queryParameters.editMode, 'true');
+    setSearchParams(nextSearchParams);
+  };
 
-    if (isEditMode) {
-      await tabRepository.set(tab, props.user!.uid);
+  const exitPlayMode = () => {
+    const nextTab = tabOperations.resetActiveFrame(tab);
+    clearTimeout(activeFrameLastTimeout);
+    setTab(nextTab);
+  };
 
-      nextSearchParams.delete(queryParameters.editMode);
+  const exitEditMode = () => {
+    if (JSON.stringify(tab) === editingCopy) {
+      confirmExitEditMode();
     } else {
-      nextSearchParams.set(queryParameters.editMode, 'true');
+      setDiscardingChanges(true);
     }
+  };
 
-    setIsEditMode(!isEditMode);
+  const removeTab = () => {
+    setDeletingTab(tab.id);
+  };
+
+  const saveEditModeChanges = async () => {
+    await tabRepository.set(tab, props.user!.uid);
+
+    setEditingCopy('');
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete(queryParameters.editMode);
     setSearchParams(nextSearchParams);
   };
 
@@ -149,6 +177,20 @@ export const TabView: React.FC<TabViewProps> = (props) => {
             </button>
             <button onClick={cancelDelete} type="button">
               Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {discardingChanges && (
+        <Modal closeHandler={cancelExitEditMode}>
+          <p>Do you want to discard the unsaved changes?</p>
+          <div>
+            <button onClick={confirmExitEditMode} style={{ marginRight: 8 }} type="button">
+              Yes
+            </button>
+            <button onClick={cancelExitEditMode} type="button">
+              No
             </button>
           </div>
         </Modal>
@@ -169,12 +211,25 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         </h3>
         {isTabOwner && (
           <React.Fragment>
-            <button onClick={toggleEditMode} style={{ marginLeft: 8 }} type="button">
-              {isEditMode ? saveSymbol : editSymbol}
-            </button>
-            <button onClick={removeTab} style={{ marginLeft: 8 }} type="button">
-              {removeSymbol}
-            </button>
+            {isEditMode ? (
+              <React.Fragment>
+                <button onClick={saveEditModeChanges} style={{ marginLeft: 8 }} type="button">
+                  {saveSymbol}
+                </button>
+                <button onClick={exitEditMode} style={{ marginLeft: 8 }} type="button">
+                  ❌
+                </button>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                <button onClick={enterEditMode} style={{ marginLeft: 8 }} type="button">
+                  {editSymbol}
+                </button>
+                <button onClick={removeTab} style={{ marginLeft: 8 }} type="button">
+                  {removeSymbol}
+                </button>
+              </React.Fragment>
+            )}
           </React.Fragment>
         )}
 
@@ -329,13 +384,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
           <button
             disabled={!tab.tempo}
             onClick={() => {
-              const nextTab =
-                tab.activeFrame === undefined
-                  ? tabOperations.updateActiveFrame(tab, barContainers)
-                  : tabOperations.resetActiveFrame(tab);
-              clearTimeout(activeFrameLastTimeout);
-
-              setTab(nextTab);
+              if (tab.activeFrame === undefined) {
+                setTab(tabOperations.updateActiveFrame(tab, barContainers));
+              } else {
+                exitPlayMode();
+              }
             }}
             style={{ marginLeft: 8 }}
             type="button"
