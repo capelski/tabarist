@@ -1,6 +1,6 @@
 import React from 'react';
 import { frameMaxCharacters, removeSymbol, stringHeight } from '../constants';
-import { getIndexDisplayValue, sPatternOperations, tabOperations } from '../operations';
+import { sPatternOperations, tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
 import { TempoPicker } from './tempo-picker';
 
@@ -16,7 +16,6 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
   return (
     <div style={{ marginBottom: 16 }}>
       <p>
-        <span style={{ marginRight: 8 }}>{getIndexDisplayValue(props.strummingPattern.index)}</span>
         <input
           onChange={(event) => {
             const nextTab = tabOperations.renameStrummingPattern(

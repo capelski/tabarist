@@ -1,12 +1,7 @@
 import React from 'react';
 import { BarGroup } from '.';
 import { removeSymbol } from '../constants';
-import {
-  barsToBarContainers,
-  getIndexDisplayValue,
-  sectionOperations,
-  tabOperations,
-} from '../operations';
+import { barsToBarContainers, sectionOperations, tabOperations } from '../operations';
 import { Section, Tab } from '../types';
 
 export type SectionProps = {
@@ -21,7 +16,6 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
   return (
     <React.Fragment>
       <p>
-        <span style={{ marginRight: 8 }}>{getIndexDisplayValue(props.section.index)}</span>
         <input
           onChange={(event) => {
             const nextTab = tabOperations.renameSection(
