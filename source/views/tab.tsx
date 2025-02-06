@@ -211,12 +211,16 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       )}
 
       <div style={{ alignItems: 'center', display: 'flex' }}>
-        <h3>
+        <h3 style={{ flexGrow: 1 }}>
           {isEditMode ? (
             <input
               value={tab.title}
               onChange={(event) => {
                 setTab(tabOperations.updateTitle(tab, event.target.value));
+              }}
+              style={{
+                fontSize: '1em', // Mimics <h3>
+                width: '95%',
               }}
             />
           ) : (
