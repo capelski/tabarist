@@ -15,4 +15,6 @@ export type DiminishedTab = {
   strummingPatterns: DiminishedStrummingPattern[];
   tempo: number | undefined;
   title: string;
+  /** Each word contained in the title in lowercase. Used to match text via Firestore queries */
+  titleWords: string[];
 };

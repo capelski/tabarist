@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { getTitleWords } from '../common';
 import { BarType, bodyMargin, characterWidth, NonReferenceBarType, ViewMode } from '../constants';
 import { User } from '../firebase';
 import {
@@ -257,6 +258,7 @@ export const tabOperations = {
     strummingPatterns: [],
     tempo: undefined,
     title: 'Unnamed tab',
+    titleWords: ['unnamed', 'tab'],
   }),
 
   getLongestBarWidth: (tab: Tab, windowWidth: number, viewMode: ViewMode) => {
@@ -596,6 +598,7 @@ export const tabOperations = {
     return {
       ...tab,
       title,
+      titleWords: getTitleWords(title),
     };
   },
 };

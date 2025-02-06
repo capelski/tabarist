@@ -1,7 +1,6 @@
+- Pagination
 - Long section names get cut in the repeats section
 - Collapsible sections and patterns
-- Pagination
-- The search doesn't work great... Display matching text in bold
 - Option to not display unused strings?
 - Allow copying a tab from another user
 - Support lyrics underneath the bars

@@ -4,6 +4,15 @@
       "collectionGroup": "tabs",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "titleWords", "mode": "ARRAY_CONTAINS" },
+        { "fieldPath": "title", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "titleWords", "mode": "ARRAY_CONTAINS" },
         { "fieldPath": "ownerId", "order": "ASCENDING" },
         { "fieldPath": "title", "order": "ASCENDING" }
       ]

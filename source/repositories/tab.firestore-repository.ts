@@ -1,4 +1,5 @@
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { getTitleWords } from '../common';
 import { getFirebaseDb, User } from '../firebase';
 import { deleteDocument, getDocument, setDocument } from '../firestore';
 import { augmentTab, diminishTab } from '../operations';
@@ -20,7 +21,10 @@ export const tabFirestoreRepository: TabRepository = {
   getPublicTabs: async (titleFilter = '') => {
     const queryData = query(
       collection(getFirebaseDb(), tabsPath),
-      where('title', '>=', titleFilter),
+      orderBy('title'),
+      ...(titleFilter
+        ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))]
+        : []),
     );
     const querySnapshot = await getDocs(queryData);
     return querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
@@ -28,8 +32,11 @@ export const tabFirestoreRepository: TabRepository = {
   getUserTabs: async (userId: User['uid'], titleFilter = '') => {
     const queryData = query(
       collection(getFirebaseDb(), tabsPath),
+      orderBy('title'),
       where('ownerId', '==', userId),
-      where('title', '>=', titleFilter),
+      ...(titleFilter
+        ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))]
+        : []),
     );
     const querySnapshot = await getDocs(queryData);
     return querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
