@@ -1,11 +1,21 @@
-import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  QueryFieldFilterConstraint,
+  startAfter,
+  where,
+} from 'firebase/firestore';
 import { getTitleWords } from '../common';
+import { pageSize } from '../constants';
 import { getFirebaseDb, User } from '../firebase';
 import { deleteDocument, getDocument, setDocument } from '../firestore';
 import { augmentTab, diminishTab } from '../operations';
 import { Tab } from '../types';
 import { DiminishedTab } from '../types/diminished-tab.type';
-import { TabRepository } from './tab.repository-interface';
+import { TabQueryParameters, TabRepository } from './tab.repository-interface';
 
 const tabsPath = 'tabs';
 
@@ -13,33 +23,41 @@ const getTabPath = (tabId: string) => {
   return [tabsPath, tabId];
 };
 
+const getFirestoreTabs = async (
+  params?: TabQueryParameters,
+  whereClauses: QueryFieldFilterConstraint[] = [],
+) => {
+  const queryData = query(
+    collection(getFirebaseDb(), tabsPath),
+    orderBy('title'),
+    ...whereClauses,
+    ...(params?.titleFilter
+      ? [where('titleWords', 'array-contains-any', getTitleWords(params.titleFilter))]
+      : []),
+    ...(params?.lastTitle ? [startAfter(params.lastTitle)] : []),
+    limit(pageSize + 1),
+  );
+
+  const querySnapshot = await getDocs(queryData);
+  const tabs = querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
+  const tabsPage = tabs.slice(0, pageSize);
+
+  return {
+    isLastPage: tabs.length <= pageSize,
+    tabs: tabsPage,
+  };
+};
+
 export const tabFirestoreRepository: TabRepository = {
   getById: async (tabId: string) => {
     const diminishedTab = (await getDocument(getTabPath(tabId))) as DiminishedTab;
     return augmentTab(diminishedTab);
   },
-  getPublicTabs: async (titleFilter = '') => {
-    const queryData = query(
-      collection(getFirebaseDb(), tabsPath),
-      orderBy('title'),
-      ...(titleFilter
-        ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))]
-        : []),
-    );
-    const querySnapshot = await getDocs(queryData);
-    return querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
+  getPublicTabs: (params) => {
+    return getFirestoreTabs(params);
   },
-  getUserTabs: async (userId: User['uid'], titleFilter = '') => {
-    const queryData = query(
-      collection(getFirebaseDb(), tabsPath),
-      orderBy('title'),
-      where('ownerId', '==', userId),
-      ...(titleFilter
-        ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))]
-        : []),
-    );
-    const querySnapshot = await getDocs(queryData);
-    return querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
+  getUserTabs: (userId, params) => {
+    return getFirestoreTabs(params, [where('ownerId', '==', userId)]);
   },
   remove: (tabId: string) => {
     return deleteDocument(getTabPath(tabId));

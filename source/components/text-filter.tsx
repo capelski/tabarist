@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export type TextFilterProps = {
   text: string;
@@ -7,6 +7,10 @@ export type TextFilterProps = {
 
 export const TextFilter: React.FC<TextFilterProps> = (props) => {
   const [filter, setFilter] = useState(props.text);
+
+  useEffect(() => {
+    setFilter(props.text);
+  }, [props.text]);
 
   return (
     <span>

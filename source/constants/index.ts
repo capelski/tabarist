@@ -19,6 +19,8 @@ export const operationColor = 'lightblue';
 export const referenceColor = '#e4ecfb';
 export const sectionColor = '#ebf3e8';
 
+export const pageSize = 10;
+
 export * from './bar-type';
 export * from './route-names';
 export * from './symbols';

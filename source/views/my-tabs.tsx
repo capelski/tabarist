@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from '../firebase';
 import { tabRepository } from '../repositories';
-import { Tab } from '../types';
+import { TabPageResponse } from '../repositories/tab.repository-interface';
 import { TabListView } from './tab-list';
 
 export type MyTabsViewProps = {
@@ -11,10 +11,10 @@ export type MyTabsViewProps = {
 export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
   return (
     <TabListView
-      getTabs={(titleFilter) => {
+      getTabs={(params) => {
         return props.user
-          ? tabRepository.getUserTabs(props.user.uid, titleFilter)
-          : Promise.resolve([] as Tab[]);
+          ? tabRepository.getUserTabs(props.user.uid, params)
+          : Promise.resolve<TabPageResponse>({ isLastPage: true, tabs: [] });
       }}
       user={props.user}
     />

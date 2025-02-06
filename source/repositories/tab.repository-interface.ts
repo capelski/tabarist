@@ -1,10 +1,22 @@
 import { User } from '../firebase';
 import { Tab } from '../types';
 
+export type TabQueryParameters = {
+  /** FireStore doesn't support skipping records. Use the title of the last record in
+   * the previous page to retrieve the documents of the following page */
+  lastTitle?: string;
+  titleFilter?: string;
+};
+
+export type TabPageResponse = {
+  isLastPage: boolean;
+  tabs: Tab[];
+};
+
 export type TabRepository = {
   getById(tabId: string): Promise<Tab | undefined>;
-  getPublicTabs(titleFilter?: string): Promise<Tab[]>;
-  getUserTabs(userId: User['uid'], titleFilter?: string): Promise<Tab[]>;
+  getPublicTabs(params?: TabQueryParameters): Promise<TabPageResponse>;
+  getUserTabs(userId: User['uid'], params?: TabQueryParameters): Promise<TabPageResponse>;
   remove(tabId: string): Promise<void>;
   set(tab: Tab, ownerId: User['uid']): Promise<void>;
 };

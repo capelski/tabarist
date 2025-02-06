@@ -9,9 +9,6 @@ export type HomeViewProps = {
 
 export const HomeView: React.FC<HomeViewProps> = (props) => {
   return (
-    <TabListView
-      getTabs={(titleFilter) => tabRepository.getPublicTabs(titleFilter)}
-      user={props.user}
-    />
+    <TabListView getTabs={(params) => tabRepository.getPublicTabs(params)} user={props.user} />
   );
 };

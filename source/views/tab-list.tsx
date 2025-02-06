@@ -7,15 +7,17 @@ import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { User } from '../firebase';
 import { getTabRelativeUrl } from '../operations';
 import { tabRepository } from '../repositories';
+import { TabPageResponse, TabQueryParameters } from '../repositories/tab.repository-interface';
 import { Tab } from '../types';
 
 export type TabListViewProps = {
-  getTabs: (titleFilter: string) => Promise<Tab[]>;
+  getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
   user: User | null;
 };
 
 export const TabListView: React.FC<TabListViewProps> = (props) => {
   const [deletingTab, setDeletingTab] = useState('');
+  const [isLastPage, setIsLastPage] = useState(true);
   const [loading, setLoading] = useState(true);
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [titleFilter, setTitleFilter] = useState('');
@@ -30,18 +32,20 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     }
   }, []);
 
-  const updateTabs = async () => {
+  const updateTabs = async (params?: TabQueryParameters) => {
     setLoading(true);
 
-    const tabs = await props.getTabs(titleFilter);
+    const response = await props.getTabs(params);
+    const keepPreviousTabs = !!params?.lastTitle;
 
-    setTabs(tabs);
+    setIsLastPage(response.isLastPage);
     setLoading(false);
+    setTabs(keepPreviousTabs ? [...tabs, ...response.tabs] : response.tabs);
   };
 
   useEffect(() => {
-    updateTabs();
-  }, [props.user, titleFilter]);
+    updateTabs({ titleFilter });
+  }, [props.user]);
 
   const cancelDelete = () => {
     setDeletingTab('');
@@ -53,7 +57,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     }
 
     await tabRepository.remove(deletingTab);
-    updateTabs();
+    setTabs(tabs.filter((tab) => tab.id !== deletingTab));
     cancelDelete();
   };
 
@@ -61,15 +65,16 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     setDeletingTab(tabId);
   };
 
-  const updateTitleFilter = (filter: string) => {
-    setTitleFilter(filter);
+  const updateTitleFilter = (nextTitleFilter: string) => {
     const nextSearchParams = new URLSearchParams(searchParams);
-    if (filter) {
-      nextSearchParams.set(queryParameters.title, filter);
+    if (nextTitleFilter) {
+      nextSearchParams.set(queryParameters.title, nextTitleFilter);
     } else {
       nextSearchParams.delete(queryParameters.title);
     }
+    setTitleFilter(nextTitleFilter);
     setSearchParams(nextSearchParams);
+    updateTabs({ titleFilter: nextTitleFilter });
   };
 
   return (
@@ -102,35 +107,49 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
         )}
       </p>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : tabs.length === 0 ? (
+      {tabs.length === 0 && !loading ? (
         <p>No tabs to display{!props.user && <span>. Sign in to create your own tabs</span>}</p>
       ) : (
-        tabs.map((tab) => {
-          const isTabOwner = props.user && props.user.uid === tab.ownerId;
+        <div>
+          {tabs.map((tab) => {
+            const isTabOwner = props.user && props.user.uid === tab.ownerId;
 
-          return (
-            <div
-              key={tab.id}
-              style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
-            >
-              <div>
-                {tab.title}
-                <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(tab.id)}>
-                  ➡️
-                </NavLink>
-              </div>
-              {isTabOwner && (
+            return (
+              <div
+                key={tab.id}
+                style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
+              >
                 <div>
-                  <button onClick={() => removeTab(tab.id)} type="button">
-                    {removeSymbol}
-                  </button>
+                  {tab.title}
+                  <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(tab.id)}>
+                    ➡️
+                  </NavLink>
                 </div>
-              )}
-            </div>
-          );
-        })
+                {isTabOwner && (
+                  <div>
+                    <button onClick={() => removeTab(tab.id)} type="button">
+                      {removeSymbol}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <button
+              disabled={isLastPage}
+              onClick={() => {
+                updateTabs({ titleFilter, lastTitle: tabs[tabs.length - 1].title });
+              }}
+              type="button"
+            >
+              Load more
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

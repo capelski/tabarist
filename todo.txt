@@ -1,4 +1,3 @@
-- Pagination
 - Long section names get cut in the repeats section
 - Collapsible sections and patterns
 - Option to not display unused strings?
