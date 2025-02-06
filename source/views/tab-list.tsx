@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router';
+import { NavLink, useNavigate, useSearchParams } from 'react-router';
 import { TextFilter } from '../components';
 import { createTab } from '../components/commons';
 import { Modal } from '../components/modal';
-import { addSymbol, removeSymbol } from '../constants';
+import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { User } from '../firebase';
 import { getTabRelativeUrl } from '../operations';
 import { tabRepository } from '../repositories';
@@ -20,7 +20,15 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [titleFilter, setTitleFilter] = useState('');
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const titleParameter = searchParams.get(queryParameters.title);
+    if (titleParameter) {
+      setTitleFilter(titleParameter);
+    }
+  }, []);
 
   const updateTabs = async () => {
     setLoading(true);
@@ -53,6 +61,17 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     setDeletingTab(tabId);
   };
 
+  const updateTitleFilter = (filter: string) => {
+    setTitleFilter(filter);
+    const nextSearchParams = new URLSearchParams(searchParams);
+    if (filter) {
+      nextSearchParams.set(queryParameters.title, filter);
+    } else {
+      nextSearchParams.delete(queryParameters.title);
+    }
+    setSearchParams(nextSearchParams);
+  };
+
   return (
     <div className="tabs">
       {deletingTab && (
@@ -70,7 +89,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
       )}
 
       <p>
-        <TextFilter text={titleFilter} textSetter={setTitleFilter} />
+        <TextFilter text={titleFilter} textSetter={updateTitleFilter} />
 
         {props.user && (
           <button
