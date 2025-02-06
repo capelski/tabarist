@@ -22,6 +22,8 @@ export type TabViewProps = {
   scrollView: RefObject<HTMLDivElement>;
 };
 
+let activeFrameLastDelay = 0;
+let activeFrameLastRender = 0;
 let activeFrameLastTimeout = 0;
 
 export const TabView: React.FC<TabViewProps> = (props) => {
@@ -56,17 +58,25 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
   }, [tabId]);
 
-  useEffect(() => {
+  const updateActiveFrame = () => {
     if (tab?.tempo && tab.activeFrame) {
       const msPerBeat = 60_000 / tab.tempo;
       const msPerBar = msPerBeat * 4;
       const msPerFrame = msPerBar / tab.activeFrame.barContainer.renderedBar.frames.length;
 
+      activeFrameLastDelay = Date.now() - activeFrameLastRender; // - msPerFrame;
+
       activeFrameLastTimeout = window.setTimeout(() => {
         setTab(tabOperations.updateActiveFrame(tab, barContainers));
-      }, msPerFrame);
+        activeFrameLastRender = Date.now();
+      }, msPerFrame - activeFrameLastDelay);
+    } else {
+      activeFrameLastDelay = 0;
+      activeFrameLastRender = 0;
     }
-  }, [tab?.activeFrame]);
+  };
+
+  useEffect(updateActiveFrame, [tab?.activeFrame]);
 
   const { areModesEquivalent, barWidth, barContainers } = useMemo(() => {
     if (tab?.bars) {
@@ -138,18 +148,22 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     setSearchParams(nextSearchParams);
   };
 
-  const exitPlayMode = () => {
-    const nextTab = tabOperations.resetActiveFrame(tab);
-    clearTimeout(activeFrameLastTimeout);
-    setTab(nextTab);
-  };
+  const enterPlayMode = () => {
+    setTab(tabOperations.updateActiveFrame(tab, barContainers));
 
+    activeFrameLastRender = Date.now();
+  };
   const exitEditMode = () => {
     if (JSON.stringify(tab) === editingCopy) {
       confirmExitEditMode();
     } else {
       setDiscardingChanges(true);
     }
+  };
+
+  const exitPlayMode = () => {
+    clearTimeout(activeFrameLastTimeout);
+    setTab(tabOperations.resetActiveFrame(tab));
   };
 
   const removeTab = () => {
@@ -362,6 +376,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <div style={{ backgroundColor: 'white', bottom: 0, paddingTop: 8, position: 'sticky' }}>
         <span style={{ marginLeft: 8 }}>♫</span>
         <input
+          disabled={!!tab.activeFrame}
           onBlur={() => {
             if (tab.tempo) {
               const validTempo = Math.max(Math.min(tab.tempo, maxTempo), minTempo);
@@ -385,7 +400,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
             disabled={!tab.tempo}
             onClick={() => {
               if (tab.activeFrame === undefined) {
-                setTab(tabOperations.updateActiveFrame(tab, barContainers));
+                enterPlayMode();
               } else {
                 exitPlayMode();
               }
