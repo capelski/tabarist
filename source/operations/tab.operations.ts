@@ -285,7 +285,7 @@ export const tabOperations = {
             : bar.frames.map((frame) => {
                 return frame.strings.reduce((stringLength, string) => {
                   return Math.max(stringLength, getValueLength(string.value));
-                }, 0);
+                }, getValueLength(frame.chordSupport ?? ''));
               })
         ).reduce<FrameAggregation>(
           (lengthsReduced, currentLength) => {
