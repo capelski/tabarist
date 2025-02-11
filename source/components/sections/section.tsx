@@ -1,8 +1,8 @@
 import React from 'react';
-import { BarGroup } from '.';
-import { removeSymbol } from '../constants';
-import { barsToBarContainers, sectionOperations, tabOperations } from '../operations';
-import { Section, Tab } from '../types';
+import { BarGroup } from '..';
+import { removeSymbol } from '../../constants';
+import { barsToBarContainers, sectionOperations, tabOperations } from '../../operations';
+import { Section, Tab } from '../../types';
 
 export type SectionProps = {
   barWidth: string;

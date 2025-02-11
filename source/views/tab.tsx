@@ -1,8 +1,7 @@
 import React, { RefObject, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
-import { BarGroup, Modal, SectionComponent, StrummingPatternComponent } from '../components';
+import { BarGroup, Modal, SectionList, StrummingPatternList } from '../components';
 import {
-  addSymbol,
   editSymbol,
   maxTempo,
   minTempo,
@@ -13,7 +12,7 @@ import {
   ViewMode,
 } from '../constants';
 import { User } from '../firebase';
-import { barsToBarContainers, sPatternOperations, tabOperations } from '../operations';
+import { barsToBarContainers, tabOperations } from '../operations';
 import { tabRepository } from '../repositories';
 import { Tab } from '../types';
 
@@ -98,14 +97,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   }
 
   const isTabOwner = props.user && props.user.uid === tab.ownerId;
-
-  const addSection = () => {
-    setTab(tabOperations.addSection(tab));
-  };
-
-  const addStrummingPattern = () => {
-    setTab(tabOperations.addStrummingPattern(tab));
-  };
 
   const cancelDelete = () => {
     setDeletingTab('');
@@ -329,51 +320,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
       {isEditMode && (
         <React.Fragment>
-          <h3>Strumming patterns</h3>
-
-          {tab.strummingPatterns.map((sPattern) => {
-            return (
-              <StrummingPatternComponent
-                key={sPattern.index}
-                rebase={(framesNumber) => {
-                  setTab(sPatternOperations.rebase(tab, sPattern.index, framesNumber));
-                }}
-                strummingPattern={sPattern}
-                tab={tab}
-                update={(frameIndex, value) => {
-                  setTab(sPatternOperations.update(tab, sPattern.index, frameIndex, value));
-                }}
-                updateTab={setTab}
-              />
-            );
-          })}
-
-          <p>
-            <button onClick={addStrummingPattern} type="button">
-              {addSymbol} strumming pattern
-            </button>
-          </p>
-
-          <h3>Sections</h3>
-
-          {tab.sections.map((section) => {
-            return (
-              <SectionComponent
-                barWidth={`${barWidth}px`}
-                isEditMode={isEditMode}
-                key={section.index}
-                section={section}
-                tab={tab}
-                updateTab={setTab}
-              />
-            );
-          })}
-
-          <p>
-            <button onClick={addSection} type="button">
-              {addSymbol} section
-            </button>
-          </p>
+          <SectionList barWidth={`${barWidth}px`} tab={tab} updateTab={setTab} />
+          <StrummingPatternList tab={tab} updateTab={setTab} />
         </React.Fragment>
       )}
 
