@@ -2,9 +2,13 @@ import { User } from '../firebase';
 import { Tab } from '../types';
 
 export type TabQueryParameters = {
-  /** FireStore doesn't support skipping records. Use the title of the last record in
-   * the previous page to retrieve the documents of the following page */
-  lastTitle?: string;
+  /** FireStore doesn't support skipping records. Use the title and id of the
+   * last record in the previous page to retrieve the documents of the following page.
+   * We need both title and id, as there can be multiple tabs with the same title */
+  lastDocument?: {
+    id: string;
+    title: string;
+  };
   titleFilter?: string;
 };
 

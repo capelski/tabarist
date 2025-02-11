@@ -30,11 +30,14 @@ const getFirestoreTabs = async (
   const queryData = query(
     collection(getFirebaseDb(), tabsPath),
     orderBy('title'),
-    ...whereClauses,
+    orderBy('id'),
     ...(params?.titleFilter
       ? [where('titleWords', 'array-contains-any', getTitleWords(params.titleFilter))]
       : []),
-    ...(params?.lastTitle ? [startAfter(params.lastTitle)] : []),
+    ...whereClauses,
+    ...(params?.lastDocument
+      ? [startAfter(params.lastDocument.title, params.lastDocument.id)]
+      : []),
     limit(pageSize + 1),
   );
 

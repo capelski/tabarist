@@ -4,17 +4,30 @@
       "collectionGroup": "tabs",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": "Fetching all tabs. orderBy: title, id"
+    },
+    {
+      "collectionGroup": "tabs",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "ownerId", "order": "ASCENDING" },
-        { "fieldPath": "title", "order": "ASCENDING" }
-      ]
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": "Fetching the tabs of a user. where: ownerId / orderBy: title, id"
     },
     {
       "collectionGroup": "tabs",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "titleWords", "mode": "ARRAY_CONTAINS" },
-        { "fieldPath": "title", "order": "ASCENDING" }
-      ]
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": "Fetching all tabs that contain certain words in the title. where: titleWords / orderBy: title, id"
     },
     {
       "collectionGroup": "tabs",
@@ -22,8 +35,10 @@
       "fields": [
         { "fieldPath": "titleWords", "mode": "ARRAY_CONTAINS" },
         { "fieldPath": "ownerId", "order": "ASCENDING" },
-        { "fieldPath": "title", "order": "ASCENDING" }
-      ]
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": "Fetching the tabs of a user that contain certain words in the title. where: titleWords, ownerId / orderBy: title, id"
     }
   ],
   "fieldOverrides": []

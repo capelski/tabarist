@@ -36,7 +36,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     setLoading(true);
 
     const response = await props.getTabs(params);
-    const keepPreviousTabs = !!params?.lastTitle;
+    const keepPreviousTabs = !!params?.lastDocument;
 
     setIsLastPage(response.isLastPage);
     setLoading(false);
@@ -142,7 +142,14 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
             <button
               disabled={isLastPage}
               onClick={() => {
-                updateTabs({ titleFilter, lastTitle: tabs[tabs.length - 1].title });
+                const lastTab = tabs[tabs.length - 1];
+                updateTabs({
+                  titleFilter,
+                  lastDocument: {
+                    id: lastTab.id,
+                    title: lastTab.title,
+                  },
+                });
               }}
               type="button"
             >
