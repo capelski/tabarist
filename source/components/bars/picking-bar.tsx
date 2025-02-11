@@ -1,7 +1,7 @@
 import React from 'react';
 import { tabOperations } from '../../operations';
 import { BarContainer, PickingBar } from '../../types';
-import { BarComponentBaseProps, getFrameBackgroundColor } from '../commons';
+import { BarComponentBaseProps, getFrameBackgroundColor } from './bar-handlers';
 import { PickingFrameComponent } from './picking-frame';
 
 export type PickingBarComponentProps = BarComponentBaseProps & {

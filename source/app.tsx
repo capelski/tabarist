@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
-import { NavBar } from './components';
 import { RouteNames } from './constants';
 import { getFirebaseAuth, User } from './firebase';
-import { HomeView, MyTabsView, TabView } from './views';
+import { HomeView, MyTabsView, NavBar, TabView } from './views';
 
 export const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);

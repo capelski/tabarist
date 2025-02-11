@@ -6,10 +6,10 @@ import {
   NonReferenceBarType,
   operationColor,
   stringHeight,
-} from '../constants';
-import { barOperations, sectionOperations } from '../operations';
-import { Section, Tab } from '../types';
-import { addBar, copyBarEnd, moveBarEnd } from './commons';
+} from '../../constants';
+import { barOperations, sectionOperations } from '../../operations';
+import { Section, Tab } from '../../types';
+import { addBar, copyBarEnd, moveBarEnd } from './bar-handlers';
 
 export type AddBarProps = {
   barIndex: number;

@@ -2,7 +2,7 @@ import React from 'react';
 import { frameMaxCharacters, removeSymbol, stringHeight } from '../constants';
 import { sPatternOperations, tabOperations } from '../operations';
 import { StrummingPattern, Tab } from '../types';
-import { DivisionsPicker } from './divisions-picker';
+import { DivisionsPicker } from './common/divisions-picker';
 
 export type StrummingPatternProps = {
   rebase: (framesNumber: number) => void;

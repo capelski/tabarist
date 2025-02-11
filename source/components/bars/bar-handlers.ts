@@ -1,9 +1,6 @@
-import { NavigateFunction } from 'react-router';
-import { activeColor, NonReferenceBarType } from '../constants';
-import { User } from '../firebase';
-import { getTabRelativeUrl, tabOperations } from '../operations';
-import { tabRepository } from '../repositories';
-import { Section, Tab } from '../types';
+import { activeColor, NonReferenceBarType } from '../../constants';
+import { tabOperations } from '../../operations';
+import { Section, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
   backgroundColor: string;
@@ -22,13 +19,6 @@ export const addBar = (
 ) => {
   const nextTab = tabOperations.addBar(tab, barIndex, type, inSection);
   updateTab(nextTab);
-};
-
-export const createTab = async (user: User, navigate: NavigateFunction) => {
-  const tab = tabOperations.create(user.uid);
-  await tabRepository.set(tab, user.uid);
-
-  navigate(getTabRelativeUrl(tab.id, true));
 };
 
 export const copyBarEnd = (

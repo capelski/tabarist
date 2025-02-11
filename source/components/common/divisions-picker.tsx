@@ -1,5 +1,5 @@
 import React from 'react';
-import { framesNumberOptions } from '../constants';
+import { framesNumberOptions } from '../../constants';
 
 export type DivisionsPickerProps = {
   framesNumber: number;

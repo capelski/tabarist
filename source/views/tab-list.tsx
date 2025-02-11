@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router';
-import { TextFilter } from '../components';
-import { createTab } from '../components/commons';
-import { Modal } from '../components/modal';
+import { Modal, TextFilter } from '../components';
 import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { User } from '../firebase';
-import { getTabRelativeUrl } from '../operations';
-import { tabRepository } from '../repositories';
-import { TabPageResponse, TabQueryParameters } from '../repositories/tab.repository-interface';
+import { getTabRelativeUrl, tabOperations } from '../operations';
+import { TabPageResponse, TabQueryParameters, tabRepository } from '../repositories';
 import { Tab } from '../types';
 
 export type TabListViewProps = {
@@ -61,6 +58,17 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     cancelDelete();
   };
 
+  const createTab = async () => {
+    if (!props.user) {
+      return;
+    }
+
+    const tab = tabOperations.create(props.user.uid);
+    await tabRepository.set(tab, props.user.uid);
+
+    navigate(getTabRelativeUrl(tab.id, true));
+  };
+
   const removeTab = (tabId: string) => {
     setDeletingTab(tabId);
   };
@@ -97,11 +105,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
         <TextFilter text={titleFilter} textSetter={updateTitleFilter} />
 
         {props.user && (
-          <button
-            onClick={() => createTab(props.user!, navigate)}
-            style={{ marginLeft: 16 }}
-            type="button"
-          >
+          <button onClick={createTab} style={{ marginLeft: 16 }} type="button">
             {addSymbol} tab
           </button>
         )}

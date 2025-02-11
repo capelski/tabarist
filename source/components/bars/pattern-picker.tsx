@@ -1,5 +1,5 @@
 import React from 'react';
-import { StrummingPattern } from '../types';
+import { StrummingPattern } from '../../types';
 
 export type PatternPickerProps = {
   rebase: (sPatternIndex: number) => void;

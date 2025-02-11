@@ -2,8 +2,8 @@ import React from 'react';
 import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../../constants';
 import { getIndexDisplayValue, sectionOperations, tabOperations } from '../../operations';
 import { BarContainer, Section, Tab } from '../../types';
-import { DivisionsPicker, DivisionsPickerProps } from '../divisions-picker';
-import { PatternPicker, PatternPickerProps } from '../pattern-picker';
+import { DivisionsPicker, DivisionsPickerProps } from '../common/divisions-picker';
+import { PatternPicker, PatternPickerProps } from './pattern-picker';
 
 export type BarControlsProps = {
   canRebase: boolean;

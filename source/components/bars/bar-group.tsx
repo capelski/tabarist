@@ -1,8 +1,8 @@
 import React, { RefObject } from 'react';
-import { repeatsHeight } from '../constants';
-import { BarContainer, Section, Tab } from '../types';
+import { repeatsHeight } from '../../constants';
+import { BarContainer, Section, Tab } from '../../types';
 import { AddBar } from './add-bar';
-import { BarContainerComponent } from './bars/bar-container';
+import { BarContainerComponent } from './bar-container';
 
 export type BarGroupProps = {
   barContainers: BarContainer[];

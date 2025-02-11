@@ -1,7 +1,7 @@
 import React from 'react';
 import { tabOperations } from '../../operations';
 import { BarContainer, ChordBar, StrummingPattern } from '../../types';
-import { BarComponentBaseProps, getFrameBackgroundColor } from '../commons';
+import { BarComponentBaseProps, getFrameBackgroundColor } from './bar-handlers';
 import { ChordFrame } from './chord-frame';
 
 export type ChordBarCoreProps = BarComponentBaseProps & {
