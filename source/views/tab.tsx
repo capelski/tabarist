@@ -51,6 +51,12 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
   }, [tabId]);
 
+  useEffect(() => {
+    if (isEditMode && searchParams.get(queryParameters.editMode) !== 'true') {
+      setEditingCopy('');
+    }
+  }, [searchParams]);
+
   const { areModesEquivalent, barWidth, barContainers } = useMemo(() => {
     if (tab?.bars) {
       const { areModesEquivalent, barWidth } = tabOperations.getLongestBarWidth(
