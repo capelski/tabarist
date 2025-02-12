@@ -16,7 +16,7 @@ export const SectionList: React.FC<SectionListProps> = (props) => {
   };
 
   return (
-    <React.Fragment>
+    <div className="section-list">
       <h3>Sections</h3>
 
       {props.tab.sections.map((section) => {
@@ -37,6 +37,6 @@ export const SectionList: React.FC<SectionListProps> = (props) => {
           {addSymbol} section
         </button>
       </p>
-    </React.Fragment>
+    </div>
   );
 };

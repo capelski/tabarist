@@ -22,7 +22,7 @@ export const StrummingPatternComponent: React.FC<StrummingPatternProps> = (props
   const divisions = props.strummingPattern.frames.length / 4;
 
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div className="strumming-pattern" style={{ marginBottom: 16 }}>
       <p>
         <input
           onChange={(event) => {

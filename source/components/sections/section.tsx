@@ -14,7 +14,7 @@ export type SectionProps = {
 
 export const SectionComponent: React.FC<SectionProps> = (props) => {
   return (
-    <React.Fragment>
+    <div className="section">
       <p>
         <input
           onChange={(event) => {
@@ -49,6 +49,6 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
         inSection={props.section}
         scrollView={undefined}
       />
-    </React.Fragment>
+    </div>
   );
 };

@@ -15,7 +15,7 @@ export const StrummingPatternList: React.FC<StrummingPatternListProps> = (props)
   };
 
   return (
-    <React.Fragment>
+    <div className="strumming-pattern-list">
       <h3>Strumming patterns</h3>
 
       {props.tab.strummingPatterns.map((sPattern) => {
@@ -42,6 +42,6 @@ export const StrummingPatternList: React.FC<StrummingPatternListProps> = (props)
           {addSymbol} strumming pattern
         </button>
       </p>
-    </React.Fragment>
+    </div>
   );
 };
