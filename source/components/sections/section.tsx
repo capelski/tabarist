@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarGroup } from '..';
 import { removeSymbol } from '../../constants';
 import { barsToBarContainers, sectionOperations, tabOperations } from '../../operations';
@@ -13,20 +13,42 @@ export type SectionProps = {
 };
 
 export const SectionComponent: React.FC<SectionProps> = (props) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <div className="section">
-      <p>
-        <input
-          onChange={(event) => {
-            const nextTab = tabOperations.renameSection(
-              props.tab,
-              props.section.index,
-              event.target.value,
-            );
-            props.updateTab(nextTab);
-          }}
-          value={props.section.name}
-        />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBlockStart: '1em', // Mimics <p>
+          marginBlockEnd: '1em',
+        }}
+      >
+        <div>
+          <button
+            onClick={() => {
+              setIsExpanded(!isExpanded);
+            }}
+            style={{ marginRight: 8 }}
+            type="button"
+          >
+            {isExpanded ? '⬇️' : '➡️'}
+          </button>
+
+          <input
+            onChange={(event) => {
+              const nextTab = tabOperations.renameSection(
+                props.tab,
+                props.section.index,
+                event.target.value,
+              );
+              props.updateTab(nextTab);
+            }}
+            value={props.section.name}
+          />
+        </div>
+
         <button
           disabled={!sectionOperations.canDelete(props.tab, props.section.index)}
           onClick={() => {
@@ -38,17 +60,19 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
         >
           {removeSymbol}
         </button>
-      </p>
+      </div>
 
-      <BarGroup
-        {...props}
-        barContainers={barsToBarContainers(props.tab, props.section.bars, {
-          inSection: props.section,
-        })}
-        barsNumber={props.section.bars.length}
-        inSection={props.section}
-        scrollView={undefined}
-      />
+      {isExpanded && (
+        <BarGroup
+          {...props}
+          barContainers={barsToBarContainers(props.tab, props.section.bars, {
+            inSection: props.section,
+          })}
+          barsNumber={props.section.bars.length}
+          inSection={props.section}
+          scrollView={undefined}
+        />
+      )}
     </div>
   );
 };

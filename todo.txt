@@ -1,4 +1,3 @@
-- Collapsible sections and patterns
 - Display total documents matching in tab-list component, next to load more
 - Long section names get cut in the repeats section
 - Option to not display unused strings?
