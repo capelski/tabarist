@@ -1,6 +1,13 @@
 import { nanoid } from 'nanoid';
 import { getTitleWords } from '../common';
-import { BarType, bodyMargin, characterWidth, NonReferenceBarType, ViewMode } from '../constants';
+import {
+  BarType,
+  bodyMargin,
+  characterWidth,
+  NonReferenceBarType,
+  sectionNameMaxWidth,
+  ViewMode,
+} from '../constants';
 import { User } from '../firebase';
 import {
   Bar,
@@ -267,7 +274,13 @@ export const tabOperations = {
       ...tab.sections.map((s) => s.bars).reduce((reduced, bars) => [...reduced, ...bars], []),
     ].filter((b) => b.type === BarType.chord || b.type === BarType.picking);
 
-    const minimumWidth = 140; // Used on empty bars and tabs with no bars
+    const longestSectionName = tab.sections.reduce<string>((reduced, section) => {
+      return reduced.length > section.name.length ? reduced : section.name;
+    }, '');
+
+    // Used on empty section bars and tabs with no bars
+    const minimumWidth =
+      75 + Math.min(longestSectionName.length * characterWidth, sectionNameMaxWidth);
 
     const { longestBarAdaptive, longestBarUniform } = bars.reduce<BarAggregation>(
       (barsReduced, bar) => {

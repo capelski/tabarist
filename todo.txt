@@ -1,10 +1,10 @@
 - Display total documents matching in tab-list component, next to load more
-- Long section names get cut in the repeats section
 - Option to not display unused strings?
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
 - Line breaks
 - Offer default sPatterns: Common, asynchopated, waltz, etc.
 - Possibility to assign a color to sections/sPatterns
-- Add capacitor and build APP bundle
+- Add capacitor and build APP bundle. Integrate AdMob/AdSense
 - Rename "Strumming patterns" to signatures (Time signatures)
+- Integrate with https://extensions.dev/extensions/invertase/firestore-stripe-payments

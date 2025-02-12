@@ -1,4 +1,5 @@
 import React from 'react';
+import { sectionNameMaxWidth } from '../../constants';
 import { Section } from '../../types';
 
 export interface SectionPickerProps {
@@ -15,7 +16,7 @@ export const SectionPicker: React.FC<SectionPickerProps> = (props) => {
         const nextSectionIndex = parseInt(event.target.value);
         props.changeSection(nextSectionIndex);
       }}
-      style={{ marginLeft: 8 }}
+      style={{ marginLeft: 8, maxWidth: sectionNameMaxWidth }}
       value={props.section.index}
     >
       {props.sections.map((section) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { repeatsHeight, sectionColor } from '../../constants';
+import { repeatsHeight, sectionColor, sectionNameMaxWidth } from '../../constants';
 import { tabOperations } from '../../operations';
 import { BarContainer, Tab } from '../../types';
 import { SectionPicker, SectionPickerProps } from './section-picker';
@@ -71,7 +71,14 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
                 )}
               </React.Fragment>
             ) : (
-              <span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  maxWidth: sectionNameMaxWidth,
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {remainingRepeats ? (
                   <span style={{ fontWeight: 'bold' }}>{remainingRepeats}x </span>
                 ) : (

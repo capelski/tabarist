@@ -12,6 +12,7 @@ export const bodyMargin = 8;
 export const characterWidth = 12;
 export const repeatsHeight = 24;
 export const stringHeight = 20;
+export const sectionNameMaxWidth = 250;
 
 export const activeColor = '#fff2cc';
 export const addBarColor = '#fff8e5';
