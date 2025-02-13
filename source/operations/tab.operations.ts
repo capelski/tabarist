@@ -279,8 +279,10 @@ export const tabOperations = {
     }, '');
 
     // Used on empty section bars and tabs with no bars
-    const minimumWidth =
-      75 + Math.min(longestSectionName.length * characterWidth, sectionNameMaxWidth);
+    const minimumWidth = Math.max(
+      140,
+      75 + Math.min(longestSectionName.length * characterWidth, sectionNameMaxWidth),
+    );
 
     const { longestBarAdaptive, longestBarUniform } = bars.reduce<BarAggregation>(
       (barsReduced, bar) => {
