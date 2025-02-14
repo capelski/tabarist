@@ -14,7 +14,11 @@ export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
       getTabs={(params) => {
         return props.user
           ? tabRepository.getUserTabs(props.user.uid, params)
-          : Promise.resolve<TabPageResponse>({ isLastPage: true, tabs: [] });
+          : Promise.resolve<TabPageResponse>({
+              hasNextPage: false,
+              hasPreviousPage: false,
+              tabs: [],
+            });
       }}
       user={props.user}
     />

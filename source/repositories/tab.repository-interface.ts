@@ -1,11 +1,14 @@
 import { User } from '../firebase';
 import { Tab } from '../types';
 
+export type AnchorDirection = 'previous' | 'next';
+
 export type TabQueryParameters = {
-  /** FireStore doesn't support skipping records. Use the title and id of the
-   * last record in the previous page to retrieve the documents of the following page.
+  /** Firestore doesn't support skipping documents. Use the title and id of the first/last
+   * documents in the current page to retrieve the documents of the previous/following page.
    * We need both title and id, as there can be multiple tabs with the same title */
-  lastDocument?: {
+  anchorDocument?: {
+    direction: AnchorDirection;
     id: string;
     title: string;
   };
@@ -13,7 +16,8 @@ export type TabQueryParameters = {
 };
 
 export type TabPageResponse = {
-  isLastPage: boolean;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
   tabs: Tab[];
 };
 

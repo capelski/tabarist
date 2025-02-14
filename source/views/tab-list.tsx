@@ -4,8 +4,12 @@ import { Modal, TextFilter } from '../components';
 import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { User } from '../firebase';
 import { getTabRelativeUrl, tabOperations } from '../operations';
-import { TabPageResponse, TabQueryParameters, tabRepository } from '../repositories';
-import { Tab } from '../types';
+import {
+  AnchorDirection,
+  TabPageResponse,
+  TabQueryParameters,
+  tabRepository,
+} from '../repositories';
 
 export type TabListViewProps = {
   getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
@@ -14,35 +18,60 @@ export type TabListViewProps = {
 
 export const TabListView: React.FC<TabListViewProps> = (props) => {
   const [deletingTab, setDeletingTab] = useState('');
-  const [isLastPage, setIsLastPage] = useState(true);
+  const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({
+    hasNextPage: false,
+    hasPreviousPage: false,
+    tabs: [],
+  });
   const [loading, setLoading] = useState(true);
-  const [tabs, setTabs] = useState<Tab[]>([]);
-  const [titleFilter, setTitleFilter] = useState('');
+  const [tabParams, setTabParams] = useState<TabQueryParameters>();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const titleParameter = searchParams.get(queryParameters.title);
+    const aDParameter = searchParams.get(queryParameters.anchorDirection);
+    const aIParameter = searchParams.get(queryParameters.anchorId);
+    const aTParameter = searchParams.get(queryParameters.anchorTitle);
+
+    const nextTabParams: TabQueryParameters = {};
+
     if (titleParameter) {
-      setTitleFilter(titleParameter);
+      nextTabParams.titleFilter = titleParameter;
     }
+
+    if (aDParameter && aIParameter && aTParameter) {
+      nextTabParams.anchorDocument = {
+        direction: aDParameter as AnchorDirection,
+        id: aIParameter,
+        title: aTParameter,
+      };
+    }
+
+    setTabParams(nextTabParams);
   }, []);
 
   const updateTabs = async (params?: TabQueryParameters) => {
     setLoading(true);
 
     const response = await props.getTabs(params);
-    const keepPreviousTabs = !!params?.lastDocument;
 
-    setIsLastPage(response.isLastPage);
+    if (params?.anchorDocument) {
+      const nextSearchParams = new URLSearchParams(searchParams);
+      nextSearchParams.set(queryParameters.anchorDirection, params.anchorDocument.direction);
+      nextSearchParams.set(queryParameters.anchorId, params.anchorDocument.id);
+      nextSearchParams.set(queryParameters.anchorTitle, params.anchorDocument.title);
+      setSearchParams(nextSearchParams);
+    }
+
     setLoading(false);
-    setTabs(keepPreviousTabs ? [...tabs, ...response.tabs] : response.tabs);
+    setTabPageResponse(response);
   };
 
   useEffect(() => {
-    updateTabs({ titleFilter });
-  }, [props.user]);
+    updateTabs(tabParams);
+  }, [props.user, tabParams]);
 
   const cancelDelete = () => {
     setDeletingTab('');
@@ -54,7 +83,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     }
 
     await tabRepository.remove(deletingTab);
-    setTabs(tabs.filter((tab) => tab.id !== deletingTab));
+    updateTabs(tabParams);
     cancelDelete();
   };
 
@@ -80,9 +109,13 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     } else {
       nextSearchParams.delete(queryParameters.title);
     }
-    setTitleFilter(nextTitleFilter);
+    nextSearchParams.delete(queryParameters.anchorDirection);
+    nextSearchParams.delete(queryParameters.anchorId);
+    nextSearchParams.delete(queryParameters.anchorTitle);
+
+    const nextParams = { titleFilter: nextTitleFilter };
+    setTabParams(nextParams);
     setSearchParams(nextSearchParams);
-    updateTabs({ titleFilter: nextTitleFilter });
   };
 
   return (
@@ -102,7 +135,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
       )}
 
       <p>
-        <TextFilter text={titleFilter} textSetter={updateTitleFilter} />
+        <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
 
         {props.user && (
           <button onClick={createTab} style={{ marginLeft: 16 }} type="button">
@@ -111,54 +144,79 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
         )}
       </p>
 
-      {tabs.length === 0 && !loading ? (
+      <p style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button
+          disabled={!tabPageResponse.hasPreviousPage}
+          onClick={() => {
+            const firstTab = tabPageResponse.tabs[0];
+            const nextTabParams: TabQueryParameters = {
+              ...tabParams,
+              anchorDocument: {
+                direction: 'previous',
+                id: firstTab.id,
+                title: firstTab.title,
+              },
+            };
+
+            setTabParams(nextTabParams);
+          }}
+          style={{ marginRight: 8 }}
+          type="button"
+        >
+          ⏪️
+        </button>
+        <button
+          disabled={!tabPageResponse.hasNextPage}
+          onClick={() => {
+            const lastTab = tabPageResponse.tabs[tabPageResponse.tabs.length - 1];
+            const nextTabParams: TabQueryParameters = {
+              ...tabParams,
+              anchorDocument: {
+                direction: 'next',
+                id: lastTab.id,
+                title: lastTab.title,
+              },
+            };
+
+            setTabParams(nextTabParams);
+          }}
+          type="button"
+        >
+          ⏩
+        </button>
+      </p>
+
+      {tabPageResponse.tabs.length === 0 && !loading ? (
         <p>No tabs to display{!props.user && <span>. Sign in to create your own tabs</span>}</p>
       ) : (
         <div>
-          {tabs.map((tab) => {
-            const isTabOwner = props.user && props.user.uid === tab.ownerId;
-
-            return (
-              <div
-                key={tab.id}
-                style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
-              >
-                <div>
-                  {tab.title}
-                  <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(tab.id)}>
-                    ➡️
-                  </NavLink>
-                </div>
-                {isTabOwner && (
-                  <div>
-                    <button onClick={() => removeTab(tab.id)} type="button">
-                      {removeSymbol}
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
           {loading ? (
             <p>Loading...</p>
           ) : (
-            <button
-              disabled={isLastPage}
-              onClick={() => {
-                const lastTab = tabs[tabs.length - 1];
-                updateTabs({
-                  titleFilter,
-                  lastDocument: {
-                    id: lastTab.id,
-                    title: lastTab.title,
-                  },
-                });
-              }}
-              type="button"
-            >
-              Load more
-            </button>
+            tabPageResponse.tabs.map((tab) => {
+              const isTabOwner = props.user && props.user.uid === tab.ownerId;
+
+              return (
+                <div
+                  key={tab.id}
+                  style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
+                >
+                  <div>
+                    {tab.title}
+                    <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(tab.id)}>
+                      ➡️
+                    </NavLink>
+                  </div>
+                  {isTabOwner && (
+                    <div>
+                      <button onClick={() => removeTab(tab.id)} type="button">
+                        {removeSymbol}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
       )}

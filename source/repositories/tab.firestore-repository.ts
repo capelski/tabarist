@@ -3,6 +3,7 @@ import {
   getDocs,
   limit,
   orderBy,
+  OrderByDirection,
   query,
   QueryFieldFilterConstraint,
   startAfter,
@@ -15,7 +16,7 @@ import { deleteDocument, getDocument, setDocument } from '../firestore';
 import { augmentTab, diminishTab } from '../operations';
 import { Tab } from '../types';
 import { DiminishedTab } from '../types/diminished-tab.type';
-import { TabQueryParameters, TabRepository } from './tab.repository-interface';
+import { TabPageResponse, TabQueryParameters, TabRepository } from './tab.repository-interface';
 
 const tabsPath = 'tabs';
 
@@ -23,31 +24,71 @@ const getTabPath = (tabId: string) => {
   return [tabsPath, tabId];
 };
 
+const getTabsQuery = (
+  whereClauses: QueryFieldFilterConstraint[] = [],
+  order: OrderByDirection,
+  documentsNumber: number,
+  titleFilter = '',
+  anchorDocument?: TabQueryParameters['anchorDocument'],
+) => {
+  return query(
+    collection(getFirebaseDb(), tabsPath),
+    orderBy('title', order),
+    orderBy('id', order),
+    ...(titleFilter ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))] : []),
+    ...whereClauses,
+    ...(anchorDocument ? [startAfter(anchorDocument.title, anchorDocument.id)] : []),
+    limit(documentsNumber),
+  );
+};
+
 const getFirestoreTabs = async (
   params?: TabQueryParameters,
   whereClauses: QueryFieldFilterConstraint[] = [],
-) => {
-  const queryData = query(
-    collection(getFirebaseDb(), tabsPath),
-    orderBy('title'),
-    orderBy('id'),
-    ...(params?.titleFilter
-      ? [where('titleWords', 'array-contains-any', getTitleWords(params.titleFilter))]
-      : []),
-    ...whereClauses,
-    ...(params?.lastDocument
-      ? [startAfter(params.lastDocument.title, params.lastDocument.id)]
-      : []),
-    limit(pageSize + 1),
+): Promise<TabPageResponse> => {
+  const order = params?.anchorDocument?.direction === 'previous' ? 'desc' : 'asc';
+
+  const queryData = getTabsQuery(
+    whereClauses,
+    order,
+    pageSize,
+    params?.titleFilter,
+    params?.anchorDocument,
   );
 
   const querySnapshot = await getDocs(queryData);
   const tabs = querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
-  const tabsPage = tabs.slice(0, pageSize);
+  const sortedTabs = order === 'desc' ? tabs.reverse() : tabs;
+
+  let hasNextPage = false;
+  let hasPreviousPage = false;
+
+  if (sortedTabs.length > 0) {
+    const firstTab = sortedTabs[0];
+    const previousPage = await getDocs(
+      getTabsQuery(whereClauses, 'desc', 1, params?.titleFilter, {
+        direction: 'previous',
+        id: firstTab.id,
+        title: firstTab.title,
+      }),
+    );
+    hasPreviousPage = previousPage.docs.length > 0;
+
+    const lastTab = sortedTabs[sortedTabs.length - 1];
+    const nextPage = await getDocs(
+      getTabsQuery(whereClauses, 'asc', 1, params?.titleFilter, {
+        direction: 'next',
+        id: lastTab.id,
+        title: lastTab.title,
+      }),
+    );
+    hasNextPage = nextPage.docs.length > 0;
+  }
 
   return {
-    isLastPage: tabs.length <= pageSize,
-    tabs: tabsPage,
+    hasNextPage,
+    hasPreviousPage,
+    tabs: sortedTabs,
   };
 };
 

@@ -7,4 +7,7 @@ export enum RouteNames {
 export const queryParameters = {
   editMode: 'editMode',
   title: 'title',
+  anchorDirection: 'aD',
+  anchorId: 'aI',
+  anchorTitle: 'aT',
 };
