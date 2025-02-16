@@ -15,14 +15,16 @@ export const sPatternOperations = {
     );
   },
 
-  create: (index: number): StrummingPattern => ({
-    frames: createIndexedValuesArray(framesNumberDefault, (index) =>
-      index === 0 ? '↓' : index === 1 ? '↑' : '',
-    ),
-    framesNumber: framesNumberDefault,
-    index,
-    name: 'Unnamed pattern',
-  }),
+  create: (index: number): StrummingPattern => {
+    return {
+      frames: createIndexedValuesArray(framesNumberDefault, (index) =>
+        index === 0 ? '↓' : index === 1 ? '↑' : '',
+      ),
+      framesNumber: framesNumberDefault,
+      index,
+      name: 'Unnamed pattern',
+    };
+  },
 
   rebase: (tab: Tab, sPatternIndex: number, framesNumber: number): Tab => {
     const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);

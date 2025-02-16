@@ -21,15 +21,7 @@ import {
   Tab,
 } from '../types';
 import { DiminishedTab } from '../types/diminished-tab.type';
-import {
-  augmentBar,
-  barOperations,
-  createChordBar,
-  createPickingBar,
-  createReferenceBar,
-  createSectionBar,
-  diminishBar,
-} from './bar.operations';
+import { barOperations } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
 import { sPatternOperations } from './strumming-pattern.operations';
@@ -67,56 +59,6 @@ const getNextActiveFrame = (
           : undefined)
       );
     }, undefined);
-};
-
-export const augmentTab = (diminishedTab: DiminishedTab): Tab => {
-  return {
-    ...diminishedTab,
-    activeFrame: undefined,
-    bars: diminishedTab.bars.map((bar, index) => augmentBar(bar, index)),
-    sections: diminishedTab.sections.map((section, index) => {
-      return {
-        ...section,
-        bars: section.bars.map((bar, index) => augmentBar(bar, index)),
-        index,
-      };
-    }),
-    strummingPatterns: diminishedTab.strummingPatterns.map((sPattern, index) => {
-      return {
-        ...sPattern,
-        frames: sPattern.frames.map((frame, index) => {
-          return { index, value: frame };
-        }),
-        framesNumber: sPattern.frames.length,
-        index,
-      };
-    }),
-  };
-};
-
-export const diminishTab = (tab: Tab): DiminishedTab => {
-  return {
-    ...tab,
-    bars: tab.bars.map(diminishBar),
-    sections: tab.sections.map((section) => {
-      const { bars, index, ...rest } = section;
-
-      return {
-        ...rest,
-        bars: bars.map(diminishBar),
-      };
-    }),
-    strummingPatterns: tab.strummingPatterns.map((sPattern) => {
-      const { frames, framesNumber, index, ...rest } = sPattern;
-
-      return {
-        ...rest,
-        frames: frames.map((frame) => {
-          return frame.value;
-        }),
-      };
-    }),
-  };
 };
 
 const applyBarsOperation = (
@@ -161,10 +103,10 @@ export const tabOperations = {
       (bars) => {
         const newBar =
           type === BarType.chord
-            ? createChordBar(index, nextTab.strummingPatterns[0])
+            ? barOperations.createChordBar(index, nextTab.strummingPatterns[0])
             : type === BarType.picking
-            ? createPickingBar(index)
-            : createSectionBar(index, nextTab.sections[0]);
+            ? barOperations.createPickingBar(index)
+            : barOperations.createSectionBar(index, nextTab.sections[0]);
 
         return barOperations.addBar(bars, newBar as any);
       },
@@ -192,6 +134,31 @@ export const tabOperations = {
         ...section,
         bars: barOperations.setStrummingPattern(section.bars, sPattern, undefined),
       })),
+    };
+  },
+
+  augmentTab: (diminishedTab: DiminishedTab): Tab => {
+    return {
+      ...diminishedTab,
+      activeFrame: undefined,
+      bars: diminishedTab.bars.map((bar, index) => barOperations.augmentBar(bar, index)),
+      sections: diminishedTab.sections.map((section, index) => {
+        return {
+          ...section,
+          bars: section.bars.map((bar, index) => barOperations.augmentBar(bar, index)),
+          index,
+        };
+      }),
+      strummingPatterns: diminishedTab.strummingPatterns.map((sPattern, index) => {
+        return {
+          ...sPattern,
+          frames: sPattern.frames.map((frame, index) => {
+            return { index, value: frame };
+          }),
+          framesNumber: sPattern.frames.length,
+          index,
+        };
+      }),
     };
   },
 
@@ -231,11 +198,11 @@ export const tabOperations = {
         const targetBar = bars[copying.startIndex];
         const newBar =
           targetBar.type === BarType.section
-            ? createSectionBar(
+            ? barOperations.createSectionBar(
                 endIndex,
                 tab.sections.find((s) => targetBar.sectionIndex === s.index)!,
               )
-            : createReferenceBar(targetBar, endIndex);
+            : barOperations.createReferenceBar(targetBar, endIndex);
         return barOperations.addBar(bars, newBar as any);
       },
       inSection,
@@ -252,21 +219,48 @@ export const tabOperations = {
     };
   },
 
-  create: (ownerId: User['uid']): Tab => ({
-    backingTrack: undefined,
-    activeFrame: undefined,
-    bars: [],
-    capo: undefined,
-    copying: undefined,
-    id: nanoid(),
-    moving: undefined,
-    ownerId,
-    sections: [],
-    strummingPatterns: [],
-    tempo: undefined,
-    title: 'Unnamed tab',
-    titleWords: ['unnamed', 'tab'],
-  }),
+  create: (ownerId: User['uid']): Tab => {
+    return {
+      backingTrack: undefined,
+      activeFrame: undefined,
+      bars: [],
+      capo: undefined,
+      copying: undefined,
+      id: nanoid(),
+      moving: undefined,
+      ownerId,
+      sections: [],
+      strummingPatterns: [],
+      tempo: undefined,
+      title: 'Unnamed tab',
+      titleWords: ['unnamed', 'tab'],
+    };
+  },
+
+  diminishTab: (tab: Tab): DiminishedTab => {
+    return {
+      ...tab,
+      bars: tab.bars.map(barOperations.diminishBar),
+      sections: tab.sections.map((section) => {
+        const { bars, index, ...rest } = section;
+
+        return {
+          ...rest,
+          bars: bars.map(barOperations.diminishBar),
+        };
+      }),
+      strummingPatterns: tab.strummingPatterns.map((sPattern) => {
+        const { frames, framesNumber, index, ...rest } = sPattern;
+
+        return {
+          ...rest,
+          frames: frames.map((frame) => {
+            return frame.value;
+          }),
+        };
+      }),
+    };
+  },
 
   getLongestBarWidth: (tab: Tab, windowWidth: number, viewMode: ViewMode) => {
     const bars = [
@@ -493,14 +487,14 @@ export const tabOperations = {
     };
   },
 
-  resetActiveFrame(tab: Tab): Tab {
+  resetActiveFrame: (tab: Tab): Tab => {
     return {
       ...tab,
       activeFrame: undefined,
     };
   },
 
-  updateActiveFrame(tab: Tab, barContainers: BarContainer[]): Tab {
+  updateActiveFrame: (tab: Tab, barContainers: BarContainer[]): Tab => {
     if (tab.bars.length === 0) {
       return tab;
     }

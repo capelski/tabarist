@@ -13,7 +13,7 @@ import { getTitleWords } from '../common';
 import { pageSize } from '../constants';
 import { getFirebaseDb, User } from '../firebase';
 import { deleteDocument, getDocument, setDocument } from '../firestore';
-import { augmentTab, diminishTab } from '../operations';
+import { tabOperations } from '../operations';
 import { Tab } from '../types';
 import { DiminishedTab } from '../types/diminished-tab.type';
 import { TabPageResponse, TabQueryParameters, TabRepository } from './tab.repository-interface';
@@ -57,7 +57,9 @@ const getFirestoreTabs = async (
   );
 
   const querySnapshot = await getDocs(queryData);
-  const tabs = querySnapshot.docs.map((snapshot) => augmentTab(snapshot.data() as DiminishedTab));
+  const tabs = querySnapshot.docs.map((snapshot) =>
+    tabOperations.augmentTab(snapshot.data() as DiminishedTab),
+  );
   const sortedTabs = order === 'desc' ? tabs.reverse() : tabs;
 
   let hasNextPage = false;
@@ -95,7 +97,7 @@ const getFirestoreTabs = async (
 export const tabFirestoreRepository: TabRepository = {
   getById: async (tabId: string) => {
     const diminishedTab = (await getDocument(getTabPath(tabId))) as DiminishedTab;
-    return augmentTab(diminishedTab);
+    return tabOperations.augmentTab(diminishedTab);
   },
   getPublicTabs: (params) => {
     return getFirestoreTabs(params);
@@ -107,7 +109,7 @@ export const tabFirestoreRepository: TabRepository = {
     return deleteDocument(getTabPath(tabId));
   },
   set: (tab: Tab, ownerId: User['uid']) => {
-    const ownedTab = { ...diminishTab(tab), ownerId };
+    const ownedTab = { ...tabOperations.diminishTab(tab), ownerId };
     return setDocument(['tabs', tab.id], ownedTab);
   },
 };

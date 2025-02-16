@@ -24,126 +24,11 @@ import {
   getIndexIncrease,
 } from './indexed-value.operations';
 
-export const createChordBar = (index: number, strummingPattern: StrummingPattern): ChordBar => ({
-  frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
-  index,
-  sPatternIndex: strummingPattern.index,
-  repeats: undefined,
-  type: BarType.chord,
-});
-
-export const createPickingBar = (index: number): PickingBar => ({
-  frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
-  framesNumber: framesNumberDefault,
-  index,
-  repeats: undefined,
-  type: BarType.picking,
-});
-
-export const createPickingFrame = (index: number): PickingFrame => ({
+const createPickingFrame = (index: number): PickingFrame => ({
   chordSupport: undefined,
   index,
   strings: createIndexedValuesArray(stringsNumber, ''),
 });
-
-export const createReferenceBar = (targetBar: Bar, index: number): ReferenceBar => {
-  // If we are creating a copy in an earlier position, the new reference bar will shift the
-  // pointed bar one position to the right; increasing the effective barIndex
-  const isPointingToLaterPosition =
-    index <= (targetBar.type === BarType.reference ? targetBar.barIndex : targetBar.index);
-
-  const barIndex =
-    (targetBar.type === BarType.reference ? targetBar.barIndex : targetBar.index) +
-    +isPointingToLaterPosition;
-
-  return {
-    barIndex,
-    index,
-    repeats: undefined,
-    type: BarType.reference,
-  };
-};
-
-export const createSectionBar = (index: number, section: Section): SectionBar => ({
-  index,
-  sectionIndex: section.index,
-  repeats: undefined,
-  type: BarType.section,
-});
-
-export const augmentBar = <TDiminishedBar extends DiminishedBar | DiminishedNonSectionBar>(
-  diminishedBar: TDiminishedBar,
-  index: number,
-): TDiminishedBar extends DiminishedNonSectionBar ? NonSectionBar : Bar => {
-  if (diminishedBar.type === BarType.chord) {
-    const chordBar: ChordBar = {
-      ...diminishedBar,
-      frames: diminishedBar.frames.map((frame, index) => {
-        return { index, value: frame };
-      }),
-      index,
-    };
-    return chordBar;
-  }
-
-  if (diminishedBar.type === BarType.picking) {
-    const pickingBar: PickingBar = {
-      ...diminishedBar,
-      frames: diminishedBar.frames.map((frame, frameIndex) => {
-        return {
-          ...frame,
-          index: frameIndex,
-          strings: frame.strings.map((string, stringIndex) => {
-            return { index: stringIndex, value: string };
-          }),
-        };
-      }),
-      framesNumber: diminishedBar.frames.length,
-      index,
-    };
-    return pickingBar;
-  }
-
-  const otherBar: SectionBar | ReferenceBar = { ...diminishedBar, index };
-  return otherBar as NonSectionBar;
-};
-
-export const diminishBar = <TBar extends Bar | NonSectionBar>(
-  bar: TBar,
-): TBar extends NonSectionBar ? DiminishedNonSectionBar : DiminishedBar => {
-  if (bar.type === BarType.chord) {
-    const { frames, index, ...rest } = bar as ChordBar;
-
-    const diminishedChordBar: DiminishedChordBar = {
-      ...rest,
-      frames: frames.map((frame) => {
-        return frame.value;
-      }),
-    };
-    return diminishedChordBar;
-  }
-
-  if (bar.type === BarType.picking) {
-    const { frames, framesNumber, index, ...barRest } = bar as PickingBar;
-
-    const diminishedPickingBar: DiminishedPickingBar = {
-      ...barRest,
-      frames: frames.map((frame) => {
-        const { index, strings, ...frameRest } = frame;
-        return {
-          ...frameRest,
-          strings: strings.map((string) => {
-            return string.value;
-          }),
-        };
-      }),
-    };
-    return diminishedPickingBar;
-  }
-
-  const { index, ...rest } = bar as SectionBar | ReferenceBar;
-  return rest as DiminishedNonSectionBar;
-};
 
 export const barOperations = {
   addBar: <TBar extends Bar | NonSectionBar>(bars: TBar[], newBar: TBar): TBar[] => {
@@ -178,11 +63,132 @@ export const barOperations = {
     return nextBars;
   },
 
+  augmentBar: <TDiminishedBar extends DiminishedBar | DiminishedNonSectionBar>(
+    diminishedBar: TDiminishedBar,
+    index: number,
+  ): TDiminishedBar extends DiminishedNonSectionBar ? NonSectionBar : Bar => {
+    if (diminishedBar.type === BarType.chord) {
+      const chordBar: ChordBar = {
+        ...diminishedBar,
+        frames: diminishedBar.frames.map((frame, index) => {
+          return { index, value: frame };
+        }),
+        index,
+      };
+      return chordBar;
+    }
+
+    if (diminishedBar.type === BarType.picking) {
+      const pickingBar: PickingBar = {
+        ...diminishedBar,
+        frames: diminishedBar.frames.map((frame, frameIndex) => {
+          return {
+            ...frame,
+            index: frameIndex,
+            strings: frame.strings.map((string, stringIndex) => {
+              return { index: stringIndex, value: string };
+            }),
+          };
+        }),
+        framesNumber: diminishedBar.frames.length,
+        index,
+      };
+      return pickingBar;
+    }
+
+    const otherBar: SectionBar | ReferenceBar = { ...diminishedBar, index };
+    return otherBar as NonSectionBar;
+  },
+
   canMoveBarToPosition: (startIndex: number, endIndex: number) => {
     // A bar cannot be moved to the same position. That is:
     // - The position that is currently holding
     // - The position before the bar that comes immediately next
     return startIndex !== endIndex && startIndex + 1 !== endIndex;
+  },
+
+  createChordBar: (index: number, strummingPattern: StrummingPattern): ChordBar => {
+    return {
+      frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
+      index,
+      sPatternIndex: strummingPattern.index,
+      repeats: undefined,
+      type: BarType.chord,
+    };
+  },
+
+  createPickingBar: (index: number): PickingBar => {
+    return {
+      frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
+      framesNumber: framesNumberDefault,
+      index,
+      repeats: undefined,
+      type: BarType.picking,
+    };
+  },
+
+  createReferenceBar: (targetBar: Bar, index: number): ReferenceBar => {
+    // If we are creating a copy in an earlier position, the new reference bar will shift the
+    // pointed bar one position to the right; increasing the effective barIndex
+    const isPointingToLaterPosition =
+      index <= (targetBar.type === BarType.reference ? targetBar.barIndex : targetBar.index);
+
+    const barIndex =
+      (targetBar.type === BarType.reference ? targetBar.barIndex : targetBar.index) +
+      +isPointingToLaterPosition;
+
+    return {
+      barIndex,
+      index,
+      repeats: undefined,
+      type: BarType.reference,
+    };
+  },
+
+  createSectionBar: (index: number, section: Section): SectionBar => {
+    return {
+      index,
+      sectionIndex: section.index,
+      repeats: undefined,
+      type: BarType.section,
+    };
+  },
+
+  diminishBar: <TBar extends Bar | NonSectionBar>(
+    bar: TBar,
+  ): TBar extends NonSectionBar ? DiminishedNonSectionBar : DiminishedBar => {
+    if (bar.type === BarType.chord) {
+      const { frames, index, ...rest } = bar as ChordBar;
+
+      const diminishedChordBar: DiminishedChordBar = {
+        ...rest,
+        frames: frames.map((frame) => {
+          return frame.value;
+        }),
+      };
+      return diminishedChordBar;
+    }
+
+    if (bar.type === BarType.picking) {
+      const { frames, framesNumber, index, ...barRest } = bar as PickingBar;
+
+      const diminishedPickingBar: DiminishedPickingBar = {
+        ...barRest,
+        frames: frames.map((frame) => {
+          const { index, strings, ...frameRest } = frame;
+          return {
+            ...frameRest,
+            strings: strings.map((string) => {
+              return string.value;
+            }),
+          };
+        }),
+      };
+      return diminishedPickingBar;
+    }
+
+    const { index, ...rest } = bar as SectionBar | ReferenceBar;
+    return rest as DiminishedNonSectionBar;
   },
 
   moveBar: <TBar extends Bar | NonSectionBar>(
