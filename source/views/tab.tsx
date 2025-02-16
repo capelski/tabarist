@@ -54,6 +54,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     if (isEditMode && searchParams.get(queryParameters.editMode) !== 'true') {
       setEditingCopy('');
+    } else if (!isEditMode && searchParams.get(queryParameters.editMode) === 'true' && tab) {
+      setEditingCopy(JSON.stringify(tab));
     }
   }, [searchParams]);
 
