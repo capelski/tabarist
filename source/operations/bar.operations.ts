@@ -3,6 +3,10 @@ import {
   Bar,
   BarBase,
   ChordBar,
+  DiminishedBar,
+  DiminishedChordBar,
+  DiminishedNonSectionBar,
+  DiminishedPickingBar,
   NonSectionBar,
   PickingBar,
   PickingFrame,
@@ -11,12 +15,6 @@ import {
   SectionBar,
   StrummingPattern,
 } from '../types';
-import {
-  DiminishedBar,
-  DiminishedChordBar,
-  DiminishedNonSectionBar,
-  DiminishedPickingBar,
-} from '../types/diminished-bar.type';
 import {
   createIndexedValuesArray,
   debugBarMovements,

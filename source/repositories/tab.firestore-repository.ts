@@ -14,8 +14,7 @@ import { pageSize } from '../constants';
 import { getFirebaseDb, User } from '../firebase';
 import { deleteDocument, getDocument, setDocument } from '../firestore';
 import { tabOperations } from '../operations';
-import { Tab } from '../types';
-import { DiminishedTab } from '../types/diminished-tab.type';
+import { DiminishedTab, Tab } from '../types';
 import { TabPageResponse, TabQueryParameters, TabRepository } from './tab.repository-interface';
 
 const tabsPath = 'tabs';

@@ -1,5 +1,7 @@
 export * from './bar-container.type';
 export * from './bar.type';
+export * from './diminished-bar.type';
+export * from './diminished-tab.type';
 export * from './indexed-value.type';
 export * from './position-operation.type';
 export * from './section.type';

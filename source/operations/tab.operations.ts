@@ -14,13 +14,13 @@ import {
   BarBase,
   BarContainer,
   ChordBar,
+  DiminishedTab,
   NonSectionBar,
   PickingBar,
   Section,
   StrummingPattern,
   Tab,
 } from '../types';
-import { DiminishedTab } from '../types/diminished-tab.type';
 import { barOperations } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
 import { sectionOperations } from './section.operations';
