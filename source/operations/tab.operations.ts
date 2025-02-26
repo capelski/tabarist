@@ -134,6 +134,8 @@ export const tabOperations = {
       ...diminishedTab,
       activeSlot: undefined,
       bars: diminishedTab.bars.map(barOperations.augmentBar),
+      copying: undefined,
+      moving: undefined,
       rhythms: diminishedTab.rhythms.map(rhythmOperations.augmentRhythm),
       sections: diminishedTab.sections.map((section, index) => {
         return {
@@ -221,7 +223,7 @@ export const tabOperations = {
   },
 
   diminishTab: (tab: Tab): DiminishedTab => {
-    const { activeSlot, ...rest } = tab;
+    const { activeSlot, copying, moving, ...rest } = tab;
 
     return {
       ...rest,

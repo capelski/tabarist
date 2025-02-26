@@ -1,15 +1,12 @@
 import { DiminishedBar } from './diminished-bar.type';
 import { DiminishedRhythm } from './diminished-rhythm.type';
 import { DiminishedSection } from './diminished-section.type';
-import { PositionOperation } from './position-operation.type';
 
 export type DiminishedTab = {
   backingTrack: string | undefined;
   bars: DiminishedBar[];
   capo: number | undefined;
-  copying: PositionOperation | undefined;
   id: string;
-  moving: PositionOperation | undefined;
   ownerId: string;
   rhythms: DiminishedRhythm[];
   sections: DiminishedSection[];
