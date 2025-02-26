@@ -12,39 +12,37 @@ export type TabPlayProps = {
   updateTab: (tab: Tab) => void;
 };
 
-let activeFrameLastDelay = 0;
-let activeFrameLastRender = 0;
+let activeSlotLastDelay = 0;
+let activeSlotLastRender = 0;
 
 export const TabPlay: React.FC<TabPlayProps> = (props) => {
-  const updateActiveFrame = () => {
-    if (props.tab.tempo && props.tab.activeFrame) {
+  const updateActiveSlot = () => {
+    if (props.tab.tempo && props.tab.activeSlot) {
       const msPerBeat = 60_000 / props.tab.tempo;
-      const msPerBar = msPerBeat * 4;
-      const msPerFrame = msPerBar / props.tab.activeFrame.barContainer.renderedBar.frames.length;
 
-      activeFrameLastDelay = Date.now() - activeFrameLastRender; // - msPerFrame;
+      activeSlotLastDelay = Date.now() - activeSlotLastRender;
 
       props.playTimeoutRef.current = window.setTimeout(() => {
-        props.updateTab(tabOperations.updateActiveFrame(props.tab, props.barContainers));
-        activeFrameLastRender = Date.now();
-      }, msPerFrame - activeFrameLastDelay);
+        props.updateTab(tabOperations.updateActiveSlot(props.tab, props.barContainers));
+        activeSlotLastRender = Date.now();
+      }, msPerBeat - activeSlotLastDelay);
     } else {
-      activeFrameLastDelay = 0;
-      activeFrameLastRender = 0;
+      activeSlotLastDelay = 0;
+      activeSlotLastRender = 0;
       props.playTimeoutRef.current = 0;
     }
   };
 
-  useEffect(updateActiveFrame, [props.tab.activeFrame]);
+  useEffect(updateActiveSlot, [props.tab.activeSlot]);
 
   const enterPlayMode = () => {
-    props.updateTab(tabOperations.updateActiveFrame(props.tab, props.barContainers));
-    activeFrameLastRender = Date.now();
+    props.updateTab(tabOperations.updateActiveSlot(props.tab, props.barContainers));
+    activeSlotLastRender = Date.now();
   };
 
   const exitPlayMode = () => {
     clearTimeout(props.playTimeoutRef.current);
-    props.updateTab(tabOperations.resetActiveFrame(props.tab));
+    props.updateTab(tabOperations.resetActiveSlot(props.tab));
   };
 
   return (
@@ -54,7 +52,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
     >
       <span style={{ marginLeft: 8 }}>♫</span>
       <input
-        disabled={!!props.tab.activeFrame}
+        disabled={!!props.tab.activeSlot}
         onBlur={() => {
           if (props.tab.tempo) {
             const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
@@ -77,7 +75,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
         <button
           disabled={!props.tab.tempo}
           onClick={() => {
-            if (props.tab.activeFrame === undefined) {
+            if (props.tab.activeSlot === undefined) {
               enterPlayMode();
             } else {
               exitPlayMode();
@@ -86,7 +84,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
           style={{ marginLeft: 8 }}
           type="button"
         >
-          {props.tab.activeFrame !== undefined ? 'Stop' : 'Play'}
+          {props.tab.activeSlot !== undefined ? 'Stop' : 'Play'}
         </button>
       )}
     </div>

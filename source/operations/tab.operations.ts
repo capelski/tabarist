@@ -17,44 +17,41 @@ import {
   DiminishedTab,
   NonSectionBar,
   PickingBar,
+  Rhythm,
   Section,
-  StrummingPattern,
   Tab,
 } from '../types';
 import { barOperations } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
+import { rhythmOperations } from './rhythm.operations';
 import { sectionOperations } from './section.operations';
-import { sPatternOperations } from './strumming-pattern.operations';
+import { slotOperations } from './slot.operations';
 
 type BarAggregation = {
   longestBarAdaptive: number;
   longestBarUniform: number;
 };
 
-type FrameAggregation = {
-  longestFrame: number;
+type SlotAggregation = {
+  longestSlot: number;
   totalLength: number;
 };
 
-const getValueLength = (value: string) => {
-  return value.length || 1;
-};
-
-const getNextActiveFrame = (
+const getNextActiveSlot = (
   barContainers: BarContainer[],
   startingPosition: number,
   repeats?: number,
-): Tab['activeFrame'] | undefined => {
+): Tab['activeSlot'] | undefined => {
   return barContainers
     .slice(startingPosition)
-    .reduce<Tab['activeFrame'] | undefined>((reduced, barContainer) => {
+    .reduce<Tab['activeSlot'] | undefined>((reduced, barContainer) => {
       return (
         reduced ||
         (barContainer.renderedBar
           ? {
               barContainer: barContainer as BarContainer<ChordBar | PickingBar>,
-              frameIndex: 0,
               repeats: repeats ?? barContainer.originalBar.repeats ?? 0,
+              slotIndex: 0,
             }
           : undefined)
       );
@@ -92,8 +89,8 @@ export const tabOperations = {
   addBar: (tab: Tab, index: number, type: NonReferenceBarType, inSection?: Section): Tab => {
     let nextTab = { ...tab };
 
-    if (type === BarType.chord && tab.strummingPatterns.length === 0) {
-      nextTab.strummingPatterns = [sPatternOperations.create(0)];
+    if (type === BarType.chord && tab.rhythms.length === 0) {
+      nextTab.rhythms = [rhythmOperations.create(0)];
     } else if (type === BarType.section && tab.sections.length === 0) {
       nextTab.sections = [sectionOperations.create(0)];
     }
@@ -103,7 +100,7 @@ export const tabOperations = {
       (bars) => {
         const newBar =
           type === BarType.chord
-            ? barOperations.createChordBar(index, nextTab.strummingPatterns[0])
+            ? barOperations.createChordBar(index, nextTab.rhythms[0])
             : type === BarType.picking
             ? barOperations.createPickingBar(index)
             : barOperations.createSectionBar(index, nextTab.sections[0]);
@@ -112,6 +109,15 @@ export const tabOperations = {
       },
       inSection,
     );
+  },
+
+  addRhythm: (tab: Tab): Tab => {
+    const rhythm = rhythmOperations.create(tab.rhythms.length);
+
+    return {
+      ...tab,
+      rhythms: [...tab.rhythms, rhythm],
+    };
   },
 
   addSection: (tab: Tab): Tab => {
@@ -123,39 +129,16 @@ export const tabOperations = {
     };
   },
 
-  addStrummingPattern: (tab: Tab): Tab => {
-    const sPattern = sPatternOperations.create(tab.strummingPatterns.length);
-
-    return {
-      ...tab,
-      strummingPatterns: [...tab.strummingPatterns, sPattern],
-      bars: barOperations.setStrummingPattern(tab.bars, sPattern, undefined),
-      sections: tab.sections.map((section) => ({
-        ...section,
-        bars: barOperations.setStrummingPattern(section.bars, sPattern, undefined),
-      })),
-    };
-  },
-
   augmentTab: (diminishedTab: DiminishedTab): Tab => {
     return {
       ...diminishedTab,
-      activeFrame: undefined,
-      bars: diminishedTab.bars.map((bar, index) => barOperations.augmentBar(bar, index)),
+      activeSlot: undefined,
+      bars: diminishedTab.bars.map(barOperations.augmentBar),
+      rhythms: diminishedTab.rhythms.map(rhythmOperations.augmentRhythm),
       sections: diminishedTab.sections.map((section, index) => {
         return {
           ...section,
-          bars: section.bars.map((bar, index) => barOperations.augmentBar(bar, index)),
-          index,
-        };
-      }),
-      strummingPatterns: diminishedTab.strummingPatterns.map((sPattern, index) => {
-        return {
-          ...sPattern,
-          frames: sPattern.frames.map((frame, index) => {
-            return { index, value: frame };
-          }),
-          framesNumber: sPattern.frames.length,
+          bars: section.bars.map(barOperations.augmentBar),
           index,
         };
       }),
@@ -222,15 +205,15 @@ export const tabOperations = {
   create: (ownerId: User['uid']): Tab => {
     return {
       backingTrack: undefined,
-      activeFrame: undefined,
+      activeSlot: undefined,
       bars: [],
       capo: undefined,
       copying: undefined,
       id: nanoid(),
       moving: undefined,
       ownerId,
+      rhythms: [],
       sections: [],
-      strummingPatterns: [],
       tempo: undefined,
       title: 'Unnamed tab',
       titleWords: ['unnamed', 'tab'],
@@ -238,25 +221,18 @@ export const tabOperations = {
   },
 
   diminishTab: (tab: Tab): DiminishedTab => {
+    const { activeSlot, ...rest } = tab;
+
     return {
-      ...tab,
+      ...rest,
       bars: tab.bars.map(barOperations.diminishBar),
+      rhythms: tab.rhythms.map(rhythmOperations.diminishRhythm),
       sections: tab.sections.map((section) => {
         const { bars, index, ...rest } = section;
 
         return {
           ...rest,
           bars: bars.map(barOperations.diminishBar),
-        };
-      }),
-      strummingPatterns: tab.strummingPatterns.map((sPattern) => {
-        const { frames, framesNumber, index, ...rest } = sPattern;
-
-        return {
-          ...rest,
-          frames: frames.map((frame) => {
-            return frame.value;
-          }),
         };
       }),
     };
@@ -280,34 +256,38 @@ export const tabOperations = {
 
     const { longestBarAdaptive, longestBarUniform } = bars.reduce<BarAggregation>(
       (barsReduced, bar) => {
-        const { longestFrame, totalLength } = (
+        const { longestSlot, totalLength } = (
           bar.type === BarType.chord
-            ? bar.frames.map((frame) => {
-                const strummingPattern = tab.strummingPatterns.find(
-                  (sp) => sp.index === bar.sPatternIndex,
-                );
-                const strummingFrame = strummingPattern?.frames[frame.index].value ?? '';
-                const effectiveValue =
-                  strummingFrame.length > frame.value.length ? strummingFrame : frame.value;
-                return getValueLength(effectiveValue);
+            ? bar.slots.map((slot) => {
+                const slotLength = slotOperations.getSlotLength(slot);
+
+                const rhythm = tab.rhythms.find((rhythm) => rhythm.index === bar.rhythmIndex);
+                const rhythmSlot = rhythm?.slots[slot.index];
+                const rhythmLength = (rhythmSlot && slotOperations.getSlotLength(rhythmSlot)) ?? 0;
+
+                return Math.max(slotLength, rhythmLength) || 1;
               })
-            : bar.frames.map((frame) => {
-                return frame.strings.reduce((stringLength, string) => {
-                  return Math.max(stringLength, getValueLength(string.value));
-                }, getValueLength(frame.chordSupport ?? ''));
+            : bar.chordSupport.map((chordSupportSlot) => {
+                return bar.strings.reduce((reduced, string) => {
+                  return Math.max(
+                    reduced,
+                    slotOperations.getSlotLength(string.slots[chordSupportSlot.index]),
+                  );
+                }, slotOperations.getSlotLength(chordSupportSlot) || 1);
               })
-        ).reduce<FrameAggregation>(
+        ).reduce<SlotAggregation>(
           (lengthsReduced, currentLength) => {
             return {
-              longestFrame: Math.max(lengthsReduced.longestFrame, currentLength),
+              longestSlot: Math.max(lengthsReduced.longestSlot, currentLength),
               totalLength: lengthsReduced.totalLength + currentLength,
             };
           },
-          { longestFrame: 0, totalLength: 0 },
+          { longestSlot: 0, totalLength: 0 },
         );
 
+        const slotsNumber = bar.type === BarType.chord ? bar.slots.length : bar.chordSupport.length;
         const barLengthAdaptive = characterWidth * totalLength;
-        const barLengthUniform = characterWidth * longestFrame * bar.frames.length;
+        const barLengthUniform = characterWidth * longestSlot * slotsNumber;
 
         return {
           longestBarAdaptive: Math.max(barsReduced.longestBarAdaptive, barLengthAdaptive),
@@ -376,38 +356,45 @@ export const tabOperations = {
     };
   },
 
-  rebaseChordBar: (tab: Tab, barIndex: number, sPatternIndex: number, inSection?: Section): Tab => {
-    const sPattern = tab.strummingPatterns.find((sPattern) => sPattern.index === sPatternIndex);
-    if (!sPattern) {
-      return tab;
-    }
-
-    return applyBarsOperation(
-      tab,
-      (bars) => barOperations.rebaseChordBar(bars, barIndex, sPattern),
-      inSection,
-    );
-  },
-
-  rebasePickingBar: (
-    tab: Tab,
-    barIndex: number,
-    framesNumber: number,
-    inSection?: Section,
-  ): Tab => {
-    return applyBarsOperation(
-      tab,
-      (bars) => barOperations.rebasePickingBar(bars, barIndex, framesNumber),
-      inSection,
-    );
-  },
-
   removeBar: (tab: Tab, deletionIndex: number, inSection?: Section): Tab => {
     return applyBarsOperation(
       tab,
       (bars) => barOperations.removeBar(bars, deletionIndex),
       inSection,
     );
+  },
+
+  removeRhythm: (tab: Tab, deletionIndex: number): Tab => {
+    if (!rhythmOperations.canDelete(tab, deletionIndex)) {
+      return tab;
+    }
+
+    const processBars = <TBar extends Bar | NonSectionBar>(bars: TBar[]): TBar[] => {
+      return bars.map((bar) => {
+        return bar.type === BarType.chord
+          ? { ...bar, rhythmIndex: getIndexDecrease(bar.rhythmIndex, deletionIndex, 1) }
+          : bar;
+      });
+    };
+
+    return {
+      ...tab,
+      bars: processBars(tab.bars),
+      sections: tab.sections.map((section) => {
+        return { ...section, bars: processBars(section.bars) };
+      }),
+      rhythms: tab.rhythms.reduce<Rhythm[]>((reduced, rhythm) => {
+        return rhythm.index === deletionIndex
+          ? reduced
+          : [
+              ...reduced,
+              {
+                ...rhythm,
+                index: getIndexDecrease(rhythm.index, deletionIndex, 1),
+              },
+            ];
+      }, []),
+    };
   },
 
   removeSection: (tab: Tab, deletionIndex: number): Tab => {
@@ -436,36 +423,12 @@ export const tabOperations = {
     };
   },
 
-  removeSPattern: (tab: Tab, deletionIndex: number): Tab => {
-    if (!sPatternOperations.canDelete(tab, deletionIndex)) {
-      return tab;
-    }
-
-    const processBars = <TBar extends Bar | NonSectionBar>(bars: TBar[]): TBar[] => {
-      return bars.map((bar) => {
-        return bar.type === BarType.chord
-          ? { ...bar, sPatternIndex: getIndexDecrease(bar.sPatternIndex, deletionIndex, 1) }
-          : bar;
-      });
-    };
-
+  renameRhythm: (tab: Tab, rhythmIndex: number, name: string): Tab => {
     return {
       ...tab,
-      bars: processBars(tab.bars),
-      sections: tab.sections.map((section) => {
-        return { ...section, bars: processBars(section.bars) };
+      rhythms: tab.rhythms.map((rhythm) => {
+        return rhythm.index === rhythmIndex ? { ...rhythm, name } : rhythm;
       }),
-      strummingPatterns: tab.strummingPatterns.reduce<StrummingPattern[]>((reduced, sPattern) => {
-        return sPattern.index === deletionIndex
-          ? reduced
-          : [
-              ...reduced,
-              {
-                ...sPattern,
-                index: getIndexDecrease(sPattern.index, deletionIndex, 1),
-              },
-            ];
-      }, []),
     };
   },
 
@@ -478,65 +441,113 @@ export const tabOperations = {
     };
   },
 
-  renameStrummingPattern: (tab: Tab, sPatternIndex: number, name: string): Tab => {
+  resetActiveSlot: (tab: Tab): Tab => {
     return {
       ...tab,
-      strummingPatterns: tab.strummingPatterns.map((sPattern) => {
-        return sPattern.index === sPatternIndex ? { ...sPattern, name } : sPattern;
-      }),
+      activeSlot: undefined,
     };
   },
 
-  resetActiveFrame: (tab: Tab): Tab => {
-    return {
-      ...tab,
-      activeFrame: undefined,
-    };
+  setChordBarRhythm: (tab: Tab, barIndex: number, rhythm: Rhythm, inSection?: Section): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.setChordBarRhythm(bars, barIndex, rhythm),
+      inSection,
+    );
   },
 
-  updateActiveFrame: (tab: Tab, barContainers: BarContainer[]): Tab => {
+  setChordBarSlotValue: (
+    tab: Tab,
+    barIndex: number,
+    value: string,
+    indexesPath: number[],
+    inSection?: Section,
+  ): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.setChordBarSlotValue(bars, barIndex, value, indexesPath),
+      inSection,
+    );
+  },
+
+  setPickingBarSlotsSize: (
+    tab: Tab,
+    barIndex: number,
+    size: number,
+    indexesPath: number[],
+    inSection?: Section,
+  ): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) => barOperations.setPickingBarSlotsSize(bars, barIndex, size, indexesPath),
+      inSection,
+    );
+  },
+
+  setPickingBarSlotValue: (
+    tab: Tab,
+    barIndex: number,
+    stringIndex: number | 'chordSupport',
+    value: string,
+    indexesPath: number[],
+    inSection?: Section,
+  ): Tab => {
+    return applyBarsOperation(
+      tab,
+      (bars) =>
+        barOperations.setPickingBarSlotValue(bars, barIndex, stringIndex, value, indexesPath),
+      inSection,
+    );
+  },
+
+  updateActiveSlot: (tab: Tab, barContainers: BarContainer[]): Tab => {
     if (tab.bars.length === 0) {
       return tab;
     }
 
-    if (tab.activeFrame === undefined) {
+    if (tab.activeSlot === undefined) {
       return {
         ...tab,
-        activeFrame: getNextActiveFrame(barContainers, 0),
+        activeSlot: getNextActiveSlot(barContainers, 0),
       };
     }
 
     const { inSectionBar, isLastInSectionBar, position, positionOfFirstBar, renderedBar } =
-      tab.activeFrame.barContainer;
+      tab.activeSlot.barContainer;
 
-    const isLastFrame = tab.activeFrame.frameIndex === renderedBar.frames.length - 1;
-    if (!isLastFrame) {
+    const slotsLength =
+      renderedBar.type === BarType.chord
+        ? renderedBar.slots.length
+        : renderedBar.chordSupport.length;
+
+    const isLastSlot = tab.activeSlot.slotIndex === slotsLength - 1;
+    if (!isLastSlot) {
       return {
         ...tab,
-        activeFrame: {
-          ...tab.activeFrame,
-          frameIndex: tab.activeFrame.frameIndex + 1,
+        activeSlot: {
+          ...tab.activeSlot,
+          slotIndex: tab.activeSlot.slotIndex + 1,
         },
       };
     }
 
-    const hasRemainingRepeats = tab.activeFrame.repeats > 1;
+    const hasRemainingRepeats = tab.activeSlot.repeats > 1;
     const mustRepeat = hasRemainingRepeats && (!inSectionBar || isLastInSectionBar);
     if (mustRepeat) {
       const repeatPosition = positionOfFirstBar ?? position;
       return {
         ...tab,
-        activeFrame: getNextActiveFrame(barContainers, repeatPosition, tab.activeFrame.repeats - 1),
+        activeSlot: getNextActiveSlot(barContainers, repeatPosition, tab.activeSlot.repeats - 1),
       };
     }
 
     const nextRepeats =
       inSectionBar && (!isLastInSectionBar || hasRemainingRepeats)
-        ? tab.activeFrame.repeats
+        ? tab.activeSlot.repeats
         : undefined;
     return {
       ...tab,
-      activeFrame: getNextActiveFrame(barContainers, position + 1, nextRepeats),
+      activeSlot: getNextActiveSlot(barContainers, position + 1, nextRepeats),
     };
   },
 
@@ -552,35 +563,6 @@ export const tabOperations = {
       ...tab,
       capo,
     };
-  },
-
-  updateChordFrame: (
-    tab: Tab,
-    barIndex: number,
-    frameIndex: number,
-    value: string,
-    inSection?: Section,
-  ): Tab => {
-    return applyBarsOperation(
-      tab,
-      (bars) => barOperations.updateChordFrame(bars, barIndex, frameIndex, value),
-      inSection,
-    );
-  },
-
-  updatePickingFrame: (
-    tab: Tab,
-    barIndex: number,
-    frameIndex: number,
-    stringIndex: number,
-    value: string,
-    inSection?: Section,
-  ): Tab => {
-    return applyBarsOperation(
-      tab,
-      (bars) => barOperations.updatePickingFrame(bars, barIndex, frameIndex, stringIndex, value),
-      inSection,
-    );
   },
 
   updateRepeats: (

@@ -1,4 +1,5 @@
 import { BarType } from '../constants';
+import { DiminishedSlot } from './diminished-slot.type';
 
 export type DiminishedNonSectionBar =
   | DiminishedChordBar
@@ -11,20 +12,15 @@ export type DiminishedBarBase = {
 };
 
 export type DiminishedChordBar = DiminishedBarBase & {
-  frames: string[];
-  /** Strumming pattern index */
-  sPatternIndex: number;
+  rhythmIndex: number;
+  slots: DiminishedSlot[];
   type: BarType.chord;
 };
 
 export type DiminishedPickingBar = DiminishedBarBase & {
-  frames: DiminishedPickingFrame[];
+  chordSupport: DiminishedSlot[];
+  strings: { slots: DiminishedSlot[] }[];
   type: BarType.picking;
-};
-
-export type DiminishedPickingFrame = {
-  chordSupport: string | undefined;
-  strings: string[];
 };
 
 export type DiminishedReferenceBar = DiminishedBarBase & {

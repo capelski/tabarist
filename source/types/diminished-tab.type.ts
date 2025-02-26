@@ -1,6 +1,6 @@
 import { DiminishedBar } from './diminished-bar.type';
+import { DiminishedRhythm } from './diminished-rhythm.type';
 import { DiminishedSection } from './diminished-section.type';
-import { DiminishedStrummingPattern } from './diminished-strumming-pattern.type';
 import { PositionOperation } from './position-operation.type';
 
 export type DiminishedTab = {
@@ -11,8 +11,8 @@ export type DiminishedTab = {
   id: string;
   moving: PositionOperation | undefined;
   ownerId: string;
+  rhythms: DiminishedRhythm[];
   sections: DiminishedSection[];
-  strummingPatterns: DiminishedStrummingPattern[];
   tempo: number | undefined;
   title: string;
   /** Each word contained in the title in lowercase. Used to match text via Firestore queries */

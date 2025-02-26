@@ -17,8 +17,8 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
   const { repeats } = props.container.originalBar;
   const hasRepeats = repeats && repeats > 1;
   const remainingRepeats =
-    props.tab.activeFrame?.barContainer.positionOfFirstBar === props.container.positionOfFirstBar &&
-    props.tab.activeFrame?.repeats;
+    props.tab.activeSlot?.barContainer.positionOfFirstBar === props.container.positionOfFirstBar &&
+    props.tab.activeSlot?.repeats;
 
   const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
     const nextTab = tabOperations.changeSection(

@@ -31,12 +31,12 @@ export const copyBarEnd = (
   updateTab(nextTab);
 };
 
-export const getFrameBackgroundColor = (
-  activeFrame: Tab['activeFrame'],
+export const getSlotBackgroundColor = (
+  activeSlot: Tab['activeSlot'],
   position: number,
-  frameIndex: number,
+  slotIndex: number,
 ) => {
-  return activeFrame?.barContainer.position === position && activeFrame?.frameIndex === frameIndex
+  return activeSlot?.barContainer.position === position && activeSlot?.slotIndex === slotIndex
     ? activeColor
     : undefined;
 };

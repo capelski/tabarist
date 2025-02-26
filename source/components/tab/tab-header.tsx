@@ -70,7 +70,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
     clearTimeout(props.playTimeoutRef.current);
 
-    const nextTab = tabOperations.resetActiveFrame(props.tab);
+    const nextTab = tabOperations.resetActiveSlot(props.tab);
     props.updateEditingCopy(JSON.stringify(nextTab));
     props.updateTab(nextTab);
 

@@ -33,8 +33,8 @@ export const barsToBarContainers = (
           isFirstInSectionBar,
           isLastInSectionBar,
           isReference: false,
-          omitStrummingPattern:
-            bar.type === BarType.chord && bar.sPatternIndex === reduced.lastChordBar?.sPatternIndex,
+          omitRhythm:
+            bar.type === BarType.chord && bar.rhythmIndex === reduced.lastChordBar?.rhythmIndex,
           originalBar: inSectionBar?.bar || bar,
           position,
           positionOfFirstBar: sectionOffset,
@@ -53,9 +53,9 @@ export const barsToBarContainers = (
           isFirstInSectionBar,
           isLastInSectionBar,
           isReference: true,
-          omitStrummingPattern:
+          omitRhythm:
             referencedBar.type === BarType.chord &&
-            referencedBar.sPatternIndex === reduced.lastChordBar?.sPatternIndex,
+            referencedBar.rhythmIndex === reduced.lastChordBar?.rhythmIndex,
           originalBar: inSectionBar?.bar || bar,
           position,
           positionOfFirstBar: sectionOffset,
@@ -78,7 +78,7 @@ export const barsToBarContainers = (
             isFirstInSectionBar: true,
             isLastInSectionBar: true,
             isReference: false,
-            omitStrummingPattern: true,
+            omitRhythm: true,
             originalBar: bar,
             position,
             positionOfFirstBar: sectionOffset,

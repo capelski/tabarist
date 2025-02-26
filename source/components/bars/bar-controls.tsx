@@ -2,11 +2,8 @@ import React from 'react';
 import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../../constants';
 import { getIndexDisplayValue, sectionOperations, tabOperations } from '../../operations';
 import { BarContainer, Section, Tab } from '../../types';
-import { DivisionsPicker, DivisionsPickerProps } from '../common/divisions-picker';
-import { PatternPicker, PatternPickerProps } from './pattern-picker';
 
 export type BarControlsProps = {
-  canRebase: boolean;
   container: BarContainer;
   inSection: Section | undefined;
   tab: Tab;
@@ -33,26 +30,6 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       props.tab,
       props.container.originalBar.index,
       props.container.inSection?.index,
-    );
-    props.updateTab(nextTab);
-  };
-
-  const rebaseChord: PatternPickerProps['rebase'] = (sPatternIndex) => {
-    const nextTab = tabOperations.rebaseChordBar(
-      props.tab,
-      props.container.originalBar.index,
-      sPatternIndex,
-      props.container.inSection,
-    );
-    props.updateTab(nextTab);
-  };
-
-  const rebasePicking: DivisionsPickerProps['rebase'] = (framesNumber) => {
-    const nextTab = tabOperations.rebasePickingBar(
-      props.tab,
-      props.container.originalBar.index,
-      framesNumber,
-      props.container.inSection,
     );
     props.updateTab(nextTab);
   };
@@ -119,26 +96,6 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       <button onClick={removeBar} style={{ marginBottom: 16 }} type="button">
         {removeSymbol}
       </button>
-
-      <div style={{ display: 'inline-block', marginBottom: 16, marginLeft: 8 }}>
-        {props.canRebase && (
-          <div style={{ marginRight: 8, textAlign: 'center' }}>
-            {props.container.originalBar.type === BarType.chord && (
-              <PatternPicker
-                rebase={rebaseChord}
-                sPatternIndex={props.container.originalBar.sPatternIndex}
-                strummingPatterns={props.tab.strummingPatterns}
-              />
-            )}
-            {props.container.originalBar.type === BarType.picking && (
-              <DivisionsPicker
-                framesNumber={props.container.originalBar.framesNumber}
-                rebase={rebasePicking}
-              />
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 };

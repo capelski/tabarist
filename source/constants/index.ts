@@ -1,6 +1,7 @@
-export const frameMaxCharacters = 6; // E.g. Cmadd9
-export const framesNumberOptions = [4, 8, 16];
-export const framesNumberDefault = framesNumberOptions[1];
+export const slotsOptions = [1, 2, 3, 4];
+export const slotsDefault = slotsOptions[3];
+export const slotValueOptions = ['', '↓', '↑', 'S', 'x'];
+
 export const maxTempo = 200;
 export const minTempo = 30;
 export const stringsNumber = 6;
@@ -19,10 +20,13 @@ export const addBarColor = '#fff8e5';
 export const operationColor = 'lightblue';
 export const referenceColor = '#e4ecfb';
 export const sectionColor = '#ebf3e8';
+export const rhythmLineColor = '#bbb';
+export const rhythmNestedLineColor = '#ddd';
 
 export const pageSize = 10;
 
 export * from './bar-type';
 export * from './route-names';
+export * from './slot-type';
 export * from './symbols';
 export * from './view-mode';

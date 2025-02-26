@@ -1,7 +1,6 @@
 import React from 'react';
 import { User } from '../firebase';
-import { tabRepository } from '../repositories';
-import { TabPageResponse } from '../repositories/tab.repository-interface';
+import { TabPageResponse, tabRepository } from '../repositories';
 import { TabListView } from './tab-list';
 
 export type MyTabsViewProps = {

@@ -1,13 +1,6 @@
 import React, { RefObject, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
-import {
-  BarGroup,
-  SectionList,
-  StrummingPatternList,
-  TabDetails,
-  TabHeader,
-  TabPlay,
-} from '../components';
+import { BarGroup, RhythmList, SectionList, TabDetails, TabHeader, TabPlay } from '../components';
 import { queryParameters, ViewMode } from '../constants';
 import { User } from '../firebase';
 import { barsToBarContainers, tabOperations } from '../operations';
@@ -72,7 +65,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
 
     return { areModesEquivalent: true, barWidth: -1, barContainers: [] };
-  }, [tab?.bars, tab?.sections, tab?.strummingPatterns, viewMode, windowWidth]);
+  }, [tab?.bars, tab?.rhythms, tab?.sections, viewMode, windowWidth]);
 
   if (!tab) {
     return <h3>Couldn't load tab</h3>;
@@ -98,6 +91,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
       <TabDetails isEditMode={isEditMode} isTabOwner={isTabOwner} tab={tab} updateTab={setTab} />
 
+      {isEditMode && (
+        <React.Fragment>
+          <SectionList barWidth={`${barWidth}px`} tab={tab} updateTab={setTab} />
+          <RhythmList tab={tab} updateTab={setTab} />
+        </React.Fragment>
+      )}
+
       <BarGroup
         barContainers={barContainers}
         barsNumber={tab.bars.length}
@@ -108,13 +108,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         tab={tab}
         updateTab={setTab}
       />
-
-      {isEditMode && (
-        <React.Fragment>
-          <SectionList barWidth={`${barWidth}px`} tab={tab} updateTab={setTab} />
-          <StrummingPatternList tab={tab} updateTab={setTab} />
-        </React.Fragment>
-      )}
 
       <TabPlay
         barContainers={barContainers}

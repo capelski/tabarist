@@ -17,17 +17,14 @@ Given(/^a section "(.*)" in tab "(.*)"/, function (sectionName: string, tabName:
   );
 });
 
-Given(
-  /^a strumming pattern "(.*)" in tab "(.*)"/,
-  function (sPatternName: string, tabName: string) {
-    globals.tabs[tabName] = tabOperations.addStrummingPattern(globals.tabs[tabName]);
-    globals.tabs[tabName] = tabOperations.renameStrummingPattern(
-      globals.tabs[tabName],
-      globals.tabs[tabName].strummingPatterns.length - 1,
-      sPatternName,
-    );
-  },
-);
+Given(/^a rhythm "(.*)" in tab "(.*)"/, function (rhythmName: string, tabName: string) {
+  globals.tabs[tabName] = tabOperations.addRhythm(globals.tabs[tabName]);
+  globals.tabs[tabName] = tabOperations.renameRhythm(
+    globals.tabs[tabName],
+    globals.tabs[tabName].rhythms.length - 1,
+    rhythmName,
+  );
+});
 
 When(
   /^adding to (section "(.*)" of )?tab "(.*)" a (chord|picking|section) bar in position (\d+)/,
@@ -97,8 +94,8 @@ Then(
   },
 );
 
-Then(/^tab "(.*)" has (\d*) strumming pattern\(s\)/, function (tabName: string, count: number) {
-  expect(globals.tabs[tabName].strummingPatterns).to.have.length(count);
+Then(/^tab "(.*)" has (\d*) rhythm\(s\)/, function (tabName: string, count: number) {
+  expect(globals.tabs[tabName].rhythms).to.have.length(count);
 });
 
 Then(/^tab "(.*)" has (\d*) section\(s\)/, function (tabName: string, count: number) {

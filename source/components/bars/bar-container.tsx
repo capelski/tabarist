@@ -35,13 +35,12 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
   };
   const canAddBar = !props.container.inSectionBar || props.container.isFirstInSectionBar;
   const canChangeSection = !!props.container.inSectionBar && props.container.isFirstInSectionBar;
-  const canRebase = !props.container.inSectionBar && !props.container.isReference;
   const canRepeat = !props.container.inSectionBar || props.container.isFirstInSectionBar;
   const displayBarControls = !props.container.inSectionBar || props.container.isFirstInSectionBar;
 
   useEffect(() => {
     if (
-      props.tab.activeFrame?.barContainer.position === props.container.position &&
+      props.tab.activeSlot?.barContainer.position === props.container.position &&
       props.scrollView?.current &&
       divRef.current
     ) {
@@ -50,7 +49,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         behavior: 'smooth',
       });
     }
-  }, [props.tab.activeFrame]);
+  }, [props.tab.activeSlot]);
 
   return (
     <div
@@ -113,7 +112,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
             <ChordBarComponent
               {...barBaseProps}
               container={props.container as BarContainer<ChordBar>}
-              strummingPatterns={props.tab.strummingPatterns}
+              rhythms={props.tab.rhythms}
             />
           ) : (
             <PickingBarComponent
@@ -126,7 +125,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
 
       {props.isEditMode && displayBarControls && (
         <BarControls
-          canRebase={canRebase}
           container={props.container}
           inSection={props.container.inSection}
           tab={props.tab}

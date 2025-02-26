@@ -2,11 +2,10 @@ import {
   DiminishedBarBase,
   DiminishedChordBar,
   DiminishedPickingBar,
-  DiminishedPickingFrame,
   DiminishedReferenceBar,
   DiminishedSectionBar,
 } from './diminished-bar.type';
-import { IndexedValue } from './indexed-value.type';
+import { Slot } from './slot.type';
 
 export type NonSectionBar = ChordBar | PickingBar | ReferenceBar;
 export type Bar = NonSectionBar | SectionBar;
@@ -16,20 +15,15 @@ export type BarBase = DiminishedBarBase & {
 };
 
 export type ChordBar = BarBase &
-  Omit<DiminishedChordBar, 'frames'> & {
-    frames: IndexedValue[];
+  Omit<DiminishedChordBar, 'slots'> & {
+    slots: Slot[];
   };
 
 export type PickingBar = BarBase &
-  Omit<DiminishedPickingBar, 'frames'> & {
-    framesNumber: number;
-    frames: PickingFrame[];
+  Omit<DiminishedPickingBar, 'chordSupport' | 'strings'> & {
+    chordSupport: Slot[];
+    strings: { index: number; slots: Slot[] }[];
   };
-
-export type PickingFrame = Omit<DiminishedPickingFrame, 'strings'> & {
-  index: number;
-  strings: IndexedValue[];
-};
 
 export type ReferenceBar = BarBase & DiminishedReferenceBar;
 

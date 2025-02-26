@@ -48,11 +48,11 @@ Then(
 );
 
 Then(
-  /^the chord bar in position (\d+) in tab "(.*)" uses the strumming pattern (\d+)/,
-  function (position: number, tabName: string, sPatternPosition: number) {
+  /^the chord bar in position (\d+) in tab "(.*)" uses the rhythm (\d+)/,
+  function (position: number, tabName: string, rhythmPosition: number) {
     const bar = globals.tabs[tabName].bars[position - 1];
     expect(bar.type).to.equal(BarType.chord);
-    expect((bar as ChordBar).sPatternIndex).to.equal(sPatternPosition - 1);
+    expect((bar as ChordBar).rhythmIndex).to.equal(rhythmPosition - 1);
   },
 );
 

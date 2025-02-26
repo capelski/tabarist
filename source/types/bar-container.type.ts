@@ -14,10 +14,10 @@ export type BarContainer<
   isFirstInSectionBar: boolean;
   isLastInSectionBar: boolean;
   isReference: boolean;
-  omitStrummingPattern: boolean;
+  omitRhythm: boolean;
   originalBar: Bar;
   position: number;
-  /** Used to find the position of the first bar of a section when repeating the active frame */
+  /** Used to find the position of the first bar of a section when repeating the active slot */
   positionOfFirstBar: number | undefined;
   /** An undefined value is used to represent a section bar for a section with no bars */
   renderedBar: TBar extends SectionBar ? undefined : TBar;

@@ -1,4 +1,4 @@
-import { BarType, framesNumberDefault, stringsNumber } from '../constants';
+import { BarType, slotsDefault, stringsNumber } from '../constants';
 import {
   Bar,
   BarBase,
@@ -9,24 +9,13 @@ import {
   DiminishedPickingBar,
   NonSectionBar,
   PickingBar,
-  PickingFrame,
   ReferenceBar,
+  Rhythm,
   Section,
   SectionBar,
-  StrummingPattern,
 } from '../types';
-import {
-  createIndexedValuesArray,
-  debugBarMovements,
-  getIndexAfterMove,
-  getIndexIncrease,
-} from './indexed-value.operations';
-
-const createPickingFrame = (index: number): PickingFrame => ({
-  chordSupport: undefined,
-  index,
-  strings: createIndexedValuesArray(stringsNumber, ''),
-});
+import { debugBarMovements, getIndexAfterMove, getIndexIncrease } from './indexed-value.operations';
+import { slotOperations } from './slot.operations';
 
 export const barOperations = {
   addBar: <TBar extends Bar | NonSectionBar>(bars: TBar[], newBar: TBar): TBar[] => {
@@ -68,10 +57,8 @@ export const barOperations = {
     if (diminishedBar.type === BarType.chord) {
       const chordBar: ChordBar = {
         ...diminishedBar,
-        frames: diminishedBar.frames.map((frame, index) => {
-          return { index, value: frame };
-        }),
         index,
+        slots: diminishedBar.slots.map(slotOperations.augmentSlot),
       };
       return chordBar;
     }
@@ -79,18 +66,16 @@ export const barOperations = {
     if (diminishedBar.type === BarType.picking) {
       const pickingBar: PickingBar = {
         ...diminishedBar,
-        frames: diminishedBar.frames.map((frame, frameIndex) => {
+        index,
+        chordSupport: diminishedBar.chordSupport.map(slotOperations.augmentSlot),
+        strings: diminishedBar.strings.map((string, index) => {
           return {
-            ...frame,
-            index: frameIndex,
-            strings: frame.strings.map((string, stringIndex) => {
-              return { index: stringIndex, value: string };
-            }),
+            index,
+            slots: string.slots.map(slotOperations.augmentSlot),
           };
         }),
-        framesNumber: diminishedBar.frames.length,
-        index,
       };
+
       return pickingBar;
     }
 
@@ -105,22 +90,24 @@ export const barOperations = {
     return startIndex !== endIndex && startIndex + 1 !== endIndex;
   },
 
-  createChordBar: (index: number, strummingPattern: StrummingPattern): ChordBar => {
+  createChordBar: (index: number, rhythm: Rhythm): ChordBar => {
     return {
-      frames: createIndexedValuesArray(strummingPattern?.framesNumber ?? 0, ''),
       index,
-      sPatternIndex: strummingPattern.index,
       repeats: undefined,
+      rhythmIndex: rhythm.index,
+      slots: slotOperations.createSlots(slotsDefault),
       type: BarType.chord,
     };
   },
 
   createPickingBar: (index: number): PickingBar => {
     return {
-      frames: Array.from({ length: framesNumberDefault }, (_, index) => createPickingFrame(index)),
-      framesNumber: framesNumberDefault,
+      chordSupport: slotOperations.createSlots(slotsDefault),
       index,
       repeats: undefined,
+      strings: Array.from({ length: stringsNumber }, (_, index) => {
+        return { index, slots: slotOperations.createSlots(slotsDefault) };
+      }),
       type: BarType.picking,
     };
   },
@@ -156,31 +143,24 @@ export const barOperations = {
     bar: TBar,
   ): TBar extends NonSectionBar ? DiminishedNonSectionBar : DiminishedBar => {
     if (bar.type === BarType.chord) {
-      const { frames, index, ...rest } = bar as ChordBar;
+      const { index, slots, ...rest } = bar as ChordBar;
 
       const diminishedChordBar: DiminishedChordBar = {
         ...rest,
-        frames: frames.map((frame) => {
-          return frame.value;
-        }),
+        slots: slots.map(slotOperations.diminishSlot),
       };
       return diminishedChordBar;
     }
 
     if (bar.type === BarType.picking) {
-      const { frames, framesNumber, index, ...barRest } = bar as PickingBar;
+      const { index, chordSupport, strings, ...barRest } = bar as PickingBar;
 
       const diminishedPickingBar: DiminishedPickingBar = {
         ...barRest,
-        frames: frames.map((frame) => {
-          const { index, strings, ...frameRest } = frame;
-          return {
-            ...frameRest,
-            strings: strings.map((string) => {
-              return string.value;
-            }),
-          };
-        }),
+        chordSupport: chordSupport.map(slotOperations.diminishSlot),
+        strings: strings.map((string) => ({
+          slots: string.slots.map(slotOperations.diminishSlot),
+        })),
       };
       return diminishedPickingBar;
     }
@@ -236,44 +216,6 @@ export const barOperations = {
     return reIndexedBars;
   },
 
-  rebaseChordBar: <TBar extends Bar | NonSectionBar>(
-    bars: TBar[],
-    barIndex: number,
-    sPattern: StrummingPattern,
-  ): TBar[] => {
-    return bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            sPatternIndex: sPattern.index,
-            frames: createIndexedValuesArray(
-              sPattern.framesNumber,
-              (index) => bar.frames[index]?.value ?? '',
-            ),
-          };
-    });
-  },
-
-  rebasePickingBar: <TBar extends Bar | NonSectionBar>(
-    bars: TBar[],
-    barIndex: number,
-    framesNumber: number,
-  ): TBar[] => {
-    return bars.map((bar) => {
-      return bar.type !== BarType.picking || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            frames: Array.from(
-              { length: framesNumber },
-              (_, index) => bar.frames[index] ?? createPickingFrame(index),
-            ),
-            framesNumber,
-          };
-    });
-  },
-
   removeBar: <TBar extends Bar | NonSectionBar>(bars: TBar[], deletionIndex: number): TBar[] => {
     // Reference bars can point to a bar that is being deleted in a later position; we need
     // to compute the deleted count at each position prior to re-indexing the bars
@@ -319,66 +261,103 @@ export const barOperations = {
     return nextBars;
   },
 
-  setStrummingPattern: <TBar extends Bar | NonSectionBar>(
-    bars: TBar[],
-    sPattern: StrummingPattern,
-    matchingIndex: number | undefined,
-  ): TBar[] => {
-    return bars.map((bar) => {
-      return bar.type === BarType.chord && bar.sPatternIndex === matchingIndex
-        ? {
-            ...bar,
-            sPatternIndex: sPattern.index,
-            frames: createIndexedValuesArray(
-              sPattern.framesNumber,
-              (index) => bar.frames[index]?.value ?? '',
-            ),
-          }
-        : bar;
-    });
-  },
-
-  updateChordFrame: <TBar extends Bar | NonSectionBar>(
+  setChordBarRhythm: <TBar extends Bar | NonSectionBar>(
     bars: TBar[],
     barIndex: number,
-    frameIndex: number,
-    value: string,
+    rhythm: Rhythm,
   ): TBar[] => {
     return bars.map((bar) => {
       return bar.type !== BarType.chord || bar.index !== barIndex
         ? bar
         : {
             ...bar,
-            frames: bar.frames.map((frame) => {
-              return frame.index !== frameIndex ? frame : { ...frame, value };
-            }),
+            rhythmIndex: rhythm.index,
+            slots: slotOperations.copyStructure(rhythm.slots, bar.slots),
           };
     });
   },
 
-  updatePickingFrame: <TBar extends Bar | NonSectionBar>(
+  setChordBarSlotSize: <TBar extends Bar | NonSectionBar>(
     bars: TBar[],
     barIndex: number,
-    frameIndex: number,
-    stringIndex: number,
+    size: number,
+    indexesPath: number[],
+  ): TBar[] => {
+    return bars.map((bar) => {
+      return bar.type !== BarType.chord || bar.index !== barIndex
+        ? bar
+        : {
+            ...bar,
+            slots: slotOperations.setSlotSize(bar.slots, size, indexesPath),
+          };
+    });
+  },
+
+  setChordBarSlotValue: <TBar extends Bar | NonSectionBar>(
+    bars: TBar[],
+    barIndex: number,
     value: string,
+    indexesPath: number[],
+  ): TBar[] => {
+    return bars.map((bar) => {
+      return bar.type !== BarType.chord || bar.index !== barIndex
+        ? bar
+        : {
+            ...bar,
+            slots: slotOperations.setSlotValue(bar.slots, value, indexesPath),
+          };
+    });
+  },
+
+  setPickingBarSlotsSize: <TBar extends Bar | NonSectionBar>(
+    bars: TBar[],
+    barIndex: number,
+    size: number,
+    indexesPath: number[],
   ): TBar[] => {
     return bars.map((bar) => {
       return bar.type !== BarType.picking || bar.index !== barIndex
         ? bar
         : {
             ...bar,
-            frames: bar.frames.map((frame) => {
-              return frame.index !== frameIndex
-                ? frame
-                : {
-                    ...frame,
-                    chordSupport: stringIndex === frame.strings.length ? value : frame.chordSupport,
-                    strings: frame.strings.map((string) => {
-                      return string.index !== stringIndex ? string : { ...string, value };
-                    }),
-                  };
+            chordSupport: slotOperations.setSlotSize(bar.chordSupport, size, indexesPath),
+            strings: bar.strings.map((string) => {
+              return {
+                index: string.index,
+                slots: slotOperations.setSlotSize(string.slots, size, indexesPath),
+              };
             }),
+          };
+    });
+  },
+
+  setPickingBarSlotValue: <TBar extends Bar | NonSectionBar>(
+    bars: TBar[],
+    barIndex: number,
+    stringIndex: number | 'chordSupport',
+    value: string,
+    indexesPath: number[],
+  ): TBar[] => {
+    return bars.map((bar) => {
+      return bar.type !== BarType.picking || bar.index !== barIndex
+        ? bar
+        : {
+            ...bar,
+            chordSupport:
+              stringIndex === 'chordSupport'
+                ? slotOperations.setSlotValue(bar.chordSupport, value, indexesPath)
+                : bar.chordSupport,
+            strings:
+              stringIndex === 'chordSupport'
+                ? bar.strings
+                : bar.strings.map((string) => {
+                    return stringIndex !== string.index
+                      ? string
+                      : {
+                          index: string.index,
+                          slots: slotOperations.setSlotValue(string.slots, value, indexesPath),
+                        };
+                  }),
           };
     });
   },
