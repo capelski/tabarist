@@ -3,7 +3,7 @@ import { Slot } from '../../types';
 import { SlotDivider } from './slot-divider';
 
 export type SlotsDividerProps = {
-  denominator?: number;
+  denominator: number | undefined;
   indexesPath: number[];
   setSlotSize: (size: number, indexesPath: number[]) => void;
   slots: Slot[];
@@ -15,7 +15,7 @@ export const SlotsDivider: React.FC<SlotsDividerProps> = (props) => {
       {props.slots.map((slot) => {
         return (
           <SlotDivider
-            denominator={props.slots.length * (props.denominator ?? 1)}
+            denominator={props.denominator && props.slots.length * props.denominator}
             indexesPath={[...props.indexesPath, slot.index]}
             isFirstSlot={slot.index === 0}
             key={slot.index}

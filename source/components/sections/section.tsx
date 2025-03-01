@@ -5,7 +5,6 @@ import { barsToBarContainers, sectionOperations, tabOperations } from '../../ope
 import { Section, Tab } from '../../types';
 
 export type SectionProps = {
-  barWidth: string;
   isEditMode: boolean;
   section: Section;
   tab: Tab;

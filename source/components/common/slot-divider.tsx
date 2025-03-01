@@ -1,10 +1,17 @@
 import React from 'react';
-import { rhythmLineColor, rhythmNestedLineColor, slotsOptions, SlotType } from '../../constants';
+import {
+  inputWidth,
+  rhythmLineColor,
+  rhythmNestedLineColor,
+  slotsOptions,
+  SlotType,
+} from '../../constants';
 import { Slot } from '../../types';
 import { SlotsDivider } from './slots-divider';
 
 export type SlotDividerProps = {
-  denominator: number;
+  /** When set to undefined to the size fraction will be hidden */
+  denominator: number | undefined;
   indexesPath: number[];
   isFirstSlot: boolean;
   parentSlotSize: number;
@@ -14,6 +21,8 @@ export type SlotDividerProps = {
 
 export const SlotDivider: React.FC<SlotDividerProps> = (props) => {
   const slotSize = props.slot.type === SlotType.block ? props.slot.slots.length : 1;
+  const showText =
+    props.indexesPath.length === 0 || (props.denominator && props.slot.type === SlotType.value);
 
   return (
     <div
@@ -33,20 +42,18 @@ export const SlotDivider: React.FC<SlotDividerProps> = (props) => {
       }}
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <span>
-          {props.indexesPath.length === 0
-            ? 'Beats'
-            : props.slot.type === SlotType.value
-            ? `1/${props.denominator}`
-            : ''}
-        </span>
+        {showText && (
+          <span style={{ marginRight: 4 }}>
+            {props.indexesPath.length === 0 ? 'Beats' : `1/${props.denominator}`}
+          </span>
+        )}
 
         <select
           onChange={(event) => {
             const nextSlotSize = parseInt(event.target.value);
             props.setSlotSize(nextSlotSize, props.indexesPath);
           }}
-          style={{ marginLeft: 8 }}
+          style={{ width: inputWidth }}
           value={slotSize}
         >
           {slotsOptions.map((option) => {

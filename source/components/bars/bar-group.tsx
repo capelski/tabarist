@@ -1,5 +1,5 @@
 import React, { RefObject } from 'react';
-import { repeatsHeight } from '../../constants';
+import { barMinWidth } from '../../constants';
 import { BarContainer, Section, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarContainerComponent } from './bar-container';
@@ -7,7 +7,6 @@ import { BarContainerComponent } from './bar-container';
 export type BarGroupProps = {
   barContainers: BarContainer[];
   barsNumber: number;
-  barWidth: string;
   isEditMode: boolean;
   inSection: Section | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
@@ -31,14 +30,16 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           inSection={props.inSection}
           style={{
             boxSizing: 'border-box',
-            marginTop: props.inSection ? undefined : repeatsHeight,
             padding: '0 8px',
-            width: props.barWidth,
+            width: barMinWidth,
           }}
           tab={props.tab}
           updateTab={props.updateTab}
         />
       )}
+
+      {/* Prevent last line from overstretching the bars */}
+      <div style={{ height: 1, flexGrow: 1000000 }}></div>
     </div>
   );
 };

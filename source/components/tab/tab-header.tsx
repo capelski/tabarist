@@ -1,13 +1,6 @@
 import React, { MutableRefObject, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import {
-  editSymbol,
-  queryParameters,
-  removeSymbol,
-  RouteNames,
-  saveSymbol,
-  ViewMode,
-} from '../../constants';
+import { editSymbol, queryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
 import { User } from '../../firebase';
 import { tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
@@ -15,7 +8,6 @@ import { Tab } from '../../types';
 import { Modal } from '../common/modal';
 
 export type TabHeaderProps = {
-  areModesEquivalent: boolean;
   editingCopy: string;
   isEditMode: boolean;
   isTabOwner: boolean;
@@ -23,9 +15,7 @@ export type TabHeaderProps = {
   tab: Tab;
   updateEditingCopy: (editingCopy: string) => void;
   updateTab: (tab: Tab) => void;
-  updateViewMode: (viewMode: ViewMode) => void;
   user: User | null;
-  viewMode: ViewMode;
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
@@ -170,28 +160,6 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 </button>
               </React.Fragment>
             )}
-          </React.Fragment>
-        )}
-
-        {!props.areModesEquivalent && (
-          <React.Fragment>
-            <span style={{ marginLeft: 8 }}>👁️</span>
-            <select
-              onChange={(event) => {
-                const nextViewMode = event.target.value as ViewMode;
-                props.updateViewMode(nextViewMode);
-              }}
-              style={{ marginLeft: 8 }}
-              value={props.viewMode}
-            >
-              {Object.values(ViewMode).map((viewMode) => {
-                return (
-                  <option key={viewMode} value={viewMode}>
-                    {viewMode}
-                  </option>
-                );
-              })}
-            </select>
           </React.Fragment>
         )}
       </div>

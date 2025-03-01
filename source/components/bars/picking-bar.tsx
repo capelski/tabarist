@@ -12,13 +12,13 @@ export type PickingBarComponentProps = BarComponentBaseProps & {
 export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) => {
   const virtualSlot = slotOperations.createBlockSlot(0, props.container.renderedBar.chordSupport);
   const displayChordSupport = props.container.renderedBar.chordSupport.some(
-    (slot) => slotOperations.getSlotLength(slot) > 0,
+    (slot) => slotOperations.getSlotLength(slot, 0) > 0,
   );
   const canUpdate = props.isEditMode && props.canUpdate;
 
   const getBackground = (slot: Slot) => {
     const backgroundColor = getBackgroundColor(slot);
-    return `linear-gradient(180deg, ${backgroundColor} calc(50% - 1px), black calc(50%), ${backgroundColor} calc(50% + 1px)`;
+    return `linear-gradient(180deg, ${backgroundColor} calc(50% - 1px), #555 calc(50%), ${backgroundColor} calc(50% + 1px)`;
   };
 
   const getBackgroundColor = (slot: Slot) => {
@@ -59,20 +59,26 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
       style={{
         borderLeft: '1px solid black',
         boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
       }}
     >
-      {canUpdate && (
-        <div style={{ marginBottom: 8 }}>
-          <SlotDivider
-            denominator={1}
-            indexesPath={[]}
-            isFirstSlot={true}
-            parentSlotSize={virtualSlot.slots.length}
-            setSlotSize={setSlotSize}
-            slot={virtualSlot}
-          />
-        </div>
-      )}
+      {props.isEditMode &&
+        (props.canUpdate ? (
+          <div style={{ marginBottom: 8 }}>
+            <SlotDivider
+              denominator={undefined}
+              indexesPath={[]}
+              isFirstSlot={true}
+              parentSlotSize={virtualSlot.slots.length}
+              setSlotSize={setSlotSize}
+              slot={virtualSlot}
+            />
+          </div>
+        ) : (
+          <div style={{ flexGrow: 1 }}></div>
+        ))}
 
       {props.container.renderedBar.strings.map((string) => {
         return (
@@ -89,7 +95,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
         );
       })}
 
-      {(displayChordSupport || canUpdate) && (
+      {(displayChordSupport || props.isEditMode) && (
         <div style={{ marginTop: 8 }}>
           <SlotsValue
             backgroundColor={getBackgroundColor}

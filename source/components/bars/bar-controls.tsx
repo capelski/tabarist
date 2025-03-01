@@ -50,29 +50,24 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
+        marginTop: 8,
       }}
     >
-      <span style={{ marginBottom: 16, marginRight: 8 }}>
+      <span style={{ marginRight: 8 }}>
         {getIndexDisplayValue(props.container.originalBar.index)}
         {props.container.originalBar.type === BarType.reference && (
-          <span style={{ marginLeft: 8 }}>
-            ={'>'} {getIndexDisplayValue(props.container.originalBar.barIndex)}
-          </span>
+          <span>={getIndexDisplayValue(props.container.originalBar.barIndex)}</span>
         )}
       </span>
 
       {props.tab.moving &&
       sectionOperations.isOperationInSection(props.tab.moving, props.inSection) &&
       props.tab.moving.startIndex === props.container.originalBar.index ? (
-        <button
-          onClick={cancelPositionOperation}
-          style={{ marginBottom: 16, marginRight: 8 }}
-          type="button"
-        >
+        <button onClick={cancelPositionOperation} style={{ marginRight: 8 }} type="button">
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={moveBarStart} style={{ marginBottom: 16, marginRight: 8 }} type="button">
+        <button onClick={moveBarStart} style={{ marginRight: 8 }} type="button">
           {moveStartSymbol}
         </button>
       )}
@@ -80,20 +75,16 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       {props.tab.copying &&
       sectionOperations.isOperationInSection(props.tab.copying, props.inSection) &&
       props.tab.copying.startIndex === props.container.originalBar.index ? (
-        <button
-          onClick={cancelPositionOperation}
-          style={{ marginBottom: 16, marginRight: 8 }}
-          type="button"
-        >
+        <button onClick={cancelPositionOperation} style={{ marginRight: 8 }} type="button">
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={copyBarStart} style={{ marginBottom: 16, marginRight: 8 }} type="button">
+        <button onClick={copyBarStart} style={{ marginRight: 8 }} type="button">
           =
         </button>
       )}
 
-      <button onClick={removeBar} style={{ marginBottom: 16 }} type="button">
+      <button onClick={removeBar} type="button">
         {removeSymbol}
       </button>
     </div>

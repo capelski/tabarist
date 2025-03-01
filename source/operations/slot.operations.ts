@@ -51,18 +51,18 @@ const diminishSlot = (slot: Slot): DiminishedSlot => {
       }, {});
 };
 
-const getSlotLength = (slot: Slot): number => {
-  return slot.type === SlotType.value
-    ? slot.value.length
-    : slot.slots.reduce((reduced, nestedSlot) => {
-        return reduced + getSlotLength(nestedSlot);
-      }, 0);
-};
-
 const getNextSlotValue = (previousSlot: Slot): ValueSlot['value'] => {
   return previousSlot.type === SlotType.value
     ? previousSlot.value
     : getNextSlotValue(previousSlot.slots[0]);
+};
+
+const getSlotLength = (slot: Slot, minimumLength = 1): number => {
+  return slot.type === SlotType.value
+    ? Math.max(slot.value.length, minimumLength)
+    : slot.slots.reduce((reduced, nestedSlot) => {
+        return reduced + getSlotLength(nestedSlot, minimumLength);
+      }, 0);
 };
 
 const setSlotSize = (slots: Slot[], size: number, indexesPath: number[]): Slot[] => {

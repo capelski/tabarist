@@ -1,9 +1,9 @@
-import React, { RefObject, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabHeader, TabPlay } from '../components';
-import { queryParameters, ViewMode } from '../constants';
+import { queryParameters } from '../constants';
 import { User } from '../firebase';
-import { barsToBarContainers, tabOperations } from '../operations';
+import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
 import { Tab } from '../types';
 
@@ -15,20 +15,10 @@ export type TabViewProps = {
 export const TabView: React.FC<TabViewProps> = (props) => {
   const [editingCopy, setEditingCopy] = useState('');
   const [tab, setTab] = useState<Tab>();
-  const [viewMode, setViewMode] = useState(ViewMode.adaptive);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const isEditMode = !!editingCopy;
 
   // When entering edit mode from play mode we need to clear the next timeout
   const playTimeoutRef = useRef(0);
-
-  useLayoutEffect(() => {
-    function updateSize() {
-      setWindowWidth(window.innerWidth);
-    }
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
 
   const [searchParams] = useSearchParams();
   const { tabId } = useParams();
@@ -52,20 +42,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
   }, [searchParams]);
 
-  const { areModesEquivalent, barWidth, barContainers } = useMemo(() => {
+  const barContainers = useMemo(() => {
     if (tab?.bars) {
-      const { areModesEquivalent, barWidth } = tabOperations.getLongestBarWidth(
-        tab,
-        windowWidth,
-        viewMode,
-      );
-      const barContainers = barsToBarContainers(tab, tab.bars);
-
-      return { areModesEquivalent, barWidth, barContainers };
+      return barsToBarContainers(tab, tab.bars);
     }
 
-    return { areModesEquivalent: true, barWidth: -1, barContainers: [] };
-  }, [tab?.bars, tab?.rhythms, tab?.sections, viewMode, windowWidth]);
+    return [];
+  }, [tab?.bars, tab?.rhythms, tab?.sections]);
 
   if (!tab) {
     return <h3>Couldn't load tab</h3>;
@@ -76,7 +59,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   return (
     <div className="tab">
       <TabHeader
-        areModesEquivalent={areModesEquivalent}
         editingCopy={editingCopy}
         isEditMode={isEditMode}
         isTabOwner={isTabOwner}
@@ -84,16 +66,14 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         tab={tab}
         updateEditingCopy={setEditingCopy}
         updateTab={setTab}
-        updateViewMode={setViewMode}
         user={props.user}
-        viewMode={viewMode}
       />
 
       <TabDetails isEditMode={isEditMode} isTabOwner={isTabOwner} tab={tab} updateTab={setTab} />
 
       {isEditMode && (
         <React.Fragment>
-          <SectionList barWidth={`${barWidth}px`} tab={tab} updateTab={setTab} />
+          <SectionList tab={tab} updateTab={setTab} />
           <RhythmList tab={tab} updateTab={setTab} />
         </React.Fragment>
       )}
@@ -101,7 +81,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <BarGroup
         barContainers={barContainers}
         barsNumber={tab.bars.length}
-        barWidth={`${barWidth}px`}
         inSection={undefined}
         isEditMode={isEditMode}
         scrollView={props.scrollView}

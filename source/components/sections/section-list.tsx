@@ -5,7 +5,6 @@ import { Tab } from '../../types';
 import { SectionComponent } from './section';
 
 export type SectionListProps = {
-  barWidth: string;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -22,7 +21,6 @@ export const SectionList: React.FC<SectionListProps> = (props) => {
       {props.tab.sections.map((section) => {
         return (
           <SectionComponent
-            barWidth={props.barWidth}
             isEditMode={true}
             key={section.index}
             section={section}

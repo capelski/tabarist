@@ -1,10 +1,13 @@
 import React, { CSSProperties } from 'react';
 import {
   addBarColor,
+  addBarWidth,
+  barControlsHeight,
   BarType,
   moveEndSymbol,
   NonReferenceBarType,
   operationColor,
+  repeatsHeight,
   stringHeight,
 } from '../../constants';
 import { barOperations, sectionOperations } from '../../operations';
@@ -50,7 +53,11 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: stringHeight * 6,
+        marginBottom: props.expanded ? 8 : undefined,
+        marginTop: props.inSection ? undefined : repeatsHeight,
+        maxWidth: props.expanded ? undefined : addBarWidth,
+        minHeight: stringHeight * 6,
+        minWidth: props.expanded ? undefined : addBarWidth,
         ...props.style,
       }}
     >
@@ -107,6 +114,8 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
           )}
         </React.Fragment>
       )}
+
+      {props.expanded && <div style={{ height: barControlsHeight }}></div>}
     </div>
   );
 };

@@ -1,5 +1,34 @@
-import { BarType } from '../constants';
+import {
+  addBarWidth,
+  barMinWidth,
+  BarType,
+  characterWidth,
+  inputWidth,
+  sectionNameMaxWidth,
+} from '../constants';
 import { Bar, BarContainer, ChordBar, PickingBar, Tab } from '../types';
+import { slotOperations } from './slot.operations';
+
+const getBarWidth = (bar: ChordBar | PickingBar) => {
+  const width =
+    bar.type === BarType.chord
+      ? bar.slots.reduce((barReduced, slot) => {
+          return barReduced + slotOperations.getSlotLength(slot);
+        }, 0)
+      : [bar.chordSupport, ...bar.strings.map((string) => string.slots)].reduce(
+          (barReduced, slots) => {
+            return Math.max(
+              barReduced,
+              slots.reduce((reduced, slot) => {
+                return reduced + slotOperations.getSlotLength(slot, inputWidth);
+              }, 0),
+            );
+          },
+          0,
+        );
+
+  return Math.max(width + addBarWidth, barMinWidth);
+};
 
 export const barsToBarContainers = (
   tab: Tab,
@@ -39,6 +68,7 @@ export const barsToBarContainers = (
           position,
           positionOfFirstBar: sectionOffset,
           renderedBar: bar,
+          width: getBarWidth(bar),
         });
 
         if (bar.type === BarType.chord) {
@@ -60,6 +90,7 @@ export const barsToBarContainers = (
           position,
           positionOfFirstBar: sectionOffset,
           renderedBar: referencedBar,
+          width: getBarWidth(referencedBar),
         });
 
         if (referencedBar.type === BarType.chord) {
@@ -83,6 +114,13 @@ export const barsToBarContainers = (
             position,
             positionOfFirstBar: sectionOffset,
             renderedBar: undefined,
+            width: Math.min(
+              Math.max(
+                addBarWidth + inputWidth + section.name.length * characterWidth,
+                barMinWidth,
+              ),
+              sectionNameMaxWidth,
+            ),
           });
         } else {
           nextBarContainers.push(

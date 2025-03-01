@@ -21,4 +21,5 @@ export type BarContainer<
   positionOfFirstBar: number | undefined;
   /** An undefined value is used to represent a section bar for a section with no bars */
   renderedBar: TBar extends SectionBar ? undefined : TBar;
+  width: number;
 };

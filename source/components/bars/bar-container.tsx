@@ -1,5 +1,5 @@
 import React, { RefObject, useEffect, useRef } from 'react';
-import { BarType, referenceColor, repeatsHeight, sectionColor } from '../../constants';
+import { barControlsHeight, BarType, referenceColor, sectionColor } from '../../constants';
 import { BarContainer, ChordBar, PickingBar, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarControls } from './bar-controls';
@@ -9,7 +9,6 @@ import { PickingBarComponent } from './picking-bar';
 import { Repeats } from './repeats';
 
 export type BarContainerComponentProps = {
-  barWidth: string;
   container: BarContainer;
   isEditMode: boolean;
   scrollView: RefObject<HTMLDivElement> | undefined;
@@ -59,20 +58,16 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         alignSelf: 'stretch', // So chord bars next to picking bars have the same height
         display: 'flex',
         flexDirection: 'column',
-        width: props.barWidth,
+        flexGrow: 1,
+        marginBottom: 8,
+        width: props.container.width,
       }}
     >
-      <div
-        className="bar-content"
-        style={{ display: 'flex', flexGrow: 1, flexDirection: 'row', marginBottom: 8 }}
-      >
+      <div className="bar-content" style={{ display: 'flex', flexGrow: 1, flexDirection: 'row' }}>
         {props.isEditMode && canAddBar && (
           <AddBar
             barIndex={props.container.originalBar.index}
             inSection={props.container.inSection}
-            style={{
-              marginTop: props.container.inSection ? undefined : repeatsHeight,
-            }}
             tab={props.tab}
             updateTab={props.updateTab}
           />
@@ -84,6 +79,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
             display: 'flex',
             flexDirection: 'column',
             flexGrow: 1,
+            justifyContent: 'end',
           }}
         >
           {!props.container.inSection && (
@@ -123,13 +119,17 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         </div>
       </div>
 
-      {props.isEditMode && displayBarControls && (
-        <BarControls
-          container={props.container}
-          inSection={props.container.inSection}
-          tab={props.tab}
-          updateTab={props.updateTab}
-        />
+      {props.isEditMode && (
+        <div style={{ height: barControlsHeight }}>
+          {displayBarControls && (
+            <BarControls
+              container={props.container}
+              inSection={props.container.inSection}
+              tab={props.tab}
+              updateTab={props.updateTab}
+            />
+          )}
+        </div>
       )}
     </div>
   );

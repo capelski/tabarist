@@ -1,5 +1,5 @@
 import React from 'react';
-import { repeatsHeight, sectionColor, sectionNameMaxWidth } from '../../constants';
+import { inputWidth, repeatsHeight, sectionColor, sectionNameMaxWidth } from '../../constants';
 import { tabOperations } from '../../operations';
 import { BarContainer, Tab } from '../../types';
 import { SectionPicker, SectionPickerProps } from './section-picker';
@@ -58,7 +58,12 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
                     const nextRepeats = parseInt(event.target.value);
                     updateRepeats(isNaN(nextRepeats) ? undefined : nextRepeats);
                   }}
-                  style={{ boxSizing: 'border-box', marginRight: 4, maxHeight: 20, maxWidth: 30 }}
+                  style={{
+                    boxSizing: 'border-box',
+                    marginRight: 4,
+                    maxHeight: 20,
+                    maxWidth: inputWidth,
+                  }}
                   value={repeats ?? ''}
                 />
                 x

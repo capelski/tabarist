@@ -58,7 +58,9 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
       }}
     >
       {canUpdate && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+        <div
+          style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 8 }}
+        >
           <RhythmPicker
             setRhythm={setRhythm}
             rhythmIndex={props.container.renderedBar.rhythmIndex}
@@ -76,16 +78,15 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
         slots={props.container.renderedBar.slots}
       />
 
-      {!props.container.omitRhythm && (
-        <SlotsValue
-          backgroundColor={getBackgroundColor}
-          canUpdate={false}
-          elementType="input"
-          indexesPath={[]}
-          setSlotValue={() => {}}
-          slots={rhythm.slots}
-        />
-      )}
+      <SlotsValue
+        backgroundColor={getBackgroundColor}
+        canUpdate={false}
+        color={props.container.omitRhythm ? '#bbb' : undefined}
+        elementType="input"
+        indexesPath={[]}
+        setSlotValue={() => {}}
+        slots={rhythm.slots}
+      />
     </div>
   );
 };

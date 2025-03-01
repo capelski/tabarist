@@ -9,8 +9,12 @@ export const stringsNumber = 6;
 export const localStorageKey_tab = 'tabarist_tab_ID';
 export const localStorageKey_tabRegistry = 'tabarist_tabRegistry';
 
+export const addBarWidth = 25;
+export const barMinWidth = 160;
+export const barControlsHeight = 30;
 export const bodyMargin = 8;
 export const characterWidth = 12;
+export const inputWidth = 30;
 export const repeatsHeight = 24;
 export const stringHeight = 20;
 export const sectionNameMaxWidth = 250;
@@ -29,4 +33,3 @@ export * from './bar-type';
 export * from './route-names';
 export * from './slot-type';
 export * from './symbols';
-export * from './view-mode';

@@ -1,13 +1,6 @@
 import { nanoid } from 'nanoid';
 import { getTitleWords } from '../common';
-import {
-  BarType,
-  bodyMargin,
-  characterWidth,
-  NonReferenceBarType,
-  sectionNameMaxWidth,
-  ViewMode,
-} from '../constants';
+import { BarType, NonReferenceBarType } from '../constants';
 import { User } from '../firebase';
 import {
   Bar,
@@ -25,17 +18,6 @@ import { barOperations } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
 import { rhythmOperations } from './rhythm.operations';
 import { sectionOperations } from './section.operations';
-import { slotOperations } from './slot.operations';
-
-type BarAggregation = {
-  longestBarAdaptive: number;
-  longestBarUniform: number;
-};
-
-type SlotAggregation = {
-  longestSlot: number;
-  totalLength: number;
-};
 
 const getNextActiveSlot = (
   barContainers: BarContainer[],
@@ -238,99 +220,6 @@ export const tabOperations = {
         };
       }),
     };
-  },
-
-  getLongestBarWidth: (tab: Tab, windowWidth: number, viewMode: ViewMode) => {
-    const bars = [
-      ...tab.bars,
-      ...tab.sections.map((s) => s.bars).reduce((reduced, bars) => [...reduced, ...bars], []),
-    ].filter((b) => b.type === BarType.chord || b.type === BarType.picking);
-
-    const longestSectionName = tab.sections.reduce<string>((reduced, section) => {
-      return reduced.length > section.name.length ? reduced : section.name;
-    }, '');
-
-    // Used on empty section bars and tabs with no bars
-    const minimumWidth = Math.max(
-      140,
-      75 + Math.min(longestSectionName.length * characterWidth, sectionNameMaxWidth),
-    );
-
-    const { longestBarAdaptive, longestBarUniform } = bars.reduce<BarAggregation>(
-      (barsReduced, bar) => {
-        const { longestSlot, totalLength } = (
-          bar.type === BarType.chord
-            ? bar.slots.map((slot) => {
-                const slotLength = slotOperations.getSlotLength(slot);
-
-                const rhythm = tab.rhythms.find((rhythm) => rhythm.index === bar.rhythmIndex);
-                const rhythmSlot = rhythm?.slots[slot.index];
-                const rhythmLength = (rhythmSlot && slotOperations.getSlotLength(rhythmSlot)) ?? 0;
-
-                return Math.max(slotLength, rhythmLength) || 1;
-              })
-            : bar.chordSupport.map((chordSupportSlot) => {
-                return bar.strings.reduce((reduced, string) => {
-                  return Math.max(
-                    reduced,
-                    slotOperations.getSlotLength(string.slots[chordSupportSlot.index]),
-                  );
-                }, slotOperations.getSlotLength(chordSupportSlot) || 1);
-              })
-        ).reduce<SlotAggregation>(
-          (lengthsReduced, currentLength) => {
-            return {
-              longestSlot: Math.max(lengthsReduced.longestSlot, currentLength),
-              totalLength: lengthsReduced.totalLength + currentLength,
-            };
-          },
-          { longestSlot: 0, totalLength: 0 },
-        );
-
-        const slotsNumber = bar.type === BarType.chord ? bar.slots.length : bar.chordSupport.length;
-        const barLengthAdaptive = characterWidth * totalLength;
-        const barLengthUniform = characterWidth * longestSlot * slotsNumber;
-
-        return {
-          longestBarAdaptive: Math.max(barsReduced.longestBarAdaptive, barLengthAdaptive),
-          longestBarUniform: Math.max(barsReduced.longestBarUniform, barLengthUniform),
-        };
-      },
-      { longestBarAdaptive: minimumWidth, longestBarUniform: minimumWidth },
-    );
-
-    const effectiveWindowWidth = windowWidth - bodyMargin * 2;
-
-    const maxBarsAdaptive = Math.max(1, Math.floor(effectiveWindowWidth / longestBarAdaptive));
-    const barsPerLineAdaptive =
-      maxBarsAdaptive >= 16
-        ? 16
-        : maxBarsAdaptive >= 8
-        ? 8
-        : maxBarsAdaptive >= 4
-        ? 4
-        : maxBarsAdaptive >= 2
-        ? 2
-        : 1;
-
-    const maxBarsUniform = Math.max(1, Math.floor(effectiveWindowWidth / longestBarUniform));
-    const barsPerLineUniform =
-      maxBarsUniform >= 16
-        ? 16
-        : maxBarsUniform >= 8
-        ? 8
-        : maxBarsUniform >= 4
-        ? 4
-        : maxBarsUniform >= 2
-        ? 2
-        : 1;
-
-    const barWidth =
-      Math.floor(
-        (effectiveWindowWidth * 100) /
-          (viewMode === ViewMode.adaptive ? barsPerLineAdaptive : barsPerLineUniform),
-      ) / 100;
-    return { areModesEquivalent: barsPerLineAdaptive === barsPerLineUniform, barWidth };
   },
 
   moveBarEnd: (tab: Tab, endIndex: number, inSection?: Section): Tab => {

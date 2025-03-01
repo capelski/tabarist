@@ -12,6 +12,7 @@ export type SlotsValueProps = {
   background?: (slot: Slot) => string | undefined;
   backgroundColor?: (slot: Slot) => string | undefined;
   canUpdate: boolean;
+  color?: string;
   elementType: 'input' | 'select';
   indexesPath: number[];
   setSlotValue: (value: string, indexesPath: number[]) => void;
@@ -91,7 +92,7 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
                     height: stringHeight,
                   }}
                 >
-                  <span style={{ backgroundColor }}>{slot.value}</span>
+                  <span style={{ backgroundColor, color: props.color }}>{slot.value}</span>
                 </div>
               )
             ) : (
@@ -99,6 +100,7 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
                 background={() => background}
                 backgroundColor={() => backgroundColor}
                 canUpdate={props.canUpdate}
+                color={props.color}
                 elementType={props.elementType}
                 indexesPath={currenPath}
                 setSlotValue={props.setSlotValue}
