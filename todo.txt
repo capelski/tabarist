@@ -5,4 +5,4 @@
 - Integrate with https://extensions.dev/extensions/invertase/firestore-stripe-payments
 - Tabulation should jump across the string before going down ¿?
 - Display total documents matching in tab-list component
-- Option to not display unused strings?
+- Consider section name length in bar container operations, getBarWidth
