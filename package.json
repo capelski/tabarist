@@ -6,10 +6,9 @@
   "author": "Carles Capellas <capellas.carles@gmail.com>",
   "license": "ISC",
   "scripts": {
-    "build:firebase": "rm -rf dist && webpack --config webpack/firebase.config.js",
-    "build:github": "rm -rf docs && webpack --config webpack/github.config.js",
-    "deploy:firebase": "npm run build:firebase && firebase deploy",
+    "build": "rm -rf dist && webpack --config webpack/production.config.js",
     "dev": "webpack serve --config webpack/development.config.js",
+    "firebase:deploy": "npm run build && firebase deploy",
     "test": "cucumber-js --require-module ts-node/register --require 'source/**/*.cucumber.ts' source/**/*.feature"
   },
   "dependencies": {

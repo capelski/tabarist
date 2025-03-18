@@ -19,13 +19,10 @@ export const TextFilter: React.FC<TextFilterProps> = (props) => {
         onChange={(event) => {
           const nextText = event.target.value;
           setFilter(nextText);
-
-          if (!WEBPACK_USE_FIREBASE) {
-            props.textSetter(nextText);
-          }
         }}
         value={filter}
       />
+
       {props.text && (
         <span
           onClick={() => {
@@ -38,17 +35,16 @@ export const TextFilter: React.FC<TextFilterProps> = (props) => {
           ❌
         </span>
       )}
-      {WEBPACK_USE_FIREBASE && (
-        <button
-          onClick={() => {
-            props.textSetter(filter);
-          }}
-          style={{ marginLeft: 8 }}
-          type="button"
-        >
-          Search
-        </button>
-      )}
+
+      <button
+        onClick={() => {
+          props.textSetter(filter);
+        }}
+        style={{ marginLeft: 8 }}
+        type="button"
+      >
+        Search
+      </button>
     </span>
   );
 };

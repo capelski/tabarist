@@ -10,15 +10,10 @@ export const App: React.FC = () => {
   const scrollViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (WEBPACK_USE_FIREBASE) {
-      getFirebaseAuth().onAuthStateChanged(setUser, (error) => {
-        console.log(error);
-        toast('Could not reach the user account', { type: 'error' });
-      });
-    } else {
-      // For demonstration purposes, pretend there's a signed in user when not using Firebase
-      setUser({ uid: 'non-applicable' } as User);
-    }
+    getFirebaseAuth().onAuthStateChanged(setUser, (error) => {
+      console.log(error);
+      toast('Could not reach the user account', { type: 'error' });
+    });
   }, []);
 
   return (

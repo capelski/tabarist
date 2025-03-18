@@ -24,12 +24,11 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       <NavLink style={{ marginRight: 8 }} to={RouteNames.myTabs}>
         My tabs
       </NavLink>
-      {WEBPACK_USE_FIREBASE &&
-        (props.user ? (
-          <button onClick={signOut}>Sign out</button>
-        ) : (
-          <button onClick={signIn}>Sign in with google</button>
-        ))}
+      {props.user ? (
+        <button onClick={signOut}>Sign out</button>
+      ) : (
+        <button onClick={signIn}>Sign in with google</button>
+      )}
     </div>
   );
 };

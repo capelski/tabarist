@@ -6,15 +6,14 @@ import {
   persistentLocalCache,
   persistentMultipleTabManager,
 } from 'firebase/firestore';
+import firebaseConfig from '../firebase-config.json';
 
 export { User } from 'firebase/auth';
-
-// The firebase initialization is lazy loaded so it can be skipped in GitHub pages
 
 let firebaseApp: FirebaseApp;
 export const getFirebaseApp = () => {
   if (!firebaseApp) {
-    firebaseApp = initializeApp(WEBPACK_FIREBASE_CONFIG);
+    firebaseApp = initializeApp(firebaseConfig);
   }
 
   return firebaseApp;

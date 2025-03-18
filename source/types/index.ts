@@ -1,3 +1,4 @@
+export * from './anchor-direction.type';
 export * from './bar-container.type';
 export * from './bar.type';
 export * from './diminished-bar.type';
@@ -9,5 +10,7 @@ export * from './position-operation.type';
 export * from './rhythm.type';
 export * from './section.type';
 export * from './slot.type';
+export * from './tab-page-response.type';
+export * from './tab-query-parameters.type';
 export * from './tab-registry.type';
 export * from './tab.type';

@@ -4,12 +4,8 @@ import { Modal, TextFilter } from '../components';
 import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { User } from '../firebase';
 import { getTabRelativeUrl, tabOperations } from '../operations';
-import {
-  AnchorDirection,
-  TabPageResponse,
-  TabQueryParameters,
-  tabRepository,
-} from '../repositories';
+import { tabRepository } from '../repositories';
+import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../types';
 
 export type TabListViewProps = {
   getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
