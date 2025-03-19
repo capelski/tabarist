@@ -1,11 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { HashRouter, Route, Routes } from 'react-router';
+import { Route, Routes } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
-import { RouteNames } from './constants';
+import { bodyMargin, RouteNames } from './constants';
 import { getFirebaseAuth, User } from './firebase';
+import { Tab, TabPageResponse } from './types';
 import { HomeView, MyTabsView, NavBar, TabView } from './views';
 
-export const App: React.FC = () => {
+export type AppProps = {
+  homeData?: TabPageResponse;
+  myTabsData?: TabPageResponse;
+  tabData?: Tab;
+};
+
+export const App: React.FC<AppProps> = () => {
   const [user, setUser] = useState<User | null>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
 
@@ -17,7 +24,16 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <HashRouter>
+    <div
+      style={{
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100dvh',
+        overflow: 'hidden',
+        padding: bodyMargin,
+      }}
+    >
       <ToastContainer position="bottom-center" />
       <NavBar user={user} />
       <div ref={scrollViewRef} style={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
@@ -32,6 +48,6 @@ export const App: React.FC = () => {
           />
         </Routes>
       </div>
-    </HashRouter>
+    </div>
   );
 };

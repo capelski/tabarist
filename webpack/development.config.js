@@ -1,4 +1,5 @@
 const { merge } = require('webpack-merge');
+const { getHtml } = require('../source/html');
 const baseConfig = require('./base.config');
 
 module.exports = merge(baseConfig, {
@@ -6,5 +7,12 @@ module.exports = merge(baseConfig, {
   devServer: {
     historyApiFallback: true,
     open: true,
+    setupMiddlewares: (middlewares, devServer) => {
+      devServer.app.get('/', (_req, res) => {
+        res.send(getHtml());
+      });
+
+      return middlewares;
+    },
   },
 });

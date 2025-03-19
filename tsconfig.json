@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
@@ -9,11 +10,13 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
+    "outDir": "functions/src/ssr",
     "resolveJsonModule": true,
     "rootDir": "./source",
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "target": "es2016"
-  }
+  },
+  "include": ["source"]
 }
