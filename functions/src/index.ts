@@ -8,13 +8,13 @@ import {
   AppPropsBase,
   DiminishedTab,
   getHtml,
+  routes,
   SsrApp,
   SsrAppProps,
   tabOperations,
 } from './ssr/ssr';
 
 const expressApp = express();
-const routes = [/^\/$/, '/my-tabs', '/tab/:tabId'];
 
 const firebaseApp = admin.initializeApp();
 const firestore = firebaseApp.firestore();
