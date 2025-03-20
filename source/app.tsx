@@ -3,16 +3,18 @@ import { Route, Routes } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { bodyMargin, RouteNames } from './constants';
 import { getFirebaseAuth, User } from './firebase';
-import { Tab, TabPageResponse } from './types';
+import { Tab } from './types';
 import { HomeView, MyTabsView, NavBar, TabView } from './views';
 
-export type AppProps = {
-  homeData?: TabPageResponse;
-  myTabsData?: TabPageResponse;
-  tabData?: Tab;
+export type AppPropsBase = {
+  tab?: Tab;
 };
 
-export const App: React.FC<AppProps> = () => {
+export type AppProps = AppPropsBase & {
+  isServerRendered: boolean;
+};
+
+export const App: React.FC<AppProps> = (props) => {
   const [user, setUser] = useState<User | null>(null);
   const scrollViewRef = useRef<HTMLDivElement>(null);
 
@@ -38,13 +40,19 @@ export const App: React.FC<AppProps> = () => {
       <NavBar user={user} />
       <div ref={scrollViewRef} style={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
         <Routes>
-          <Route path={RouteNames.home} element={<HomeView user={user} />} />
+          <Route
+            path={RouteNames.home}
+            element={<HomeView isServerRendered={props.isServerRendered} user={user} />}
+          />
 
-          <Route path={RouteNames.myTabs} element={<MyTabsView user={user} />} />
+          <Route
+            path={RouteNames.myTabs}
+            element={<MyTabsView isServerRendered={props.isServerRendered} user={user} />}
+          />
 
           <Route
             path={RouteNames.tabDetails}
-            element={<TabView scrollView={scrollViewRef} user={user} />}
+            element={<TabView scrollView={scrollViewRef} tab={props.tab} user={user} />}
           />
         </Routes>
       </div>

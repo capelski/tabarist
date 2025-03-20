@@ -11,8 +11,8 @@ module.exports = {
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    ${initialState ? `<script>window.initialState = ${JSON.stringify({})};</script>` : ''}
-    <script defer="defer" src="main.js"></script>
+    ${initialState ? `<script>window.initialState = ${JSON.stringify(initialState)};</script>` : ''}
+    <script defer="defer" src="/main.js"></script>
   </head>
 
   <body style="margin: 0">

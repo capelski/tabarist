@@ -7,9 +7,13 @@ import { getTabRelativeUrl, tabOperations } from '../operations';
 import { tabRepository } from '../repositories';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../types';
 
-export type TabListViewProps = {
-  getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
+export type TabListBaseProps = {
+  isServerRendered: boolean;
   user: User | null;
+};
+
+export type TabListViewProps = TabListBaseProps & {
+  getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
 };
 
 export const TabListView: React.FC<TabListViewProps> = (props) => {
@@ -19,7 +23,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     hasPreviousPage: false,
     tabs: [],
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!props.isServerRendered);
   const [tabParams, setTabParams] = useState<TabQueryParameters>();
 
   const [searchParams, setSearchParams] = useSearchParams();

@@ -1,16 +1,12 @@
 import React from 'react';
-import { User } from '../firebase';
 import { tabRepository } from '../repositories';
 import { TabPageResponse } from '../types';
-import { TabListView } from './tab-list';
+import { TabListBaseProps, TabListView } from './tab-list';
 
-export type MyTabsViewProps = {
-  user: User | null;
-};
-
-export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
+export const MyTabsView: React.FC<TabListBaseProps> = (props) => {
   return (
     <TabListView
+      {...props}
       getTabs={(params) => {
         return props.user
           ? tabRepository.getUserTabs(props.user.uid, params)
@@ -20,7 +16,6 @@ export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
               tabs: [],
             });
       }}
-      user={props.user}
     />
   );
 };

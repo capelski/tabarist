@@ -1,14 +1,7 @@
 import React from 'react';
-import { User } from '../firebase';
 import { tabRepository } from '../repositories';
-import { TabListView } from './tab-list';
+import { TabListBaseProps, TabListView } from './tab-list';
 
-export type HomeViewProps = {
-  user: User | null;
-};
-
-export const HomeView: React.FC<HomeViewProps> = (props) => {
-  return (
-    <TabListView getTabs={(params) => tabRepository.getPublicTabs(params)} user={props.user} />
-  );
+export const HomeView: React.FC<TabListBaseProps> = (props) => {
+  return <TabListView {...props} getTabs={(params) => tabRepository.getPublicTabs(params)} />;
 };

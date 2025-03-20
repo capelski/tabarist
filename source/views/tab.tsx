@@ -8,13 +8,14 @@ import { tabRepository } from '../repositories';
 import { Tab } from '../types';
 
 export type TabViewProps = {
-  user: User | null;
   scrollView: RefObject<HTMLDivElement>;
+  tab?: Tab;
+  user: User | null;
 };
 
 export const TabView: React.FC<TabViewProps> = (props) => {
   const [editingCopy, setEditingCopy] = useState('');
-  const [tab, setTab] = useState<Tab>();
+  const [tab, setTab] = useState(props.tab);
   const isEditMode = !!editingCopy;
 
   // When entering edit mode from play mode we need to clear the next timeout
@@ -24,7 +25,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const { tabId } = useParams();
 
   useEffect(() => {
-    if (tabId) {
+    if (tabId && !tab) {
       tabRepository.getById(tabId).then((tab) => {
         setTab(tab);
         if (searchParams.get(queryParameters.editMode) === 'true') {

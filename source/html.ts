@@ -1,3 +1,3 @@
-import { AppProps } from './app';
+import { AppPropsBase } from './app';
 
-export declare const getHtml: (appHtml?: string, initialState?: AppProps) => string;
+export declare const getHtml: (appHtml?: string, initialState?: AppPropsBase) => string;
