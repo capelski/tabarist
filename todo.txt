@@ -1,8 +1,6 @@
-- Server side rendering. https://firebase.google.com/docs/hosting/serverless-overview
+- Integrate with https://extensions.dev/extensions/invertase/firestore-stripe-payments
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
 - Add capacitor and build APP bundle. Integrate AdMob/AdSense
-- Integrate with https://extensions.dev/extensions/invertase/firestore-stripe-payments
-- Tabulation should jump across the string before going down ¿?
 - Display total documents matching in tab-list component
 - Consider section name length in bar container operations, getBarWidth
