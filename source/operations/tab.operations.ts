@@ -1,7 +1,7 @@
+import { User } from 'firebase/auth';
 import { nanoid } from 'nanoid';
 import { getTitleWords } from '../common';
 import { BarType, NonReferenceBarType } from '../constants';
-import { User } from '../firebase';
 import {
   Bar,
   BarBase,

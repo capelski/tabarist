@@ -1,7 +1,7 @@
+import { User } from 'firebase/auth';
 import React, { MutableRefObject, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { editSymbol, queryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
-import { User } from '../../firebase';
 import { tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
 import { Tab } from '../../types';

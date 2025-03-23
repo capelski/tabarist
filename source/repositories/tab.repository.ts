@@ -1,3 +1,4 @@
+import { User } from 'firebase/auth';
 import {
   collection,
   getDocs,
@@ -11,15 +12,15 @@ import {
 } from 'firebase/firestore';
 import { getTitleWords } from '../common';
 import { pageSize } from '../constants';
-import { getFirebaseDb, User } from '../firebase';
-import { deleteDocument, getDocument, setDocument } from '../firestore';
+import { getFirebaseContext } from '../firebase-context';
+import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { tabOperations } from '../operations';
 import { DiminishedTab, Tab, TabPageResponse, TabQueryParameters } from '../types';
 
-const tabsPath = 'tabs';
+const tabsCollection = 'tabs';
 
 const getTabPath = (tabId: string) => {
-  return [tabsPath, tabId];
+  return [tabsCollection, tabId];
 };
 
 const getTabsQuery = (
@@ -30,7 +31,7 @@ const getTabsQuery = (
   anchorDocument?: TabQueryParameters['anchorDocument'],
 ) => {
   return query(
-    collection(getFirebaseDb(), tabsPath),
+    collection(getFirebaseContext().firestore, tabsCollection),
     orderBy('title', order),
     orderBy('id', order),
     ...(titleFilter ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))] : []),

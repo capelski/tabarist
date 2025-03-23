@@ -1,8 +1,9 @@
+import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
 import React from 'react';
 import { NavLink } from 'react-router';
 import { toast } from 'react-toastify';
 import { RouteNames } from '../constants';
-import { signInWithGoogle, signOut, User } from '../firebase';
+import { getFirebaseContext } from '../firebase-context';
 
 export interface NavBarProps {
   user: User | null;
@@ -10,10 +11,14 @@ export interface NavBarProps {
 
 export const NavBar: React.FC<NavBarProps> = (props) => {
   const signIn = () => {
-    return signInWithGoogle().catch((error) => {
+    return signInWithPopup(getFirebaseContext().auth, new GoogleAuthProvider()).catch((error) => {
       console.log(error);
       toast('The sign in was not completed', { type: 'error', autoClose: 5000 });
     });
+  };
+
+  const signOut = () => {
+    return getFirebaseContext().auth.signOut();
   };
 
   return (

@@ -1,8 +1,9 @@
+import { User } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
 import { Route, Routes } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { bodyMargin, RouteNames } from './constants';
-import { getFirebaseAuth, User } from './firebase';
+import { getFirebaseContext } from './firebase-context';
 import { Tab } from './types';
 import { HomeView, MyTabsView, NavBar, TabView } from './views';
 
@@ -19,7 +20,7 @@ export const App: React.FC<AppProps> = (props) => {
   const scrollViewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    getFirebaseAuth().onAuthStateChanged(setUser, (error) => {
+    getFirebaseContext().auth.onAuthStateChanged(setUser, (error) => {
       console.log(error);
       toast('Could not reach the user account', { type: 'error' });
     });

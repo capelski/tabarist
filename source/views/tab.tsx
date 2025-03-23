@@ -1,8 +1,8 @@
+import { User } from 'firebase/auth';
 import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabHeader, TabPlay } from '../components';
 import { queryParameters } from '../constants';
-import { User } from '../firebase';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
 import { Tab } from '../types';
