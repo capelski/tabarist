@@ -1,6 +1,7 @@
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
+import { Functions, getFunctions } from 'firebase/functions';
 import firebaseConfig from '../firebase-config.json';
 
 export const getFirebaseContext = (function () {
@@ -9,6 +10,7 @@ export const getFirebaseContext = (function () {
         app: FirebaseApp;
         auth: Auth;
         firestore: Firestore;
+        functions: Functions;
       }
     | undefined = undefined;
 
@@ -17,11 +19,13 @@ export const getFirebaseContext = (function () {
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const firestore = getFirestore(app);
+      const functions = getFunctions(app, 'europe-west3');
 
       firebaseContext = {
         app,
         auth,
         firestore,
+        functions,
       };
     }
 

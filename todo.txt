@@ -1,4 +1,3 @@
-- Integrate with https://extensions.dev/extensions/invertase/firestore-stripe-payments
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
 - Add capacitor and build APP bundle. Integrate AdMob/AdSense
