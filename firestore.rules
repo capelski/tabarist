@@ -21,6 +21,36 @@ service cloud.firestore {
         resource.data.ownerId == request.auth.uid;
     }
 
+    match /customers/{uid} {
+      allow read: if request.auth.uid == uid;
+
+      match /checkout_sessions/{id} {
+        allow read, write: if request.auth.uid == uid;
+      }
+      match /subscriptions/{id} {
+        allow read: if request.auth.uid == uid;
+      }
+      match /payments/{id} {
+        allow read: if request.auth.uid == uid;
+      }
+    }
+
+    match /products {
+      allow read;
+      
+      match /{id} {
+      	allow read;
+      
+        match /prices/{id} {
+          allow read;
+        }
+
+        match /tax_rates/{id} {
+          allow read;
+        }
+      }
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
