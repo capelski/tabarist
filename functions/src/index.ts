@@ -5,7 +5,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import {
-  AppPropsBase,
+  AppProps,
   DiminishedTab,
   getHtml,
   routes,
@@ -21,7 +21,7 @@ const firestore = firebaseApp.firestore();
 
 expressApp.get(routes, async (req, res) => {
   const { tabId } = req.params;
-  const initialState: AppPropsBase = {};
+  const initialState: AppProps = {};
 
   if (tabId) {
     try {
@@ -39,7 +39,6 @@ expressApp.get(routes, async (req, res) => {
 
   const ssrAppProps: SsrAppProps = {
     ...initialState,
-    isServerRendered: true,
     location: req.originalUrl,
   };
   const appHtml = renderToString(createElement(SsrApp, ssrAppProps));

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import Modal from 'react-modal';
 import { BrowserRouter } from 'react-router';
-import { App, AppPropsBase } from './app';
+import { App, AppProps } from './app';
 
-const AppWithRouter: React.FC<AppPropsBase> = (props) => {
-  const [initialState, setInitialState] = useState<AppPropsBase | undefined>(props);
+const AppWithRouter: React.FC<AppProps> = (props) => {
+  const [initialState, setInitialState] = useState<AppProps | undefined>(props);
 
   useEffect(() => {
     // After first render, clear the state so components re-fetch data when needed
@@ -15,7 +15,7 @@ const AppWithRouter: React.FC<AppPropsBase> = (props) => {
 
   return (
     <BrowserRouter>
-      <App {...initialState} isServerRendered={false} />
+      <App {...initialState} />
     </BrowserRouter>
   );
 };
@@ -24,7 +24,7 @@ const container = document.getElementById('app-placeholder')!;
 Modal.setAppElement(container);
 
 if ('initialState' in window) {
-  const initialState = window.initialState as AppPropsBase;
+  const initialState = window.initialState as AppProps;
   hydrateRoot(container, <AppWithRouter {...initialState} />);
 } else {
   // Used in development mode (i.e. npm run dev)

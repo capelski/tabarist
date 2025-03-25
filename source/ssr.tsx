@@ -2,7 +2,7 @@ import React from 'react';
 import { StaticRouter } from 'react-router';
 import { App, AppProps } from './app';
 
-export { AppPropsBase } from './app';
+export { AppProps } from './app';
 export * from './html';
 export * from './operations';
 export * from './types';

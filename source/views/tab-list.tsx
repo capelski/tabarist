@@ -8,7 +8,6 @@ import { tabRepository } from '../repositories';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../types';
 
 export type TabListBaseProps = {
-  isServerRendered: boolean;
   user: User | null;
 };
 
@@ -23,7 +22,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     hasPreviousPage: false,
     tabs: [],
   });
-  const [loading, setLoading] = useState(!props.isServerRendered);
+  const [loading, setLoading] = useState(false);
   const [tabParams, setTabParams] = useState<TabQueryParameters>();
 
   const [searchParams, setSearchParams] = useSearchParams();

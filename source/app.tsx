@@ -7,12 +7,8 @@ import { getFirebaseContext } from './firebase-context';
 import { Tab } from './types';
 import { HomeView, MyTabsView, NavBar, TabView } from './views';
 
-export type AppPropsBase = {
+export type AppProps = {
   tab?: Tab;
-};
-
-export type AppProps = AppPropsBase & {
-  isServerRendered: boolean;
 };
 
 export const App: React.FC<AppProps> = (props) => {
@@ -41,15 +37,9 @@ export const App: React.FC<AppProps> = (props) => {
       <NavBar user={user} />
       <div ref={scrollViewRef} style={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
         <Routes>
-          <Route
-            path={RouteNames.home}
-            element={<HomeView isServerRendered={props.isServerRendered} user={user} />}
-          />
+          <Route path={RouteNames.home} element={<HomeView user={user} />} />
 
-          <Route
-            path={RouteNames.myTabs}
-            element={<MyTabsView isServerRendered={props.isServerRendered} user={user} />}
-          />
+          <Route path={RouteNames.myTabs} element={<MyTabsView user={user} />} />
 
           <Route
             path={RouteNames.tabDetails}
