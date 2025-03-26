@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router';
-import { TabDeletionModal, TextFilter } from '../components';
+import { SignInModal, TabDeletionModal, TextFilter } from '../components';
 import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { getTabRelativeUrl, tabOperations } from '../operations';
 import { tabRepository } from '../repositories';
@@ -17,12 +17,13 @@ export type TabListViewProps = TabListBaseProps & {
 
 export const TabListView: React.FC<TabListViewProps> = (props) => {
   const [deletingTabId, setDeletingTabId] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
   const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({
     hasNextPage: false,
     hasPreviousPage: false,
     tabs: [],
   });
-  const [loading, setLoading] = useState(false);
   const [tabParams, setTabParams] = useState<TabQueryParameters>();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -107,6 +108,14 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     setSearchParams(nextSearchParams);
   };
 
+  const cancelSignIn = () => {
+    setSigningIn(false);
+  };
+
+  const startSignIn = () => {
+    setSigningIn(true);
+  };
+
   return (
     <div className="tabs">
       <TabDeletionModal
@@ -116,6 +125,11 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
         cancelDelete={cancelDelete}
         tabId={deletingTabId}
       />
+      {signingIn && (
+        <SignInModal cancelSignIn={cancelSignIn}>
+          <p>Sign in to start creating tabs</p>
+        </SignInModal>
+      )}
 
       <p>
         <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
@@ -170,7 +184,10 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
       </p>
 
       {tabPageResponse.tabs.length === 0 && !loading ? (
-        <p>No tabs to display{!props.user && <span>. Sign in to create your own tabs</span>}</p>
+        <p>
+          No tabs to display. Create your first tab:{' '}
+          <button onClick={props.user ? createTab : startSignIn}>{addSymbol} tab</button>
+        </p>
       ) : (
         <div>
           {loading ? (

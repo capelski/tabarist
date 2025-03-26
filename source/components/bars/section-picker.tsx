@@ -2,11 +2,11 @@ import React from 'react';
 import { sectionNameMaxWidth } from '../../constants';
 import { Section } from '../../types';
 
-export interface SectionPickerProps {
+export type SectionPickerProps = {
   changeSection: (sectionIndex: number) => void;
   section: Section;
   sections: Section[];
-}
+};
 
 export const SectionPicker: React.FC<SectionPickerProps> = (props) => {
   return (
