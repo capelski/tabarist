@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, useSearchParams } from 'react-router';
-import { Modal, TextFilter } from '../components';
+import { TabDeletionModal, TextFilter } from '../components';
 import { addSymbol, queryParameters, removeSymbol } from '../constants';
 import { getTabRelativeUrl, tabOperations } from '../operations';
 import { tabRepository } from '../repositories';
@@ -16,7 +16,7 @@ export type TabListViewProps = TabListBaseProps & {
 };
 
 export const TabListView: React.FC<TabListViewProps> = (props) => {
-  const [deletingTab, setDeletingTab] = useState('');
+  const [deletingTabId, setDeletingTabId] = useState('');
   const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({
     hasNextPage: false,
     hasPreviousPage: false,
@@ -73,17 +73,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
   }, [props.user, tabParams]);
 
   const cancelDelete = () => {
-    setDeletingTab('');
-  };
-
-  const confirmDelete = async () => {
-    if (!props.user) {
-      return;
-    }
-
-    await tabRepository.remove(deletingTab);
-    updateTabs(tabParams);
-    cancelDelete();
+    setDeletingTabId('');
   };
 
   const createTab = async () => {
@@ -98,7 +88,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
   };
 
   const removeTab = (tabId: string) => {
-    setDeletingTab(tabId);
+    setDeletingTabId(tabId);
   };
 
   const updateTitleFilter = (nextTitleFilter: string) => {
@@ -119,19 +109,13 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
 
   return (
     <div className="tabs">
-      {deletingTab && (
-        <Modal closeHandler={cancelDelete}>
-          <p>Are you sure you want to delete this tab?</p>
-          <div>
-            <button onClick={confirmDelete} style={{ marginRight: 8 }} type="button">
-              Delete
-            </button>
-            <button onClick={cancelDelete} type="button">
-              Cancel
-            </button>
-          </div>
-        </Modal>
-      )}
+      <TabDeletionModal
+        afterDeletion={() => {
+          updateTabs(tabParams);
+        }}
+        cancelDelete={cancelDelete}
+        tabId={deletingTabId}
+      />
 
       <p>
         <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />

@@ -6,6 +6,7 @@ import { tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
 import { Tab } from '../../types';
 import { Modal } from '../common/modal';
+import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
   editingCopy: string;
@@ -19,28 +20,18 @@ export type TabHeaderProps = {
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
-  const [deletingTab, setDeletingTab] = useState('');
+  const [deletingTabId, setDeletingTabId] = useState('');
   const [discardingChanges, setDiscardingChanges] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const cancelDelete = () => {
-    setDeletingTab('');
+    setDeletingTabId('');
   };
 
   const cancelExitEditMode = () => {
     setDiscardingChanges(false);
-  };
-
-  const confirmDelete = async () => {
-    if (!props.isTabOwner) {
-      return;
-    }
-
-    await tabRepository.remove(deletingTab);
-    cancelDelete();
-    navigate(RouteNames.myTabs);
   };
 
   const confirmExitEditMode = () => {
@@ -78,7 +69,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   };
 
   const removeTab = () => {
-    setDeletingTab(props.tab.id);
+    setDeletingTabId(props.tab.id);
   };
 
   const saveEditModeChanges = async () => {
@@ -93,19 +84,13 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
   return (
     <div className="tab-header">
-      {deletingTab && (
-        <Modal closeHandler={cancelDelete}>
-          <p>Are you sure you want to delete this tab?</p>
-          <div>
-            <button onClick={confirmDelete} style={{ marginRight: 8 }} type="button">
-              Delete
-            </button>
-            <button onClick={cancelDelete} type="button">
-              Cancel
-            </button>
-          </div>
-        </Modal>
-      )}
+      <TabDeletionModal
+        afterDeletion={() => {
+          navigate(RouteNames.myTabs);
+        }}
+        cancelDelete={cancelDelete}
+        tabId={deletingTabId}
+      />
 
       {discardingChanges && (
         <Modal closeHandler={cancelExitEditMode}>
