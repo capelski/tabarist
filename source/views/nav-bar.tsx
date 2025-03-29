@@ -73,34 +73,82 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   }, [props.user]);
 
   return (
-    <div style={{ paddingBottom: 8 }}>
+    <nav className="navbar navbar-expand-sm navbar-light bg-light">
       {signingIn && <SignInModal cancelSignIn={cancelSignIn} />}
-      <NavLink style={{ marginRight: 8 }} to={RouteNames.home}>
-        Home
-      </NavLink>
-      <NavLink style={{ marginRight: 8 }} to={RouteNames.myTabs}>
-        My tabs
-      </NavLink>
-      {props.user ? (
-        <React.Fragment>
-          {subscription ? (
-            <button
-              disabled={loadingUpgrade}
-              onClick={manageSubscription}
-              style={{ marginRight: 8 }}
-            >
-              Manage subscription
-            </button>
+
+      <div className="container-fluid">
+        <NavLink className="navbar-brand" style={{ marginRight: 8 }} to={RouteNames.home}>
+          Tabarist
+        </NavLink>
+
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav me-auto">
+            <li className="nav-item">
+              <NavLink
+                className="nav-link mb-2 mb-sm-0"
+                style={{ marginRight: 8 }}
+                to={RouteNames.myTabs}
+              >
+                My tabs
+              </NavLink>
+            </li>
+          </ul>
+
+          {props.user ? (
+            <div className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                {props.user.displayName ?? 'User'}
+              </a>
+              <ul className="dropdown-menu dropdown-menu-sm-end" aria-labelledby="navbarDropdown">
+                <li>
+                  {subscription ? (
+                    <a
+                      className={`dropdown-item${loadingUpgrade ? ' disabled' : ''}`}
+                      onClick={loadingUpgrade ? undefined : manageSubscription}
+                    >
+                      Manage subscription
+                    </a>
+                  ) : (
+                    <a
+                      className={`dropdown-item${loadingUpgrade ? ' disabled' : ''}`}
+                      onClick={loadingUpgrade ? undefined : upgrade}
+                    >
+                      Upgrade
+                    </a>
+                  )}
+                </li>
+                <li>
+                  <a className="dropdown-item" onClick={signOut}>
+                    Sign out
+                  </a>
+                </li>
+              </ul>
+            </div>
           ) : (
-            <button disabled={loadingUpgrade} onClick={upgrade} style={{ marginRight: 8 }}>
-              Upgrade
+            <button className="btn btn-success" onClick={startSignIn}>
+              Sign in
             </button>
           )}
-          <button onClick={signOut}>Sign out</button>
-        </React.Fragment>
-      ) : (
-        <button onClick={startSignIn}>Sign in</button>
-      )}
-    </div>
+        </div>
+      </div>
+    </nav>
   );
 };

@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
 import { Route, Routes } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
-import { bodyMargin, RouteNames } from './constants';
+import { RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
 import { Tab } from './types';
 import { HomeView, MyTabsView, NavBar, TabView } from './views';
@@ -30,12 +30,14 @@ export const App: React.FC<AppProps> = (props) => {
         flexDirection: 'column',
         height: '100dvh',
         overflow: 'hidden',
-        padding: bodyMargin,
       }}
     >
       <ToastContainer position="bottom-center" />
       <NavBar user={user} />
-      <div ref={scrollViewRef} style={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
+      <div
+        ref={scrollViewRef}
+        style={{ flexGrow: 1, overflow: 'auto', padding: 8, position: 'relative' }}
+      >
         <Routes>
           <Route path={RouteNames.home} element={<HomeView user={user} />} />
 
