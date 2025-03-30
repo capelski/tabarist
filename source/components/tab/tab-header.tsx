@@ -93,54 +93,80 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
       />
 
       {discardingChanges && (
-        <Modal closeHandler={cancelExitEditMode}>
+        <Modal closeHandler={cancelExitEditMode} hideCloseButton={true}>
           <p>Do you want to discard the unsaved changes?</p>
           <div>
-            <button onClick={confirmExitEditMode} style={{ marginRight: 8 }} type="button">
-              Yes
+            <button
+              className="btn btn-danger"
+              onClick={confirmExitEditMode}
+              style={{ marginRight: 8 }}
+              type="button"
+            >
+              Discard
             </button>
-            <button onClick={cancelExitEditMode} type="button">
-              No
+            <button
+              className="btn btn-outline-secondary"
+              onClick={cancelExitEditMode}
+              type="button"
+            >
+              Cancel
             </button>
           </div>
         </Modal>
       )}
 
-      <div style={{ alignItems: 'center', display: 'flex' }}>
-        <h3 style={{ flexGrow: 1 }}>
-          {props.isEditMode ? (
+      <div className="mb-3" style={{ alignItems: 'center', display: 'flex' }}>
+        {props.isEditMode ? (
+          <div className="input-group">
             <input
-              value={props.tab.title}
+              className="form-control"
               onChange={(event) => {
                 props.updateTab(tabOperations.updateTitle(props.tab, event.target.value));
               }}
-              style={{
-                fontSize: '1em', // Mimics <h3>
-                width: '95%',
-              }}
+              value={props.tab.title}
             />
-          ) : (
-            props.tab.title
-          )}
-        </h3>
+          </div>
+        ) : (
+          <h3 style={{ flexGrow: 1 }}>{props.tab.title}</h3>
+        )}
 
         {props.isTabOwner && (
           <React.Fragment>
             {props.isEditMode ? (
               <React.Fragment>
-                <button onClick={saveEditModeChanges} style={{ marginLeft: 8 }} type="button">
+                <button
+                  className="btn btn-outline-success"
+                  onClick={saveEditModeChanges}
+                  style={{ marginLeft: 8 }}
+                  type="button"
+                >
                   {saveSymbol}
                 </button>
-                <button onClick={exitEditMode} style={{ marginLeft: 8 }} type="button">
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={exitEditMode}
+                  style={{ marginLeft: 8 }}
+                  type="button"
+                >
                   ❌
                 </button>
               </React.Fragment>
             ) : (
               <React.Fragment>
-                <button onClick={enterEditMode} style={{ marginLeft: 8 }} type="button">
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={enterEditMode}
+                  style={{ marginLeft: 8 }}
+                  type="button"
+                >
                   {editSymbol}
                 </button>
-                <button onClick={removeTab} style={{ marginLeft: 8 }} type="button">
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={removeTab}
+                  style={{ marginLeft: 8 }}
+                  type="button"
+                >
                   {removeSymbol}
                 </button>
               </React.Fragment>

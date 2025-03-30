@@ -48,45 +48,56 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
   return (
     <div
       className="tab-play"
-      style={{ backgroundColor: 'white', bottom: 0, paddingTop: 8, position: 'sticky' }}
+      style={{
+        backgroundColor: 'white',
+        bottom: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '8px 0',
+        position: 'sticky',
+      }}
     >
-      <span style={{ marginLeft: 8 }}>♫</span>
-      <input
-        disabled={!!props.tab.activeSlot}
-        onBlur={() => {
-          if (props.tab.tempo) {
-            const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
-            if (validTempo !== props.tab.tempo) {
-              props.updateTab(tabOperations.updateTempo(props.tab, validTempo));
-            }
-          }
-        }}
-        onChange={(event) => {
-          const parsedTempo = parseInt(event.target.value);
-          const nextTempo = isNaN(parsedTempo) ? undefined : parsedTempo;
-          props.updateTab(tabOperations.updateTempo(props.tab, nextTempo));
-        }}
-        value={props.tab.tempo ?? ''}
-        style={{ marginLeft: 8, maxWidth: 40 }}
-        type="number"
-      />
-
-      {!props.isEditMode && (
-        <button
-          disabled={!props.tab.tempo}
-          onClick={() => {
-            if (props.tab.activeSlot === undefined) {
-              enterPlayMode();
-            } else {
-              exitPlayMode();
+      <div className="input-group" style={{ maxWidth: 180 }}>
+        <span className="input-group-text">♫</span>
+        <input
+          className="form-control"
+          disabled={!!props.tab.activeSlot}
+          onBlur={() => {
+            if (props.tab.tempo) {
+              const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
+              if (validTempo !== props.tab.tempo) {
+                props.updateTab(tabOperations.updateTempo(props.tab, validTempo));
+              }
             }
           }}
-          style={{ marginLeft: 8 }}
-          type="button"
-        >
-          {props.tab.activeSlot !== undefined ? 'Stop' : 'Play'}
-        </button>
-      )}
+          onChange={(event) => {
+            const parsedTempo = parseInt(event.target.value);
+            const nextTempo = isNaN(parsedTempo) ? undefined : parsedTempo;
+            props.updateTab(tabOperations.updateTempo(props.tab, nextTempo));
+          }}
+          value={props.tab.tempo ?? ''}
+          style={{ textAlign: 'center' }}
+          type="number"
+        />
+
+        {!props.isEditMode &&
+          (props.tab.activeSlot ? (
+            <button className="btn btn-danger" onClick={exitPlayMode} type="button">
+              Stop
+            </button>
+          ) : (
+            <button
+              className="btn btn-success"
+              disabled={!props.tab.tempo}
+              onClick={() => {
+                enterPlayMode();
+              }}
+              type="button"
+            >
+              Play
+            </button>
+          ))}
+      </div>
     </div>
   );
 };

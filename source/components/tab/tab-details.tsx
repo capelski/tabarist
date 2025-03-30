@@ -10,47 +10,56 @@ export type TabDetailsProps = {
 };
 
 export const TabDetails: React.FC<TabDetailsProps> = (props) => {
+  const openBackingTrack = () => {
+    if (props.isEditMode) {
+      return;
+    }
+
+    window.open(props.tab.backingTrack);
+  };
+
   return (
     <div className="tab-details">
-      {(props.isEditMode || props.tab.capo) && (
-        <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
-          <span style={{ marginRight: 8 }}>Capo: </span>
-          {props.isEditMode ? (
-            <input
-              onChange={(event) => {
-                const nextCapo = parseInt(event.target.value);
-                const nextTab = tabOperations.updateCapo(
-                  props.tab,
-                  isNaN(nextCapo) ? undefined : nextCapo,
-                );
-                props.updateTab(nextTab);
-              }}
-              type="number"
-              value={props.tab.capo ?? ''}
-            />
-          ) : (
-            <span>{props.tab.capo}</span>
-          )}
+      {(props.isEditMode || props.tab.backingTrack) && (
+        <div className="input-group mb-2">
+          <span
+            className="input-group-text"
+            onClick={openBackingTrack}
+            style={{ cursor: props.isEditMode ? undefined : 'pointer' }}
+          >
+            Backing track
+          </span>
+          <input
+            className="form-control"
+            onChange={(event) => {
+              const nextTab = tabOperations.updateBackingTrack(props.tab, event.target.value);
+              props.updateTab(nextTab);
+            }}
+            onClick={openBackingTrack}
+            readOnly={!props.isEditMode}
+            style={{ cursor: props.isEditMode ? undefined : 'pointer' }}
+            value={props.tab.backingTrack ?? ''}
+          />
         </div>
       )}
 
-      {(props.isEditMode || props.tab.backingTrack) && (
-        <div style={{ display: 'flex', flexDirection: 'row', marginBottom: 8 }}>
-          <span style={{ marginRight: 8 }}>Backing track: </span>
-          {props.isEditMode ? (
-            <input
-              onChange={(event) => {
-                const nextTab = tabOperations.updateBackingTrack(props.tab, event.target.value);
-                props.updateTab(nextTab);
-              }}
-              style={{ flexGrow: 1 }}
-              value={props.tab.backingTrack ?? ''}
-            />
-          ) : (
-            <a href={props.tab.backingTrack} style={{ flexGrow: 1 }} target="_blank">
-              {props.tab.backingTrack}
-            </a>
-          )}
+      {(props.isEditMode || props.tab.capo) && (
+        <div className="input-group mb-2" style={{ maxWidth: 250 }}>
+          <span className="input-group-text">Capo</span>
+          <input
+            className="form-control"
+            onChange={(event) => {
+              const nextCapo = parseInt(event.target.value);
+              const nextTab = tabOperations.updateCapo(
+                props.tab,
+                isNaN(nextCapo) ? undefined : nextCapo,
+              );
+              props.updateTab(nextTab);
+            }}
+            readOnly={!props.isEditMode}
+            type="number"
+            value={props.tab.capo ?? ''}
+          />
         </div>
       )}
     </div>

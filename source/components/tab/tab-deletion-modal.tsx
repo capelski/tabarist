@@ -20,13 +20,18 @@ export const TabDeletionModal: React.FC<TabDeletionModalProps> = (props) => {
 
   return (
     props.tabId && (
-      <Modal closeHandler={props.cancelDelete}>
+      <Modal closeHandler={props.cancelDelete} hideCloseButton={true}>
         <p>Are you sure you want to delete this tab?</p>
         <div>
-          <button onClick={confirmDelete} style={{ marginRight: 8 }} type="button">
+          <button
+            className="btn btn-danger"
+            onClick={confirmDelete}
+            style={{ marginRight: 8 }}
+            type="button"
+          >
             Delete
           </button>
-          <button onClick={props.cancelDelete} type="button">
+          <button className="btn btn-outline-secondary" onClick={props.cancelDelete} type="button">
             Cancel
           </button>
         </div>

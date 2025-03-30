@@ -5,6 +5,7 @@ interface ModalProps {
   closeHandler?: () => void;
   children?: React.ReactNode;
   inset?: string;
+  hideCloseButton?: boolean;
   style?: CSSProperties;
 }
 
@@ -38,7 +39,7 @@ export const Modal: React.FC<ModalProps> = (props) => {
           }}
           style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, padding: 8 }}
         >
-          {props.closeHandler && (
+          {props.closeHandler && !props.hideCloseButton && (
             <div style={{ textAlign: 'right' }}>
               <span onClick={props.closeHandler} style={{ cursor: 'pointer' }}>
                 ❌

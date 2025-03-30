@@ -10,8 +10,8 @@ export const localStorageKey_tab = 'tabarist_tab_ID';
 export const localStorageKey_tabRegistry = 'tabarist_tabRegistry';
 
 export const addBarWidth = 25;
-export const barMinWidth = 160;
-export const barControlsHeight = 30;
+export const barMinWidth = 165;
+export const barControlsHeight = 45;
 export const characterWidth = 12;
 export const inputWidth = 30;
 export const repeatsHeight = 24;

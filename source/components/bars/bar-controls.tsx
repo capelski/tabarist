@@ -47,6 +47,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     <div
       className="bar-controls"
       style={{
+        alignItems: 'center',
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
@@ -63,11 +64,21 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       {props.tab.moving &&
       sectionOperations.isOperationInSection(props.tab.moving, props.inSection) &&
       props.tab.moving.startIndex === props.container.originalBar.index ? (
-        <button onClick={cancelPositionOperation} style={{ marginRight: 8 }} type="button">
+        <button
+          className="btn btn-outline-secondary"
+          onClick={cancelPositionOperation}
+          style={{ marginRight: 8 }}
+          type="button"
+        >
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={moveBarStart} style={{ marginRight: 8 }} type="button">
+        <button
+          className="btn btn-outline-primary"
+          onClick={moveBarStart}
+          style={{ marginRight: 8 }}
+          type="button"
+        >
           {moveStartSymbol}
         </button>
       )}
@@ -75,16 +86,26 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       {props.tab.copying &&
       sectionOperations.isOperationInSection(props.tab.copying, props.inSection) &&
       props.tab.copying.startIndex === props.container.originalBar.index ? (
-        <button onClick={cancelPositionOperation} style={{ marginRight: 8 }} type="button">
+        <button
+          className="btn btn-outline-secondary"
+          onClick={cancelPositionOperation}
+          style={{ marginRight: 8 }}
+          type="button"
+        >
           {cancelSymbol}
         </button>
       ) : (
-        <button onClick={copyBarStart} style={{ marginRight: 8 }} type="button">
+        <button
+          className="btn btn-outline-secondary"
+          onClick={copyBarStart}
+          style={{ marginRight: 8 }}
+          type="button"
+        >
           =
         </button>
       )}
 
-      <button onClick={removeBar} type="button">
+      <button className="btn btn-outline-danger" onClick={removeBar} type="button">
         {removeSymbol}
       </button>
     </div>

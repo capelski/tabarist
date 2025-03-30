@@ -70,7 +70,7 @@ export const App: React.FC<AppProps> = (props) => {
       <NavBar createTab={createTab} startSignIn={startSignIn} user={user} />
       <div
         ref={scrollViewRef}
-        style={{ flexGrow: 1, overflow: 'auto', padding: 8, position: 'relative' }}
+        style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
       >
         <Routes>
           <Route path={RouteNames.home} element={<HomeView createTab={createTab} user={user} />} />
