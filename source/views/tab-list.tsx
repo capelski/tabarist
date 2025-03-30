@@ -1,13 +1,13 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate, useSearchParams } from 'react-router';
-import { SignInModal, TabDeletionModal, TextFilter } from '../components';
-import { addSymbol, queryParameters, removeSymbol } from '../constants';
-import { getTabRelativeUrl, tabOperations } from '../operations';
-import { tabRepository } from '../repositories';
+import { NavLink, useSearchParams } from 'react-router';
+import { TabDeletionModal, TextFilter } from '../components';
+import { queryParameters, removeSymbol } from '../constants';
+import { getTabRelativeUrl } from '../operations';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../types';
 
 export type TabListBaseProps = {
+  createTab: () => void;
   user: User | null;
 };
 
@@ -18,7 +18,6 @@ export type TabListViewProps = TabListBaseProps & {
 export const TabListView: React.FC<TabListViewProps> = (props) => {
   const [deletingTabId, setDeletingTabId] = useState('');
   const [loading, setLoading] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
   const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({
     hasNextPage: false,
     hasPreviousPage: false,
@@ -27,7 +26,6 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
   const [tabParams, setTabParams] = useState<TabQueryParameters>();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const titleParameter = searchParams.get(queryParameters.title);
@@ -77,17 +75,6 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     setDeletingTabId('');
   };
 
-  const createTab = async () => {
-    if (!props.user) {
-      return;
-    }
-
-    const tab = tabOperations.create(props.user.uid);
-    await tabRepository.set(tab, props.user.uid);
-
-    navigate(getTabRelativeUrl(tab.id, true));
-  };
-
   const removeTab = (tabId: string) => {
     setDeletingTabId(tabId);
   };
@@ -108,14 +95,6 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
     setSearchParams(nextSearchParams);
   };
 
-  const cancelSignIn = () => {
-    setSigningIn(false);
-  };
-
-  const startSignIn = () => {
-    setSigningIn(true);
-  };
-
   return (
     <div className="tabs">
       <TabDeletionModal
@@ -125,24 +104,14 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
         cancelDelete={cancelDelete}
         tabId={deletingTabId}
       />
-      {signingIn && (
-        <SignInModal cancelSignIn={cancelSignIn}>
-          <p>Sign in to start creating tabs</p>
-        </SignInModal>
-      )}
 
       <p>
         <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
-
-        {props.user && (
-          <button onClick={createTab} style={{ marginLeft: 16 }} type="button">
-            {addSymbol} tab
-          </button>
-        )}
       </p>
 
       <p style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
+          className="btn btn-outline-secondary"
           disabled={!tabPageResponse.hasPreviousPage}
           onClick={() => {
             const firstTab = tabPageResponse.tabs[0];
@@ -163,6 +132,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
           ⏪️
         </button>
         <button
+          className="btn btn-outline-secondary"
           disabled={!tabPageResponse.hasNextPage}
           onClick={() => {
             const lastTab = tabPageResponse.tabs[tabPageResponse.tabs.length - 1];
@@ -184,9 +154,12 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
       </p>
 
       {tabPageResponse.tabs.length === 0 && !loading ? (
-        <p>
-          No tabs to display. Create your first tab:{' '}
-          <button onClick={props.user ? createTab : startSignIn}>{addSymbol} tab</button>
+        <p style={{ textAlign: 'center' }}>
+          No tabs to display. Create your first tab by clicking on{' '}
+          <a onClick={props.createTab} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+            New tab
+          </a>
+          .
         </p>
       ) : (
         <div>

@@ -5,14 +5,14 @@ import { getFirebaseContext } from '../../firebase-context';
 import { Modal } from '../common/modal';
 
 export type SignInModalProps = PropsWithChildren<{
-  cancelSignIn: () => void;
+  finishSignIn: () => void;
 }>;
 
 export const SignInModal: React.FC<SignInModalProps> = (props) => {
   const signIn = async () => {
     try {
       await signInWithPopup(getFirebaseContext().auth, new GoogleAuthProvider());
-      props.cancelSignIn();
+      props.finishSignIn();
     } catch (error) {
       console.log(error);
       toast('The sign in was not completed', { type: 'error', autoClose: 5000 });
@@ -20,7 +20,7 @@ export const SignInModal: React.FC<SignInModalProps> = (props) => {
   };
 
   return (
-    <Modal closeHandler={props.cancelSignIn}>
+    <Modal closeHandler={props.finishSignIn}>
       {props.children}
       <button onClick={signIn} style={{ marginRight: 8 }} type="button">
         Sign in with google

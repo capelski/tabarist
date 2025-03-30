@@ -1,20 +1,23 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink, useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
-import { SignInModal } from '../components';
 import { RouteNames } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
 
 export type NavBarProps = {
+  createTab: () => void;
+  startSignIn: () => void;
   user: User | null;
 };
 
 export const NavBar: React.FC<NavBarProps> = (props) => {
   const [loadingUpgrade, setLoadingUpgrade] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
   const [subscription, setSubscription] = useState<any>();
+
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const manageSubscription = async () => {
     setLoadingUpgrade(true);
@@ -33,16 +36,11 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
     }
   };
 
-  const cancelSignIn = () => {
-    setSigningIn(false);
-  };
-
-  const startSignIn = () => {
-    setSigningIn(true);
-  };
-
   const signOut = () => {
     getFirebaseContext().auth.signOut();
+    if (pathname === RouteNames.myTabs) {
+      navigate(RouteNames.home);
+    }
   };
 
   const upgrade = async () => {
@@ -74,8 +72,6 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
 
   return (
     <nav className="navbar navbar-expand-sm navbar-light bg-light">
-      {signingIn && <SignInModal cancelSignIn={cancelSignIn} />}
-
       <div className="container-fluid">
         <NavLink className="navbar-brand" style={{ marginRight: 8 }} to={RouteNames.home}>
           Tabarist
@@ -96,13 +92,13 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <NavLink
+              <a
                 className="nav-link mb-2 mb-sm-0"
-                style={{ marginRight: 8 }}
-                to={RouteNames.myTabs}
+                onClick={props.createTab}
+                style={{ cursor: 'pointer' }}
               >
-                My tabs
-              </NavLink>
+                New tab
+              </a>
             </li>
           </ul>
 
@@ -119,10 +115,16 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
               </a>
               <ul className="dropdown-menu dropdown-menu-sm-end" aria-labelledby="navbarDropdown">
                 <li>
+                  <NavLink className="dropdown-item" to={RouteNames.myTabs}>
+                    My tabs
+                  </NavLink>
+                </li>
+                <li>
                   {subscription ? (
                     <a
                       className={`dropdown-item${loadingUpgrade ? ' disabled' : ''}`}
                       onClick={loadingUpgrade ? undefined : manageSubscription}
+                      style={{ cursor: 'pointer' }}
                     >
                       Manage subscription
                     </a>
@@ -130,20 +132,21 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                     <a
                       className={`dropdown-item${loadingUpgrade ? ' disabled' : ''}`}
                       onClick={loadingUpgrade ? undefined : upgrade}
+                      style={{ cursor: 'pointer' }}
                     >
                       Upgrade
                     </a>
                   )}
                 </li>
                 <li>
-                  <a className="dropdown-item" onClick={signOut}>
+                  <a className="dropdown-item" onClick={signOut} style={{ cursor: 'pointer' }}>
                     Sign out
                   </a>
                 </li>
               </ul>
             </div>
           ) : (
-            <button className="btn btn-success" onClick={startSignIn}>
+            <button className="btn btn-success" onClick={props.startSignIn}>
               Sign in
             </button>
           )}
