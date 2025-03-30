@@ -14,37 +14,39 @@ export const TextFilter: React.FC<TextFilterProps> = (props) => {
 
   return (
     <span>
-      <span style={{ marginRight: 8 }}>🔎</span>
-      <input
-        onChange={(event) => {
-          const nextText = event.target.value;
-          setFilter(nextText);
-        }}
-        value={filter}
-      />
-
-      {props.text && (
-        <span
-          onClick={() => {
-            const nextText = '';
+      <div className="input-group mb-3">
+        {props.text && (
+          <button
+            className="btn btn-outline-secondary"
+            onClick={() => {
+              const nextText = '';
+              setFilter(nextText);
+              props.textSetter(nextText);
+            }}
+            type="button"
+          >
+            ❌
+          </button>
+        )}
+        <input
+          className="form-control"
+          onChange={(event) => {
+            const nextText = event.target.value;
             setFilter(nextText);
-            props.textSetter(nextText);
           }}
-          style={{ cursor: 'pointer', marginLeft: 8 }}
+          placeholder="Title filter..."
+          value={filter}
+        />
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => {
+            props.textSetter(filter);
+          }}
+          type="button"
         >
-          ❌
-        </span>
-      )}
-
-      <button
-        onClick={() => {
-          props.textSetter(filter);
-        }}
-        style={{ marginLeft: 8 }}
-        type="button"
-      >
-        Search
-      </button>
+          Search
+        </button>
+      </div>
     </span>
   );
 };
