@@ -1,9 +1,8 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { NavLink, useSearchParams } from 'react-router';
-import { TabDeletionModal, TextFilter } from '../components';
-import { queryParameters, removeSymbol } from '../constants';
-import { getTabRelativeUrl } from '../operations';
+import { useSearchParams } from 'react-router';
+import { TabDeletionModal, TabListItem, TextFilter } from '../components';
+import { queryParameters } from '../constants';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../types';
 
 export type TabListBaseProps = {
@@ -167,27 +166,13 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
             <p>Loading...</p>
           ) : (
             tabPageResponse.tabs.map((tab) => {
-              const isTabOwner = props.user && props.user.uid === tab.ownerId;
-
               return (
-                <div
+                <TabListItem
+                  isTabOwner={!!props.user && props.user.uid === tab.ownerId}
                   key={tab.id}
-                  style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}
-                >
-                  <div>
-                    {tab.title}
-                    <NavLink style={{ marginLeft: 8 }} to={getTabRelativeUrl(tab.id)}>
-                      ➡️
-                    </NavLink>
-                  </div>
-                  {isTabOwner && (
-                    <div>
-                      <button onClick={() => removeTab(tab.id)} type="button">
-                        {removeSymbol}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  startRemoveTab={() => removeTab(tab.id)}
+                  tab={tab}
+                />
               );
             })
           )}
