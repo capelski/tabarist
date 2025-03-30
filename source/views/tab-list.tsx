@@ -104,9 +104,7 @@ export const TabListView: React.FC<TabListViewProps> = (props) => {
         tabId={deletingTabId}
       />
 
-      <p>
-        <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
-      </p>
+      <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
 
       <p style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
