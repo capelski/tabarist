@@ -15,6 +15,7 @@ export type AppProps = {
 };
 
 export const App: React.FC<AppProps> = (props) => {
+  const [currentTab, setCurrentTab] = useState(props.tab);
   const [signingIn, setSigningIn] = useState(false);
   const [signingInMessage, setSigningInMessage] = useState<string>();
   const [user, setUser] = useState<User | null>(null);
@@ -82,7 +83,14 @@ export const App: React.FC<AppProps> = (props) => {
 
           <Route
             path={RouteNames.tabDetails}
-            element={<TabView scrollView={scrollViewRef} tab={props.tab} user={user} />}
+            element={
+              <TabView
+                scrollView={scrollViewRef}
+                setTab={setCurrentTab}
+                tab={currentTab}
+                user={user}
+              />
+            }
           />
         </Routes>
       </div>

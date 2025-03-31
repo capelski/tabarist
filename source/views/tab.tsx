@@ -10,13 +10,13 @@ import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
   scrollView: RefObject<HTMLDivElement>;
+  setTab: (tab: Tab) => void;
   tab?: Tab;
   user: User | null;
 };
 
 export const TabView: React.FC<TabViewProps> = (props) => {
   const [editingCopy, setEditingCopy] = useState('');
-  const [tab, setTab] = useState(props.tab);
   const isEditMode = !!editingCopy;
 
   // When entering edit mode from play mode we need to clear the next timeout
@@ -26,11 +26,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const { tabId } = useParams();
 
   useEffect(() => {
-    if (tabId && tab?.id !== tabId) {
-      tabRepository.getById(tabId).then((tab) => {
-        setTab(tab);
+    if (tabId && props.tab?.id !== tabId) {
+      tabRepository.getById(tabId).then((nextTab) => {
+        props.setTab(nextTab);
         if (searchParams.get(queryParameters.editMode) === 'true') {
-          setEditingCopy(JSON.stringify(tab));
+          setEditingCopy(JSON.stringify(nextTab));
         }
       });
     }
@@ -39,57 +39,62 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     if (isEditMode && searchParams.get(queryParameters.editMode) !== 'true') {
       setEditingCopy('');
-    } else if (!isEditMode && searchParams.get(queryParameters.editMode) === 'true' && tab) {
-      setEditingCopy(JSON.stringify(tab));
+    } else if (!isEditMode && searchParams.get(queryParameters.editMode) === 'true' && props.tab) {
+      setEditingCopy(JSON.stringify(props.tab));
     }
   }, [searchParams]);
 
   const barContainers = useMemo(() => {
-    if (tab?.bars) {
-      return barsToBarContainers(tab, tab.bars);
+    if (props.tab?.bars) {
+      return barsToBarContainers(props.tab, props.tab.bars);
     }
 
     return [];
-  }, [tab?.bars, tab?.rhythms, tab?.sections]);
+  }, [props.tab?.bars, props.tab?.rhythms, props.tab?.sections]);
 
-  if (!tab) {
+  if (!props.tab) {
     return <h3>Couldn't load tab</h3>;
   }
 
-  const isTabOwner = !!props.user && props.user.uid === tab.ownerId;
+  const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
 
   return (
     <div className="tab">
-      <MetaTags description={`Guitar tab for ${tab.title}`} title={tab.title} />
+      <MetaTags description={`Guitar tab for ${props.tab.title}`} title={props.tab.title} />
 
       <TabHeader
         editingCopy={editingCopy}
         isEditMode={isEditMode}
         isTabOwner={isTabOwner}
         playTimeoutRef={playTimeoutRef}
-        tab={tab}
+        tab={props.tab}
         updateEditingCopy={setEditingCopy}
-        updateTab={setTab}
+        updateTab={props.setTab}
         user={props.user}
       />
 
-      <TabDetails isEditMode={isEditMode} isTabOwner={isTabOwner} tab={tab} updateTab={setTab} />
+      <TabDetails
+        isEditMode={isEditMode}
+        isTabOwner={isTabOwner}
+        tab={props.tab}
+        updateTab={props.setTab}
+      />
 
       {isEditMode && (
         <React.Fragment>
-          <SectionList tab={tab} updateTab={setTab} />
-          <RhythmList tab={tab} updateTab={setTab} />
+          <SectionList tab={props.tab} updateTab={props.setTab} />
+          <RhythmList tab={props.tab} updateTab={props.setTab} />
         </React.Fragment>
       )}
 
       <BarGroup
         barContainers={barContainers}
-        barsNumber={tab.bars.length}
+        barsNumber={props.tab.bars.length}
         inSection={undefined}
         isEditMode={isEditMode}
         scrollView={props.scrollView}
-        tab={tab}
-        updateTab={setTab}
+        tab={props.tab}
+        updateTab={props.setTab}
       />
 
       <TabPlay
@@ -97,8 +102,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         isEditMode={isEditMode}
         isTabOwner={isTabOwner}
         playTimeoutRef={playTimeoutRef}
-        tab={tab}
-        updateTab={setTab}
+        tab={props.tab}
+        updateTab={props.setTab}
       />
     </div>
   );
