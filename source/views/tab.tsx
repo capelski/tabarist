@@ -26,7 +26,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const { tabId } = useParams();
 
   useEffect(() => {
-    if (tabId && !tab) {
+    if (tabId && tab?.id !== tabId) {
       tabRepository.getById(tabId).then((tab) => {
         setTab(tab);
         if (searchParams.get(queryParameters.editMode) === 'true') {

@@ -65,7 +65,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       sectionOperations.isOperationInSection(props.tab.moving, props.inSection) &&
       props.tab.moving.startIndex === props.container.originalBar.index ? (
         <button
-          className="btn btn-outline-secondary"
+          className="btn btn-sm btn-outline-secondary"
           onClick={cancelPositionOperation}
           style={{ marginRight: 8 }}
           type="button"
@@ -74,7 +74,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         </button>
       ) : (
         <button
-          className="btn btn-outline-primary"
+          className="btn btn-sm btn-outline-primary"
           onClick={moveBarStart}
           style={{ marginRight: 8 }}
           type="button"
@@ -87,7 +87,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       sectionOperations.isOperationInSection(props.tab.copying, props.inSection) &&
       props.tab.copying.startIndex === props.container.originalBar.index ? (
         <button
-          className="btn btn-outline-secondary"
+          className="btn btn-sm btn-outline-secondary"
           onClick={cancelPositionOperation}
           style={{ marginRight: 8 }}
           type="button"
@@ -96,7 +96,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         </button>
       ) : (
         <button
-          className="btn btn-outline-secondary"
+          className="btn btn-sm btn-outline-secondary"
           onClick={copyBarStart}
           style={{ marginRight: 8 }}
           type="button"
@@ -105,7 +105,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         </button>
       )}
 
-      <button className="btn btn-outline-danger" onClick={removeBar} type="button">
+      <button className="btn btn-sm btn-outline-danger" onClick={removeBar} type="button">
         {removeSymbol}
       </button>
     </div>
