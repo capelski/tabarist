@@ -6,6 +6,7 @@ import { queryParameters } from '../constants';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
 import { Tab } from '../types';
+import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
   scrollView: RefObject<HTMLDivElement>;
@@ -59,6 +60,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   return (
     <div className="tab">
+      <MetaTags description={`Guitar tab for ${tab.title}`} title={tab.title} />
+
       <TabHeader
         editingCopy={editingCopy}
         isEditMode={isEditMode}

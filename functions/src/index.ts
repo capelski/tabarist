@@ -4,6 +4,7 @@ import { error } from 'firebase-functions/logger';
 import { onRequest } from 'firebase-functions/v2/https';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
+import { Helmet } from 'react-helmet';
 import {
   AppProps,
   DiminishedTab,
@@ -42,7 +43,11 @@ expressApp.get(routes, async (req, res) => {
     location: req.originalUrl,
   };
   const appHtml = renderToString(createElement(SsrApp, ssrAppProps));
-  const indexHtml = getHtml(appHtml, initialState);
+
+  const helmet = Helmet.renderStatic();
+  const headTags = helmet.title.toString() + helmet.meta.toString();
+
+  const indexHtml = getHtml(appHtml, headTags, initialState);
 
   res.send(indexHtml);
 });

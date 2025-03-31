@@ -2,13 +2,13 @@ import { User } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
-import { SignInModal } from './components';
+import { NavBar, SignInModal } from './components';
 import { RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl, tabOperations } from './operations';
 import { tabRepository } from './repositories';
 import { Tab } from './types';
-import { HomeView, MyTabsView, NavBar, TabView } from './views';
+import { HomeView, MyTabsView, TabView } from './views';
 
 export type AppProps = {
   tab?: Tab;

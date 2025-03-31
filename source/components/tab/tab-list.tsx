@@ -1,20 +1,22 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { TabDeletionModal, TabListItem, TextFilter } from '../components';
-import { queryParameters } from '../constants';
-import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../types';
+import { queryParameters } from '../../constants';
+import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../../types';
+import { TextFilter } from '../common/text-filter';
+import { TabDeletionModal } from './tab-deletion-modal';
+import { TabListItem } from './tab-list-item';
 
 export type TabListBaseProps = {
   createTab: () => void;
   user: User | null;
 };
 
-export type TabListViewProps = TabListBaseProps & {
+export type TabListProps = TabListBaseProps & {
   getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
 };
 
-export const TabListView: React.FC<TabListViewProps> = (props) => {
+export const TabList: React.FC<TabListProps> = (props) => {
   const [deletingTabId, setDeletingTabId] = useState('');
   const [loading, setLoading] = useState(false);
   const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({

@@ -5,12 +5,16 @@
 // by webpack development configuration
 
 module.exports = {
-  getHtml: (appHtml = '', initialState) =>
+  getHtml: (appHtml = '', headTags = '', initialState) =>
     `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="author" content="Carles Capellas" />
+    <meta name="robots" content="index, follow" />
+    ${headTags}
+
     <link rel="stylesheet" href="/main.css">
     ${initialState ? `<script>window.initialState = ${JSON.stringify(initialState)};</script>` : ''}
     <script defer="defer" src="/main.js"></script>

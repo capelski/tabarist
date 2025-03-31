@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { resolve } = require('path');
+const { DefinePlugin } = require('webpack');
 
 module.exports = {
   entry: './source/index.tsx',
@@ -26,7 +27,12 @@ module.exports = {
       },
     ],
   },
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new DefinePlugin({
+      PRODUCTION_URL_BASE: JSON.stringify('https://tabarist.com'),
+    }),
+    new MiniCssExtractPlugin(),
+  ],
   resolve: {
     extensions: ['.js', '.ts', '.tsx', '.json'],
   },
