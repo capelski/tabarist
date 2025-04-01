@@ -9,12 +9,13 @@ import { Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
+  existsInServer: boolean;
   isEditMode: boolean;
   promptDiscardChanges: () => void;
   saveEditChanges: () => void;
   scrollView: RefObject<HTMLDivElement>;
   tab?: Tab;
-  updateTab: (tab: Tab, updateOriginal?: boolean) => void;
+  updateTab: (tab: Tab, options?: { setExists?: boolean; setOriginal?: boolean }) => void;
   user: User | null;
 };
 
@@ -28,10 +29,28 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     if (tabId && props.tab?.id !== tabId) {
       tabRepository.getById(tabId).then((nextTab) => {
-        props.updateTab(nextTab, searchParams.get(QueryParameters.editMode) === 'true');
+        if (nextTab) {
+          props.updateTab(nextTab, {
+            setExists: true,
+            setOriginal: searchParams.get(QueryParameters.editMode) === 'true',
+          });
+        }
       });
     }
   }, [tabId]);
+
+  // Update edit mode upon browser back/forward navigation
+  useEffect(() => {
+    if (props.isEditMode && searchParams.get(QueryParameters.editMode) !== 'true') {
+      props.promptDiscardChanges();
+    } else if (
+      !props.isEditMode &&
+      searchParams.get(QueryParameters.editMode) === 'true' &&
+      props.tab
+    ) {
+      props.updateTab(props.tab, { setOriginal: true });
+    }
+  }, [searchParams]);
 
   const barContainers = useMemo(() => {
     if (props.tab?.bars) {
@@ -52,6 +71,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <MetaTags description={`Guitar tab for ${props.tab.title}`} title={props.tab.title} />
 
       <TabHeader
+        existsInServer={props.existsInServer}
         isEditMode={props.isEditMode}
         isTabOwner={isTabOwner}
         playTimeoutRef={playTimeoutRef}

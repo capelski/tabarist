@@ -6,13 +6,14 @@ import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
+  existsInServer: boolean;
   isEditMode: boolean;
   isTabOwner: boolean;
   playTimeoutRef: MutableRefObject<number>;
   promptDiscardChanges: () => void;
   saveEditChanges: () => void;
   tab: Tab;
-  updateTab: (tab: Tab, updateOriginal?: boolean) => void;
+  updateTab: (tab: Tab, options?: { setExists?: boolean; setOriginal?: boolean }) => void;
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
@@ -33,7 +34,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
     clearTimeout(props.playTimeoutRef.current);
 
     const nextTab = tabOperations.resetActiveSlot(props.tab);
-    props.updateTab(nextTab, true);
+    props.updateTab(nextTab, { setOriginal: true });
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.set(QueryParameters.editMode, 'true');
@@ -100,14 +101,16 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 >
                   {editSymbol}
                 </button>
-                <button
-                  className="btn btn-outline-danger"
-                  onClick={removeTab}
-                  style={{ marginLeft: 8 }}
-                  type="button"
-                >
-                  {removeSymbol}
-                </button>
+                {props.existsInServer && (
+                  <button
+                    className="btn btn-outline-danger"
+                    onClick={removeTab}
+                    style={{ marginLeft: 8 }}
+                    type="button"
+                  >
+                    {removeSymbol}
+                  </button>
+                )}
               </React.Fragment>
             )}
           </React.Fragment>

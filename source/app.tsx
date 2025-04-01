@@ -17,6 +17,7 @@ export type AppProps = {
 
 export const App: React.FC<AppProps> = (props) => {
   const [currentTab, setCurrentTab] = useState(props.tab);
+  const [currentTabExists, setCurrentTabExists] = useState(!!props.tab);
   const [currentTabOriginal, setCurrentTabOriginal] = useState('');
   const [currentTabDiscarding, setCurrentTabDiscarding] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
@@ -49,7 +50,7 @@ export const App: React.FC<AppProps> = (props) => {
     setSearchParams(nextSearchParams);
   };
 
-  const createTab = async () => {
+  const createTab = () => {
     if (!user) {
       setSigningInMessage('Sign in to start creating tabs');
       startSignIn();
@@ -62,7 +63,7 @@ export const App: React.FC<AppProps> = (props) => {
     }
 
     const tab = tabOperations.create(user.uid);
-    await tabRepository.set(tab, user.uid);
+    updateTab(tab, { setExists: false, setOriginal: true });
 
     navigate(getTabRelativeUrl(tab.id, true));
   };
@@ -99,6 +100,7 @@ export const App: React.FC<AppProps> = (props) => {
 
     await tabRepository.set(currentTab, user.uid);
 
+    setCurrentTabExists(true);
     setCurrentTabOriginal('');
     clearSearchParams(QueryParameters.editMode);
   };
@@ -107,9 +109,17 @@ export const App: React.FC<AppProps> = (props) => {
     setSigningIn(true);
   };
 
-  const updateTab = (nextTab: Tab, updateOriginal = false) => {
+  const updateTab = (
+    nextTab: Tab,
+    options: { setExists?: boolean; setOriginal?: boolean } = {},
+  ) => {
     setCurrentTab(nextTab);
-    if (updateOriginal) {
+
+    if (options.setExists !== undefined) {
+      setCurrentTabExists(options.setExists);
+    }
+
+    if (options.setOriginal) {
       setCurrentTabOriginal(JSON.stringify(nextTab));
     }
   };
@@ -161,6 +171,7 @@ export const App: React.FC<AppProps> = (props) => {
             path={RouteNames.tabDetails}
             element={
               <TabView
+                existsInServer={currentTabExists}
                 isEditMode={isEditMode}
                 promptDiscardChanges={promptDiscardChanges}
                 saveEditChanges={saveEditChanges}

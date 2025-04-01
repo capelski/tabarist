@@ -96,7 +96,7 @@ const getFirestoreTabs = async (
 export const tabRepository = {
   getById: async (tabId: string) => {
     const diminishedTab = (await getDocument(getTabPath(tabId))) as DiminishedTab;
-    return tabOperations.augmentTab(diminishedTab);
+    return diminishedTab ? tabOperations.augmentTab(diminishedTab) : undefined;
   },
   getPublicTabs: (params?: TabQueryParameters) => {
     return getFirestoreTabs(params);
