@@ -2,17 +2,16 @@ import { User } from 'firebase/auth';
 import React, { RefObject, useEffect, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabHeader, TabPlay } from '../components';
-import { queryParameters } from '../constants';
+import { QueryParameters } from '../constants';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
 import { Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
-  cancelEditChanges: () => void;
-  confirmEditChanges: () => void;
-  isDirty: boolean;
   isEditMode: boolean;
+  promptDiscardChanges: () => void;
+  saveEditChanges: () => void;
   scrollView: RefObject<HTMLDivElement>;
   tab?: Tab;
   updateTab: (tab: Tab, updateOriginal?: boolean) => void;
@@ -29,7 +28,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     if (tabId && props.tab?.id !== tabId) {
       tabRepository.getById(tabId).then((nextTab) => {
-        props.updateTab(nextTab, searchParams.get(queryParameters.editMode) === 'true');
+        props.updateTab(nextTab, searchParams.get(QueryParameters.editMode) === 'true');
       });
     }
   }, [tabId]);
@@ -53,15 +52,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <MetaTags description={`Guitar tab for ${props.tab.title}`} title={props.tab.title} />
 
       <TabHeader
-        cancelEditChanges={props.cancelEditChanges}
-        confirmEditChanges={props.confirmEditChanges}
-        isDirty={props.isDirty}
         isEditMode={props.isEditMode}
         isTabOwner={isTabOwner}
         playTimeoutRef={playTimeoutRef}
+        promptDiscardChanges={props.promptDiscardChanges}
+        saveEditChanges={props.saveEditChanges}
         tab={props.tab}
         updateTab={props.updateTab}
-        user={props.user}
       />
 
       <TabDetails

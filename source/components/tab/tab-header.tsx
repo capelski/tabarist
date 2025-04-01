@@ -1,48 +1,28 @@
-import { User } from 'firebase/auth';
 import React, { MutableRefObject, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { editSymbol, queryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
+import { editSymbol, QueryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
-import { tabRepository } from '../../repositories';
 import { Tab } from '../../types';
-import { Modal } from '../common/modal';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
-  cancelEditChanges: () => void;
-  confirmEditChanges: () => void;
-  isDirty: boolean;
   isEditMode: boolean;
   isTabOwner: boolean;
   playTimeoutRef: MutableRefObject<number>;
+  promptDiscardChanges: () => void;
+  saveEditChanges: () => void;
   tab: Tab;
   updateTab: (tab: Tab, updateOriginal?: boolean) => void;
-  user: User | null;
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   const [deletingTabId, setDeletingTabId] = useState('');
-  const [discardingChanges, setDiscardingChanges] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const cancelDelete = () => {
     setDeletingTabId('');
-  };
-
-  const cancelExitEditMode = () => {
-    setDiscardingChanges(false);
-  };
-
-  const confirmExitEditMode = () => {
-    setDiscardingChanges(false);
-
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete(queryParameters.editMode);
-    setSearchParams(nextSearchParams);
-
-    props.cancelEditChanges();
   };
 
   const enterEditMode = () => {
@@ -56,30 +36,12 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
     props.updateTab(nextTab, true);
 
     const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.set(queryParameters.editMode, 'true');
+    nextSearchParams.set(QueryParameters.editMode, 'true');
     setSearchParams(nextSearchParams);
-  };
-
-  const exitEditMode = () => {
-    if (props.isDirty) {
-      setDiscardingChanges(true);
-    } else {
-      confirmExitEditMode();
-    }
   };
 
   const removeTab = () => {
     setDeletingTabId(props.tab.id);
-  };
-
-  const saveEditModeChanges = async () => {
-    await tabRepository.set(props.tab, props.user!.uid);
-
-    props.confirmEditChanges();
-
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete(queryParameters.editMode);
-    setSearchParams(nextSearchParams);
   };
 
   return (
@@ -91,29 +53,6 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
         cancelDelete={cancelDelete}
         tabId={deletingTabId}
       />
-
-      {discardingChanges && (
-        <Modal closeHandler={cancelExitEditMode} hideCloseButton={true}>
-          <p>Do you want to discard the unsaved changes?</p>
-          <div>
-            <button
-              className="btn btn-danger"
-              onClick={confirmExitEditMode}
-              style={{ marginRight: 8 }}
-              type="button"
-            >
-              Discard
-            </button>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={cancelExitEditMode}
-              type="button"
-            >
-              Cancel
-            </button>
-          </div>
-        </Modal>
-      )}
 
       <div className="mb-3" style={{ alignItems: 'center', display: 'flex' }}>
         {props.isEditMode ? (
@@ -136,7 +75,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
               <React.Fragment>
                 <button
                   className="btn btn-outline-success"
-                  onClick={saveEditModeChanges}
+                  onClick={props.saveEditChanges}
                   style={{ marginLeft: 8 }}
                   type="button"
                 >
@@ -144,7 +83,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 </button>
                 <button
                   className="btn btn-outline-danger"
-                  onClick={exitEditMode}
+                  onClick={props.promptDiscardChanges}
                   style={{ marginLeft: 8 }}
                   type="button"
                 >

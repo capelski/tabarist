@@ -4,10 +4,10 @@ export enum RouteNames {
   tabDetails = '/tab/:tabId',
 }
 
-export const queryParameters = {
-  editMode: 'editMode',
-  title: 'title',
-  anchorDirection: 'aD',
-  anchorId: 'aI',
-  anchorTitle: 'aT',
-};
+export enum QueryParameters {
+  editMode = 'editMode',
+  title = 'title',
+  anchorDirection = 'aD',
+  anchorId = 'aI',
+  anchorTitle = 'aT',
+}

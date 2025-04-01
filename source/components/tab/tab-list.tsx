@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { queryParameters } from '../../constants';
+import { QueryParameters } from '../../constants';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../../types';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
@@ -29,10 +29,10 @@ export const TabList: React.FC<TabListProps> = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const titleParameter = searchParams.get(queryParameters.title);
-    const aDParameter = searchParams.get(queryParameters.anchorDirection);
-    const aIParameter = searchParams.get(queryParameters.anchorId);
-    const aTParameter = searchParams.get(queryParameters.anchorTitle);
+    const titleParameter = searchParams.get(QueryParameters.title);
+    const aDParameter = searchParams.get(QueryParameters.anchorDirection);
+    const aIParameter = searchParams.get(QueryParameters.anchorId);
+    const aTParameter = searchParams.get(QueryParameters.anchorTitle);
 
     const nextTabParams: TabQueryParameters = {};
 
@@ -58,9 +58,9 @@ export const TabList: React.FC<TabListProps> = (props) => {
 
     if (params?.anchorDocument) {
       const nextSearchParams = new URLSearchParams(searchParams);
-      nextSearchParams.set(queryParameters.anchorDirection, params.anchorDocument.direction);
-      nextSearchParams.set(queryParameters.anchorId, params.anchorDocument.id);
-      nextSearchParams.set(queryParameters.anchorTitle, params.anchorDocument.title);
+      nextSearchParams.set(QueryParameters.anchorDirection, params.anchorDocument.direction);
+      nextSearchParams.set(QueryParameters.anchorId, params.anchorDocument.id);
+      nextSearchParams.set(QueryParameters.anchorTitle, params.anchorDocument.title);
       setSearchParams(nextSearchParams);
     }
 
@@ -69,7 +69,9 @@ export const TabList: React.FC<TabListProps> = (props) => {
   };
 
   useEffect(() => {
-    updateTabs(tabParams);
+    if (props.user || tabParams) {
+      updateTabs(tabParams);
+    }
   }, [props.user, tabParams]);
 
   const cancelDelete = () => {
@@ -83,13 +85,13 @@ export const TabList: React.FC<TabListProps> = (props) => {
   const updateTitleFilter = (nextTitleFilter: string) => {
     const nextSearchParams = new URLSearchParams(searchParams);
     if (nextTitleFilter) {
-      nextSearchParams.set(queryParameters.title, nextTitleFilter);
+      nextSearchParams.set(QueryParameters.title, nextTitleFilter);
     } else {
-      nextSearchParams.delete(queryParameters.title);
+      nextSearchParams.delete(QueryParameters.title);
     }
-    nextSearchParams.delete(queryParameters.anchorDirection);
-    nextSearchParams.delete(queryParameters.anchorId);
-    nextSearchParams.delete(queryParameters.anchorTitle);
+    nextSearchParams.delete(QueryParameters.anchorDirection);
+    nextSearchParams.delete(QueryParameters.anchorId);
+    nextSearchParams.delete(QueryParameters.anchorTitle);
 
     const nextParams = { titleFilter: nextTitleFilter };
     setTabParams(nextParams);
@@ -154,7 +156,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
 
       {tabPageResponse.tabs.length === 0 && !loading ? (
         <p style={{ textAlign: 'center' }}>
-          No tabs to display. Create your first tab by clicking on{' '}
+          No tabs to display. Create a tab by clicking on{' '}
           <a onClick={props.createTab} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
             New tab
           </a>

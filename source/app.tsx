@@ -1,9 +1,10 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router';
+import { Route, Routes, useNavigate, useSearchParams } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { NavBar, SignInModal } from './components';
-import { RouteNames } from './constants';
+import { TabDiscardModal } from './components/tab/tab-discard-modal';
+import { QueryParameters, RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl, tabOperations } from './operations';
 import { tabRepository } from './repositories';
@@ -17,10 +18,12 @@ export type AppProps = {
 export const App: React.FC<AppProps> = (props) => {
   const [currentTab, setCurrentTab] = useState(props.tab);
   const [currentTabOriginal, setCurrentTabOriginal] = useState('');
+  const [currentTabDiscarding, setCurrentTabDiscarding] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [signingInMessage, setSigningInMessage] = useState<string>();
   const [user, setUser] = useState<User | null>(null);
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const isEditMode = !!currentTabOriginal;
@@ -34,13 +37,10 @@ export const App: React.FC<AppProps> = (props) => {
     });
   }, []);
 
-  const cancelEditChanges = () => {
-    setCurrentTab(JSON.parse(currentTabOriginal));
-    setCurrentTabOriginal('');
-  };
-
-  const confirmEditChanges = () => {
-    setCurrentTabOriginal('');
+  const clearSearchParams = (parameter: QueryParameters) => {
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete(parameter);
+    setSearchParams(nextSearchParams);
   };
 
   const createTab = async () => {
@@ -50,15 +50,51 @@ export const App: React.FC<AppProps> = (props) => {
       return;
     }
 
+    if (isCurrentTabDirty) {
+      promptDiscardChanges();
+      return;
+    }
+
     const tab = tabOperations.create(user.uid);
     await tabRepository.set(tab, user.uid);
 
     navigate(getTabRelativeUrl(tab.id, true));
   };
 
+  const discardEditChanges = () => {
+    setCurrentTab(JSON.parse(currentTabOriginal));
+    setCurrentTabOriginal('');
+    setCurrentTabDiscarding(false);
+
+    clearSearchParams(QueryParameters.editMode);
+  };
+
   const finishSignIn = () => {
     setSigningIn(false);
     setSigningInMessage(undefined);
+  };
+
+  const keepEditChanges = () => {
+    setCurrentTabDiscarding(false);
+  };
+
+  const promptDiscardChanges = () => {
+    if (isCurrentTabDirty) {
+      setCurrentTabDiscarding(true);
+    } else {
+      discardEditChanges();
+    }
+  };
+
+  const saveEditChanges = async () => {
+    if (!currentTab || !user) {
+      return;
+    }
+
+    await tabRepository.set(currentTab, user.uid);
+
+    setCurrentTabOriginal('');
+    clearSearchParams(QueryParameters.editMode);
   };
 
   const startSignIn = () => {
@@ -87,6 +123,14 @@ export const App: React.FC<AppProps> = (props) => {
           {signingInMessage && <p>{signingInMessage}</p>}
         </SignInModal>
       )}
+
+      {currentTabDiscarding && (
+        <TabDiscardModal
+          discardEditChanges={discardEditChanges}
+          keepEditChanges={keepEditChanges}
+        />
+      )}
+
       <ToastContainer position="bottom-center" />
       <NavBar createTab={createTab} startSignIn={startSignIn} user={user} />
       <div
@@ -105,10 +149,9 @@ export const App: React.FC<AppProps> = (props) => {
             path={RouteNames.tabDetails}
             element={
               <TabView
-                cancelEditChanges={cancelEditChanges}
-                confirmEditChanges={confirmEditChanges}
-                isDirty={isCurrentTabDirty}
                 isEditMode={isEditMode}
+                promptDiscardChanges={promptDiscardChanges}
+                saveEditChanges={saveEditChanges}
                 scrollView={scrollViewRef}
                 tab={currentTab}
                 updateTab={updateTab}
