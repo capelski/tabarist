@@ -132,7 +132,13 @@ export const App: React.FC<AppProps> = (props) => {
       )}
 
       <ToastContainer position="bottom-center" />
-      <NavBar createTab={createTab} startSignIn={startSignIn} user={user} />
+      <NavBar
+        createTab={createTab}
+        isCurrentTabDirty={isCurrentTabDirty}
+        promptDiscardChanges={promptDiscardChanges}
+        startSignIn={startSignIn}
+        user={user}
+      />
       <div
         ref={scrollViewRef}
         style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}

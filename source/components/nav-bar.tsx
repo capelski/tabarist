@@ -7,7 +7,9 @@ import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
 
 export type NavBarProps = {
+  isCurrentTabDirty: boolean;
   createTab: () => void;
+  promptDiscardChanges: () => void;
   startSignIn: () => void;
   user: User | null;
 };
@@ -20,6 +22,11 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   const { pathname } = useLocation();
 
   const manageSubscription = async () => {
+    if (props.isCurrentTabDirty) {
+      props.promptDiscardChanges();
+      return;
+    }
+
     setLoadingUpgrade(true);
 
     try {
@@ -37,6 +44,11 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   };
 
   const signOut = () => {
+    if (props.isCurrentTabDirty) {
+      props.promptDiscardChanges();
+      return;
+    }
+
     getFirebaseContext().auth.signOut();
     if (pathname === RouteNames.myTabs) {
       navigate(RouteNames.home);
@@ -45,6 +57,11 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
 
   const upgrade = async () => {
     if (!props.user) {
+      return;
+    }
+
+    if (props.isCurrentTabDirty) {
+      props.promptDiscardChanges();
       return;
     }
 
@@ -73,7 +90,16 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   return (
     <nav className="navbar navbar-expand-sm navbar-light bg-light">
       <div className="container-fluid">
-        <NavLink className="navbar-brand" style={{ marginRight: 8 }} to={RouteNames.home}>
+        <NavLink
+          className="navbar-brand"
+          onClick={(event) => {
+            if (props.isCurrentTabDirty) {
+              props.promptDiscardChanges();
+              event.preventDefault();
+            }
+          }}
+          to={RouteNames.home}
+        >
           Tabarist
         </NavLink>
 
@@ -115,7 +141,16 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
               </a>
               <ul className="dropdown-menu dropdown-menu-sm-end" aria-labelledby="navbarDropdown">
                 <li>
-                  <NavLink className="dropdown-item" to={RouteNames.myTabs}>
+                  <NavLink
+                    className="dropdown-item"
+                    onClick={(event) => {
+                      if (props.isCurrentTabDirty) {
+                        props.promptDiscardChanges();
+                        event.preventDefault();
+                      }
+                    }}
+                    to={RouteNames.myTabs}
+                  >
                     My tabs
                   </NavLink>
                 </li>
