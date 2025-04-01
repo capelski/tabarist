@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
 import React, { useEffect, useRef, useState } from 'react';
-import { Route, Routes, useNavigate, useSearchParams } from 'react-router';
+import { Route, Routes, useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
@@ -36,6 +36,12 @@ export const App: React.FC<AppProps> = (props) => {
       toast('Could not reach the user account', { type: 'error' });
     });
   }, []);
+
+  useBeforeUnload((event) => {
+    if (isCurrentTabDirty) {
+      event.preventDefault();
+    }
+  });
 
   const clearSearchParams = (parameter: QueryParameters) => {
     const nextSearchParams = new URLSearchParams(searchParams);
