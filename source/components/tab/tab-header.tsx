@@ -9,13 +9,14 @@ import { Modal } from '../common/modal';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
-  editingCopy: string;
+  cancelEditChanges: () => void;
+  confirmEditChanges: () => void;
+  isDirty: boolean;
   isEditMode: boolean;
   isTabOwner: boolean;
   playTimeoutRef: MutableRefObject<number>;
   tab: Tab;
-  updateEditingCopy: (editingCopy: string) => void;
-  updateTab: (tab: Tab) => void;
+  updateTab: (tab: Tab, updateOriginal?: boolean) => void;
   user: User | null;
 };
 
@@ -36,12 +37,12 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
   const confirmExitEditMode = () => {
     setDiscardingChanges(false);
-    props.updateEditingCopy('');
-    props.updateTab(JSON.parse(props.editingCopy));
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.delete(queryParameters.editMode);
     setSearchParams(nextSearchParams);
+
+    props.cancelEditChanges();
   };
 
   const enterEditMode = () => {
@@ -52,8 +53,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
     clearTimeout(props.playTimeoutRef.current);
 
     const nextTab = tabOperations.resetActiveSlot(props.tab);
-    props.updateEditingCopy(JSON.stringify(nextTab));
-    props.updateTab(nextTab);
+    props.updateTab(nextTab, true);
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.set(queryParameters.editMode, 'true');
@@ -61,10 +61,10 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   };
 
   const exitEditMode = () => {
-    if (JSON.stringify(props.tab) === props.editingCopy) {
-      confirmExitEditMode();
-    } else {
+    if (props.isDirty) {
       setDiscardingChanges(true);
+    } else {
+      confirmExitEditMode();
     }
   };
 
@@ -75,7 +75,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   const saveEditModeChanges = async () => {
     await tabRepository.set(props.tab, props.user!.uid);
 
-    props.updateEditingCopy('');
+    props.confirmEditChanges();
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.delete(queryParameters.editMode);

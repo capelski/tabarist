@@ -16,12 +16,16 @@ export type AppProps = {
 
 export const App: React.FC<AppProps> = (props) => {
   const [currentTab, setCurrentTab] = useState(props.tab);
+  const [currentTabOriginal, setCurrentTabOriginal] = useState('');
   const [signingIn, setSigningIn] = useState(false);
   const [signingInMessage, setSigningInMessage] = useState<string>();
   const [user, setUser] = useState<User | null>(null);
 
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const isEditMode = !!currentTabOriginal;
+  const isCurrentTabDirty =
+    !!currentTab && !!currentTabOriginal && currentTabOriginal !== JSON.stringify(currentTab);
 
   useEffect(() => {
     getFirebaseContext().auth.onAuthStateChanged(setUser, (error) => {
@@ -29,6 +33,15 @@ export const App: React.FC<AppProps> = (props) => {
       toast('Could not reach the user account', { type: 'error' });
     });
   }, []);
+
+  const cancelEditChanges = () => {
+    setCurrentTab(JSON.parse(currentTabOriginal));
+    setCurrentTabOriginal('');
+  };
+
+  const confirmEditChanges = () => {
+    setCurrentTabOriginal('');
+  };
 
   const createTab = async () => {
     if (!user) {
@@ -50,6 +63,13 @@ export const App: React.FC<AppProps> = (props) => {
 
   const startSignIn = () => {
     setSigningIn(true);
+  };
+
+  const updateTab = (nextTab: Tab, updateOriginal = false) => {
+    setCurrentTab(nextTab);
+    if (updateOriginal) {
+      setCurrentTabOriginal(JSON.stringify(nextTab));
+    }
   };
 
   return (
@@ -85,9 +105,13 @@ export const App: React.FC<AppProps> = (props) => {
             path={RouteNames.tabDetails}
             element={
               <TabView
+                cancelEditChanges={cancelEditChanges}
+                confirmEditChanges={confirmEditChanges}
+                isDirty={isCurrentTabDirty}
+                isEditMode={isEditMode}
                 scrollView={scrollViewRef}
-                setTab={setCurrentTab}
                 tab={currentTab}
+                updateTab={updateTab}
                 user={user}
               />
             }
