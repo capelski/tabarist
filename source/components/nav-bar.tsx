@@ -1,8 +1,10 @@
 import { User } from 'firebase/auth';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
+import { ActionType } from '../action-type';
 import { RouteNames } from '../constants';
+import { DispatchProvider } from '../dispatch-provider';
 import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
 
@@ -10,7 +12,6 @@ export type NavBarProps = {
   isCurrentTabDirty: boolean;
   createTab: () => void;
   promptDiscardChanges: () => void;
-  startSignIn: () => void;
   user: User | null;
 };
 
@@ -18,6 +19,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   const [loadingUpgrade, setLoadingUpgrade] = useState(false);
   const [subscription, setSubscription] = useState<any>();
 
+  const dispatch = useContext(DispatchProvider);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -181,7 +183,12 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
               </ul>
             </div>
           ) : (
-            <button className="btn btn-success" onClick={() => props.startSignIn()}>
+            <button
+              className="btn btn-success"
+              onClick={() => {
+                dispatch({ type: ActionType.signInStart });
+              }}
+            >
               Sign in
             </button>
           )}

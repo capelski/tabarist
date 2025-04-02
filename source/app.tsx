@@ -7,6 +7,7 @@ import { getInitialState } from './app-state';
 import { NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { QueryParameters, RouteNames } from './constants';
+import { DispatchProvider } from './dispatch-provider';
 import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl, tabOperations } from './operations';
 import { tabRepository } from './repositories';
@@ -57,7 +58,7 @@ export const App: React.FC<AppProps> = (props) => {
 
   const createTab = () => {
     if (!state.user) {
-      startSignIn('Sign in to start creating tabs');
+      dispatch({ type: ActionType.signInStart, payload: 'Sign in to start creating tabs' });
       return;
     }
 
@@ -78,10 +79,6 @@ export const App: React.FC<AppProps> = (props) => {
     setCurrentTabDiscarding(false);
 
     clearSearchParams(QueryParameters.editMode);
-  };
-
-  const finishSignIn = () => {
-    dispatch({ type: ActionType.signInFinish });
   };
 
   const keepEditChanges = () => {
@@ -108,10 +105,6 @@ export const App: React.FC<AppProps> = (props) => {
     clearSearchParams(QueryParameters.editMode);
   };
 
-  const startSignIn = (message?: string) => {
-    dispatch({ type: ActionType.signInStart, payload: message });
-  };
-
   const updateTab = (
     nextTab: Tab,
     options: { setExists?: boolean; setOriginal?: boolean } = {},
@@ -128,68 +121,71 @@ export const App: React.FC<AppProps> = (props) => {
   };
 
   return (
-    <div
-      style={{
-        boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100dvh',
-        overflow: 'hidden',
-      }}
-    >
-      {state.signInDialog && (
-        <SignInModal finishSignIn={finishSignIn}>
-          {state.signInDialog.message && <p>{state.signInDialog.message}</p>}
-        </SignInModal>
-      )}
-
-      {currentTabDiscarding && (
-        <TabDiscardModal
-          discardEditChanges={discardEditChanges}
-          keepEditChanges={keepEditChanges}
-        />
-      )}
-
-      <ToastContainer position="bottom-center" />
-      <NavBar
-        createTab={createTab}
-        isCurrentTabDirty={isCurrentTabDirty}
-        promptDiscardChanges={promptDiscardChanges}
-        startSignIn={startSignIn}
-        user={state.user}
-      />
+    <DispatchProvider.Provider value={dispatch}>
       <div
-        ref={scrollViewRef}
-        style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
+        style={{
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100dvh',
+          overflow: 'hidden',
+        }}
       >
-        <Routes>
-          <Route
-            path={RouteNames.home}
-            element={<HomeView createTab={createTab} user={state.user} />}
-          />
+        {state.signInDialog && (
+          <SignInModal>
+            {state.signInDialog.message && <p>{state.signInDialog.message}</p>}
+          </SignInModal>
+        )}
 
-          <Route
-            path={RouteNames.myTabs}
-            element={<MyTabsView createTab={createTab} user={state.user} />}
+        {currentTabDiscarding && (
+          <TabDiscardModal
+            discardEditChanges={discardEditChanges}
+            keepEditChanges={keepEditChanges}
           />
+        )}
 
-          <Route
-            path={RouteNames.tabDetails}
-            element={
-              <TabView
-                existsInServer={currentTabExists}
-                isEditMode={isEditMode}
-                promptDiscardChanges={promptDiscardChanges}
-                saveEditChanges={saveEditChanges}
-                scrollView={scrollViewRef}
-                tab={state.tab.document}
-                updateTab={updateTab}
-                user={state.user}
-              />
-            }
-          />
-        </Routes>
+        <ToastContainer position="bottom-center" />
+
+        <NavBar
+          createTab={createTab}
+          isCurrentTabDirty={isCurrentTabDirty}
+          promptDiscardChanges={promptDiscardChanges}
+          user={state.user}
+        />
+
+        <div
+          ref={scrollViewRef}
+          style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
+        >
+          <Routes>
+            <Route
+              path={RouteNames.home}
+              element={<HomeView createTab={createTab} user={state.user} />}
+            />
+
+            <Route
+              path={RouteNames.myTabs}
+              element={<MyTabsView createTab={createTab} user={state.user} />}
+            />
+
+            <Route
+              path={RouteNames.tabDetails}
+              element={
+                <TabView
+                  existsInServer={currentTabExists}
+                  isEditMode={isEditMode}
+                  promptDiscardChanges={promptDiscardChanges}
+                  saveEditChanges={saveEditChanges}
+                  scrollView={scrollViewRef}
+                  tab={state.tab.document}
+                  updateTab={updateTab}
+                  user={state.user}
+                />
+              }
+            />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </DispatchProvider.Provider>
   );
 };
