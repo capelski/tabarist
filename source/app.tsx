@@ -9,7 +9,6 @@ import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { QueryParameters, RouteNames } from './constants';
 import { DispatchProvider } from './dispatch-provider';
 import { getFirebaseContext } from './firebase-context';
-import { getTabRelativeUrl, tabOperations } from './operations';
 import { tabRepository } from './repositories';
 import { Tab } from './types';
 import { HomeView, MyTabsView, TabView } from './views';
@@ -37,6 +36,13 @@ export const App: React.FC<AppProps> = (props) => {
     );
   }, []);
 
+  useEffect(() => {
+    if (state.navigateTo) {
+      navigate(state.navigateTo);
+      dispatch({ type: ActionType.clearNavigation });
+    }
+  }, [state.navigateTo]);
+
   useBeforeUnload((event) => {
     if (state.tab.isDirty) {
       event.preventDefault();
@@ -47,26 +53,6 @@ export const App: React.FC<AppProps> = (props) => {
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.delete(parameter);
     setSearchParams(nextSearchParams);
-  };
-
-  const createTab = () => {
-    if (!state.user) {
-      dispatch({ type: ActionType.signInStart, payload: 'Sign in to start creating tabs' });
-      return;
-    }
-
-    if (state.tab.isDirty) {
-      dispatch({ type: ActionType.discardChangesPrompt });
-      return;
-    }
-
-    const tab = tabOperations.create(state.user.uid);
-    dispatch({
-      type: ActionType.setTab,
-      payload: { document: tab, isDraft: true, isEditMode: true },
-    });
-
-    navigate(getTabRelativeUrl(tab.id, true));
   };
 
   const discardEditChanges = () => {
@@ -109,22 +95,16 @@ export const App: React.FC<AppProps> = (props) => {
 
         <ToastContainer position="bottom-center" />
 
-        <NavBar createTab={createTab} isCurrentTabDirty={!!state.tab.isDirty} user={state.user} />
+        <NavBar isCurrentTabDirty={!!state.tab.isDirty} user={state.user} />
 
         <div
           ref={scrollViewRef}
           style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
         >
           <Routes>
-            <Route
-              path={RouteNames.home}
-              element={<HomeView createTab={createTab} user={state.user} />}
-            />
+            <Route path={RouteNames.home} element={<HomeView user={state.user} />} />
 
-            <Route
-              path={RouteNames.myTabs}
-              element={<MyTabsView createTab={createTab} user={state.user} />}
-            />
+            <Route path={RouteNames.myTabs} element={<MyTabsView user={state.user} />} />
 
             <Route
               path={RouteNames.tabDetails}

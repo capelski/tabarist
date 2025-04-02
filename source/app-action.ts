@@ -8,6 +8,12 @@ export type AppAction =
       payload: User | null;
     }
   | {
+      type: ActionType.clearNavigation;
+    }
+  | {
+      type: ActionType.createTab;
+    }
+  | {
       type: ActionType.discardChangesCancel;
     }
   | {

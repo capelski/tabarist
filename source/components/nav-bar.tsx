@@ -10,7 +10,6 @@ import { customerRepository } from '../repositories';
 
 export type NavBarProps = {
   isCurrentTabDirty: boolean;
-  createTab: () => void;
   user: User | null;
 };
 
@@ -121,7 +120,9 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
             <li className="nav-item">
               <a
                 className="nav-link mb-2 mb-sm-0"
-                onClick={props.createTab}
+                onClick={() => {
+                  dispatch({ type: ActionType.createTab });
+                }}
                 style={{ cursor: 'pointer' }}
               >
                 New tab

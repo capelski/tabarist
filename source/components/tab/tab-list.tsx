@@ -1,14 +1,15 @@
 import { User } from 'firebase/auth';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { ActionType } from '../../action-type';
 import { QueryParameters } from '../../constants';
+import { DispatchProvider } from '../../dispatch-provider';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../../types';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
 import { TabListItem } from './tab-list-item';
 
 export type TabListBaseProps = {
-  createTab: () => void;
   user: User | null;
 };
 
@@ -26,6 +27,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
   });
   const [tabParams, setTabParams] = useState<TabQueryParameters>();
 
+  const dispatch = useContext(DispatchProvider);
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -157,7 +159,12 @@ export const TabList: React.FC<TabListProps> = (props) => {
       {tabPageResponse.tabs.length === 0 && !loading ? (
         <p style={{ textAlign: 'center' }}>
           No tabs to display. Create a tab by clicking on{' '}
-          <a onClick={props.createTab} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+          <a
+            onClick={() => {
+              dispatch({ type: ActionType.createTab });
+            }}
+            style={{ cursor: 'pointer', fontWeight: 'bold' }}
+          >
             New tab
           </a>
           .

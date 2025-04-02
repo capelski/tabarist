@@ -1,6 +1,7 @@
 import { ActionType } from './action-type';
 import { AppAction } from './app-action';
 import { AppState } from './app-state';
+import { getTabRelativeUrl, tabOperations } from './operations';
 
 const getDiscardChangesState = (state: AppState): AppState => ({
   ...state,
@@ -14,11 +15,50 @@ const getDiscardChangesState = (state: AppState): AppState => ({
   },
 });
 
+const getDiscardPromptState = (state: AppState): AppState => ({
+  ...state,
+  tab: {
+    ...state.tab,
+    discardChangesModal: true,
+  },
+});
+
 export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.authStateChanged) {
     return {
       ...state,
       user: action.payload,
+    };
+  }
+  if (action.type === ActionType.clearNavigation) {
+    return {
+      ...state,
+      navigateTo: undefined,
+    };
+  }
+
+  if (action.type === ActionType.createTab) {
+    if (!state.user) {
+      return {
+        ...state,
+        signInDialog: { message: 'Sign in to start creating tabs' },
+      };
+    }
+
+    if (state.tab.isDirty) {
+      return getDiscardPromptState(state);
+    }
+
+    const document = tabOperations.create(state.user.uid);
+    return {
+      ...state,
+      navigateTo: getTabRelativeUrl(document.id, true),
+      tab: {
+        document,
+        isDraft: true,
+        isEditMode: true,
+        originalDocument: JSON.stringify(document),
+      },
     };
   }
 
@@ -37,15 +77,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   }
 
   if (action.type === ActionType.discardChangesPrompt) {
-    return state.tab.isDirty
-      ? {
-          ...state,
-          tab: {
-            ...state.tab,
-            discardChangesModal: true,
-          },
-        }
-      : getDiscardChangesState(state);
+    return state.tab.isDirty ? getDiscardPromptState(state) : getDiscardChangesState(state);
   }
 
   if (action.type === ActionType.setTab) {

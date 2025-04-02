@@ -1,5 +1,7 @@
 export enum ActionType {
   authStateChanged = 'authStateChanged',
+  clearNavigation = 'clearNavigation',
+  createTab = 'createTab',
   discardChangesCancel = 'discardChangesCancel',
   discardChangesConfirm = 'discardChangesConfirm',
   discardChangesPrompt = 'discardChangesPrompt',

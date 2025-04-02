@@ -3,6 +3,7 @@ import { AppProps } from './app';
 import { Tab } from './types';
 
 export type AppState = {
+  navigateTo?: string;
   signInDialog:
     | {
         message?: string;
