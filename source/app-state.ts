@@ -9,7 +9,13 @@ export type AppState = {
       }
     | undefined;
   tab: {
+    discardChangesModal?: boolean;
     document: Tab | undefined;
+    isDirty?: boolean;
+    isDraft?: boolean;
+    isEditMode?: boolean;
+    /** Snapshot of the unmodified document */
+    originalDocument?: string;
   };
   user: User | null;
 };

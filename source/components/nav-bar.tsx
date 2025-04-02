@@ -11,7 +11,6 @@ import { customerRepository } from '../repositories';
 export type NavBarProps = {
   isCurrentTabDirty: boolean;
   createTab: () => void;
-  promptDiscardChanges: () => void;
   user: User | null;
 };
 
@@ -25,7 +24,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
 
   const manageSubscription = async () => {
     if (props.isCurrentTabDirty) {
-      props.promptDiscardChanges();
+      dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
 
@@ -47,7 +46,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
 
   const signOut = () => {
     if (props.isCurrentTabDirty) {
-      props.promptDiscardChanges();
+      dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
 
@@ -63,7 +62,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
     }
 
     if (props.isCurrentTabDirty) {
-      props.promptDiscardChanges();
+      dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
 
@@ -96,7 +95,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
           className="navbar-brand"
           onClick={(event) => {
             if (props.isCurrentTabDirty) {
-              props.promptDiscardChanges();
+              dispatch({ type: ActionType.discardChangesPrompt });
               event.preventDefault();
             }
           }}
@@ -147,7 +146,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                     className="dropdown-item"
                     onClick={(event) => {
                       if (props.isCurrentTabDirty) {
-                        props.promptDiscardChanges();
+                        dispatch({ type: ActionType.discardChangesPrompt });
                         event.preventDefault();
                       }
                     }}

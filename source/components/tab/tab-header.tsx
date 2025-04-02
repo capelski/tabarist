@@ -1,24 +1,26 @@
-import React, { MutableRefObject, useState } from 'react';
+import React, { MutableRefObject, useContext, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { ActionType } from '../../action-type';
 import { editSymbol, QueryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
+import { DispatchProvider } from '../../dispatch-provider';
 import { tabOperations } from '../../operations';
 import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
-  existsInServer: boolean;
+  isDraft?: boolean;
   isEditMode: boolean;
   isTabOwner: boolean;
   playTimeoutRef: MutableRefObject<number>;
-  promptDiscardChanges: () => void;
   saveEditChanges: () => void;
   tab: Tab;
-  updateTab: (tab: Tab, options?: { setExists?: boolean; setOriginal?: boolean }) => void;
+  updateTab: (tab: Tab) => void;
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   const [deletingTabId, setDeletingTabId] = useState('');
 
+  const dispatch = useContext(DispatchProvider);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -34,7 +36,10 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
     clearTimeout(props.playTimeoutRef.current);
 
     const nextTab = tabOperations.resetActiveSlot(props.tab);
-    props.updateTab(nextTab, { setOriginal: true });
+    dispatch({
+      type: ActionType.setTab,
+      payload: { document: nextTab, isDraft: props.isDraft, isEditMode: true },
+    });
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.set(QueryParameters.editMode, 'true');
@@ -84,7 +89,9 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 </button>
                 <button
                   className="btn btn-outline-danger"
-                  onClick={props.promptDiscardChanges}
+                  onClick={() => {
+                    dispatch({ type: ActionType.discardChangesPrompt });
+                  }}
                   style={{ marginLeft: 8 }}
                   type="button"
                 >
@@ -101,7 +108,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 >
                   {editSymbol}
                 </button>
-                {props.existsInServer && (
+                {!props.isDraft && (
                   <button
                     className="btn btn-outline-danger"
                     onClick={removeTab}

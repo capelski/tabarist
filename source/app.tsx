@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import { Route, Routes, useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
 import { ActionType } from './action-type';
@@ -21,16 +21,9 @@ export type AppProps = {
 export const App: React.FC<AppProps> = (props) => {
   const [state, dispatch] = useReducer(appReducer, getInitialState(props));
 
-  const [currentTabExists, setCurrentTabExists] = useState(!!props.tab);
-  const [currentTabOriginal, setCurrentTabOriginal] = useState('');
-  const [currentTabDiscarding, setCurrentTabDiscarding] = useState(false);
-
   const [searchParams, setSearchParams] = useSearchParams();
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const isEditMode = !!currentTabOriginal;
-  const isCurrentTabDirty =
-    !!state.tab && !!currentTabOriginal && currentTabOriginal !== JSON.stringify(state.tab);
 
   useEffect(() => {
     getFirebaseContext().auth.onAuthStateChanged(
@@ -45,7 +38,7 @@ export const App: React.FC<AppProps> = (props) => {
   }, []);
 
   useBeforeUnload((event) => {
-    if (isCurrentTabDirty) {
+    if (state.tab.isDirty) {
       event.preventDefault();
     }
   });
@@ -62,35 +55,23 @@ export const App: React.FC<AppProps> = (props) => {
       return;
     }
 
-    if (isCurrentTabDirty) {
-      promptDiscardChanges();
+    if (state.tab.isDirty) {
+      dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
 
     const tab = tabOperations.create(state.user.uid);
-    updateTab(tab, { setExists: false, setOriginal: true });
+    dispatch({
+      type: ActionType.setTab,
+      payload: { document: tab, isDraft: true, isEditMode: true },
+    });
 
     navigate(getTabRelativeUrl(tab.id, true));
   };
 
   const discardEditChanges = () => {
-    dispatch({ type: ActionType.updateTab, payload: JSON.parse(currentTabOriginal) });
-    setCurrentTabOriginal('');
-    setCurrentTabDiscarding(false);
-
+    dispatch({ type: ActionType.discardChangesConfirm });
     clearSearchParams(QueryParameters.editMode);
-  };
-
-  const keepEditChanges = () => {
-    setCurrentTabDiscarding(false);
-  };
-
-  const promptDiscardChanges = () => {
-    if (isCurrentTabDirty) {
-      setCurrentTabDiscarding(true);
-    } else {
-      discardEditChanges();
-    }
   };
 
   const saveEditChanges = async () => {
@@ -100,24 +81,9 @@ export const App: React.FC<AppProps> = (props) => {
 
     await tabRepository.set(state.tab.document, state.user.uid);
 
-    setCurrentTabExists(true);
-    setCurrentTabOriginal('');
+    dispatch({ type: ActionType.setTab, payload: { document: state.tab.document } });
+
     clearSearchParams(QueryParameters.editMode);
-  };
-
-  const updateTab = (
-    nextTab: Tab,
-    options: { setExists?: boolean; setOriginal?: boolean } = {},
-  ) => {
-    dispatch({ type: ActionType.updateTab, payload: nextTab });
-
-    if (options.setExists !== undefined) {
-      setCurrentTabExists(options.setExists);
-    }
-
-    if (options.setOriginal) {
-      setCurrentTabOriginal(JSON.stringify(nextTab));
-    }
   };
 
   return (
@@ -137,21 +103,13 @@ export const App: React.FC<AppProps> = (props) => {
           </SignInModal>
         )}
 
-        {currentTabDiscarding && (
-          <TabDiscardModal
-            discardEditChanges={discardEditChanges}
-            keepEditChanges={keepEditChanges}
-          />
+        {state.tab.discardChangesModal && (
+          <TabDiscardModal discardEditChanges={discardEditChanges} />
         )}
 
         <ToastContainer position="bottom-center" />
 
-        <NavBar
-          createTab={createTab}
-          isCurrentTabDirty={isCurrentTabDirty}
-          promptDiscardChanges={promptDiscardChanges}
-          user={state.user}
-        />
+        <NavBar createTab={createTab} isCurrentTabDirty={!!state.tab.isDirty} user={state.user} />
 
         <div
           ref={scrollViewRef}
@@ -172,13 +130,11 @@ export const App: React.FC<AppProps> = (props) => {
               path={RouteNames.tabDetails}
               element={
                 <TabView
-                  existsInServer={currentTabExists}
-                  isEditMode={isEditMode}
-                  promptDiscardChanges={promptDiscardChanges}
+                  isDraft={state.tab.isDraft}
+                  isEditMode={!!state.tab.isEditMode}
                   saveEditChanges={saveEditChanges}
                   scrollView={scrollViewRef}
                   tab={state.tab.document}
-                  updateTab={updateTab}
                   user={state.user}
                 />
               }

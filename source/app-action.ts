@@ -8,6 +8,23 @@ export type AppAction =
       payload: User | null;
     }
   | {
+      type: ActionType.discardChangesCancel;
+    }
+  | {
+      type: ActionType.discardChangesConfirm;
+    }
+  | {
+      type: ActionType.discardChangesPrompt;
+    }
+  | {
+      type: ActionType.setTab;
+      payload: {
+        isDraft?: boolean;
+        isEditMode?: boolean;
+        document: Tab;
+      };
+    }
+  | {
       type: ActionType.signInFinish;
     }
   | {

@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { ActionType } from '../../action-type';
+import { DispatchProvider } from '../../dispatch-provider';
 import { Modal } from '../common/modal';
 
 export type TabDiscardModalProps = {
   discardEditChanges: () => void;
-  keepEditChanges: () => void;
 };
 
 export const TabDiscardModal: React.FC<TabDiscardModalProps> = (props) => {
+  const dispatch = useContext(DispatchProvider);
+
+  const cancelDiscardChanges = () => {
+    dispatch({ type: ActionType.discardChangesCancel });
+  };
+
   return (
-    <Modal closeHandler={props.keepEditChanges} hideCloseButton={true}>
+    <Modal closeHandler={cancelDiscardChanges} hideCloseButton={true}>
       <p>Do you want to discard the unsaved changes?</p>
       <div>
         <button
@@ -19,7 +26,7 @@ export const TabDiscardModal: React.FC<TabDiscardModalProps> = (props) => {
         >
           Discard
         </button>
-        <button className="btn btn-outline-secondary" onClick={props.keepEditChanges} type="button">
+        <button className="btn btn-outline-secondary" onClick={cancelDiscardChanges} type="button">
           Cancel
         </button>
       </div>
