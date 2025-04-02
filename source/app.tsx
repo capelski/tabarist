@@ -107,6 +107,7 @@ export const App: React.FC<AppProps> = (props) => {
               path={RouteNames.tabDetails}
               element={
                 <TabView
+                  activeSlot={state.tab.activeSlot}
                   isDraft={state.tab.isDraft}
                   isEditMode={!!state.tab.isEditMode}
                   saveEditChanges={saveEditChanges}

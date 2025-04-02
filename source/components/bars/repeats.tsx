@@ -1,10 +1,11 @@
 import React from 'react';
 import { inputWidth, repeatsHeight, sectionColor, sectionNameMaxWidth } from '../../constants';
 import { tabOperations } from '../../operations';
-import { BarContainer, Tab } from '../../types';
+import { ActiveSlot, BarContainer, Tab } from '../../types';
 import { SectionPicker, SectionPickerProps } from './section-picker';
 
 export type RepeatsProps = {
+  activeSlot: ActiveSlot | undefined;
   canChangeSection: boolean;
   canRepeat: boolean;
   container: BarContainer;
@@ -17,8 +18,8 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
   const { repeats } = props.container.originalBar;
   const hasRepeats = repeats && repeats > 1;
   const remainingRepeats =
-    props.tab.activeSlot?.barContainer.positionOfFirstBar === props.container.positionOfFirstBar &&
-    props.tab.activeSlot?.repeats;
+    props.activeSlot?.barContainer.positionOfFirstBar === props.container.positionOfFirstBar &&
+    props.activeSlot?.repeats;
 
   const changeSection: SectionPickerProps['changeSection'] = (sectionIndex) => {
     const nextTab = tabOperations.changeSection(

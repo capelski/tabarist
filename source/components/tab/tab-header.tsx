@@ -34,11 +34,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
     clearTimeout(props.playTimeoutRef.current);
 
-    const nextTab = tabOperations.resetActiveSlot(props.tab);
-    dispatch({
-      type: ActionType.setTab,
-      payload: { document: nextTab, isDraft: props.isDraft, isEditMode: true },
-    });
+    dispatch({ type: ActionType.enterEditMode });
 
     const nextSearchParams = new URLSearchParams(searchParams);
     nextSearchParams.set(QueryParameters.editMode, 'true');

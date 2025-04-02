@@ -2,43 +2,11 @@ import { User } from 'firebase/auth';
 import { nanoid } from 'nanoid';
 import { getTitleWords } from '../common';
 import { BarType, NonReferenceBarType } from '../constants';
-import {
-  Bar,
-  BarBase,
-  BarContainer,
-  ChordBar,
-  DiminishedTab,
-  NonSectionBar,
-  PickingBar,
-  Rhythm,
-  Section,
-  Tab,
-} from '../types';
+import { Bar, BarBase, DiminishedTab, NonSectionBar, Rhythm, Section, Tab } from '../types';
 import { barOperations } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
 import { rhythmOperations } from './rhythm.operations';
 import { sectionOperations } from './section.operations';
-
-const getNextActiveSlot = (
-  barContainers: BarContainer[],
-  startingPosition: number,
-  repeats?: number,
-): Tab['activeSlot'] | undefined => {
-  return barContainers
-    .slice(startingPosition)
-    .reduce<Tab['activeSlot'] | undefined>((reduced, barContainer) => {
-      return (
-        reduced ||
-        (barContainer.renderedBar
-          ? {
-              barContainer: barContainer as BarContainer<ChordBar | PickingBar>,
-              repeats: repeats ?? barContainer.originalBar.repeats ?? 0,
-              slotIndex: 0,
-            }
-          : undefined)
-      );
-    }, undefined);
-};
 
 const applyBarsOperation = (
   tab: Tab,
@@ -114,7 +82,6 @@ export const tabOperations = {
   augmentTab: (diminishedTab: DiminishedTab): Tab => {
     return {
       ...diminishedTab,
-      activeSlot: undefined,
       bars: diminishedTab.bars.map(barOperations.augmentBar),
       copying: undefined,
       moving: undefined,
@@ -189,7 +156,6 @@ export const tabOperations = {
   create: (ownerId: User['uid']): Tab => {
     return {
       backingTrack: undefined,
-      activeSlot: undefined,
       bars: [],
       capo: undefined,
       copying: undefined,
@@ -205,7 +171,7 @@ export const tabOperations = {
   },
 
   diminishTab: (tab: Tab): DiminishedTab => {
-    const { activeSlot, copying, moving, ...rest } = tab;
+    const { copying, moving, ...rest } = tab;
 
     return {
       ...rest,
@@ -332,13 +298,6 @@ export const tabOperations = {
     };
   },
 
-  resetActiveSlot: (tab: Tab): Tab => {
-    return {
-      ...tab,
-      activeSlot: undefined,
-    };
-  },
-
   setChordBarRhythm: (tab: Tab, barIndex: number, rhythm: Rhythm, inSection?: Section): Tab => {
     return applyBarsOperation(
       tab,
@@ -389,57 +348,6 @@ export const tabOperations = {
         barOperations.setPickingBarSlotValue(bars, barIndex, stringIndex, value, indexesPath),
       inSection,
     );
-  },
-
-  updateActiveSlot: (tab: Tab, barContainers: BarContainer[]): Tab => {
-    if (tab.bars.length === 0) {
-      return tab;
-    }
-
-    if (tab.activeSlot === undefined) {
-      return {
-        ...tab,
-        activeSlot: getNextActiveSlot(barContainers, 0),
-      };
-    }
-
-    const { inSectionBar, isLastInSectionBar, position, positionOfFirstBar, renderedBar } =
-      tab.activeSlot.barContainer;
-
-    const slotsLength =
-      renderedBar.type === BarType.chord
-        ? renderedBar.slots.length
-        : renderedBar.chordSupport.length;
-
-    const isLastSlot = tab.activeSlot.slotIndex === slotsLength - 1;
-    if (!isLastSlot) {
-      return {
-        ...tab,
-        activeSlot: {
-          ...tab.activeSlot,
-          slotIndex: tab.activeSlot.slotIndex + 1,
-        },
-      };
-    }
-
-    const hasRemainingRepeats = tab.activeSlot.repeats > 1;
-    const mustRepeat = hasRemainingRepeats && (!inSectionBar || isLastInSectionBar);
-    if (mustRepeat) {
-      const repeatPosition = positionOfFirstBar ?? position;
-      return {
-        ...tab,
-        activeSlot: getNextActiveSlot(barContainers, repeatPosition, tab.activeSlot.repeats - 1),
-      };
-    }
-
-    const nextRepeats =
-      inSectionBar && (!isLastInSectionBar || hasRemainingRepeats)
-        ? tab.activeSlot.repeats
-        : undefined;
-    return {
-      ...tab,
-      activeSlot: getNextActiveSlot(barContainers, position + 1, nextRepeats),
-    };
   },
 
   updateBackingTrack: (tab: Tab, backingTrack: string | undefined): Tab => {

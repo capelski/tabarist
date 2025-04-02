@@ -1,8 +1,15 @@
 import { User } from 'firebase/auth';
-import { Tab } from '../types';
+import { BarContainer, Tab } from '../types';
 import { ActionType } from './action-type';
 
 export type AppAction =
+  | {
+      type: ActionType.activeSlotClear;
+    }
+  | {
+      type: ActionType.activeSlotUpdate;
+      payload: BarContainer[];
+    }
   | {
       type: ActionType.authStateChanged;
       payload: User | null;
@@ -23,9 +30,11 @@ export type AppAction =
       type: ActionType.discardChangesPrompt;
     }
   | {
+      type: ActionType.enterEditMode;
+    }
+  | {
       type: ActionType.setTab;
       payload: {
-        isDraft?: boolean;
         isEditMode?: boolean;
         document: Tab;
       };

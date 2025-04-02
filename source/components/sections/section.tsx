@@ -64,6 +64,7 @@ export const SectionComponent: React.FC<SectionProps> = (props) => {
       {isExpanded && (
         <BarGroup
           {...props}
+          activeSlot={undefined}
           barContainers={barsToBarContainers(props.tab, props.section.bars, {
             inSection: props.section,
           })}

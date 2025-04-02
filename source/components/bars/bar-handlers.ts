@@ -1,8 +1,9 @@
 import { activeColor, NonReferenceBarType } from '../../constants';
 import { tabOperations } from '../../operations';
-import { Section, Tab } from '../../types';
+import { ActiveSlot, Section, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
+  activeSlot: ActiveSlot | undefined;
   backgroundColor: string;
   canUpdate: boolean;
   isEditMode: boolean;
@@ -32,7 +33,7 @@ export const copyBarEnd = (
 };
 
 export const getSlotBackgroundColor = (
-  activeSlot: Tab['activeSlot'],
+  activeSlot: ActiveSlot | undefined,
   position: number,
   slotIndex: number,
 ) => {

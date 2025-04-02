@@ -1,6 +1,6 @@
 import React, { RefObject, useEffect, useRef } from 'react';
 import { barControlsHeight, BarType, referenceColor, sectionColor } from '../../constants';
-import { BarContainer, ChordBar, PickingBar, Tab } from '../../types';
+import { ActiveSlot, BarContainer, ChordBar, PickingBar, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarControls } from './bar-controls';
 import { BarComponentBaseProps } from './bar-handlers';
@@ -9,6 +9,7 @@ import { PickingBarComponent } from './picking-bar';
 import { Repeats } from './repeats';
 
 export type BarContainerComponentProps = {
+  activeSlot: ActiveSlot | undefined;
   container: BarContainer;
   isEditMode: boolean;
   scrollView: RefObject<HTMLDivElement> | undefined;
@@ -20,6 +21,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
   const divRef = useRef<HTMLDivElement>(null);
 
   const barBaseProps: BarComponentBaseProps = {
+    activeSlot: props.activeSlot,
     backgroundColor: props.isEditMode
       ? props.container.inSectionBar
         ? sectionColor
@@ -39,7 +41,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
 
   useEffect(() => {
     if (
-      props.tab.activeSlot?.barContainer.position === props.container.position &&
+      props.activeSlot?.barContainer.position === props.container.position &&
       props.scrollView?.current &&
       divRef.current
     ) {
@@ -48,7 +50,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         behavior: 'smooth',
       });
     }
-  }, [props.tab.activeSlot]);
+  }, [props.activeSlot]);
 
   return (
     <div
@@ -84,6 +86,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         >
           {!props.container.inSection && (
             <Repeats
+              activeSlot={props.activeSlot}
               canChangeSection={canChangeSection}
               canRepeat={canRepeat}
               container={props.container}

@@ -6,10 +6,11 @@ import { QueryParameters } from '../constants';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
-import { Tab } from '../types';
+import { ActiveSlot, Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
+  activeSlot: ActiveSlot | undefined;
   isDraft?: boolean;
   isEditMode: boolean;
   saveEditChanges: () => void;
@@ -53,7 +54,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     ) {
       dispatch({
         type: ActionType.setTab,
-        payload: { document: props.tab, isDraft: props.isDraft },
+        payload: { document: props.tab },
       });
     }
   }, [searchParams]);
@@ -105,6 +106,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       )}
 
       <BarGroup
+        activeSlot={props.activeSlot}
         barContainers={barContainers}
         barsNumber={props.tab.bars.length}
         inSection={undefined}
@@ -115,6 +117,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       />
 
       <TabPlay
+        activeSlot={props.activeSlot}
         barContainers={barContainers}
         isEditMode={props.isEditMode}
         isTabOwner={isTabOwner}

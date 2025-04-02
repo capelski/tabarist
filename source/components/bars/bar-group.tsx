@@ -1,10 +1,11 @@
 import React, { RefObject } from 'react';
 import { barMinWidth } from '../../constants';
-import { BarContainer, Section, Tab } from '../../types';
+import { ActiveSlot, BarContainer, Section, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarContainerComponent } from './bar-container';
 
 export type BarGroupProps = {
+  activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   barsNumber: number;
   isEditMode: boolean;

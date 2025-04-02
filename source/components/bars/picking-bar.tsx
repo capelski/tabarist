@@ -23,7 +23,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
 
   const getBackgroundColor = (slot: Slot) => {
     return (
-      getSlotBackgroundColor(props.tab.activeSlot, props.container.position, slot.index) ??
+      getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index) ??
       props.backgroundColor
     );
   };

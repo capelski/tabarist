@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
 import { AppProps } from '../app';
-import { Tab } from '../types';
+import { ActiveSlot, Tab } from '../types';
 
 export type AppState = {
   navigateTo?: string;
@@ -10,6 +10,7 @@ export type AppState = {
       }
     | undefined;
   tab: {
+    activeSlot?: ActiveSlot;
     discardChangesModal?: boolean;
     document: Tab | undefined;
     isDirty?: boolean;

@@ -1,10 +1,13 @@
 export enum ActionType {
+  activeSlotClear = 'activeSlotClear',
+  activeSlotUpdate = 'activeSlotUpdate',
   authStateChanged = 'authStateChanged',
   clearNavigation = 'clearNavigation',
   createTab = 'createTab',
   discardChangesCancel = 'discardChangesCancel',
   discardChangesConfirm = 'discardChangesConfirm',
   discardChangesPrompt = 'discardChangesPrompt',
+  enterEditMode = 'enterEditMode',
   setTab = 'setTab',
   signInFinish = 'signInFinish',
   signInStart = 'signInStart',

@@ -1,3 +1,4 @@
+export * from './active-slot.type';
 export * from './anchor-direction.type';
 export * from './bar-container.type';
 export * from './bar.type';

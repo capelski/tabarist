@@ -1,9 +1,11 @@
-import React, { MutableRefObject, useEffect } from 'react';
+import React, { MutableRefObject, useContext, useEffect } from 'react';
 import { maxTempo, minTempo } from '../../constants';
 import { tabOperations } from '../../operations';
-import { BarContainer, Tab } from '../../types';
+import { ActionType, DispatchProvider } from '../../state';
+import { ActiveSlot, BarContainer, Tab } from '../../types';
 
 export type TabPlayProps = {
+  activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   isEditMode: boolean;
   isTabOwner: boolean;
@@ -16,14 +18,16 @@ let activeSlotLastDelay = 0;
 let activeSlotLastRender = 0;
 
 export const TabPlay: React.FC<TabPlayProps> = (props) => {
+  const dispatch = useContext(DispatchProvider);
+
   const updateActiveSlot = () => {
-    if (props.tab.tempo && props.tab.activeSlot) {
+    if (props.tab.tempo && props.activeSlot) {
       const msPerBeat = 60_000 / props.tab.tempo;
 
       activeSlotLastDelay = Date.now() - activeSlotLastRender;
 
       props.playTimeoutRef.current = window.setTimeout(() => {
-        props.updateTab(tabOperations.updateActiveSlot(props.tab, props.barContainers));
+        dispatch({ type: ActionType.activeSlotUpdate, payload: props.barContainers });
         activeSlotLastRender = Date.now();
       }, msPerBeat - activeSlotLastDelay);
     } else {
@@ -33,16 +37,16 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
     }
   };
 
-  useEffect(updateActiveSlot, [props.tab.activeSlot]);
+  useEffect(updateActiveSlot, [props.activeSlot]);
 
   const enterPlayMode = () => {
-    props.updateTab(tabOperations.updateActiveSlot(props.tab, props.barContainers));
+    dispatch({ type: ActionType.activeSlotUpdate, payload: props.barContainers });
     activeSlotLastRender = Date.now();
   };
 
   const exitPlayMode = () => {
     clearTimeout(props.playTimeoutRef.current);
-    props.updateTab(tabOperations.resetActiveSlot(props.tab));
+    dispatch({ type: ActionType.activeSlotClear });
   };
 
   return (
@@ -61,7 +65,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
         <span className="input-group-text">♫</span>
         <input
           className="form-control"
-          disabled={!!props.tab.activeSlot}
+          disabled={!!props.activeSlot}
           onBlur={() => {
             if (props.tab.tempo) {
               const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
@@ -81,7 +85,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
         />
 
         {!props.isEditMode &&
-          (props.tab.activeSlot ? (
+          (props.activeSlot ? (
             <button className="btn btn-danger" onClick={exitPlayMode} type="button">
               Stop
             </button>
