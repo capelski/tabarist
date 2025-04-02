@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
+import { Tab } from '../types';
 import { ActionType } from './action-type';
-import { Tab } from './types';
 
 export type AppAction =
   | {

@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth';
-import { AppProps } from './app';
-import { Tab } from './types';
+import { AppProps } from '../app';
+import { Tab } from '../types';
 
 export type AppState = {
   navigateTo?: string;

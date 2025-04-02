@@ -1,9 +1,8 @@
 import { User } from 'firebase/auth';
 import React, { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
-import { ActionType } from '../../action-type';
 import { QueryParameters } from '../../constants';
-import { DispatchProvider } from '../../dispatch-provider';
+import { ActionType, DispatchProvider } from '../../state';
 import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../../types';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';

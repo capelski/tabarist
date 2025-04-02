@@ -2,11 +2,10 @@ import { User } from 'firebase/auth';
 import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
-import { ActionType } from '../action-type';
 import { RouteNames } from '../constants';
-import { DispatchProvider } from '../dispatch-provider';
 import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
+import { ActionType, DispatchProvider } from '../state';
 
 export type NavBarProps = {
   isCurrentTabDirty: boolean;

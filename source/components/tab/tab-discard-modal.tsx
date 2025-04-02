@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { ActionType } from '../../action-type';
-import { DispatchProvider } from '../../dispatch-provider';
+import { ActionType, DispatchProvider } from '../../state';
 import { Modal } from '../common/modal';
 
 export type TabDiscardModalProps = {

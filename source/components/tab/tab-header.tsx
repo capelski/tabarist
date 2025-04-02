@@ -1,9 +1,8 @@
 import React, { MutableRefObject, useContext, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { ActionType } from '../../action-type';
 import { editSymbol, QueryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
-import { DispatchProvider } from '../../dispatch-provider';
 import { tabOperations } from '../../operations';
+import { ActionType, DispatchProvider } from '../../state';
 import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 

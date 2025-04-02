@@ -1,12 +1,11 @@
 import { User } from 'firebase/auth';
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router';
-import { ActionType } from '../action-type';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabHeader, TabPlay } from '../components';
 import { QueryParameters } from '../constants';
-import { DispatchProvider } from '../dispatch-provider';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
+import { ActionType, DispatchProvider } from '../state';
 import { Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 

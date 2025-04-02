@@ -1,9 +1,8 @@
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React, { PropsWithChildren, useContext } from 'react';
 import { toast } from 'react-toastify';
-import { ActionType } from '../../action-type';
-import { DispatchProvider } from '../../dispatch-provider';
 import { getFirebaseContext } from '../../firebase-context';
+import { ActionType, DispatchProvider } from '../../state';
 import { Modal } from '../common/modal';
 
 export type SignInModalProps = PropsWithChildren<{}>;

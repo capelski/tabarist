@@ -1,7 +1,7 @@
+import { getTabRelativeUrl, tabOperations } from '../operations';
 import { ActionType } from './action-type';
 import { AppAction } from './app-action';
 import { AppState } from './app-state';
-import { getTabRelativeUrl, tabOperations } from './operations';
 
 const getDiscardChangesState = (state: AppState): AppState => ({
   ...state,

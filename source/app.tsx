@@ -1,15 +1,12 @@
 import React, { useEffect, useReducer, useRef } from 'react';
 import { Route, Routes, useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
-import { ActionType } from './action-type';
-import { appReducer } from './app-reducer';
-import { getInitialState } from './app-state';
 import { NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { QueryParameters, RouteNames } from './constants';
-import { DispatchProvider } from './dispatch-provider';
 import { getFirebaseContext } from './firebase-context';
 import { tabRepository } from './repositories';
+import { ActionType, appReducer, DispatchProvider, getInitialState } from './state';
 import { Tab } from './types';
 import { HomeView, MyTabsView, TabView } from './views';
 
