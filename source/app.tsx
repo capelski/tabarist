@@ -1,7 +1,9 @@
-import { User } from 'firebase/auth';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { Route, Routes, useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
+import { ActionType } from './action-type';
+import { appReducer } from './app-reducer';
+import { getInitialState } from './app-state';
 import { NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { QueryParameters, RouteNames } from './constants';
@@ -16,26 +18,29 @@ export type AppProps = {
 };
 
 export const App: React.FC<AppProps> = (props) => {
-  const [currentTab, setCurrentTab] = useState(props.tab);
+  const [state, dispatch] = useReducer(appReducer, getInitialState(props));
+
   const [currentTabExists, setCurrentTabExists] = useState(!!props.tab);
   const [currentTabOriginal, setCurrentTabOriginal] = useState('');
   const [currentTabDiscarding, setCurrentTabDiscarding] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
-  const [signingInMessage, setSigningInMessage] = useState<string>();
-  const [user, setUser] = useState<User | null>(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const isEditMode = !!currentTabOriginal;
   const isCurrentTabDirty =
-    !!currentTab && !!currentTabOriginal && currentTabOriginal !== JSON.stringify(currentTab);
+    !!state.tab && !!currentTabOriginal && currentTabOriginal !== JSON.stringify(state.tab);
 
   useEffect(() => {
-    getFirebaseContext().auth.onAuthStateChanged(setUser, (error) => {
-      console.log(error);
-      toast('Could not reach the user account', { type: 'error' });
-    });
+    getFirebaseContext().auth.onAuthStateChanged(
+      (user) => {
+        dispatch({ type: ActionType.authStateChanged, payload: user });
+      },
+      (error) => {
+        console.log(error);
+        toast('Could not reach the user account', { type: 'error' });
+      },
+    );
   }, []);
 
   useBeforeUnload((event) => {
@@ -51,9 +56,8 @@ export const App: React.FC<AppProps> = (props) => {
   };
 
   const createTab = () => {
-    if (!user) {
-      setSigningInMessage('Sign in to start creating tabs');
-      startSignIn();
+    if (!state.user) {
+      startSignIn('Sign in to start creating tabs');
       return;
     }
 
@@ -62,14 +66,14 @@ export const App: React.FC<AppProps> = (props) => {
       return;
     }
 
-    const tab = tabOperations.create(user.uid);
+    const tab = tabOperations.create(state.user.uid);
     updateTab(tab, { setExists: false, setOriginal: true });
 
     navigate(getTabRelativeUrl(tab.id, true));
   };
 
   const discardEditChanges = () => {
-    setCurrentTab(JSON.parse(currentTabOriginal));
+    dispatch({ type: ActionType.updateTab, payload: JSON.parse(currentTabOriginal) });
     setCurrentTabOriginal('');
     setCurrentTabDiscarding(false);
 
@@ -77,8 +81,7 @@ export const App: React.FC<AppProps> = (props) => {
   };
 
   const finishSignIn = () => {
-    setSigningIn(false);
-    setSigningInMessage(undefined);
+    dispatch({ type: ActionType.signInFinish });
   };
 
   const keepEditChanges = () => {
@@ -94,26 +97,26 @@ export const App: React.FC<AppProps> = (props) => {
   };
 
   const saveEditChanges = async () => {
-    if (!currentTab || !user) {
+    if (!state.tab.document || !state.user) {
       return;
     }
 
-    await tabRepository.set(currentTab, user.uid);
+    await tabRepository.set(state.tab.document, state.user.uid);
 
     setCurrentTabExists(true);
     setCurrentTabOriginal('');
     clearSearchParams(QueryParameters.editMode);
   };
 
-  const startSignIn = () => {
-    setSigningIn(true);
+  const startSignIn = (message?: string) => {
+    dispatch({ type: ActionType.signInStart, payload: message });
   };
 
   const updateTab = (
     nextTab: Tab,
     options: { setExists?: boolean; setOriginal?: boolean } = {},
   ) => {
-    setCurrentTab(nextTab);
+    dispatch({ type: ActionType.updateTab, payload: nextTab });
 
     if (options.setExists !== undefined) {
       setCurrentTabExists(options.setExists);
@@ -134,9 +137,9 @@ export const App: React.FC<AppProps> = (props) => {
         overflow: 'hidden',
       }}
     >
-      {signingIn && (
+      {state.signInDialog && (
         <SignInModal finishSignIn={finishSignIn}>
-          {signingInMessage && <p>{signingInMessage}</p>}
+          {state.signInDialog.message && <p>{state.signInDialog.message}</p>}
         </SignInModal>
       )}
 
@@ -153,18 +156,21 @@ export const App: React.FC<AppProps> = (props) => {
         isCurrentTabDirty={isCurrentTabDirty}
         promptDiscardChanges={promptDiscardChanges}
         startSignIn={startSignIn}
-        user={user}
+        user={state.user}
       />
       <div
         ref={scrollViewRef}
         style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
       >
         <Routes>
-          <Route path={RouteNames.home} element={<HomeView createTab={createTab} user={user} />} />
+          <Route
+            path={RouteNames.home}
+            element={<HomeView createTab={createTab} user={state.user} />}
+          />
 
           <Route
             path={RouteNames.myTabs}
-            element={<MyTabsView createTab={createTab} user={user} />}
+            element={<MyTabsView createTab={createTab} user={state.user} />}
           />
 
           <Route
@@ -176,9 +182,9 @@ export const App: React.FC<AppProps> = (props) => {
                 promptDiscardChanges={promptDiscardChanges}
                 saveEditChanges={saveEditChanges}
                 scrollView={scrollViewRef}
-                tab={currentTab}
+                tab={state.tab.document}
                 updateTab={updateTab}
-                user={user}
+                user={state.user}
               />
             }
           />

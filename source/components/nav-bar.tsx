@@ -181,7 +181,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
               </ul>
             </div>
           ) : (
-            <button className="btn btn-success" onClick={props.startSignIn}>
+            <button className="btn btn-success" onClick={() => props.startSignIn()}>
               Sign in
             </button>
           )}
