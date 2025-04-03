@@ -10,7 +10,7 @@ import {
   startAfter,
   where,
 } from 'firebase/firestore';
-import { getTitleWords } from '../common';
+import { parseTitle } from '../common';
 import { pageSize } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
@@ -34,7 +34,7 @@ const getTabsQuery = (
     collection(getFirebaseContext().firestore, tabsCollection),
     orderBy('title', order),
     orderBy('id', order),
-    ...(titleFilter ? [where('titleWords', 'array-contains-any', getTitleWords(titleFilter))] : []),
+    ...(titleFilter ? [where('titleWords', 'array-contains', parseTitle(titleFilter))] : []),
     ...whereClauses,
     ...(anchorDocument ? [startAfter(anchorDocument.title, anchorDocument.id)] : []),
     limit(documentsNumber),

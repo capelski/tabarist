@@ -166,7 +166,7 @@ export const tabOperations = {
       sections: [],
       tempo: undefined,
       title: 'Unnamed tab',
-      titleWords: ['unnamed', 'tab'],
+      titleWords: ['unnamed', 'tab', 'unnamed tab', 'tab unnamed'],
     };
   },
 

@@ -12,6 +12,7 @@ export type DiminishedTab = {
   sections: DiminishedSection[];
   tempo: number | undefined;
   title: string;
-  /** Each word contained in the title in lowercase. Used to match text via Firestore queries */
+  /** Used to match text via Firestore queries.
+   * Contains all the possible combinations of words in the title */
   titleWords: string[];
 };
