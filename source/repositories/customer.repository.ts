@@ -2,6 +2,7 @@ import { User } from 'firebase/auth';
 import { addDoc, collection, getDocs, limit, onSnapshot, query } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { getFirebaseContext } from '../firebase-context';
+import { StripeSubscription } from '../types';
 
 const checkoutSessionsCollection = 'checkout_sessions';
 const customersCollection = 'customers';
@@ -60,6 +61,6 @@ export const customerRepository = {
     );
     const querySnapshot = await getDocs(queryData);
     const subscription = querySnapshot.docs[0]?.exists() ? querySnapshot.docs[0].data() : undefined;
-    return subscription;
+    return subscription as StripeSubscription;
   },
 };

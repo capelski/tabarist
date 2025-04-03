@@ -5,7 +5,7 @@ import { BlockingLoader, NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { QueryParameters, RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
-import { tabRepository } from './repositories';
+import { customerRepository, tabRepository } from './repositories';
 import { ActionType, appReducer, DispatchProvider, getInitialState } from './state';
 import { Tab } from './types';
 import { HomeView, MyTabsView, TabView } from './views';
@@ -25,6 +25,11 @@ export const App: React.FC<AppProps> = (props) => {
     getFirebaseContext().auth.onAuthStateChanged(
       (user) => {
         dispatch({ type: ActionType.authStateChanged, payload: user });
+        if (user) {
+          customerRepository.getSubscription(user.uid).then((subscription) => {
+            dispatch({ type: ActionType.setStripeSubscription, payload: subscription });
+          });
+        }
       },
       (error) => {
         console.log(error);
@@ -58,11 +63,11 @@ export const App: React.FC<AppProps> = (props) => {
   };
 
   const saveEditChanges = async () => {
-    if (!state.tab.document || !state.user) {
+    if (!state.tab.document || !state.user.document) {
       return;
     }
 
-    await tabRepository.set(state.tab.document, state.user.uid);
+    await tabRepository.set(state.tab.document, state.user.document.uid);
 
     dispatch({ type: ActionType.setTab, payload: { document: state.tab.document } });
 
@@ -94,16 +99,21 @@ export const App: React.FC<AppProps> = (props) => {
 
         <ToastContainer position="bottom-center" />
 
-        <NavBar isCurrentTabDirty={!!state.tab.isDirty} loading={state.loading} user={state.user} />
+        <NavBar
+          isCurrentTabDirty={!!state.tab.isDirty}
+          loading={state.loading}
+          subscription={state.user.stripeSubscription}
+          user={state.user.document}
+        />
 
         <div
           ref={scrollViewRef}
           style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
         >
           <Routes>
-            <Route path={RouteNames.home} element={<HomeView user={state.user} />} />
+            <Route path={RouteNames.home} element={<HomeView user={state.user.document} />} />
 
-            <Route path={RouteNames.myTabs} element={<MyTabsView user={state.user} />} />
+            <Route path={RouteNames.myTabs} element={<MyTabsView user={state.user.document} />} />
 
             <Route
               path={RouteNames.tabDetails}
@@ -115,7 +125,7 @@ export const App: React.FC<AppProps> = (props) => {
                   saveEditChanges={saveEditChanges}
                   scrollView={scrollViewRef}
                   tab={state.tab.document}
-                  user={state.user}
+                  user={state.user.document}
                 />
               }
             />

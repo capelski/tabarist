@@ -104,7 +104,9 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.authStateChanged) {
     return {
       ...state,
-      user: action.payload,
+      user: {
+        document: action.payload,
+      },
     };
   }
 
@@ -116,7 +118,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   }
 
   if (action.type === ActionType.createTab) {
-    if (!state.user) {
+    if (!state.user.document) {
       return {
         ...state,
         signInDialog: { message: 'Sign in to start creating tabs' },
@@ -127,7 +129,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       return getDiscardPromptState(state);
     }
 
-    const document = tabOperations.create(state.user.uid);
+    const document = tabOperations.create(state.user.document.uid);
     return {
       ...state,
       navigateTo: getTabRelativeUrl(document.id, true),
@@ -194,6 +196,16 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         isDraft: undefined,
         isEditMode: action.payload.isEditMode,
         originalDocument: undefined,
+      },
+    };
+  }
+
+  if (action.type === ActionType.setStripeSubscription) {
+    return {
+      ...state,
+      user: {
+        ...state.user,
+        stripeSubscription: action.payload,
       },
     };
   }

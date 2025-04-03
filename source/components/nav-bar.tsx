@@ -1,21 +1,21 @@
 import { User } from 'firebase/auth';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { RouteNames } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
+import { StripeSubscription } from '../types';
 
 export type NavBarProps = {
   isCurrentTabDirty: boolean;
   loading?: boolean;
+  subscription?: StripeSubscription;
   user: User | null;
 };
 
 export const NavBar: React.FC<NavBarProps> = (props) => {
-  const [subscription, setSubscription] = useState<any>();
-
   const dispatch = useContext(DispatchProvider);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -39,7 +39,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       dispatch({ type: ActionType.loaderHide });
 
       console.error(error);
-      toast(`There was an error with the payment platform`, {
+      toast('An error occurred while connecting to Stripe', {
         type: 'error',
         autoClose: 5000,
       });
@@ -77,18 +77,12 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       dispatch({ type: ActionType.loaderHide });
 
       console.error(error);
-      toast(`There was an error with the payment platform`, {
+      toast('An error occurred while connecting to Stripe', {
         type: 'error',
         autoClose: 5000,
       });
     }
   };
-
-  useEffect(() => {
-    if (props.user) {
-      customerRepository.getSubscription(props.user.uid).then(setSubscription);
-    }
-  }, [props.user]);
 
   return (
     <nav className="navbar navbar-expand-sm navbar-light bg-light">
@@ -160,16 +154,16 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                   </NavLink>
                 </li>
                 <li>
-                  {subscription ? (
+                  {props.subscription ? (
                     <a
-                      className="disabled"
+                      className="dropdown-item"
                       onClick={manageSubscription}
                       style={{ cursor: 'pointer' }}
                     >
                       Manage subscription
                     </a>
                   ) : (
-                    <a className="disabled" onClick={upgrade} style={{ cursor: 'pointer' }}>
+                    <a className="dropdown-item" onClick={upgrade} style={{ cursor: 'pointer' }}>
                       Upgrade
                     </a>
                   )}

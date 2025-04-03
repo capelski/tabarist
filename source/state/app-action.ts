@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { BarContainer, Tab } from '../types';
+import { BarContainer, StripeSubscription, Tab } from '../types';
 import { ActionType } from './action-type';
 
 export type AppAction =
@@ -37,6 +37,10 @@ export type AppAction =
     }
   | {
       type: ActionType.loaderHide;
+    }
+  | {
+      type: ActionType.setStripeSubscription;
+      payload: StripeSubscription;
     }
   | {
       type: ActionType.setTab;

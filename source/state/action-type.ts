@@ -10,6 +10,7 @@ export enum ActionType {
   enterEditMode = 'enterEditMode',
   loaderDisplay = 'loaderDisplay',
   loaderHide = 'loaderHide',
+  setStripeSubscription = 'setStripeSubscription',
   setTab = 'setTab',
   signInFinish = 'signInFinish',
   signInStart = 'signInStart',
