@@ -3,12 +3,11 @@ import { AppProps } from '../app';
 import { ActiveSlot, Tab } from '../types';
 
 export type AppState = {
+  loading?: boolean;
   navigateTo?: string;
-  signInDialog:
-    | {
-        message?: string;
-      }
-    | undefined;
+  signInDialog?: {
+    message?: string;
+  };
   tab: {
     activeSlot?: ActiveSlot;
     discardChangesModal?: boolean;
@@ -23,7 +22,6 @@ export type AppState = {
 };
 
 export const getInitialState = (props: AppProps): AppState => ({
-  signInDialog: undefined,
   tab: {
     document: props.tab,
   },

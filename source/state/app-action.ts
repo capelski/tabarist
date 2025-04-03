@@ -33,6 +33,12 @@ export type AppAction =
       type: ActionType.enterEditMode;
     }
   | {
+      type: ActionType.loaderDisplay;
+    }
+  | {
+      type: ActionType.loaderHide;
+    }
+  | {
       type: ActionType.setTab;
       payload: {
         isEditMode?: boolean;

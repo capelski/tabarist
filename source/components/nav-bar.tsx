@@ -9,11 +9,11 @@ import { ActionType, DispatchProvider } from '../state';
 
 export type NavBarProps = {
   isCurrentTabDirty: boolean;
+  loading?: boolean;
   user: User | null;
 };
 
 export const NavBar: React.FC<NavBarProps> = (props) => {
-  const [loadingUpgrade, setLoadingUpgrade] = useState(false);
   const [subscription, setSubscription] = useState<any>();
 
   const dispatch = useContext(DispatchProvider);
@@ -21,18 +21,22 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   const { pathname } = useLocation();
 
   const manageSubscription = async () => {
+    if (props.loading) {
+      return;
+    }
+
     if (props.isCurrentTabDirty) {
       dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
 
-    setLoadingUpgrade(true);
+    dispatch({ type: ActionType.loaderDisplay });
 
     try {
       const url = await customerRepository.getPortalLink();
       window.location.assign(url);
     } catch (error) {
-      setLoadingUpgrade(false);
+      dispatch({ type: ActionType.loaderHide });
 
       console.error(error);
       toast(`There was an error with the payment platform`, {
@@ -55,7 +59,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   };
 
   const upgrade = async () => {
-    if (!props.user) {
+    if (!props.user || props.loading) {
       return;
     }
 
@@ -64,13 +68,13 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       return;
     }
 
-    setLoadingUpgrade(true);
+    dispatch({ type: ActionType.loaderDisplay });
 
     try {
       const checkoutUrl = await customerRepository.createCheckoutSession(props.user.uid);
       window.location.assign(checkoutUrl);
     } catch (error) {
-      setLoadingUpgrade(false);
+      dispatch({ type: ActionType.loaderHide });
 
       console.error(error);
       toast(`There was an error with the payment platform`, {
@@ -158,18 +162,14 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                 <li>
                   {subscription ? (
                     <a
-                      className={`dropdown-item${loadingUpgrade ? ' disabled' : ''}`}
-                      onClick={loadingUpgrade ? undefined : manageSubscription}
+                      className="disabled"
+                      onClick={manageSubscription}
                       style={{ cursor: 'pointer' }}
                     >
                       Manage subscription
                     </a>
                   ) : (
-                    <a
-                      className={`dropdown-item${loadingUpgrade ? ' disabled' : ''}`}
-                      onClick={loadingUpgrade ? undefined : upgrade}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <a className="disabled" onClick={upgrade} style={{ cursor: 'pointer' }}>
                       Upgrade
                     </a>
                   )}

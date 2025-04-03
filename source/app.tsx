@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useRef } from 'react';
 import { Route, Routes, useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
 import { toast, ToastContainer } from 'react-toastify';
-import { NavBar, SignInModal } from './components';
+import { BlockingLoader, NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { QueryParameters, RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
@@ -90,9 +90,11 @@ export const App: React.FC<AppProps> = (props) => {
           <TabDiscardModal discardEditChanges={discardEditChanges} />
         )}
 
+        {state.loading && <BlockingLoader />}
+
         <ToastContainer position="bottom-center" />
 
-        <NavBar isCurrentTabDirty={!!state.tab.isDirty} user={state.user} />
+        <NavBar isCurrentTabDirty={!!state.tab.isDirty} loading={state.loading} user={state.user} />
 
         <div
           ref={scrollViewRef}

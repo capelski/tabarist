@@ -8,6 +8,8 @@ export enum ActionType {
   discardChangesConfirm = 'discardChangesConfirm',
   discardChangesPrompt = 'discardChangesPrompt',
   enterEditMode = 'enterEditMode',
+  loaderDisplay = 'loaderDisplay',
+  loaderHide = 'loaderHide',
   setTab = 'setTab',
   signInFinish = 'signInFinish',
   signInStart = 'signInStart',

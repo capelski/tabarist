@@ -170,6 +170,20 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.loaderDisplay) {
+    return {
+      ...state,
+      loading: true,
+    };
+  }
+
+  if (action.type === ActionType.loaderHide) {
+    return {
+      ...state,
+      loading: true,
+    };
+  }
+
   if (action.type === ActionType.setTab) {
     return {
       ...state,
