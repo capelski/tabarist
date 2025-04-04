@@ -11,6 +11,7 @@ import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
   activeSlot: ActiveSlot | undefined;
+  isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
   saveEditChanges: () => void;
@@ -24,7 +25,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const playTimeoutRef = useRef(0);
 
   const dispatch = useContext(DispatchProvider);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { tabId } = useParams();
 
   useEffect(() => {
@@ -46,16 +47,21 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   // Update edit mode upon browser back/forward navigation
   useEffect(() => {
     if (props.isEditMode && searchParams.get(QueryParameters.editMode) !== 'true') {
-      dispatch({ type: ActionType.discardChangesPrompt });
+      if (props.isDirty) {
+        const nextSearchParams = new URLSearchParams(searchParams);
+        nextSearchParams.set(QueryParameters.editMode, 'true');
+        setSearchParams(nextSearchParams);
+
+        dispatch({ type: ActionType.discardChangesPrompt });
+      } else {
+        dispatch({ type: ActionType.discardChangesConfirm });
+      }
     } else if (
       !props.isEditMode &&
       searchParams.get(QueryParameters.editMode) === 'true' &&
       props.tab
     ) {
-      dispatch({
-        type: ActionType.setTab,
-        payload: { document: props.tab },
-      });
+      dispatch({ type: ActionType.enterEditMode });
     }
   }, [searchParams]);
 

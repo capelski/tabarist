@@ -120,6 +120,7 @@ export const App: React.FC<AppProps> = (props) => {
               element={
                 <TabView
                   activeSlot={state.tab.activeSlot}
+                  isDirty={state.tab.isDirty}
                   isDraft={state.tab.isDraft}
                   isEditMode={!!state.tab.isEditMode}
                   saveEditChanges={saveEditChanges}

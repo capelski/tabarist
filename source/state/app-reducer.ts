@@ -13,7 +13,6 @@ const getDiscardChangesState = (state: AppState): AppState => ({
     document: JSON.parse(state.tab.originalDocument!),
     isDirty: false,
     isEditMode: undefined,
-    originalDocument: undefined,
   },
 });
 
@@ -167,7 +166,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state.tab,
         activeSlot: undefined,
         isEditMode: true,
-        originalDocument: JSON.stringify(state.tab.document),
       },
     };
   }
@@ -195,7 +193,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         isDirty: undefined,
         isDraft: undefined,
         isEditMode: action.payload.isEditMode,
-        originalDocument: undefined,
+        originalDocument: JSON.stringify(action.payload.document),
       },
     };
   }
