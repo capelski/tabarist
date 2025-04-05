@@ -8,7 +8,6 @@ export type TabPlayProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   isEditMode: boolean;
-  isTabOwner: boolean;
   playTimeoutRef: MutableRefObject<number>;
   tab: Tab;
   updateTab: (tab: Tab) => void;

@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import { BarContainer, StripeSubscription, Tab } from '../types';
 import { ActionType } from './action-type';
+import { AppState } from './app-state';
 
 export type AppAction =
   | {
@@ -25,12 +26,15 @@ export type AppAction =
     }
   | {
       type: ActionType.discardChangesConfirm;
+      navigate?: AppState['navigate'];
     }
   | {
       type: ActionType.discardChangesPrompt;
+      navigate?: AppState['navigate'];
     }
   | {
       type: ActionType.enterEditMode;
+      navigate?: AppState['navigate'];
     }
   | {
       type: ActionType.loaderDisplay;
@@ -44,10 +48,8 @@ export type AppAction =
     }
   | {
       type: ActionType.setTab;
-      payload: {
-        isEditMode?: boolean;
-        document: Tab;
-      };
+      document: Tab;
+      navigate?: AppState['navigate'];
     }
   | {
       type: ActionType.signInFinish;

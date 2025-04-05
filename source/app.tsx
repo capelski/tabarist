@@ -1,12 +1,11 @@
-import React, { useEffect, useReducer, useRef } from 'react';
-import { Route, Routes, useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
-import { toast, ToastContainer } from 'react-toastify';
+import React, { useReducer, useRef } from 'react';
+import { Route, Routes } from 'react-router';
+import { ToastContainer } from 'react-toastify';
 import { BlockingLoader, NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
-import { QueryParameters, RouteNames } from './constants';
-import { getFirebaseContext } from './firebase-context';
-import { customerRepository, tabRepository } from './repositories';
-import { ActionType, appReducer, DispatchProvider, getInitialState } from './state';
+import { RouteNames } from './constants';
+import { useSideEffects } from './side-effects';
+import { appReducer, DispatchProvider, getInitialState } from './state';
 import { Tab } from './types';
 import { HomeView, MyTabsView, TabView } from './views';
 
@@ -17,62 +16,8 @@ export type AppProps = {
 export const App: React.FC<AppProps> = (props) => {
   const [state, dispatch] = useReducer(appReducer, getInitialState(props));
 
-  const [searchParams, setSearchParams] = useSearchParams();
   const scrollViewRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    getFirebaseContext().auth.onAuthStateChanged(
-      (user) => {
-        dispatch({ type: ActionType.authStateChanged, payload: user });
-        if (user) {
-          customerRepository.getSubscription(user.uid).then((subscription) => {
-            dispatch({ type: ActionType.setStripeSubscription, payload: subscription });
-          });
-        }
-      },
-      (error) => {
-        console.log(error);
-        toast('Could not reach the user account', { type: 'error' });
-      },
-    );
-  }, []);
-
-  useEffect(() => {
-    if (state.navigateTo) {
-      navigate(state.navigateTo);
-      dispatch({ type: ActionType.clearNavigation });
-    }
-  }, [state.navigateTo]);
-
-  useBeforeUnload((event) => {
-    if (state.tab.isDirty) {
-      event.preventDefault();
-    }
-  });
-
-  const clearSearchParams = (parameter: QueryParameters) => {
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete(parameter);
-    setSearchParams(nextSearchParams);
-  };
-
-  const discardEditChanges = () => {
-    dispatch({ type: ActionType.discardChangesConfirm });
-    clearSearchParams(QueryParameters.editMode);
-  };
-
-  const saveEditChanges = async () => {
-    if (!state.tab.document || !state.user.document) {
-      return;
-    }
-
-    await tabRepository.set(state.tab.document, state.user.document.uid);
-
-    dispatch({ type: ActionType.setTab, payload: { document: state.tab.document } });
-
-    clearSearchParams(QueryParameters.editMode);
-  };
+  useSideEffects(state, dispatch);
 
   return (
     <DispatchProvider.Provider value={dispatch}>
@@ -91,9 +36,7 @@ export const App: React.FC<AppProps> = (props) => {
           </SignInModal>
         )}
 
-        {state.tab.discardChangesModal && (
-          <TabDiscardModal discardEditChanges={discardEditChanges} />
-        )}
+        {state.tab.discardChangesModal && <TabDiscardModal />}
 
         {state.loading && <BlockingLoader />}
 
@@ -123,7 +66,6 @@ export const App: React.FC<AppProps> = (props) => {
                   isDirty={state.tab.isDirty}
                   isDraft={state.tab.isDraft}
                   isEditMode={!!state.tab.isEditMode}
-                  saveEditChanges={saveEditChanges}
                   scrollView={scrollViewRef}
                   tab={state.tab.document}
                   user={state.user.document}

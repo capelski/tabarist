@@ -4,7 +4,6 @@ import { Tab } from '../../types';
 
 export type TabDetailsProps = {
   isEditMode: boolean;
-  isTabOwner: boolean;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };

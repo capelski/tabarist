@@ -1,44 +1,55 @@
+import { User } from 'firebase/auth';
 import React, { MutableRefObject, useContext, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
-import { editSymbol, QueryParameters, removeSymbol, RouteNames, saveSymbol } from '../../constants';
-import { tabOperations } from '../../operations';
+import { useNavigate } from 'react-router';
+import { editSymbol, removeSymbol, RouteNames, saveSymbol } from '../../constants';
+import { getTabRelativeUrl, tabOperations } from '../../operations';
+import { tabRepository } from '../../repositories';
 import { ActionType, DispatchProvider } from '../../state';
 import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
+  isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
-  isTabOwner: boolean;
   playTimeoutRef: MutableRefObject<number>;
-  saveEditChanges: () => void;
   tab: Tab;
   updateTab: (tab: Tab) => void;
+  user: User | null;
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   const [deletingTabId, setDeletingTabId] = useState('');
 
   const dispatch = useContext(DispatchProvider);
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
 
   const cancelDelete = () => {
     setDeletingTabId('');
   };
 
   const enterEditMode = () => {
-    if (!props.isTabOwner) {
+    if (!isTabOwner) {
       return;
     }
 
     clearTimeout(props.playTimeoutRef.current);
 
-    dispatch({ type: ActionType.enterEditMode });
+    dispatch({
+      type: ActionType.enterEditMode,
+      navigate: { to: [getTabRelativeUrl(props.tab.id, true)] },
+    });
+  };
 
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.set(QueryParameters.editMode, 'true');
-    setSearchParams(nextSearchParams);
+  const saveEditChanges = async () => {
+    if (!props.user) {
+      return;
+    }
+
+    await tabRepository.set(props.tab, props.user.uid);
+
+    dispatch({ type: ActionType.setTab, document: props.tab, navigate: { back: true } });
   };
 
   const removeTab = () => {
@@ -49,7 +60,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
     <div className="tab-header">
       <TabDeletionModal
         afterDeletion={() => {
-          navigate(RouteNames.myTabs);
+          window.history.length > 0 ? window.history.back() : navigate(RouteNames.myTabs);
         }}
         cancelDelete={cancelDelete}
         tabId={deletingTabId}
@@ -70,13 +81,13 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
           <h3 style={{ flexGrow: 1 }}>{props.tab.title}</h3>
         )}
 
-        {props.isTabOwner && (
+        {isTabOwner && (
           <React.Fragment>
             {props.isEditMode ? (
               <React.Fragment>
                 <button
                   className="btn btn-outline-success"
-                  onClick={props.saveEditChanges}
+                  onClick={saveEditChanges}
                   style={{ marginLeft: 8 }}
                   type="button"
                 >
@@ -85,7 +96,14 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 <button
                   className="btn btn-outline-danger"
                   onClick={() => {
-                    dispatch({ type: ActionType.discardChangesPrompt });
+                    if (props.isDirty) {
+                      dispatch({ type: ActionType.discardChangesPrompt });
+                    } else {
+                      dispatch({
+                        type: ActionType.discardChangesConfirm,
+                        navigate: { back: true },
+                      });
+                    }
                   }}
                   style={{ marginLeft: 8 }}
                   type="button"
@@ -103,16 +121,15 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 >
                   {editSymbol}
                 </button>
-                {!props.isDraft && (
-                  <button
-                    className="btn btn-outline-danger"
-                    onClick={removeTab}
-                    style={{ marginLeft: 8 }}
-                    type="button"
-                  >
-                    {removeSymbol}
-                  </button>
-                )}
+                <button
+                  className="btn btn-outline-danger"
+                  disabled={!!props.isDraft}
+                  onClick={removeTab}
+                  style={{ marginLeft: 8 }}
+                  type="button"
+                >
+                  {removeSymbol}
+                </button>
               </React.Fragment>
             )}
           </React.Fragment>

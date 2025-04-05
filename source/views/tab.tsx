@@ -1,8 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
-import { useParams, useSearchParams } from 'react-router';
+import { useParams } from 'react-router';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabHeader, TabPlay } from '../components';
-import { QueryParameters } from '../constants';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
@@ -14,7 +13,6 @@ export type TabViewProps = {
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
-  saveEditChanges: () => void;
   scrollView: RefObject<HTMLDivElement>;
   tab?: Tab;
   user: User | null;
@@ -25,45 +23,18 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const playTimeoutRef = useRef(0);
 
   const dispatch = useContext(DispatchProvider);
-  const [searchParams, setSearchParams] = useSearchParams();
   const { tabId } = useParams();
 
+  // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded
   useEffect(() => {
     if (tabId && props.tab?.id !== tabId) {
       tabRepository.getById(tabId).then((nextTab) => {
         if (nextTab) {
-          dispatch({
-            type: ActionType.setTab,
-            payload: {
-              document: nextTab,
-              isEditMode: searchParams.get(QueryParameters.editMode) === 'true',
-            },
-          });
+          dispatch({ type: ActionType.setTab, document: nextTab });
         }
       });
     }
   }, [tabId]);
-
-  // Update edit mode upon browser back/forward navigation
-  useEffect(() => {
-    if (props.isEditMode && searchParams.get(QueryParameters.editMode) !== 'true') {
-      if (props.isDirty) {
-        const nextSearchParams = new URLSearchParams(searchParams);
-        nextSearchParams.set(QueryParameters.editMode, 'true');
-        setSearchParams(nextSearchParams);
-
-        dispatch({ type: ActionType.discardChangesPrompt });
-      } else {
-        dispatch({ type: ActionType.discardChangesConfirm });
-      }
-    } else if (
-      !props.isEditMode &&
-      searchParams.get(QueryParameters.editMode) === 'true' &&
-      props.tab
-    ) {
-      dispatch({ type: ActionType.enterEditMode });
-    }
-  }, [searchParams]);
 
   const barContainers = useMemo(() => {
     if (props.tab?.bars) {
@@ -77,8 +48,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     return <h3>Couldn't load tab</h3>;
   }
 
-  const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
-
   const updateTab = (nextTab: Tab) => {
     dispatch({ type: ActionType.updateTab, payload: nextTab });
   };
@@ -88,21 +57,16 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <MetaTags description={`Guitar tab for ${props.tab.title}`} title={props.tab.title} />
 
       <TabHeader
+        isDirty={props.isDirty}
         isDraft={props.isDraft}
         isEditMode={props.isEditMode}
-        isTabOwner={isTabOwner}
         playTimeoutRef={playTimeoutRef}
-        saveEditChanges={props.saveEditChanges}
         tab={props.tab}
         updateTab={updateTab}
+        user={props.user}
       />
 
-      <TabDetails
-        isEditMode={props.isEditMode}
-        isTabOwner={isTabOwner}
-        tab={props.tab}
-        updateTab={updateTab}
-      />
+      <TabDetails isEditMode={props.isEditMode} tab={props.tab} updateTab={updateTab} />
 
       {props.isEditMode && (
         <React.Fragment>
@@ -126,7 +90,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         activeSlot={props.activeSlot}
         barContainers={barContainers}
         isEditMode={props.isEditMode}
-        isTabOwner={isTabOwner}
         playTimeoutRef={playTimeoutRef}
         tab={props.tab}
         updateTab={updateTab}

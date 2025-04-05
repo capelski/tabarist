@@ -4,7 +4,15 @@ import { ActiveSlot, StripeSubscription, Tab } from '../types';
 
 export type AppState = {
   loading?: boolean;
-  navigateTo?: string;
+  navigate?:
+    | {
+        back?: undefined;
+        to: string[];
+      }
+    | {
+        back: true;
+        to?: undefined;
+      };
   signInDialog?: {
     message?: string;
   };

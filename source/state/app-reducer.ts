@@ -5,19 +5,9 @@ import { ActionType } from './action-type';
 import { AppAction } from './app-action';
 import { AppState } from './app-state';
 
-const getDiscardChangesState = (state: AppState): AppState => ({
+const getDiscardPromptState = (state: AppState, navigate: AppState['navigate']): AppState => ({
   ...state,
-  tab: {
-    ...state.tab,
-    discardChangesModal: undefined,
-    document: JSON.parse(state.tab.originalDocument!),
-    isDirty: false,
-    isEditMode: undefined,
-  },
-});
-
-const getDiscardPromptState = (state: AppState): AppState => ({
-  ...state,
+  navigate,
   tab: {
     ...state.tab,
     discardChangesModal: true,
@@ -112,7 +102,10 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.clearNavigation) {
     return {
       ...state,
-      navigateTo: undefined,
+      navigate:
+        state.navigate?.to && state.navigate?.to.length > 1
+          ? { to: state.navigate?.to.slice(1) }
+          : undefined,
     };
   }
 
@@ -125,13 +118,13 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     }
 
     if (state.tab.isDirty) {
-      return getDiscardPromptState(state);
+      return getDiscardPromptState(state, undefined);
     }
 
     const document = tabOperations.create(state.user.document.uid);
     return {
       ...state,
-      navigateTo: getTabRelativeUrl(document.id, true),
+      navigate: { to: [getTabRelativeUrl(document.id), getTabRelativeUrl(document.id, true)] },
       tab: {
         document,
         isDraft: true,
@@ -152,16 +145,27 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   }
 
   if (action.type === ActionType.discardChangesConfirm) {
-    return getDiscardChangesState(state);
+    return {
+      ...state,
+      navigate: action.navigate,
+      tab: {
+        ...state.tab,
+        discardChangesModal: undefined,
+        document: JSON.parse(state.tab.originalDocument!),
+        isDirty: false,
+        isEditMode: undefined,
+      },
+    };
   }
 
   if (action.type === ActionType.discardChangesPrompt) {
-    return state.tab.isDirty ? getDiscardPromptState(state) : getDiscardChangesState(state);
+    return getDiscardPromptState(state, action.navigate);
   }
 
   if (action.type === ActionType.enterEditMode) {
     return {
       ...state,
+      navigate: action.navigate,
       tab: {
         ...state.tab,
         activeSlot: undefined,
@@ -187,13 +191,13 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.setTab) {
     return {
       ...state,
+      navigate: action.navigate,
       tab: {
         ...state.tab,
-        document: action.payload.document,
+        document: action.document,
         isDirty: undefined,
         isDraft: undefined,
-        isEditMode: action.payload.isEditMode,
-        originalDocument: JSON.stringify(action.payload.document),
+        originalDocument: JSON.stringify(action.document),
       },
     };
   }

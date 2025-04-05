@@ -2,15 +2,15 @@ import React, { useContext } from 'react';
 import { ActionType, DispatchProvider } from '../../state';
 import { Modal } from '../common/modal';
 
-export type TabDiscardModalProps = {
-  discardEditChanges: () => void;
-};
-
-export const TabDiscardModal: React.FC<TabDiscardModalProps> = (props) => {
+export const TabDiscardModal: React.FC = () => {
   const dispatch = useContext(DispatchProvider);
 
   const cancelDiscardChanges = () => {
     dispatch({ type: ActionType.discardChangesCancel });
+  };
+
+  const discardEditChanges = () => {
+    dispatch({ type: ActionType.discardChangesConfirm, navigate: { back: true } });
   };
 
   return (
@@ -19,7 +19,7 @@ export const TabDiscardModal: React.FC<TabDiscardModalProps> = (props) => {
       <div>
         <button
           className="btn btn-danger"
-          onClick={props.discardEditChanges}
+          onClick={discardEditChanges}
           style={{ marginRight: 8 }}
           type="button"
         >
