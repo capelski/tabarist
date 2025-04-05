@@ -85,7 +85,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       ...state,
       tab: {
         ...state.tab,
-        activeSlot: getNextActiveSlot(state.tab.activeSlot, action.payload),
+        activeSlot: getNextActiveSlot(state.tab.activeSlot, action.barContainers),
       },
     };
   }
@@ -94,7 +94,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     return {
       ...state,
       user: {
-        document: action.payload,
+        document: action.user,
       },
     };
   }
@@ -194,10 +194,10 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       navigate: action.navigate,
       tab: {
         ...state.tab,
-        document: action.document,
+        document: action.tab,
         isDirty: undefined,
         isDraft: undefined,
-        originalDocument: JSON.stringify(action.document),
+        originalDocument: JSON.stringify(action.tab),
       },
     };
   }
@@ -207,7 +207,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       ...state,
       user: {
         ...state.user,
-        stripeSubscription: action.payload,
+        stripeSubscription: action.subscription,
       },
     };
   }
@@ -223,7 +223,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     return {
       ...state,
       signInDialog: {
-        message: action.payload,
+        message: action.message,
       },
     };
   }
@@ -233,8 +233,8 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       ...state,
       tab: {
         ...state.tab,
-        isDirty: JSON.stringify(action.payload) !== state.tab.originalDocument,
-        document: action.payload,
+        isDirty: JSON.stringify(action.tab) !== state.tab.originalDocument,
+        document: action.tab,
       },
     };
   }

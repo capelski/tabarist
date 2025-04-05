@@ -30,7 +30,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     if (tabId && props.tab?.id !== tabId) {
       tabRepository.getById(tabId).then((nextTab) => {
         if (nextTab) {
-          dispatch({ type: ActionType.setTab, document: nextTab });
+          dispatch({ type: ActionType.setTab, tab: nextTab });
         }
       });
     }
@@ -49,7 +49,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   }
 
   const updateTab = (nextTab: Tab) => {
-    dispatch({ type: ActionType.updateTab, payload: nextTab });
+    dispatch({ type: ActionType.updateTab, tab: nextTab });
   };
 
   return (

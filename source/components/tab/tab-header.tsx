@@ -49,7 +49,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
     await tabRepository.set(props.tab, props.user.uid);
 
-    dispatch({ type: ActionType.setTab, document: props.tab, navigate: { back: true } });
+    dispatch({ type: ActionType.setTab, tab: props.tab, navigate: { back: true } });
   };
 
   const removeTab = () => {

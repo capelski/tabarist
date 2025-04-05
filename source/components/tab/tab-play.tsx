@@ -26,7 +26,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
       activeSlotLastDelay = Date.now() - activeSlotLastRender;
 
       props.playTimeoutRef.current = window.setTimeout(() => {
-        dispatch({ type: ActionType.activeSlotUpdate, payload: props.barContainers });
+        dispatch({ type: ActionType.activeSlotUpdate, barContainers: props.barContainers });
         activeSlotLastRender = Date.now();
       }, msPerBeat - activeSlotLastDelay);
     } else {
@@ -39,7 +39,7 @@ export const TabPlay: React.FC<TabPlayProps> = (props) => {
   useEffect(updateActiveSlot, [props.activeSlot]);
 
   const enterPlayMode = () => {
-    dispatch({ type: ActionType.activeSlotUpdate, payload: props.barContainers });
+    dispatch({ type: ActionType.activeSlotUpdate, barContainers: props.barContainers });
     activeSlotLastRender = Date.now();
   };
 

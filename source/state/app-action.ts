@@ -9,11 +9,11 @@ export type AppAction =
     }
   | {
       type: ActionType.activeSlotUpdate;
-      payload: BarContainer[];
+      barContainers: BarContainer[];
     }
   | {
       type: ActionType.authStateChanged;
-      payload: User | null;
+      user: User | null;
     }
   | {
       type: ActionType.clearNavigation;
@@ -44,21 +44,21 @@ export type AppAction =
     }
   | {
       type: ActionType.setStripeSubscription;
-      payload: StripeSubscription;
+      subscription: StripeSubscription;
     }
   | {
       type: ActionType.setTab;
-      document: Tab;
       navigate?: AppState['navigate'];
+      tab: Tab;
     }
   | {
       type: ActionType.signInFinish;
     }
   | {
       type: ActionType.signInStart;
-      payload?: string;
+      message?: string;
     }
   | {
       type: ActionType.updateTab;
-      payload: Tab;
+      tab: Tab;
     };
