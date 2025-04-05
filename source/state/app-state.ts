@@ -3,6 +3,7 @@ import { AppProps } from '../app';
 import { ActiveSlot, StripeSubscription, Tab } from '../types';
 
 export type AppState = {
+  deletingTab?: Tab;
   loading?: boolean;
   navigate?:
     | {

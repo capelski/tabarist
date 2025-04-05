@@ -134,6 +134,25 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.deleteCancel) {
+    return {
+      ...state,
+      deletingTab: undefined,
+    };
+  }
+
+  if (action.type === ActionType.deleteConfirm) {
+    return {
+      ...state,
+      deletingTab: undefined,
+      navigate: action.navigate,
+    };
+  }
+
+  if (action.type === ActionType.deletePrompt) {
+    return { ...state, deletingTab: action.tab };
+  }
+
   if (action.type === ActionType.discardChangesCancel) {
     return {
       ...state,

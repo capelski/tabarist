@@ -22,6 +22,17 @@ export type AppAction =
       type: ActionType.createTab;
     }
   | {
+      type: ActionType.deleteCancel;
+    }
+  | {
+      type: ActionType.deleteConfirm;
+      navigate?: AppState['navigate'];
+    }
+  | {
+      type: ActionType.deletePrompt;
+      tab: Tab;
+    }
+  | {
       type: ActionType.discardChangesCancel;
     }
   | {

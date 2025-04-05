@@ -1,27 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { tabRepository } from '../../repositories';
+import { ActionType, DispatchProvider } from '../../state';
+import { Tab } from '../../types';
 import { Modal } from '../common/modal';
 
 export type TabDeletionModalProps = {
-  afterDeletion?: () => void;
-  cancelDelete: () => void;
-  tabId: string;
+  deletingTab?: Tab;
+  onTabDeleted: () => void;
 };
 
 export const TabDeletionModal: React.FC<TabDeletionModalProps> = (props) => {
-  const confirmDelete = async () => {
-    await tabRepository.remove(props.tabId);
-    props.cancelDelete();
+  const dispatch = useContext(DispatchProvider);
 
-    if (props.afterDeletion) {
-      props.afterDeletion();
-    }
+  const cancelDelete = () => {
+    dispatch({ type: ActionType.deleteCancel });
+  };
+
+  const confirmDelete = async () => {
+    await tabRepository.remove(props.deletingTab!.id);
+    props.onTabDeleted();
   };
 
   return (
-    props.tabId && (
-      <Modal closeHandler={props.cancelDelete} hideCloseButton={true}>
-        <p>Are you sure you want to delete this tab?</p>
+    props.deletingTab && (
+      <Modal closeHandler={cancelDelete} hideCloseButton={true}>
+        <p>
+          Are you sure you want to delete <b>{props.deletingTab.title}</b>?
+        </p>
         <div>
           <button
             className="btn btn-danger"
@@ -31,7 +36,7 @@ export const TabDeletionModal: React.FC<TabDeletionModalProps> = (props) => {
           >
             Delete
           </button>
-          <button className="btn btn-outline-secondary" onClick={props.cancelDelete} type="button">
+          <button className="btn btn-outline-secondary" onClick={cancelDelete} type="button">
             Cancel
           </button>
         </div>

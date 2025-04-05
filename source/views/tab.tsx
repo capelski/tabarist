@@ -10,6 +10,7 @@ import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
   activeSlot: ActiveSlot | undefined;
+  deletingTab?: Tab;
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
@@ -57,6 +58,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <MetaTags description={`Guitar tab for ${props.tab.title}`} title={props.tab.title} />
 
       <TabHeader
+        deletingTab={props.deletingTab}
         isDirty={props.isDirty}
         isDraft={props.isDraft}
         isEditMode={props.isEditMode}

@@ -54,15 +54,22 @@ export const App: React.FC<AppProps> = (props) => {
           style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
         >
           <Routes>
-            <Route path={RouteNames.home} element={<HomeView user={state.user.document} />} />
+            <Route
+              path={RouteNames.home}
+              element={<HomeView deletingTab={state.deletingTab} user={state.user.document} />}
+            />
 
-            <Route path={RouteNames.myTabs} element={<MyTabsView user={state.user.document} />} />
+            <Route
+              path={RouteNames.myTabs}
+              element={<MyTabsView deletingTab={state.deletingTab} user={state.user.document} />}
+            />
 
             <Route
               path={RouteNames.tabDetails}
               element={
                 <TabView
                   activeSlot={state.tab.activeSlot}
+                  deletingTab={state.deletingTab}
                   isDirty={state.tab.isDirty}
                   isDraft={state.tab.isDraft}
                   isEditMode={!!state.tab.isEditMode}

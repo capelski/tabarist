@@ -1,6 +1,5 @@
 import { User } from 'firebase/auth';
-import React, { MutableRefObject, useContext, useState } from 'react';
-import { useNavigate } from 'react-router';
+import React, { MutableRefObject, useContext } from 'react';
 import { editSymbol, removeSymbol, RouteNames, saveSymbol } from '../../constants';
 import { getTabRelativeUrl, tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
@@ -9,6 +8,7 @@ import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
+  deletingTab?: Tab;
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
@@ -19,15 +19,8 @@ export type TabHeaderProps = {
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
-  const [deletingTabId, setDeletingTabId] = useState('');
-
   const dispatch = useContext(DispatchProvider);
-  const navigate = useNavigate();
   const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
-
-  const cancelDelete = () => {
-    setDeletingTabId('');
-  };
 
   const enterEditMode = () => {
     if (!isTabOwner) {
@@ -53,17 +46,19 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   };
 
   const removeTab = () => {
-    setDeletingTabId(props.tab.id);
+    dispatch({ type: ActionType.deletePrompt, tab: props.tab });
   };
 
   return (
     <div className="tab-header">
       <TabDeletionModal
-        afterDeletion={() => {
-          window.history.length > 0 ? window.history.back() : navigate(RouteNames.myTabs);
+        deletingTab={props.deletingTab}
+        onTabDeleted={() => {
+          dispatch({
+            navigate: window.history.length > 0 ? { back: true } : { to: [RouteNames.myTabs] },
+            type: ActionType.deleteConfirm,
+          });
         }}
-        cancelDelete={cancelDelete}
-        tabId={deletingTabId}
       />
 
       <div className="mb-3" style={{ alignItems: 'center', display: 'flex' }}>

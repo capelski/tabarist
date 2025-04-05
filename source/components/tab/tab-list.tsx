@@ -3,12 +3,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { QueryParameters } from '../../constants';
 import { ActionType, DispatchProvider } from '../../state';
-import { AnchorDirection, TabPageResponse, TabQueryParameters } from '../../types';
+import { AnchorDirection, Tab, TabPageResponse, TabQueryParameters } from '../../types';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
 import { TabListItem } from './tab-list-item';
 
 export type TabListBaseProps = {
+  deletingTab?: Tab;
   user: User | null;
 };
 
@@ -17,7 +18,6 @@ export type TabListProps = TabListBaseProps & {
 };
 
 export const TabList: React.FC<TabListProps> = (props) => {
-  const [deletingTabId, setDeletingTabId] = useState('');
   const [loading, setLoading] = useState(false);
   const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({
     hasNextPage: false,
@@ -75,12 +75,8 @@ export const TabList: React.FC<TabListProps> = (props) => {
     }
   }, [props.user, tabParams]);
 
-  const cancelDelete = () => {
-    setDeletingTabId('');
-  };
-
-  const removeTab = (tabId: string) => {
-    setDeletingTabId(tabId);
+  const removeTab = (tab: Tab) => {
+    dispatch({ type: ActionType.deletePrompt, tab });
   };
 
   const updateTitleFilter = (nextTitleFilter: string) => {
@@ -102,11 +98,11 @@ export const TabList: React.FC<TabListProps> = (props) => {
   return (
     <div className="tabs">
       <TabDeletionModal
-        afterDeletion={() => {
+        deletingTab={props.deletingTab}
+        onTabDeleted={() => {
+          dispatch({ type: ActionType.deleteConfirm });
           updateTabs(tabParams);
         }}
-        cancelDelete={cancelDelete}
-        tabId={deletingTabId}
       />
 
       <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
@@ -178,7 +174,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
                 <TabListItem
                   isTabOwner={!!props.user && props.user.uid === tab.ownerId}
                   key={tab.id}
-                  startRemoveTab={() => removeTab(tab.id)}
+                  startRemoveTab={() => removeTab(tab)}
                   tab={tab}
                 />
               );
