@@ -113,7 +113,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     if (!state.user.document) {
       return {
         ...state,
-        signInDialog: { message: 'Sign in to start creating tabs' },
+        signInModal: { message: 'Sign in to start creating tabs' },
       };
     }
 
@@ -215,14 +215,14 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.signInFinish) {
     return {
       ...state,
-      signInDialog: undefined,
+      signInModal: undefined,
     };
   }
 
   if (action.type === ActionType.signInStart) {
     return {
       ...state,
-      signInDialog: {
+      signInModal: {
         message: action.message,
       },
     };

@@ -30,9 +30,9 @@ export const App: React.FC<AppProps> = (props) => {
           overflow: 'hidden',
         }}
       >
-        {state.signInDialog && (
+        {state.signInModal && (
           <SignInModal>
-            {state.signInDialog.message && <p>{state.signInDialog.message}</p>}
+            {state.signInModal.message && <p>{state.signInModal.message}</p>}
           </SignInModal>
         )}
 

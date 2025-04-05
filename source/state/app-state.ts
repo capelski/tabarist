@@ -13,7 +13,7 @@ export type AppState = {
         back: true;
         to?: undefined;
       };
-  signInDialog?: {
+  signInModal?: {
     message?: string;
   };
   tab: {
