@@ -1,5 +1,12 @@
 import { User } from 'firebase/auth';
-import { BarContainer, StripeSubscription, Tab } from '../types';
+import { RouteNames } from '../constants';
+import {
+  BarContainer,
+  StripeSubscription,
+  Tab,
+  TabPageResponse,
+  TabQueryParameters,
+} from '../types';
 import { ActionType } from './action-type';
 import { AppState } from './app-state';
 
@@ -48,10 +55,29 @@ export type AppAction =
       navigate?: AppState['navigate'];
     }
   | {
+      type: ActionType.fetchTabsEnd;
+      navigate?: AppState['navigate'];
+      response: TabPageResponse;
+      route: RouteNames.home | RouteNames.myTabs;
+    }
+  | {
+      type: ActionType.fetchTabsStart;
+      route: RouteNames.home | RouteNames.myTabs;
+    }
+  | {
       type: ActionType.loaderDisplay;
     }
   | {
       type: ActionType.loaderHide;
+    }
+  | {
+      type: ActionType.searchParamsReady;
+    }
+  | {
+      type: ActionType.setTabListParams;
+      params: TabQueryParameters;
+      route: RouteNames.home | RouteNames.myTabs;
+      skipUrlUpdate?: boolean;
     }
   | {
       type: ActionType.setStripeSubscription;

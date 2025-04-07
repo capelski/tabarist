@@ -1,15 +1,17 @@
 import { Dispatch, useEffect } from 'react';
-import { useBeforeUnload, useNavigate, useSearchParams } from 'react-router';
+import { useBeforeUnload, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'react-toastify';
-import { QueryParameters } from './constants';
+import { QueryParameters, RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl } from './operations';
 import { customerRepository } from './repositories';
 import { ActionType, AppAction, AppState } from './state';
+import { AnchorDirection, TabQueryParameters } from './types';
 
 export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { pathname } = useLocation();
 
   // Retrieve the authenticated user and their subscription
   useEffect(() => {
@@ -43,6 +45,46 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
       } else {
         dispatch({ type: ActionType.discardChangesConfirm });
       }
+    }
+
+    if (pathname === RouteNames.home || pathname === RouteNames.myTabs) {
+      const titleParameter = searchParams.get(QueryParameters.title);
+      const aDParameter = searchParams.get(QueryParameters.anchorDirection);
+      const aIParameter = searchParams.get(QueryParameters.anchorId);
+      const aTParameter = searchParams.get(QueryParameters.anchorTitle);
+
+      const currentParams = state[pathname].params;
+
+      if (
+        !currentParams ||
+        titleParameter !== currentParams.titleFilter ||
+        aDParameter !== currentParams.anchorDocument?.direction ||
+        aIParameter !== currentParams.anchorDocument?.id ||
+        aTParameter !== currentParams.anchorDocument?.title
+      ) {
+        const nextParams: TabQueryParameters = {
+          anchorDocument:
+            aDParameter && aIParameter && aTParameter
+              ? {
+                  direction: aDParameter as AnchorDirection,
+                  id: aIParameter,
+                  title: aTParameter,
+                }
+              : undefined,
+          titleFilter: titleParameter ?? undefined,
+        };
+
+        dispatch({
+          type: ActionType.setTabListParams,
+          params: nextParams,
+          route: pathname,
+          skipUrlUpdate: true,
+        });
+      }
+    }
+
+    if (!state.searchParamsReady) {
+      dispatch({ type: ActionType.searchParamsReady });
     }
   }, [searchParams]);
 

@@ -56,12 +56,26 @@ export const App: React.FC<AppProps> = (props) => {
           <Routes>
             <Route
               path={RouteNames.home}
-              element={<HomeView deletingTab={state.deletingTab} user={state.user.document} />}
+              element={
+                <HomeView
+                  deletingTab={state.deletingTab}
+                  listState={state[RouteNames.home]}
+                  searchParamsReady={state.searchParamsReady}
+                  user={state.user.document}
+                />
+              }
             />
 
             <Route
               path={RouteNames.myTabs}
-              element={<MyTabsView deletingTab={state.deletingTab} user={state.user.document} />}
+              element={
+                <MyTabsView
+                  deletingTab={state.deletingTab}
+                  listState={state[RouteNames.myTabs]}
+                  searchParamsReady={state.searchParamsReady}
+                  user={state.user.document}
+                />
+              }
             />
 
             <Route

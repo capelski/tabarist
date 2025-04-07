@@ -1,10 +1,20 @@
 import { User } from 'firebase/auth';
 import { AppProps } from '../app';
-import { ActiveSlot, StripeSubscription, Tab } from '../types';
+import { RouteNames } from '../constants';
+import { ActiveSlot, StripeSubscription, Tab, TabPageResponse, TabQueryParameters } from '../types';
+
+export type TabListState = {
+  data?: TabPageResponse;
+  loading?: boolean;
+  params: TabQueryParameters;
+  skipUrlUpdate?: boolean;
+};
 
 export type AppState = {
   deletingTab?: Tab;
+  [RouteNames.home]: TabListState;
   loading?: boolean;
+  [RouteNames.myTabs]: TabListState;
   navigate?:
     | {
         back?: undefined;
@@ -14,6 +24,8 @@ export type AppState = {
         back: true;
         to?: undefined;
       };
+  /** Used to delay data fetching operations until query string parameters have been parsed */
+  searchParamsReady: boolean;
   signInModal?: {
     message?: string;
   };
@@ -34,6 +46,13 @@ export type AppState = {
 };
 
 export const getInitialState = (props: AppProps): AppState => ({
+  [RouteNames.home]: {
+    params: {},
+  },
+  [RouteNames.myTabs]: {
+    params: {},
+  },
+  searchParamsReady: false,
   tab: {
     document: props.tab,
   },

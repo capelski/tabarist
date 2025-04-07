@@ -193,6 +193,29 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.fetchTabsEnd) {
+    return {
+      ...state,
+      [action.route]: {
+        ...state[action.route],
+        data: action.response,
+        loading: undefined,
+      },
+      navigate: action.navigate,
+    };
+  }
+
+  if (action.type === ActionType.fetchTabsStart) {
+    return {
+      ...state,
+      deletingTab: undefined, // Might come from a tab deletion modal
+      [action.route]: {
+        ...state[action.route],
+        loading: true,
+      },
+    };
+  }
+
   if (action.type === ActionType.loaderDisplay) {
     return {
       ...state,
@@ -217,6 +240,25 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         isDirty: undefined,
         isDraft: undefined,
         originalDocument: JSON.stringify(action.tab),
+      },
+    };
+  }
+
+  if (action.type === ActionType.searchParamsReady) {
+    return {
+      ...state,
+      searchParamsReady: true,
+    };
+  }
+
+  if (action.type === ActionType.setTabListParams) {
+    return {
+      ...state,
+      [action.route]: {
+        ...state[action.route],
+        data: undefined, // Clearing data will trigger a fetch request
+        params: action.params,
+        skipUrlUpdate: action.skipUrlUpdate,
       },
     };
   }

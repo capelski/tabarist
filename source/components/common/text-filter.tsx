@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from 'react';
 
 export type TextFilterProps = {
-  text: string;
-  textSetter: (text: string) => void;
+  initialValue: string;
+  update: (text: string) => void;
 };
 
 export const TextFilter: React.FC<TextFilterProps> = (props) => {
-  const [filter, setFilter] = useState(props.text);
+  const [filter, setFilter] = useState(props.initialValue);
 
   useEffect(() => {
-    setFilter(props.text);
-  }, [props.text]);
+    if (props.initialValue !== filter) {
+      setFilter(props.initialValue);
+    }
+  }, [props.initialValue]);
 
   return (
     <span>
       <div className="input-group mb-3">
-        {props.text && (
+        {props.initialValue && (
           <button
             className="btn btn-outline-secondary"
             onClick={() => {
               const nextText = '';
               setFilter(nextText);
-              props.textSetter(nextText);
+              props.update(nextText);
             }}
             type="button"
           >
@@ -40,7 +42,7 @@ export const TextFilter: React.FC<TextFilterProps> = (props) => {
         <button
           className="btn btn-outline-primary"
           onClick={() => {
-            props.textSetter(filter);
+            props.update(filter);
           }}
           type="button"
         >

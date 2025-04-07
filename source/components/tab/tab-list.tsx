@@ -1,98 +1,27 @@
 import { User } from 'firebase/auth';
-import React, { useContext, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router';
-import { QueryParameters } from '../../constants';
-import { ActionType, DispatchProvider } from '../../state';
-import { AnchorDirection, Tab, TabPageResponse, TabQueryParameters } from '../../types';
+import React, { useContext } from 'react';
+import { RouteNames } from '../../constants';
+import { ActionType, DispatchProvider, TabListState } from '../../state';
+import { Tab, TabQueryParameters } from '../../types';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
 import { TabListItem } from './tab-list-item';
 
 export type TabListBaseProps = {
   deletingTab?: Tab;
+  listState: TabListState;
   user: User | null;
 };
 
 export type TabListProps = TabListBaseProps & {
-  getTabs: (params?: TabQueryParameters) => Promise<TabPageResponse>;
+  route: RouteNames.home | RouteNames.myTabs;
 };
 
 export const TabList: React.FC<TabListProps> = (props) => {
-  const [loading, setLoading] = useState(false);
-  const [tabPageResponse, setTabPageResponse] = useState<TabPageResponse>({
-    hasNextPage: false,
-    hasPreviousPage: false,
-    tabs: [],
-  });
-  const [tabParams, setTabParams] = useState<TabQueryParameters>();
-
   const dispatch = useContext(DispatchProvider);
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  useEffect(() => {
-    const titleParameter = searchParams.get(QueryParameters.title);
-    const aDParameter = searchParams.get(QueryParameters.anchorDirection);
-    const aIParameter = searchParams.get(QueryParameters.anchorId);
-    const aTParameter = searchParams.get(QueryParameters.anchorTitle);
-
-    const nextTabParams: TabQueryParameters = {};
-
-    if (titleParameter) {
-      nextTabParams.titleFilter = titleParameter;
-    }
-
-    if (aDParameter && aIParameter && aTParameter) {
-      nextTabParams.anchorDocument = {
-        direction: aDParameter as AnchorDirection,
-        id: aIParameter,
-        title: aTParameter,
-      };
-    }
-
-    setTabParams(nextTabParams);
-  }, []);
-
-  const updateTabs = async (params?: TabQueryParameters) => {
-    setLoading(true);
-
-    const response = await props.getTabs(params);
-
-    if (params?.anchorDocument) {
-      const nextSearchParams = new URLSearchParams(searchParams);
-      nextSearchParams.set(QueryParameters.anchorDirection, params.anchorDocument.direction);
-      nextSearchParams.set(QueryParameters.anchorId, params.anchorDocument.id);
-      nextSearchParams.set(QueryParameters.anchorTitle, params.anchorDocument.title);
-      setSearchParams(nextSearchParams);
-    }
-
-    setLoading(false);
-    setTabPageResponse(response);
-  };
-
-  useEffect(() => {
-    if (props.user || tabParams) {
-      updateTabs(tabParams);
-    }
-  }, [props.user, tabParams]);
 
   const removeTab = (tab: Tab) => {
     dispatch({ type: ActionType.deletePrompt, tab });
-  };
-
-  const updateTitleFilter = (nextTitleFilter: string) => {
-    const nextSearchParams = new URLSearchParams(searchParams);
-    if (nextTitleFilter) {
-      nextSearchParams.set(QueryParameters.title, nextTitleFilter);
-    } else {
-      nextSearchParams.delete(QueryParameters.title);
-    }
-    nextSearchParams.delete(QueryParameters.anchorDirection);
-    nextSearchParams.delete(QueryParameters.anchorId);
-    nextSearchParams.delete(QueryParameters.anchorTitle);
-
-    const nextParams = { titleFilter: nextTitleFilter };
-    setTabParams(nextParams);
-    setSearchParams(nextSearchParams);
   };
 
   return (
@@ -100,21 +29,33 @@ export const TabList: React.FC<TabListProps> = (props) => {
       <TabDeletionModal
         deletingTab={props.deletingTab}
         onTabDeleted={() => {
-          dispatch({ type: ActionType.deleteConfirm });
-          updateTabs(tabParams);
+          dispatch({
+            type: ActionType.setTabListParams,
+            params: props.listState.params,
+            route: props.route,
+          });
         }}
       />
 
-      <TextFilter text={tabParams?.titleFilter ?? ''} textSetter={updateTitleFilter} />
+      <TextFilter
+        initialValue={props.listState.params.titleFilter ?? ''}
+        update={(titleFilter) => {
+          dispatch({
+            type: ActionType.setTabListParams,
+            params: { titleFilter },
+            route: props.route,
+          });
+        }}
+      />
 
       <p style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
           className="btn btn-outline-secondary"
-          disabled={!tabPageResponse.hasPreviousPage}
+          disabled={!props.listState.data?.hasPreviousPage}
           onClick={() => {
-            const firstTab = tabPageResponse.tabs[0];
-            const nextTabParams: TabQueryParameters = {
-              ...tabParams,
+            const firstTab = props.listState.data!.tabs[0];
+            const nextParams: TabQueryParameters = {
+              ...props.listState.params,
               anchorDocument: {
                 direction: 'previous',
                 id: firstTab.id,
@@ -122,20 +63,19 @@ export const TabList: React.FC<TabListProps> = (props) => {
               },
             };
 
-            setTabParams(nextTabParams);
+            dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
           }}
-          style={{ marginRight: 8 }}
           type="button"
         >
           ⏪️
         </button>
         <button
           className="btn btn-outline-secondary"
-          disabled={!tabPageResponse.hasNextPage}
+          disabled={!props.listState.data?.hasNextPage}
           onClick={() => {
-            const lastTab = tabPageResponse.tabs[tabPageResponse.tabs.length - 1];
-            const nextTabParams: TabQueryParameters = {
-              ...tabParams,
+            const lastTab = props.listState.data!.tabs[props.listState.data!.tabs.length - 1];
+            const nextParams: TabQueryParameters = {
+              ...props.listState.params,
               anchorDocument: {
                 direction: 'next',
                 id: lastTab.id,
@@ -143,7 +83,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
               },
             };
 
-            setTabParams(nextTabParams);
+            dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
           }}
           type="button"
         >
@@ -151,7 +91,9 @@ export const TabList: React.FC<TabListProps> = (props) => {
         </button>
       </p>
 
-      {tabPageResponse.tabs.length === 0 && !loading ? (
+      {!props.listState.data ? (
+        <p>Loading...</p>
+      ) : props.listState.data.tabs.length === 0 ? (
         <p style={{ textAlign: 'center' }}>
           No tabs to display. Create a tab by clicking on{' '}
           <a
@@ -166,20 +108,16 @@ export const TabList: React.FC<TabListProps> = (props) => {
         </p>
       ) : (
         <div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            tabPageResponse.tabs.map((tab) => {
-              return (
-                <TabListItem
-                  isTabOwner={!!props.user && props.user.uid === tab.ownerId}
-                  key={tab.id}
-                  startRemoveTab={() => removeTab(tab)}
-                  tab={tab}
-                />
-              );
-            })
-          )}
+          {props.listState.data.tabs.map((tab) => {
+            return (
+              <TabListItem
+                isTabOwner={!!props.user && props.user.uid === tab.ownerId}
+                key={tab.id}
+                startRemoveTab={() => removeTab(tab)}
+                tab={tab}
+              />
+            );
+          })}
         </div>
       )}
     </div>

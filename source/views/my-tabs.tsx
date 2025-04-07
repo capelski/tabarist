@@ -1,26 +1,55 @@
-import React from 'react';
-import { TabList, TabListBaseProps } from '../components/tab/tab-list';
+import React, { useContext, useEffect } from 'react';
+import { TabList, TabListBaseProps } from '../components';
+import { RouteNames } from '../constants';
+import { getTabListRelativeUrl } from '../operations';
 import { tabRepository } from '../repositories';
-import { TabPageResponse } from '../types';
+import { ActionType, DispatchProvider } from '../state';
 import { MetaTags } from './common/meta-tags';
 
-export const MyTabsView: React.FC<TabListBaseProps> = (props) => {
+export type MyTabsViewProps = TabListBaseProps & {
+  searchParamsReady: boolean;
+};
+
+const currentRoute = RouteNames.myTabs;
+
+export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
+  const dispatch = useContext(DispatchProvider);
+
+  const fetchTabs = async () => {
+    if (!props.user) {
+      return;
+    }
+
+    dispatch({ type: ActionType.fetchTabsStart, route: currentRoute });
+    const response = await tabRepository.getUserTabs(props.user.uid, props.listState.params);
+    dispatch({
+      type: ActionType.fetchTabsEnd,
+      navigate: props.listState.skipUrlUpdate
+        ? undefined
+        : {
+            to: [getTabListRelativeUrl(currentRoute, props.listState.params)],
+          },
+      response,
+      route: currentRoute,
+    });
+  };
+
+  useEffect(() => {
+    if (
+      props.user &&
+      props.searchParamsReady &&
+      !props.listState.data &&
+      !props.listState.loading
+    ) {
+      fetchTabs();
+    }
+  }, [props.listState, props.searchParamsReady, props.user]);
+
   return (
     <React.Fragment>
       <MetaTags title="Tabarist - My tabs" />
 
-      <TabList
-        {...props}
-        getTabs={(params) => {
-          return props.user
-            ? tabRepository.getUserTabs(props.user.uid, params)
-            : Promise.resolve<TabPageResponse>({
-                hasNextPage: false,
-                hasPreviousPage: false,
-                tabs: [],
-              });
-        }}
-      />
+      <TabList {...props} route={currentRoute} />
     </React.Fragment>
   );
 };
