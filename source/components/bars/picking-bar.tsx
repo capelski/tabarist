@@ -18,7 +18,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
 
   const getBackground = (slot: Slot) => {
     const backgroundColor = getBackgroundColor(slot);
-    return `linear-gradient(180deg, ${backgroundColor} calc(50% - 1px), #555 calc(50%), ${backgroundColor} calc(50% + 1px)`;
+    return `linear-gradient(180deg, ${backgroundColor} calc(50% - 1px), #555 calc(50%), ${backgroundColor} calc(50% + 1px))`;
   };
 
   const getBackgroundColor = (slot: Slot) => {
