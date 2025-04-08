@@ -11,6 +11,7 @@ export * from './position-operation.type';
 export * from './rhythm.type';
 export * from './section.type';
 export * from './slot.type';
+export * from './starred-tab.type';
 export * from './stripe-subscription.type';
 export * from './tab-page-response.type';
 export * from './tab-query-parameters.type';

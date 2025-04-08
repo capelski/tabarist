@@ -109,6 +109,6 @@ export const tabRepository = {
   },
   set: (tab: Tab, ownerId: User['uid']) => {
     const ownedTab = { ...tabOperations.diminishTab(tab), ownerId };
-    return setDocument(['tabs', tab.id], ownedTab);
+    return setDocument([tabsCollection, tab.id], ownedTab);
   },
 };

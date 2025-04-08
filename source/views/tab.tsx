@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository } from '../repositories';
+import { userRepository } from '../repositories/user.repository';
 import { ActionType, DispatchProvider } from '../state';
 import { ActiveSlot, Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
@@ -14,6 +15,7 @@ export type TabViewProps = {
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
+  isStarred?: boolean;
   scrollView: RefObject<HTMLDivElement>;
   tab?: Tab;
   user: User | null;
@@ -36,6 +38,19 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       });
     }
   }, [tabId]);
+
+  useEffect(() => {
+    const { tab, user } = props;
+    if (tab && user && props.isStarred === undefined) {
+      userRepository.getStarredTab(user.uid, tab.id).then((starredTab) => {
+        dispatch({ type: ActionType.setStarredTab, starredTab: !!starredTab });
+        if (starredTab && starredTab.title !== tab.title) {
+          // If the tab title has changed after it was starred, update the starred title
+          userRepository.setStarredTab(user.uid, tab);
+        }
+      });
+    }
+  }, [props.isStarred, props.tab, props.user]);
 
   const barContainers = useMemo(() => {
     if (props.tab?.bars) {
@@ -92,9 +107,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         activeSlot={props.activeSlot}
         barContainers={barContainers}
         isEditMode={props.isEditMode}
+        isStarred={props.isStarred}
         playTimeoutRef={playTimeoutRef}
         tab={props.tab}
         updateTab={updateTab}
+        user={props.user}
       />
     </div>
   );

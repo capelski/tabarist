@@ -1,6 +1,8 @@
+import { User } from 'firebase/auth';
 import React, { MutableRefObject, useContext, useEffect } from 'react';
 import { maxTempo, minTempo } from '../../constants';
 import { tabOperations } from '../../operations';
+import { userRepository } from '../../repositories/user.repository';
 import { ActionType, DispatchProvider } from '../../state';
 import { ActiveSlot, BarContainer, Tab } from '../../types';
 
@@ -8,9 +10,11 @@ export type TabFooterProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   isEditMode: boolean;
+  isStarred?: boolean;
   playTimeoutRef: MutableRefObject<number>;
   tab: Tab;
   updateTab: (tab: Tab) => void;
+  user: User | null;
 };
 
 let activeSlotLastDelay = 0;
@@ -48,6 +52,21 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     dispatch({ type: ActionType.activeSlotClear });
   };
 
+  const toggleStarredTab = async () => {
+    if (!props.user) {
+      dispatch({ type: ActionType.signInStart, message: 'Sign in to star this tab' });
+      return;
+    }
+
+    if (props.isStarred) {
+      await userRepository.removeStarredTab(props.user.uid, props.tab.id);
+      dispatch({ type: ActionType.setStarredTab, starredTab: false });
+    } else {
+      await userRepository.setStarredTab(props.user.uid, props.tab);
+      dispatch({ type: ActionType.setStarredTab, starredTab: true });
+    }
+  };
+
   return (
     <div
       className="tab-play"
@@ -60,6 +79,15 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         position: 'sticky',
       }}
     >
+      <button
+        className={`btn ${props.isStarred ? 'btn-primary' : 'btn-outline-primary'}`}
+        onClick={toggleStarredTab}
+        style={{ marginRight: 8 }}
+        type="button"
+      >
+        ★
+      </button>
+
       <div className="input-group" style={{ maxWidth: 180 }}>
         <span className="input-group-text">♫</span>
         <input

@@ -36,6 +36,7 @@ export type AppState = {
     isDirty?: boolean;
     isDraft?: boolean;
     isEditMode?: boolean;
+    isStarred?: boolean;
     /** Snapshot of the unmodified document */
     originalDocument?: string;
   };

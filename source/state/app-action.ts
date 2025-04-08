@@ -80,6 +80,10 @@ export type AppAction =
       skipUrlUpdate?: boolean;
     }
   | {
+      type: ActionType.setStarredTab;
+      starredTab: boolean;
+    }
+  | {
       type: ActionType.setStripeSubscription;
       subscription: StripeSubscription;
     }

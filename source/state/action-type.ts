@@ -16,6 +16,7 @@ export enum ActionType {
   loaderDisplay = 'loaderDisplay',
   loaderHide = 'loaderHide',
   searchParamsReady = 'searchParamsReady',
+  setStarredTab = 'setStarredTab',
   setStripeSubscription = 'setStripeSubscription',
   setTab = 'setTab',
   setTabListParams = 'setTabListParams',

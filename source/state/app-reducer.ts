@@ -263,6 +263,16 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.setStarredTab) {
+    return {
+      ...state,
+      tab: {
+        ...state.tab,
+        isStarred: action.starredTab,
+      },
+    };
+  }
+
   if (action.type === ActionType.setStripeSubscription) {
     return {
       ...state,

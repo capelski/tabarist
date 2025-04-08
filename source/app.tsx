@@ -86,6 +86,7 @@ export const App: React.FC<AppProps> = (props) => {
                   deletingTab={state.deletingTab}
                   isDirty={state.tab.isDirty}
                   isDraft={state.tab.isDraft}
+                  isStarred={state.tab.isStarred}
                   isEditMode={!!state.tab.isEditMode}
                   scrollView={scrollViewRef}
                   tab={state.tab.document}

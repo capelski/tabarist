@@ -51,6 +51,14 @@ service cloud.firestore {
       }
     }
 
+    match /users/{uid} {
+      allow read, write: if request.auth.uid == uid;
+
+      match /starredTabs/{tabId} {
+        allow read, write: if request.auth.uid == uid;
+      }
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
