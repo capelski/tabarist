@@ -4,7 +4,7 @@ import { tabOperations } from '../../operations';
 import { ActionType, DispatchProvider } from '../../state';
 import { ActiveSlot, BarContainer, Tab } from '../../types';
 
-export type TabPlayProps = {
+export type TabFooterProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   isEditMode: boolean;
@@ -16,7 +16,7 @@ export type TabPlayProps = {
 let activeSlotLastDelay = 0;
 let activeSlotLastRender = 0;
 
-export const TabPlay: React.FC<TabPlayProps> = (props) => {
+export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const dispatch = useContext(DispatchProvider);
 
   const updateActiveSlot = () => {
