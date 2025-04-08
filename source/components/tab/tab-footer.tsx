@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import React, { MutableRefObject, useContext, useEffect } from 'react';
 import { maxTempo, minTempo } from '../../constants';
 import { tabOperations } from '../../operations';
-import { userRepository } from '../../repositories/user.repository';
+import { userRepository } from '../../repositories';
 import { ActionType, DispatchProvider } from '../../state';
 import { ActiveSlot, BarContainer, Tab } from '../../types';
 

@@ -3,8 +3,7 @@ import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react'
 import { useParams } from 'react-router';
 import { BarGroup, RhythmList, SectionList, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
-import { tabRepository } from '../repositories';
-import { userRepository } from '../repositories/user.repository';
+import { tabRepository, userRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
 import { ActiveSlot, Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
