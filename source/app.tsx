@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router';
 import { ToastContainer } from 'react-toastify';
 import { BlockingLoader, NavBar, SignInModal } from './components';
 import { TabDiscardModal } from './components/tab/tab-discard-modal';
+import { UpgradeModal } from './components/user/upgrade-modal';
 import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
 import { appReducer, DispatchProvider, getInitialState } from './state';
@@ -30,6 +31,8 @@ export const App: React.FC<AppProps> = (props) => {
           overflow: 'hidden',
         }}
       >
+        {state.loading && <BlockingLoader />}
+
         {state.signInModal && (
           <SignInModal>
             {state.signInModal.message && <p>{state.signInModal.message}</p>}
@@ -38,7 +41,7 @@ export const App: React.FC<AppProps> = (props) => {
 
         {state.tab.discardChangesModal && <TabDiscardModal />}
 
-        {state.loading && <BlockingLoader />}
+        {state.upgradeModal && <UpgradeModal user={state.user.document} />}
 
         <ToastContainer position="bottom-center" />
 

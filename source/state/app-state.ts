@@ -49,6 +49,7 @@ export type AppState = {
     /** Snapshot of the unmodified document */
     originalDocument?: string;
   };
+  upgradeModal?: boolean;
   user: {
     document: User | null;
     stripeSubscription?: StripeSubscription;

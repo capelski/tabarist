@@ -26,4 +26,6 @@ export enum ActionType {
   signInFinish = 'signInFinish',
   signInStart = 'signInStart',
   updateTab = 'updateTab',
+  upgradeCancel = 'upgradeCancel',
+  upgradeStart = 'upgradeStart',
 }

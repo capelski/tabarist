@@ -117,4 +117,10 @@ export type AppAction =
   | {
       type: ActionType.updateTab;
       tab: Tab;
+    }
+  | {
+      type: ActionType.upgradeCancel;
+    }
+  | {
+      type: ActionType.upgradeStart;
     };

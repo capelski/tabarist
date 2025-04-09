@@ -352,5 +352,19 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.upgradeCancel) {
+    return {
+      ...state,
+      upgradeModal: undefined,
+    };
+  }
+
+  if (action.type === ActionType.upgradeStart) {
+    return {
+      ...state,
+      upgradeModal: true,
+    };
+  }
+
   return state;
 };

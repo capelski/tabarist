@@ -68,20 +68,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       return;
     }
 
-    dispatch({ type: ActionType.loaderDisplay });
-
-    try {
-      const checkoutUrl = await customerRepository.createCheckoutSession(props.user.uid);
-      window.location.assign(checkoutUrl);
-    } catch (error) {
-      dispatch({ type: ActionType.loaderHide });
-
-      console.error(error);
-      toast('An error occurred while connecting to Stripe', {
-        type: 'error',
-        autoClose: 5000,
-      });
-    }
+    dispatch({ type: ActionType.upgradeStart });
   };
 
   return (
