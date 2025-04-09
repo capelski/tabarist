@@ -7,7 +7,7 @@ import {
   StarredTab,
   StripeSubscription,
   Tab,
-  TabQueryParameters,
+  TabListParameters,
 } from '../types';
 import { ActionType } from './action-type';
 import { AppState } from './app-state';
@@ -90,7 +90,7 @@ export type AppAction =
     }
   | {
       type: ActionType.setTabListParams;
-      params: TabQueryParameters;
+      params: TabListParameters;
       route: RouteNames.home | RouteNames.myTabs;
       skipUrlUpdate?: boolean;
     }

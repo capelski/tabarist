@@ -8,7 +8,7 @@ import {
   StarredTab,
   StripeSubscription,
   Tab,
-  TabQueryParameters,
+  TabListParameters,
 } from '../types';
 
 export type ListState<TData, TParams> = {
@@ -20,9 +20,9 @@ export type ListState<TData, TParams> = {
 
 export type AppState = {
   deletingTab?: Tab;
-  [RouteNames.home]: ListState<Tab, TabQueryParameters>;
+  [RouteNames.home]: ListState<Tab, TabListParameters>;
   loading?: boolean;
-  [RouteNames.myTabs]: ListState<Tab, TabQueryParameters>;
+  [RouteNames.myTabs]: ListState<Tab, TabListParameters>;
   navigate?:
     | {
         back?: undefined;

@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
 import { RouteNames } from '../../constants';
 import { ActionType, DispatchProvider, ListState } from '../../state';
-import { Tab, TabQueryParameters } from '../../types';
+import { Tab, TabListParameters } from '../../types';
 import { ItemsList } from '../common/items-list';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
@@ -10,7 +10,7 @@ import { TabListItem } from './tab-list-item';
 
 export type TabListBaseProps = {
   deletingTab?: Tab;
-  listState: ListState<Tab, TabQueryParameters>;
+  listState: ListState<Tab, TabListParameters>;
   user: User | null;
 };
 
@@ -64,7 +64,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
         loadNext={() => {
           const lastTab =
             props.listState.data!.documents[props.listState.data!.documents.length - 1];
-          const nextParams: TabQueryParameters = {
+          const nextParams: TabListParameters = {
             ...props.listState.params,
             anchorDocument: {
               direction: 'next',
@@ -77,7 +77,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
         }}
         loadPrevious={() => {
           const firstTab = props.listState.data!.documents[0];
-          const nextParams: TabQueryParameters = {
+          const nextParams: TabListParameters = {
             ...props.listState.params,
             anchorDocument: {
               direction: 'previous',

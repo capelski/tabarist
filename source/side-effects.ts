@@ -6,7 +6,7 @@ import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl } from './operations';
 import { customerRepository } from './repositories';
 import { ActionType, AppAction, AppState } from './state';
-import { AnchorDirection, StarredListParameters, TabQueryParameters } from './types';
+import { AnchorDirection, StarredListParameters, TabListParameters } from './types';
 
 export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) => {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
         aIParameter !== currentParams.anchorDocument?.id ||
         aTParameter !== currentParams.anchorDocument?.title
       ) {
-        const nextParams: TabQueryParameters = {
+        const nextParams: TabListParameters = {
           anchorDocument:
             aDParameter && aIParameter && aTParameter
               ? {

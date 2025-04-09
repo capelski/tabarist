@@ -1,6 +1,10 @@
+- AdSense
+- Upgrade in the navbar, when signed in and not subscribed
+- Allow editing sections from the tab details
+- <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
-- Add capacitor and build APP bundle. Integrate AdMob/AdSense
+- Add capacitor and build APP bundle. Integrate AdMob
 - Display total documents matching in tab-list component
     https://firebase.google.com/docs/firestore/query-data/aggregation-queries
 - Consider section name length in bar container operations, getBarWidth

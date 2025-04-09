@@ -15,7 +15,7 @@ import { pageSize } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { tabOperations } from '../operations';
-import { DiminishedTab, PageResponse, Tab, TabQueryParameters } from '../types';
+import { DiminishedTab, PageResponse, Tab, TabListParameters } from '../types';
 
 const tabsCollection = 'tabs';
 
@@ -28,7 +28,7 @@ const getTabsQuery = (
   order: OrderByDirection,
   documentsNumber: number,
   titleFilter = '',
-  anchorDocument?: TabQueryParameters['anchorDocument'],
+  anchorDocument?: TabListParameters['anchorDocument'],
 ) => {
   return query(
     collection(getFirebaseContext().firestore, tabsCollection),
@@ -42,7 +42,7 @@ const getTabsQuery = (
 };
 
 const getTabs = async (
-  params?: TabQueryParameters,
+  params?: TabListParameters,
   whereClauses: QueryFieldFilterConstraint[] = [],
 ): Promise<PageResponse<Tab>> => {
   const order = params?.anchorDocument?.direction === 'previous' ? 'desc' : 'asc';
@@ -98,10 +98,10 @@ export const tabRepository = {
     const diminishedTab = (await getDocument(getTabPath(tabId))) as DiminishedTab;
     return diminishedTab ? tabOperations.augmentTab(diminishedTab) : undefined;
   },
-  getPublicTabs: (params?: TabQueryParameters) => {
+  getPublicTabs: (params?: TabListParameters) => {
     return getTabs(params);
   },
-  getUserTabs: (userId: User['uid'], params?: TabQueryParameters) => {
+  getUserTabs: (userId: User['uid'], params?: TabListParameters) => {
     return getTabs(params, [where('ownerId', '==', userId)]);
   },
   remove: (tabId: string) => {

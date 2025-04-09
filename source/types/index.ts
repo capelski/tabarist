@@ -15,6 +15,6 @@ export * from './slot.type';
 export * from './starred-list-parameters.type';
 export * from './starred-tab.type';
 export * from './stripe-subscription.type';
-export * from './tab-query-parameters.type';
+export * from './tab-list-parameters.type';
 export * from './tab-registry.type';
 export * from './tab.type';
