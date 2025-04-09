@@ -301,6 +301,13 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.setStarredTab) {
     return {
       ...state,
+      starredTabs: action.starredTab
+        ? state.starredTabs
+        : {
+            ...state.starredTabs,
+            // Removing the starred tab might require reloading the list of starred tabs
+            data: undefined,
+          },
       tab: {
         ...state.tab,
         isStarred: action.starredTab,

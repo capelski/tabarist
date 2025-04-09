@@ -2,12 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router';
 import { removeSymbol } from '../../constants';
 import { getTabRelativeUrl } from '../../operations';
-import { Tab } from '../../types';
+import { StarredTab } from '../../types';
 
 export type TabListItemProps = {
-  isTabOwner: boolean;
-  startRemoveTab: () => void;
-  tab: Tab;
+  allowRemoving: boolean;
+  remove: () => void;
+  tab: StarredTab;
 };
 
 export const TabListItem: React.FC<TabListItemProps> = (props) => {
@@ -19,9 +19,9 @@ export const TabListItem: React.FC<TabListItemProps> = (props) => {
       <NavLink className="nav-link" style={{ flexGrow: 1 }} to={getTabRelativeUrl(props.tab.id)}>
         {props.tab.title}
       </NavLink>
-      {props.isTabOwner && (
+      {props.allowRemoving && (
         <div>
-          <button className="btn btn-outline-danger" onClick={props.startRemoveTab} type="button">
+          <button className="btn btn-outline-danger" onClick={props.remove} type="button">
             {removeSymbol}
           </button>
         </div>

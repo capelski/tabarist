@@ -1,5 +1,6 @@
 import { User } from 'firebase/auth';
 import React, { useContext, useEffect } from 'react';
+import { TabListItem } from '../components';
 import { ItemsList } from '../components/common/items-list';
 import { getStarredListRelativeUrl } from '../operations';
 import { userRepository } from '../repositories';
@@ -47,11 +48,28 @@ export const StarredTabsView: React.FC<StarredTabsViewProps> = (props) => {
 
   return (
     <React.Fragment>
-      <MetaTags title="Tabarist - My tabs" />
+      <MetaTags title="Tabarist - Starred tabs" />
 
       <ItemsList
         itemRenderer={(tab: StarredTab) => {
-          return <p key={tab.id}>{tab.title}</p>;
+          return (
+            <TabListItem
+              allowRemoving={true}
+              key={tab.id}
+              remove={async () => {
+                if (!props.user) {
+                  return;
+                }
+
+                await userRepository.removeStarredTab(props.user.uid, tab.id);
+                dispatch({
+                  type: ActionType.setStarredListParameters,
+                  params: props.listState.params,
+                });
+              }}
+              tab={tab}
+            />
+          );
         }}
         listState={props.listState}
         loadNext={() => {

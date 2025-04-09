@@ -53,9 +53,9 @@ export const TabList: React.FC<TabListProps> = (props) => {
         itemRenderer={(tab: Tab) => {
           return (
             <TabListItem
-              isTabOwner={!!props.user && props.user.uid === tab.ownerId}
+              allowRemoving={!!props.user && props.user.uid === tab.ownerId}
               key={tab.id}
-              startRemoveTab={() => removeTab(tab)}
+              remove={() => removeTab(tab)}
               tab={tab}
             />
           );
