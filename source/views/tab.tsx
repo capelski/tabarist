@@ -105,6 +105,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       <TabFooter
         activeSlot={props.activeSlot}
         barContainers={barContainers}
+        isDraft={props.isDraft}
         isEditMode={props.isEditMode}
         isStarred={props.isStarred}
         playTimeoutRef={playTimeoutRef}

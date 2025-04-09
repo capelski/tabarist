@@ -9,6 +9,7 @@ import { ActiveSlot, BarContainer, Tab } from '../../types';
 export type TabFooterProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
+  isDraft?: boolean;
   isEditMode: boolean;
   isStarred?: boolean;
   playTimeoutRef: MutableRefObject<number>;
@@ -81,6 +82,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     >
       <button
         className={`btn ${props.isStarred ? 'btn-primary' : 'btn-outline-primary'}`}
+        disabled={props.isDraft}
         onClick={toggleStarredTab}
         style={{ marginRight: 8 }}
         type="button"
