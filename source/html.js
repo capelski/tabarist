@@ -5,7 +5,7 @@
 // by webpack development configuration
 
 module.exports = {
-  getHtml: (appHtml = '', headTags = '', initialState) =>
+  getHtml: (options = {}) =>
     `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -13,15 +13,27 @@ module.exports = {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="author" content="Carles Capellas" />
     <meta name="robots" content="index, follow" />
-    ${headTags}
+    ${options.headTags || ''}
 
     <link rel="stylesheet" href="/main.css">
-    ${initialState ? `<script>window.initialState = ${JSON.stringify(initialState)};</script>` : ''}
+    ${
+      options.initialState
+        ? `<script>window.initialState = ${JSON.stringify(options.initialState)};</script>`
+        : ''
+    }
     <script defer="defer" src="/main.js"></script>
+
+    ${
+      options.adSenseId
+        ? `<script async crossorigin="anonymous"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${options.adSenseId}"
+        ></script>`
+        : ''
+    }
   </head>
 
   <body style="margin: 0">
-    <div id="app-placeholder">${appHtml}</div>
+    <div id="app-placeholder">${options.appHtml || ''}</div>
   </body>
 </html>
 `,

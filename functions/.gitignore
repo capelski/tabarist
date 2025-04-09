@@ -8,4 +8,5 @@ typings/
 node_modules/
 *.local
 
+secrets.json
 src/ssr

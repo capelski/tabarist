@@ -5,6 +5,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Helmet } from 'react-helmet';
+import { adSenseId } from './secrets.json';
 import {
   AppProps,
   DiminishedTab,
@@ -47,7 +48,7 @@ expressApp.get(routes, async (req, res) => {
   const helmet = Helmet.renderStatic();
   const headTags = helmet.title.toString() + helmet.meta.toString();
 
-  const indexHtml = getHtml(appHtml, headTags, initialState);
+  const indexHtml = getHtml({ adSenseId, appHtml, headTags, initialState });
 
   res.send(indexHtml);
 });
