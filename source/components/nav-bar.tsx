@@ -125,6 +125,14 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                 New tab
               </a>
             </li>
+
+            {props.user && !props.subscription && (
+              <li className="nav-item">
+                <button className="btn btn-success" onClick={upgrade} style={{ margin: '0 8px' }}>
+                  Upgrade
+                </button>
+              </li>
+            )}
           </ul>
 
           {props.user ? (
@@ -171,17 +179,13 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  {props.subscription ? (
+                  {props.subscription && (
                     <a
                       className="dropdown-item"
                       onClick={manageSubscription}
                       style={{ cursor: 'pointer' }}
                     >
                       Manage subscription
-                    </a>
-                  ) : (
-                    <a className="dropdown-item" onClick={upgrade} style={{ cursor: 'pointer' }}>
-                      Upgrade
                     </a>
                   )}
                 </li>

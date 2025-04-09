@@ -27,7 +27,7 @@ export const SignInModal: React.FC<SignInModalProps> = (props) => {
   return (
     <Modal closeHandler={finishSignIn}>
       {props.children}
-      <button onClick={signIn} style={{ marginRight: 8 }} type="button">
+      <button className="btn btn-primary" onClick={signIn} style={{ marginRight: 8 }} type="button">
         Sign in with google
       </button>
     </Modal>
