@@ -1,15 +1,16 @@
 import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
 import { RouteNames } from '../../constants';
-import { ActionType, DispatchProvider, TabListState } from '../../state';
+import { ActionType, DispatchProvider, ListState } from '../../state';
 import { Tab, TabQueryParameters } from '../../types';
+import { ItemsList } from '../common/items-list';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
 import { TabListItem } from './tab-list-item';
 
 export type TabListBaseProps = {
   deletingTab?: Tab;
-  listState: TabListState;
+  listState: ListState<Tab, TabQueryParameters>;
   user: User | null;
 };
 
@@ -48,78 +49,60 @@ export const TabList: React.FC<TabListProps> = (props) => {
         }}
       />
 
-      <p style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button
-          className="btn btn-outline-secondary"
-          disabled={!props.listState.data?.hasPreviousPage}
-          onClick={() => {
-            const firstTab = props.listState.data!.tabs[0];
-            const nextParams: TabQueryParameters = {
-              ...props.listState.params,
-              anchorDocument: {
-                direction: 'previous',
-                id: firstTab.id,
-                title: firstTab.title,
-              },
-            };
+      <ItemsList
+        itemRenderer={(tab: Tab) => {
+          return (
+            <TabListItem
+              isTabOwner={!!props.user && props.user.uid === tab.ownerId}
+              key={tab.id}
+              startRemoveTab={() => removeTab(tab)}
+              tab={tab}
+            />
+          );
+        }}
+        listState={props.listState}
+        loadNext={() => {
+          const lastTab =
+            props.listState.data!.documents[props.listState.data!.documents.length - 1];
+          const nextParams: TabQueryParameters = {
+            ...props.listState.params,
+            anchorDocument: {
+              direction: 'next',
+              id: lastTab.id,
+              title: lastTab.title,
+            },
+          };
 
-            dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
-          }}
-          type="button"
-        >
-          ⏪️
-        </button>
-        <button
-          className="btn btn-outline-secondary"
-          disabled={!props.listState.data?.hasNextPage}
-          onClick={() => {
-            const lastTab = props.listState.data!.tabs[props.listState.data!.tabs.length - 1];
-            const nextParams: TabQueryParameters = {
-              ...props.listState.params,
-              anchorDocument: {
-                direction: 'next',
-                id: lastTab.id,
-                title: lastTab.title,
-              },
-            };
+          dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
+        }}
+        loadPrevious={() => {
+          const firstTab = props.listState.data!.documents[0];
+          const nextParams: TabQueryParameters = {
+            ...props.listState.params,
+            anchorDocument: {
+              direction: 'previous',
+              id: firstTab.id,
+              title: firstTab.title,
+            },
+          };
 
-            dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
-          }}
-          type="button"
-        >
-          ⏩
-        </button>
-      </p>
-
-      {!props.listState.data ? (
-        <p>Loading...</p>
-      ) : props.listState.data.tabs.length === 0 ? (
-        <p style={{ textAlign: 'center' }}>
-          No tabs to display. Create a tab by clicking on{' '}
-          <a
-            onClick={() => {
-              dispatch({ type: ActionType.createTab });
-            }}
-            style={{ cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            New tab
-          </a>
-          .
-        </p>
-      ) : (
-        <div>
-          {props.listState.data.tabs.map((tab) => {
-            return (
-              <TabListItem
-                isTabOwner={!!props.user && props.user.uid === tab.ownerId}
-                key={tab.id}
-                startRemoveTab={() => removeTab(tab)}
-                tab={tab}
-              />
-            );
-          })}
-        </div>
-      )}
+          dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
+        }}
+        noDocuments={
+          <p style={{ textAlign: 'center' }}>
+            No tabs to display. Create a tab by clicking on{' '}
+            <a
+              onClick={() => {
+                dispatch({ type: ActionType.createTab });
+              }}
+              style={{ cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              New tab
+            </a>
+            .
+          </p>
+        }
+      />
     </div>
   );
 };

@@ -1,20 +1,28 @@
 import { User } from 'firebase/auth';
 import { AppProps } from '../app';
 import { RouteNames } from '../constants';
-import { ActiveSlot, StripeSubscription, Tab, TabPageResponse, TabQueryParameters } from '../types';
+import {
+  ActiveSlot,
+  PageResponse,
+  StarredListParameters,
+  StarredTab,
+  StripeSubscription,
+  Tab,
+  TabQueryParameters,
+} from '../types';
 
-export type TabListState = {
-  data?: TabPageResponse;
+export type ListState<TData, TParams> = {
+  data?: PageResponse<TData>;
   loading?: boolean;
-  params: TabQueryParameters;
+  params: TParams;
   skipUrlUpdate?: boolean;
 };
 
 export type AppState = {
   deletingTab?: Tab;
-  [RouteNames.home]: TabListState;
+  [RouteNames.home]: ListState<Tab, TabQueryParameters>;
   loading?: boolean;
-  [RouteNames.myTabs]: TabListState;
+  [RouteNames.myTabs]: ListState<Tab, TabQueryParameters>;
   navigate?:
     | {
         back?: undefined;
@@ -29,6 +37,7 @@ export type AppState = {
   signInModal?: {
     message?: string;
   };
+  starredTabs: ListState<StarredTab, StarredListParameters>;
   tab: {
     activeSlot?: ActiveSlot;
     discardChangesModal?: boolean;
@@ -54,6 +63,9 @@ export const getInitialState = (props: AppProps): AppState => ({
     params: {},
   },
   searchParamsReady: false,
+  starredTabs: {
+    params: {},
+  },
   tab: {
     document: props.tab,
   },

@@ -25,5 +25,5 @@ module.exports = {
   </body>
 </html>
 `,
-  routes: [/^\/$/, '/my-tabs', '/tab/:tabId'],
+  routes: [/^\/$/, '/my-tabs', '/starred-tabs', '/tab/:tabId'],
 };

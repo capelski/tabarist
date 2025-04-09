@@ -7,7 +7,7 @@ import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
 import { appReducer, DispatchProvider, getInitialState } from './state';
 import { Tab } from './types';
-import { HomeView, MyTabsView, TabView } from './views';
+import { HomeView, MyTabsView, StarredTabsView, TabView } from './views';
 
 export type AppProps = {
   tab?: Tab;
@@ -72,6 +72,17 @@ export const App: React.FC<AppProps> = (props) => {
                 <MyTabsView
                   deletingTab={state.deletingTab}
                   listState={state[RouteNames.myTabs]}
+                  searchParamsReady={state.searchParamsReady}
+                  user={state.user.document}
+                />
+              }
+            />
+
+            <Route
+              path={RouteNames.starredTabs}
+              element={
+                <StarredTabsView
+                  listState={state.starredTabs}
                   searchParamsReady={state.searchParamsReady}
                   user={state.user.document}
                 />

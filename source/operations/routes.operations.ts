@@ -1,5 +1,14 @@
 import { QueryParameters, RouteNames } from '../constants';
-import { TabQueryParameters } from '../types';
+import { StarredListParameters, TabQueryParameters } from '../types';
+
+export const getStarredListRelativeUrl = (params: StarredListParameters) => {
+  const anchorParams = params.anchorDocument
+    ? `${QueryParameters.anchorDirection}=${params.anchorDocument.direction}&` +
+      `${QueryParameters.anchorId}=${params.anchorDocument.id}`
+    : '';
+
+  return `${RouteNames.starredTabs}${anchorParams ? `?${anchorParams}` : ''}`;
+};
 
 export const getTabListRelativeUrl = (
   tabListRoute: RouteNames.home | RouteNames.myTabs,

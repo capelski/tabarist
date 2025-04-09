@@ -2,9 +2,11 @@ import { User } from 'firebase/auth';
 import { RouteNames } from '../constants';
 import {
   BarContainer,
+  PageResponse,
+  StarredListParameters,
+  StarredTab,
   StripeSubscription,
   Tab,
-  TabPageResponse,
   TabQueryParameters,
 } from '../types';
 import { ActionType } from './action-type';
@@ -55,9 +57,17 @@ export type AppAction =
       navigate?: AppState['navigate'];
     }
   | {
+      type: ActionType.fetchStarredTabsEnd;
+      navigate?: AppState['navigate'];
+      response: PageResponse<StarredTab>;
+    }
+  | {
+      type: ActionType.fetchStarredTabsStart;
+    }
+  | {
       type: ActionType.fetchTabsEnd;
       navigate?: AppState['navigate'];
-      response: TabPageResponse;
+      response: PageResponse<Tab>;
       route: RouteNames.home | RouteNames.myTabs;
     }
   | {
@@ -72,6 +82,11 @@ export type AppAction =
     }
   | {
       type: ActionType.searchParamsReady;
+    }
+  | {
+      type: ActionType.setStarredListParameters;
+      params: StarredListParameters;
+      skipUrlUpdate?: boolean;
     }
   | {
       type: ActionType.setTabListParams;

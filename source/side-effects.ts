@@ -6,7 +6,7 @@ import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl } from './operations';
 import { customerRepository } from './repositories';
 import { ActionType, AppAction, AppState } from './state';
-import { AnchorDirection, TabQueryParameters } from './types';
+import { AnchorDirection, StarredListParameters, TabQueryParameters } from './types';
 
 export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) => {
   const navigate = useNavigate();
@@ -78,6 +78,35 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
           type: ActionType.setTabListParams,
           params: nextParams,
           route: pathname,
+          skipUrlUpdate: true,
+        });
+      }
+    }
+
+    if (pathname === RouteNames.starredTabs) {
+      const aDParameter = searchParams.get(QueryParameters.anchorDirection);
+      const aIParameter = searchParams.get(QueryParameters.anchorId);
+
+      const currentParams = state.starredTabs.params;
+
+      if (
+        !currentParams ||
+        aDParameter !== currentParams.anchorDocument?.direction ||
+        aIParameter !== currentParams.anchorDocument?.id
+      ) {
+        const nextParams: StarredListParameters = {
+          anchorDocument:
+            aDParameter && aIParameter
+              ? {
+                  direction: aDParameter as AnchorDirection,
+                  id: aIParameter,
+                }
+              : undefined,
+        };
+
+        dispatch({
+          type: ActionType.setStarredListParameters,
+          params: nextParams,
           skipUrlUpdate: true,
         });
       }

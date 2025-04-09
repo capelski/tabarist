@@ -148,10 +148,27 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
                         event.preventDefault();
                       }
                     }}
+                    to={RouteNames.starredTabs}
+                  >
+                    Starred tabs
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    className="dropdown-item"
+                    onClick={(event) => {
+                      if (props.isCurrentTabDirty) {
+                        dispatch({ type: ActionType.discardChangesPrompt });
+                        event.preventDefault();
+                      }
+                    }}
                     to={RouteNames.myTabs}
                   >
                     My tabs
                   </NavLink>
+                </li>
+                <li>
+                  <hr className="dropdown-divider" />
                 </li>
                 <li>
                   {props.subscription ? (

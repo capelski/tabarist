@@ -193,6 +193,29 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.fetchStarredTabsEnd) {
+    return {
+      ...state,
+      starredTabs: {
+        ...state.starredTabs,
+        data: action.response,
+        loading: undefined,
+        skipUrlUpdate: undefined,
+      },
+      navigate: action.navigate,
+    };
+  }
+
+  if (action.type === ActionType.fetchStarredTabsStart) {
+    return {
+      ...state,
+      starredTabs: {
+        ...state.starredTabs,
+        loading: true,
+      },
+    };
+  }
+
   if (action.type === ActionType.fetchTabsEnd) {
     return {
       ...state,
@@ -200,6 +223,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state[action.route],
         data: action.response,
         loading: undefined,
+        skipUrlUpdate: undefined,
       },
       navigate: action.navigate,
     };
@@ -239,6 +263,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         document: action.tab,
         isDirty: undefined,
         isDraft: undefined,
+        isStarred: undefined,
         originalDocument: JSON.stringify(action.tab),
       },
     };
@@ -251,12 +276,22 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
+  if (action.type === ActionType.setStarredListParameters) {
+    return {
+      ...state,
+      starredTabs: {
+        // Clearing data will trigger a fetch request
+        params: action.params,
+        skipUrlUpdate: action.skipUrlUpdate,
+      },
+    };
+  }
+
   if (action.type === ActionType.setTabListParams) {
     return {
       ...state,
       [action.route]: {
-        ...state[action.route],
-        data: undefined, // Clearing data will trigger a fetch request
+        // Clearing data will trigger a fetch request
         params: action.params,
         skipUrlUpdate: action.skipUrlUpdate,
       },
