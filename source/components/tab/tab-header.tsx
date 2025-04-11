@@ -63,7 +63,8 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
       <div className="mb-3" style={{ alignItems: 'center', display: 'flex' }}>
         {props.isEditMode ? (
-          <div className="input-group">
+          <div className="input-group ">
+            <span className="input-group-text">Title</span>
             <input
               className="form-control"
               onChange={(event) => {

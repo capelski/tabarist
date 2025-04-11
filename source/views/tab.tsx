@@ -84,13 +84,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
       <TabDetails isEditMode={props.isEditMode} tab={props.tab} updateTab={updateTab} />
 
-      {props.isEditMode && (
-        <React.Fragment>
-          <SectionList tab={props.tab} updateTab={updateTab} />
-          <RhythmList tab={props.tab} updateTab={updateTab} />
-        </React.Fragment>
-      )}
-
       <BarGroup
         activeSlot={props.activeSlot}
         barContainers={barContainers}
@@ -101,6 +94,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         tab={props.tab}
         updateTab={updateTab}
       />
+
+      {props.isEditMode && (
+        <React.Fragment>
+          <SectionList tab={props.tab} updateTab={updateTab} />
+          <RhythmList tab={props.tab} updateTab={updateTab} />
+        </React.Fragment>
+      )}
 
       <TabFooter
         activeSlot={props.activeSlot}
