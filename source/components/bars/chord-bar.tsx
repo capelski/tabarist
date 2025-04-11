@@ -49,8 +49,6 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
     <div
       className="chord-bar"
       style={{
-        borderLeft: '1px solid black',
-        boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
         flexGrow: 1,

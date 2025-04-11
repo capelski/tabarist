@@ -1,9 +1,13 @@
 import React from 'react';
-import { BarType, cancelSymbol, moveStartSymbol, removeSymbol } from '../../constants';
-import { getIndexDisplayValue, sectionOperations, tabOperations } from '../../operations';
+import { BarType, cancelSymbol, optionsSymbol } from '../../constants';
+import { getIndexDisplayValue, tabOperations } from '../../operations';
 import { BarContainer, Section, Tab } from '../../types';
+import { AddBar } from './add-bar';
+import { BarDestination } from './bar-destination';
+import { getPositionOperationConditions } from './bar-handlers';
 
 export type BarControlsProps = {
+  barIndex: number;
   container: BarContainer;
   inSection: Section | undefined;
   tab: Tab;
@@ -43,6 +47,13 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     props.updateTab(nextTab);
   };
 
+  const {
+    positionOperation,
+    positionOperationApplicable,
+    isPositionSource,
+    isValidPositionTarget,
+  } = getPositionOperationConditions(props.tab, props.container.originalBar.index, props.inSection);
+
   return (
     <div
       className="bar-controls"
@@ -61,53 +72,63 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         )}
       </span>
 
-      {props.tab.moving &&
-      sectionOperations.isOperationInSection(props.tab.moving, props.inSection) &&
-      props.tab.moving.startIndex === props.container.originalBar.index ? (
-        <button
-          className="btn btn-sm btn-outline-secondary"
-          onClick={cancelPositionOperation}
-          style={{ marginRight: 8 }}
-          type="button"
-        >
-          {cancelSymbol}
-        </button>
-      ) : (
-        <button
-          className="btn btn-sm btn-outline-primary"
-          onClick={moveBarStart}
-          style={{ marginRight: 8 }}
-          type="button"
-        >
-          {moveStartSymbol}
-        </button>
-      )}
+      {positionOperationApplicable &&
+        (isPositionSource ? (
+          <button
+            className="btn btn-sm btn-outline-secondary"
+            onClick={cancelPositionOperation}
+            type="button"
+          >
+            {cancelSymbol}
+          </button>
+        ) : (
+          isValidPositionTarget && (
+            <BarDestination
+              barIndex={props.barIndex}
+              inSection={props.inSection}
+              tab={props.tab}
+              updateTab={props.updateTab}
+            />
+          )
+        ))}
 
-      {props.tab.copying &&
-      sectionOperations.isOperationInSection(props.tab.copying, props.inSection) &&
-      props.tab.copying.startIndex === props.container.originalBar.index ? (
-        <button
-          className="btn btn-sm btn-outline-secondary"
-          onClick={cancelPositionOperation}
-          style={{ marginRight: 8 }}
-          type="button"
-        >
-          {cancelSymbol}
-        </button>
-      ) : (
-        <button
-          className="btn btn-sm btn-outline-secondary"
-          onClick={copyBarStart}
-          style={{ marginRight: 8 }}
-          type="button"
-        >
-          =
-        </button>
-      )}
+      {!positionOperation && (
+        <React.Fragment>
+          <button
+            aria-expanded="false"
+            className="btn btn-sm btn-outline-success"
+            data-bs-toggle="dropdown"
+            style={{ marginRight: 8 }}
+            type="button"
+          >
+            {optionsSymbol}
+          </button>
+          <ul className="dropdown-menu">
+            <li>
+              <a className="dropdown-item" onClick={copyBarStart}>
+                Copy
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item" onClick={moveBarStart}>
+                Move
+              </a>
+            </li>
+            <li>
+              <a className="dropdown-item" onClick={removeBar}>
+                Remove
+              </a>
+            </li>
+          </ul>
 
-      <button className="btn btn-sm btn-outline-danger" onClick={removeBar} type="button">
-        {removeSymbol}
-      </button>
+          <AddBar
+            barIndex={props.barIndex + 1}
+            inSection={props.inSection}
+            tab={props.tab}
+            updateTab={props.updateTab}
+          />
+        </React.Fragment>
+      )}
     </div>
   );
 };

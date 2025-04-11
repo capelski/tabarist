@@ -1,5 +1,5 @@
 import { activeColor, NonReferenceBarType } from '../../constants';
-import { tabOperations } from '../../operations';
+import { barOperations, sectionOperations, tabOperations } from '../../operations';
 import { ActiveSlot, Section, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
@@ -50,4 +50,29 @@ export const moveBarEnd = (
 ) => {
   const nextTab = tabOperations.moveBarEnd(tab, destinationIndex, inSection);
   updateTab(nextTab);
+};
+
+export const getPositionOperationConditions = (
+  tab: Tab,
+  barIndex: number,
+  inSection: Section | undefined,
+) => {
+  const positionOperation = tab.copying || tab.moving;
+  const positionOperationApplicable =
+    (tab.copying && sectionOperations.isOperationInSection(tab.copying, inSection)) ||
+    (tab.moving && sectionOperations.isOperationInSection(tab.moving, inSection));
+
+  const isPositionSource =
+    positionOperationApplicable &&
+    (tab.copying?.startIndex === barIndex || tab.moving?.startIndex === barIndex);
+
+  const isValidPositionTarget =
+    !tab.moving || barOperations.canMoveBarToPosition(tab.moving.startIndex, barIndex);
+
+  return {
+    positionOperation: !!positionOperation,
+    positionOperationApplicable: !!positionOperationApplicable,
+    isPositionSource: !!isPositionSource,
+    isValidPositionTarget: !!isValidPositionTarget,
+  };
 };

@@ -1,7 +1,6 @@
 import React, { RefObject, useEffect, useRef } from 'react';
 import { barControlsHeight, BarType, referenceColor, sectionColor } from '../../constants';
 import { ActiveSlot, BarContainer, ChordBar, PickingBar, Tab } from '../../types';
-import { AddBar } from './add-bar';
 import { BarControls } from './bar-controls';
 import { BarComponentBaseProps } from './bar-handlers';
 import { ChordBarComponent } from './chord-bar';
@@ -34,7 +33,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
     tab: props.tab,
     updateTab: props.updateTab,
   };
-  const canAddBar = !props.container.inSectionBar || props.container.isFirstInSectionBar;
+
   const canChangeSection = !!props.container.inSectionBar && props.container.isFirstInSectionBar;
   const canRepeat = !props.container.inSectionBar || props.container.isFirstInSectionBar;
   const displayBarControls = !props.container.inSectionBar || props.container.isFirstInSectionBar;
@@ -66,22 +65,16 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
       }}
     >
       <div className="bar-content" style={{ display: 'flex', flexGrow: 1, flexDirection: 'row' }}>
-        {props.isEditMode && canAddBar && (
-          <AddBar
-            barIndex={props.container.originalBar.index}
-            inSection={props.container.inSection}
-            tab={props.tab}
-            updateTab={props.updateTab}
-          />
-        )}
-
         <div
           className="bar-core"
           style={{
+            borderLeft: '1px solid black',
+            boxSizing: 'border-box',
             display: 'flex',
             flexDirection: 'column',
             flexGrow: 1,
             justifyContent: 'end',
+            padding: props.isEditMode ? '0 2px' : undefined,
           }}
         >
           {!props.container.inSection && (
@@ -126,6 +119,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
         <div style={{ height: barControlsHeight }}>
           {displayBarControls && (
             <BarControls
+              barIndex={props.container.originalBar.index}
               container={props.container}
               inSection={props.container.inSection}
               tab={props.tab}
