@@ -1,3 +1,4 @@
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { resolve } = require('path');
 const { DefinePlugin } = require('webpack');
@@ -32,6 +33,14 @@ module.exports = {
       PRODUCTION_URL_BASE: JSON.stringify('https://tabarist.com'),
     }),
     new MiniCssExtractPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: resolve(__dirname, '..', 'ads.txt'),
+          to: resolve(__dirname, '..', 'dist'),
+        },
+      ],
+    }),
   ],
   resolve: {
     extensions: ['.js', '.ts', '.tsx', '.json'],
