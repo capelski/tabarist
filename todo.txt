@@ -1,6 +1,8 @@
-- AdSense
-- Upgrade in the navbar, when signed in and not subscribed
+- AdSense. Fetch tabs in tabarist home page...
 - Allow editing sections from the tab details
+- Changing the slots in a rhythm doesn't propagate changes on chords
+- Move time divisions and section picker to an action in the dropdown options
+- Check whether Stripe subscription is active
 - <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
