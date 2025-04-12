@@ -57,7 +57,7 @@ export type AppState = {
 };
 
 export const getInitialState = (props: AppProps): AppState => ({
-  [RouteNames.home]: {
+  [RouteNames.home]: props.homeState ?? {
     params: {},
   },
   [RouteNames.myTabs]: {

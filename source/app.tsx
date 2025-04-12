@@ -6,11 +6,12 @@ import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { UpgradeModal } from './components/user/upgrade-modal';
 import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
-import { appReducer, DispatchProvider, getInitialState } from './state';
-import { Tab } from './types';
+import { appReducer, DispatchProvider, getInitialState, ListState } from './state';
+import { Tab, TabListParameters } from './types';
 import { HomeView, MyTabsView, StarredTabsView, TabView } from './views';
 
 export type AppProps = {
+  homeState?: ListState<Tab, TabListParameters>;
   tab?: Tab;
 };
 

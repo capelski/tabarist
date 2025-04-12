@@ -10,9 +10,12 @@ import {
   AppProps,
   DiminishedTab,
   getHtml,
+  pageSize,
+  RouteNames,
   routes,
   SsrApp,
   SsrAppProps,
+  TabListParameters,
   tabOperations,
 } from './ssr/ssr';
 
@@ -21,16 +24,42 @@ const expressApp = express();
 const firebaseApp = admin.initializeApp();
 const firestore = firebaseApp.firestore();
 
+const getDiminishedTab = async (tabId: string) => {
+  const docSnap = await firestore.collection('tabs').doc(tabId).get();
+  return docSnap.exists ? (docSnap.data() as DiminishedTab) : undefined;
+};
+
+// Fetching some tabs for SEO purposes; ignoring the parameters
+const getHomeTabs = async (_params: TabListParameters) => {
+  const query = firestore.collection('tabs').orderBy('title').orderBy('id').limit(pageSize);
+  const tabs = await query.get();
+  return tabs.docs.map((docSnapshot) => {
+    const diminishedTab = docSnapshot.data() as DiminishedTab;
+    return tabOperations.augmentTab(diminishedTab);
+  });
+};
+
 expressApp.get(routes, async (req, res) => {
   const { tabId } = req.params;
   const initialState: AppProps = {};
 
-  if (tabId) {
+  if (req.url === RouteNames.home) {
     try {
-      const docSnap = await firestore.collection('tabs').doc(tabId).get();
-      const diminishedTab: DiminishedTab | undefined = docSnap.exists
-        ? (docSnap.data() as DiminishedTab)
-        : undefined;
+      const params: TabListParameters = {};
+      initialState.homeState = {
+        data: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          documents: await getHomeTabs(params),
+        },
+        params,
+      };
+    } catch (e) {
+      error('Error fetching the tab', e);
+    }
+  } else if (tabId) {
+    try {
+      const diminishedTab = await getDiminishedTab(tabId);
       if (diminishedTab) {
         initialState.tab = tabOperations.augmentTab(diminishedTab);
       }
