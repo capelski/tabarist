@@ -27,4 +27,7 @@ export type PickingBar = BarBase &
 
 export type ReferenceBar = BarBase & DiminishedReferenceBar;
 
-export type SectionBar = BarBase & DiminishedSectionBar;
+export type SectionBar = BarBase &
+  Omit<DiminishedSectionBar, 'bars'> & {
+    bars: NonSectionBar[];
+  };

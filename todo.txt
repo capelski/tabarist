@@ -1,6 +1,3 @@
-- AdSense. Fetch tabs in tabarist home page...
-- Allow editing sections from the tab details
-- Changing the slots in a rhythm doesn't propagate changes on chords
 - Move time divisions and section picker to an action in the dropdown options
 - Check whether Stripe subscription is active
 - <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
@@ -10,3 +7,7 @@
 - Display total documents matching in tab-list component
     https://firebase.google.com/docs/firestore/query-data/aggregation-queries
 - Consider section name length in bar container operations, getBarWidth
+
+- If search params change, clear them everywhere where they are stored
+    E.g. navigating from my-tabs?params to home, and then clicking on my-tabs,
+    displays the page with params, but the URL doesn't have them

@@ -1,20 +1,12 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { NonReferenceBarType } from '../constants';
+import { BarType, NonReferenceBarType } from '../constants';
+import { SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
 Given(/^a tab "(.*)"/, function (tabName: string) {
   globals.tabs[tabName] = tabOperations.create('owner');
-});
-
-Given(/^a section "(.*)" in tab "(.*)"/, function (sectionName: string, tabName: string) {
-  globals.tabs[tabName] = tabOperations.addSection(globals.tabs[tabName]);
-  globals.tabs[tabName] = tabOperations.renameSection(
-    globals.tabs[tabName],
-    globals.tabs[tabName].sections.length - 1,
-    sectionName,
-  );
 });
 
 Given(/^a rhythm "(.*)" in tab "(.*)"/, function (rhythmName: string, tabName: string) {
@@ -29,7 +21,9 @@ Given(/^a rhythm "(.*)" in tab "(.*)"/, function (rhythmName: string, tabName: s
 When(
   /^adding to (section "(.*)" of )?tab "(.*)" a (chord|picking|section) bar in position (\d+)/,
   function (sectionName: string, tabName: string, type: NonReferenceBarType, position: number) {
-    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+    const section = globals.tabs[tabName].bars.find(
+      (b) => b.type === BarType.section && b.name === sectionName,
+    ) as SectionBar;
 
     globals.tabs[tabName] = tabOperations.addBar(
       globals.tabs[tabName],
@@ -43,7 +37,9 @@ When(
 When(
   /^copying in (section "(.*)" of )?tab "(.*)" the bar in position (\d+) to position (\d+)/,
   function (sectionName: string, tabName: string, startPosition: number, endPosition: number) {
-    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+    const section = globals.tabs[tabName].bars.find(
+      (b) => b.type === BarType.section && b.name === sectionName,
+    ) as SectionBar;
 
     globals.tabs[tabName] = tabOperations.copyBarStart(
       globals.tabs[tabName],
@@ -61,7 +57,9 @@ When(
 When(
   /^removing from (section "(.*)" of )?tab "(.*)" the bar in position (\d+)/,
   function (sectionName: string, tabName: string, position: number) {
-    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+    const section = globals.tabs[tabName].bars.find(
+      (b) => b.type === BarType.section && b.name === sectionName,
+    ) as SectionBar;
 
     globals.tabs[tabName] = tabOperations.removeBar(globals.tabs[tabName], position - 1, section);
   },
@@ -70,7 +68,9 @@ When(
 When(
   /^moving in (section "(.*)" of )?tab "(.*)" the bar in position (\d+) to position (\d+)/,
   function (sectionName: string, tabName: string, startPosition: number, endPosition: number) {
-    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+    const section = globals.tabs[tabName].bars.find(
+      (b) => b.type === BarType.section && b.name === sectionName,
+    ) as SectionBar;
 
     globals.tabs[tabName] = tabOperations.moveBarStart(
       globals.tabs[tabName],
@@ -88,7 +88,9 @@ When(
 Then(
   /^(section "(.*)" of )?tab "(.*)" has (\d+) bar\(s\)/,
   function (sectionName: string, tabName: string, count: number) {
-    const section = globals.tabs[tabName].sections.find((s) => s.name === sectionName);
+    const section = globals.tabs[tabName].bars.find(
+      (b) => b.type === BarType.section && b.name === sectionName,
+    ) as SectionBar;
     const bars = section?.bars ?? globals.tabs[tabName].bars;
     expect(bars).to.have.length(count);
   },
@@ -99,5 +101,6 @@ Then(/^tab "(.*)" has (\d*) rhythm\(s\)/, function (tabName: string, count: numb
 });
 
 Then(/^tab "(.*)" has (\d*) section\(s\)/, function (tabName: string, count: number) {
-  expect(globals.tabs[tabName].sections).to.have.length(count);
+  const sections = globals.tabs[tabName].bars.filter((b) => b.type === BarType.section);
+  expect(sections).to.have.length(count);
 });

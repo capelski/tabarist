@@ -19,20 +19,22 @@ const getActiveSlot = (
   startingPosition: number,
   repeats?: number,
 ): ActiveSlot | undefined => {
-  return barContainers
-    .slice(startingPosition)
-    .reduce<ActiveSlot | undefined>((reduced, barContainer) => {
-      return (
-        reduced ||
-        (barContainer.renderedBar
-          ? {
-              barContainer: barContainer as BarContainer<ChordBar | PickingBar>,
-              repeats: repeats ?? barContainer.originalBar.repeats ?? 0,
-              slotIndex: 0,
-            }
-          : undefined)
-      );
-    }, undefined);
+  const startIndex = barContainers.findIndex((x) => x.position === startingPosition);
+  if (startIndex === -1) {
+    return undefined;
+  }
+  return barContainers.slice(startIndex).reduce<ActiveSlot | undefined>((reduced, barContainer) => {
+    return (
+      reduced ||
+      (barContainer.renderedBar
+        ? {
+            barContainer: barContainer as BarContainer<ChordBar | PickingBar>,
+            repeats: repeats ?? barContainer.repeats ?? 0,
+            slotIndex: 0,
+          }
+        : undefined)
+    );
+  }, undefined);
 };
 
 const getNextActiveSlot = (
@@ -43,7 +45,7 @@ const getNextActiveSlot = (
     return getActiveSlot(barContainers, 0);
   }
 
-  const { inSectionBar, isLastInSectionBar, position, positionOfFirstBar, renderedBar } =
+  const { isLastInSectionBar, parentSection, position, positionOfFirstBar, renderedBar } =
     activeSlot.barContainer;
 
   const slotsLength =
@@ -58,14 +60,14 @@ const getNextActiveSlot = (
   }
 
   const hasRemainingRepeats = activeSlot.repeats > 1;
-  const mustRepeat = hasRemainingRepeats && (!inSectionBar || isLastInSectionBar);
+  const mustRepeat = hasRemainingRepeats && (!parentSection || isLastInSectionBar);
   if (mustRepeat) {
     const repeatPosition = positionOfFirstBar ?? position;
     return getActiveSlot(barContainers, repeatPosition, activeSlot.repeats - 1);
   }
 
   const nextRepeats =
-    inSectionBar && (!isLastInSectionBar || hasRemainingRepeats) ? activeSlot.repeats : undefined;
+    parentSection && (!isLastInSectionBar || hasRemainingRepeats) ? activeSlot.repeats : undefined;
   return getActiveSlot(barContainers, position + 1, nextRepeats);
 };
 

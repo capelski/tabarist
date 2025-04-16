@@ -30,15 +30,3 @@ Feature: Add bar
       When adding to tab "T" a chord bar in position 1
       And the chord bar in position 1 in tab "T" uses the rhythm 1
 
-   Scenario: Adding a section bar to a tab without sections, creates one
-      Given a tab "T"
-      When adding to tab "T" a section bar in position 1
-      Then tab "T" has 1 section(s)
-      And the section bar in position 1 in tab "T" uses the section 1
-
-   Scenario: Adding a section bar to a tab with sections, uses the first one
-      Given a tab "T"
-      And a section "S" in tab "T"
-      When adding to tab "T" a section bar in position 1
-      Then tab "T" has 1 section(s)
-      And the section bar in position 1 in tab "T" uses the section 1

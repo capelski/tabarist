@@ -10,7 +10,6 @@ export * from './indexed-value.type';
 export * from './page-response.type';
 export * from './position-operation.type';
 export * from './rhythm.type';
-export * from './section.type';
 export * from './slot.type';
 export * from './starred-list-parameters.type';
 export * from './starred-tab.type';

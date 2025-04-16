@@ -26,9 +26,9 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const setRhythm: RhythmPickerProps['setRhythm'] = (rhythm) => {
     const nextTab = tabOperations.setChordBarRhythm(
       props.tab,
-      props.container.originalBar.index,
+      props.container.originalIndex,
       rhythm,
-      props.container.inSection,
+      props.container.parentSection,
     );
     props.updateTab(nextTab);
   };
@@ -36,10 +36,10 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const setSlotValue = (value: string, indexesPath: number[]) => {
     const nextTab = tabOperations.setChordBarSlotValue(
       props.tab,
-      props.container.originalBar.index,
+      props.container.originalIndex,
       value,
       indexesPath,
-      props.container.inSection,
+      props.container.parentSection,
     );
 
     props.updateTab(nextTab);

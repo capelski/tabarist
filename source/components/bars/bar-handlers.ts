@@ -1,6 +1,6 @@
 import { activeColor, NonReferenceBarType } from '../../constants';
-import { barOperations, sectionOperations, tabOperations } from '../../operations';
-import { ActiveSlot, Section, Tab } from '../../types';
+import { barOperations, tabOperations } from '../../operations';
+import { ActiveSlot, SectionBar, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
   activeSlot: ActiveSlot | undefined;
@@ -16,9 +16,9 @@ export const addBar = (
   updateTab: (tab: Tab) => void,
   barIndex: number,
   type: NonReferenceBarType,
-  inSection?: Section,
+  parentSection?: SectionBar,
 ) => {
-  const nextTab = tabOperations.addBar(tab, barIndex, type, inSection);
+  const nextTab = tabOperations.addBar(tab, barIndex, type, parentSection);
   updateTab(nextTab);
 };
 
@@ -26,9 +26,9 @@ export const copyBarEnd = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
   destinationIndex: number,
-  inSection?: Section,
+  parentSection?: SectionBar,
 ) => {
-  const nextTab = tabOperations.copyBarEnd(tab, destinationIndex, inSection);
+  const nextTab = tabOperations.copyBarEnd(tab, destinationIndex, parentSection);
   updateTab(nextTab);
 };
 
@@ -46,21 +46,21 @@ export const moveBarEnd = (
   tab: Tab,
   updateTab: (tab: Tab) => void,
   destinationIndex: number,
-  inSection?: Section,
+  parentSection?: SectionBar,
 ) => {
-  const nextTab = tabOperations.moveBarEnd(tab, destinationIndex, inSection);
+  const nextTab = tabOperations.moveBarEnd(tab, destinationIndex, parentSection);
   updateTab(nextTab);
 };
 
 export const getPositionOperationConditions = (
   tab: Tab,
   barIndex: number,
-  inSection: Section | undefined,
+  parentSection: SectionBar | undefined,
 ) => {
   const positionOperation = tab.copying || tab.moving;
   const positionOperationApplicable =
-    (tab.copying && sectionOperations.isOperationInSection(tab.copying, inSection)) ||
-    (tab.moving && sectionOperations.isOperationInSection(tab.moving, inSection));
+    (tab.copying && barOperations.isOperationInSection(tab.copying, parentSection)) ||
+    (tab.moving && barOperations.isOperationInSection(tab.moving, parentSection));
 
   const isPositionSource =
     positionOperationApplicable &&

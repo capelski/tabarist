@@ -29,6 +29,7 @@ export type DiminishedReferenceBar = DiminishedBarBase & {
 };
 
 export type DiminishedSectionBar = DiminishedBarBase & {
-  sectionIndex: number;
+  bars: DiminishedNonSectionBar[];
+  name: string;
   type: BarType.section;
 };

@@ -1,19 +1,20 @@
 import React from 'react';
 import { addSymbol, BarType, NonReferenceBarType } from '../../constants';
-import { Section, Tab } from '../../types';
+import { SectionBar, Tab } from '../../types';
 import { addBar } from './bar-handlers';
 
 export type AddBarProps = {
   barIndex: number;
   disabled?: boolean;
-  inSection: Section | undefined;
+  isSectionBar?: boolean;
+  parentSection: SectionBar | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
 
 export const AddBar: React.FC<AddBarProps> = (props) => {
   const addBarHandler = (barType: NonReferenceBarType) => {
-    addBar(props.tab, props.updateTab, props.barIndex, barType, props.inSection);
+    addBar(props.tab, props.updateTab, props.barIndex, barType, props.parentSection);
   };
 
   return (
@@ -48,7 +49,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
             🎼 Add picking bar
           </a>
         </li>
-        {!props.inSection && (
+        {!props.parentSection && !props.isSectionBar && (
           <li>
             <a
               className="dropdown-item"

@@ -6,7 +6,8 @@ import {
   inputWidth,
   sectionNameMaxWidth,
 } from '../constants';
-import { Bar, BarContainer, ChordBar, PickingBar, Tab } from '../types';
+import { Bar, BarContainer, ChordBar, PickingBar, SectionBar, Tab } from '../types';
+import { getIndexDisplayValue } from './indexed-value.operations';
 import { slotOperations } from './slot.operations';
 
 const getBarWidth = (bar: ChordBar | PickingBar) => {
@@ -30,44 +31,110 @@ const getBarWidth = (bar: ChordBar | PickingBar) => {
   return Math.max(width + addBarWidth, barMinWidth);
 };
 
+const processSection = (
+  tab: Tab,
+  barContainers: BarContainer[],
+  originalIndex: number,
+  sectionBar: SectionBar,
+  positionReference: { value: number },
+  displayIndex: string,
+  parentIndex?: string,
+  positionOfFirstBar?: number,
+  repeats?: number,
+  isReference = false,
+) => {
+  barContainers.push({
+    displayIndex: isReference
+      ? `${getIndexDisplayValue(originalIndex)}=${getIndexDisplayValue(sectionBar.index)}`
+      : displayIndex,
+    isFirstInSectionBar: false,
+    isLastInSectionBar: false,
+    isReference,
+    omitRhythm: false,
+    originalBar: sectionBar,
+    originalIndex,
+    parentIsReference: false,
+    parentSection: undefined,
+    position: -1,
+    positionOfFirstBar,
+    renderedBar: undefined,
+    repeats,
+    width: Math.min(
+      Math.max(
+        addBarWidth + inputWidth + (sectionBar.name?.length ?? 0) * characterWidth,
+        barMinWidth,
+      ),
+      sectionNameMaxWidth,
+    ),
+  });
+
+  if (sectionBar.bars.length > 0) {
+    barContainers.push(
+      ...barsToBarContainers(tab, sectionBar.bars, {
+        isReference,
+        positionReference: positionReference,
+        parentIndex,
+        parentIsReference: isReference,
+        parentSection: sectionBar,
+        positionOfFirstBar: positionReference.value,
+        repeats,
+      }),
+    );
+  }
+};
+
 export const barsToBarContainers = (
   tab: Tab,
   bars: Bar[],
   {
-    inSection,
-    inSectionBar,
-    sectionOffset,
+    isReference,
+    positionReference,
+    parentIndex,
+    parentIsReference,
+    parentSection,
+    positionOfFirstBar,
+    repeats,
   }: {
-    inSection?: BarContainer['inSection'];
-    inSectionBar?: BarContainer['inSectionBar'];
-    sectionOffset?: number;
+    isReference?: boolean;
+    positionReference?: { value: number };
+    parentIndex?: string;
+    parentIsReference?: boolean;
+    parentSection?: SectionBar;
+    positionOfFirstBar?: number;
+    repeats?: number;
   } = {},
 ): BarContainer[] => {
+  positionReference = positionReference || { value: 0 };
   const { barContainers } = bars.reduce<{
     barContainers: BarContainer[];
     lastChordBar: ChordBar | undefined;
   }>(
     (reduced, bar) => {
-      const position = reduced.barContainers.length + (sectionOffset ?? 0);
-      const isFirstInSectionBar = !!inSectionBar && bar.index === 0;
-      const isLastInSectionBar = !!inSectionBar && bar.index === bars.length - 1;
+      const displayIndex = parentIndex
+        ? `${parentIndex}.${getIndexDisplayValue(bar.index)}`
+        : `${getIndexDisplayValue(bar.index)}`;
+      const isFirstInSectionBar = !!parentSection && bar.index === 0;
+      const isLastInSectionBar = !!parentSection && bar.index === bars.length - 1;
 
       const nextBarContainers = [...reduced.barContainers];
       let nextChordBar = reduced.lastChordBar;
 
       if (bar.type === BarType.chord || bar.type === BarType.picking) {
         nextBarContainers.push({
-          inSection: inSection,
-          inSectionBar: inSectionBar,
+          displayIndex,
           isFirstInSectionBar,
           isLastInSectionBar,
-          isReference: false,
+          isReference: !!isReference,
           omitRhythm:
             bar.type === BarType.chord && bar.rhythmIndex === reduced.lastChordBar?.rhythmIndex,
-          originalBar: inSectionBar?.bar || bar,
-          position,
-          positionOfFirstBar: sectionOffset,
+          originalBar: bar,
+          originalIndex: bar.index,
+          parentIsReference,
+          parentSection,
+          position: positionReference.value++,
+          positionOfFirstBar,
           renderedBar: bar,
+          repeats: isFirstInSectionBar && repeats ? repeats : bar.repeats,
           width: getBarWidth(bar),
         });
 
@@ -75,64 +142,64 @@ export const barsToBarContainers = (
           nextChordBar = bar;
         }
       } else if (bar.type === BarType.reference) {
-        const referencedBar = bars.find((b) => b.index === bar.barIndex) as ChordBar | PickingBar;
+        const referencedBar = bars.find((b) => b.index === bar.barIndex) as
+          | ChordBar
+          | PickingBar
+          | SectionBar;
 
-        nextBarContainers.push({
-          inSection: inSection,
-          inSectionBar: inSectionBar,
-          isFirstInSectionBar,
-          isLastInSectionBar,
-          isReference: true,
-          omitRhythm:
-            referencedBar.type === BarType.chord &&
-            referencedBar.rhythmIndex === reduced.lastChordBar?.rhythmIndex,
-          originalBar: inSectionBar?.bar || bar,
-          position,
-          positionOfFirstBar: sectionOffset,
-          renderedBar: referencedBar,
-          width: getBarWidth(referencedBar),
-        });
+        if (referencedBar.type === BarType.chord || referencedBar.type === BarType.picking) {
+          nextBarContainers.push({
+            displayIndex: `${displayIndex}=${
+              parentIndex
+                ? `${parentIndex}.${getIndexDisplayValue(referencedBar.index)}`
+                : `${getIndexDisplayValue(referencedBar.index)}`
+            }`,
+            isFirstInSectionBar,
+            isLastInSectionBar,
+            isReference: true,
+            omitRhythm:
+              referencedBar.type === BarType.chord &&
+              referencedBar.rhythmIndex === reduced.lastChordBar?.rhythmIndex,
+            originalBar: bar,
+            originalIndex: bar.index,
+            parentIsReference,
+            parentSection,
+            position: positionReference.value++,
+            positionOfFirstBar,
+            renderedBar: referencedBar,
+            repeats: isFirstInSectionBar && repeats ? repeats : bar.repeats,
+            width: getBarWidth(referencedBar),
+          });
+        } else {
+          processSection(
+            tab,
+            nextBarContainers,
+            bar.index,
+            referencedBar,
+            positionReference,
+            displayIndex,
+            displayIndex,
+            positionOfFirstBar,
+            bar.repeats,
+            true,
+          );
+        }
 
         if (referencedBar.type === BarType.chord) {
           nextChordBar = referencedBar;
         }
       } else {
-        const section = tab.sections.find((section) => bar.sectionIndex === section.index)!;
-
-        if (section.bars.length === 0) {
-          nextBarContainers.push({
-            inSection: undefined,
-            inSectionBar: {
-              bar,
-              referredSection: section,
-            },
-            isFirstInSectionBar: true,
-            isLastInSectionBar: true,
-            isReference: false,
-            omitRhythm: true,
-            originalBar: bar,
-            position,
-            positionOfFirstBar: sectionOffset,
-            renderedBar: undefined,
-            width: Math.min(
-              Math.max(
-                addBarWidth + inputWidth + section.name.length * characterWidth,
-                barMinWidth,
-              ),
-              sectionNameMaxWidth,
-            ),
-          });
-        } else {
-          nextBarContainers.push(
-            ...barsToBarContainers(tab, section.bars, {
-              inSectionBar: {
-                bar,
-                referredSection: section,
-              },
-              sectionOffset: position,
-            }),
-          );
-        }
+        processSection(
+          tab,
+          nextBarContainers,
+          bar.index,
+          bar,
+          positionReference,
+          displayIndex,
+          displayIndex,
+          positionOfFirstBar,
+          bar.repeats,
+        );
       }
 
       return {

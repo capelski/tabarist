@@ -19,9 +19,8 @@ export const rhythmOperations = {
       return bar.type === BarType.chord && bar.rhythmIndex === rhythmIndex;
     };
 
-    return (
-      !tab.bars.some(isBarUsingRhythm) &&
-      !tab.sections.some((section) => section.bars.some(isBarUsingRhythm))
+    return !tab.bars.some((bar) =>
+      bar.type === BarType.section ? bar.bars.some(isBarUsingRhythm) : isBarUsingRhythm(bar),
     );
   },
 
@@ -59,10 +58,6 @@ export const rhythmOperations = {
               slots: slotOperations.setSlotSize(rhythm.slots, size, indexesPath),
             };
       }),
-      sections: tab.sections.map((section) => ({
-        ...section,
-        bars: barOperations.setChordBarSlotSize(section.bars, rhythmIndex, size, indexesPath),
-      })),
     };
   },
 

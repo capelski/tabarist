@@ -7,15 +7,117 @@ import {
   DiminishedChordBar,
   DiminishedNonSectionBar,
   DiminishedPickingBar,
+  DiminishedReferenceBar,
+  DiminishedSectionBar,
   NonSectionBar,
   PickingBar,
+  PositionOperation,
   ReferenceBar,
   Rhythm,
-  Section,
   SectionBar,
 } from '../types';
 import { debugBarMovements, getIndexAfterMove, getIndexIncrease } from './indexed-value.operations';
 import { slotOperations } from './slot.operations';
+
+const setChordBarSlotSize = <TBar extends Bar | NonSectionBar>(
+  bars: TBar[],
+  rhythmIndex: number,
+  size: number,
+  indexesPath: number[],
+): TBar[] => {
+  return bars.map((bar) => {
+    return bar.type === BarType.chord && bar.rhythmIndex === rhythmIndex
+      ? {
+          ...bar,
+          slots: slotOperations.setSlotSize(bar.slots, size, indexesPath),
+        }
+      : bar.type === BarType.section
+      ? {
+          ...bar,
+          bars: setChordBarSlotSize(bar.bars, rhythmIndex, size, indexesPath),
+        }
+      : bar;
+  });
+};
+
+const augmentBar = <TDiminishedBar extends DiminishedBar | DiminishedNonSectionBar>(
+  diminishedBar: TDiminishedBar,
+  index: number,
+): TDiminishedBar extends DiminishedNonSectionBar ? NonSectionBar : Bar => {
+  if (diminishedBar.type === BarType.chord) {
+    const chordBar: ChordBar = {
+      ...diminishedBar,
+      index,
+      slots: diminishedBar.slots.map(slotOperations.augmentSlot),
+    };
+    return chordBar;
+  }
+
+  if (diminishedBar.type === BarType.picking) {
+    const pickingBar: PickingBar = {
+      ...diminishedBar,
+      index,
+      chordSupport: diminishedBar.chordSupport.map(slotOperations.augmentSlot),
+      strings: diminishedBar.strings.map((string, index) => {
+        return {
+          index,
+          slots: string.slots.map(slotOperations.augmentSlot),
+        };
+      }),
+    };
+
+    return pickingBar;
+  }
+
+  if (diminishedBar.type === BarType.section) {
+    const sectionBar: SectionBar = {
+      ...diminishedBar,
+      index,
+      bars: diminishedBar.bars.map(augmentBar),
+    };
+    return sectionBar as any;
+  }
+
+  const referenceBar: ReferenceBar = { ...diminishedBar, index };
+  return referenceBar;
+};
+
+const diminishBar = <TBar extends Bar | NonSectionBar>(
+  bar: TBar,
+): TBar extends NonSectionBar ? DiminishedNonSectionBar : DiminishedBar => {
+  if (bar.type === BarType.chord) {
+    const { index, slots, ...rest } = bar as ChordBar;
+
+    const diminishedChordBar: DiminishedChordBar = {
+      ...rest,
+      slots: slots.map(slotOperations.diminishSlot),
+    };
+    return diminishedChordBar;
+  }
+
+  if (bar.type === BarType.picking) {
+    const { index, chordSupport, strings, ...barRest } = bar as PickingBar;
+
+    const diminishedPickingBar: DiminishedPickingBar = {
+      ...barRest,
+      chordSupport: chordSupport.map(slotOperations.diminishSlot),
+      strings: strings.map((string) => ({
+        slots: string.slots.map(slotOperations.diminishSlot),
+      })),
+    };
+    return diminishedPickingBar;
+  }
+
+  if (bar.type === BarType.section) {
+    const { bars, index, ...rest } = bar as SectionBar;
+    const diminishedSectionBar: DiminishedSectionBar = { ...rest, bars: bars.map(diminishBar) };
+    return diminishedSectionBar as any;
+  }
+
+  const { index, ...rest } = bar as ReferenceBar;
+  const diminishedReferenceBar: DiminishedReferenceBar = { ...rest };
+  return diminishedReferenceBar;
+};
 
 export const barOperations = {
   addBar: <TBar extends Bar | NonSectionBar>(bars: TBar[], newBar: TBar): TBar[] => {
@@ -50,38 +152,7 @@ export const barOperations = {
     return nextBars;
   },
 
-  augmentBar: <TDiminishedBar extends DiminishedBar | DiminishedNonSectionBar>(
-    diminishedBar: TDiminishedBar,
-    index: number,
-  ): TDiminishedBar extends DiminishedNonSectionBar ? NonSectionBar : Bar => {
-    if (diminishedBar.type === BarType.chord) {
-      const chordBar: ChordBar = {
-        ...diminishedBar,
-        index,
-        slots: diminishedBar.slots.map(slotOperations.augmentSlot),
-      };
-      return chordBar;
-    }
-
-    if (diminishedBar.type === BarType.picking) {
-      const pickingBar: PickingBar = {
-        ...diminishedBar,
-        index,
-        chordSupport: diminishedBar.chordSupport.map(slotOperations.augmentSlot),
-        strings: diminishedBar.strings.map((string, index) => {
-          return {
-            index,
-            slots: string.slots.map(slotOperations.augmentSlot),
-          };
-        }),
-      };
-
-      return pickingBar;
-    }
-
-    const otherBar: SectionBar | ReferenceBar = { ...diminishedBar, index };
-    return otherBar as NonSectionBar;
-  },
+  augmentBar,
 
   canMoveBarToPosition: (startIndex: number, endIndex: number) => {
     // A bar cannot be moved to the same position. That is:
@@ -130,43 +201,23 @@ export const barOperations = {
     };
   },
 
-  createSectionBar: (index: number, section: Section): SectionBar => {
+  createSectionBar: (index: number): SectionBar => {
     return {
+      bars: [],
       index,
-      sectionIndex: section.index,
+      name: 'Unnamed section',
       repeats: undefined,
       type: BarType.section,
     };
   },
 
-  diminishBar: <TBar extends Bar | NonSectionBar>(
-    bar: TBar,
-  ): TBar extends NonSectionBar ? DiminishedNonSectionBar : DiminishedBar => {
-    if (bar.type === BarType.chord) {
-      const { index, slots, ...rest } = bar as ChordBar;
+  diminishBar,
 
-      const diminishedChordBar: DiminishedChordBar = {
-        ...rest,
-        slots: slots.map(slotOperations.diminishSlot),
-      };
-      return diminishedChordBar;
-    }
-
-    if (bar.type === BarType.picking) {
-      const { index, chordSupport, strings, ...barRest } = bar as PickingBar;
-
-      const diminishedPickingBar: DiminishedPickingBar = {
-        ...barRest,
-        chordSupport: chordSupport.map(slotOperations.diminishSlot),
-        strings: strings.map((string) => ({
-          slots: string.slots.map(slotOperations.diminishSlot),
-        })),
-      };
-      return diminishedPickingBar;
-    }
-
-    const { index, ...rest } = bar as SectionBar | ReferenceBar;
-    return rest as DiminishedNonSectionBar;
+  isOperationInSection: (
+    positionOperation: PositionOperation,
+    parentSection: SectionBar | undefined,
+  ) => {
+    return positionOperation.sectionIndex === parentSection?.index;
   },
 
   moveBar: <TBar extends Bar | NonSectionBar>(
@@ -277,21 +328,7 @@ export const barOperations = {
     });
   },
 
-  setChordBarSlotSize: <TBar extends Bar | NonSectionBar>(
-    bars: TBar[],
-    barIndex: number,
-    size: number,
-    indexesPath: number[],
-  ): TBar[] => {
-    return bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.index !== barIndex
-        ? bar
-        : {
-            ...bar,
-            slots: slotOperations.setSlotSize(bar.slots, size, indexesPath),
-          };
-    });
-  },
+  setChordBarSlotSize,
 
   setChordBarSlotValue: <TBar extends Bar | NonSectionBar>(
     bars: TBar[],

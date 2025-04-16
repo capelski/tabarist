@@ -3,6 +3,5 @@ export * from './bar.operations';
 export * from './indexed-value.operations';
 export * from './rhythm.operations';
 export * from './routes.operations';
-export * from './section.operations';
 export * from './slot.operations';
 export * from './tab.operations';

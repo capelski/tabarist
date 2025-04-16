@@ -31,10 +31,10 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
   const setSlotSize = (size: number, indexesPath: number[]) => {
     const nextTab = tabOperations.setPickingBarSlotsSize(
       props.tab,
-      props.container.originalBar.index,
+      props.container.originalIndex,
       size,
       indexesPath,
-      props.container.inSection,
+      props.container.parentSection,
     );
     props.updateTab(nextTab);
   };
@@ -43,11 +43,11 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
     (stringIndex: number | 'chordSupport') => (value: string, indexesPath: number[]) => {
       const nextTab = tabOperations.setPickingBarSlotValue(
         props.tab,
-        props.container.originalBar.index,
+        props.container.originalIndex,
         stringIndex,
         value,
         indexesPath,
-        props.container.inSection,
+        props.container.parentSection,
       );
 
       props.updateTab(nextTab);

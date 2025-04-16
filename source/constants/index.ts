@@ -22,6 +22,7 @@ export const activeColor = '#fff2cc';
 export const addBarColor = '#fff8e5';
 export const operationColor = 'lightblue';
 export const referenceColor = '#e4ecfb';
+export const referredSectionColor = '#E8F0F2';
 export const sectionColor = '#ebf3e8';
 export const rhythmLineColor = '#bbb';
 export const rhythmNestedLineColor = '#ddd';

@@ -1,5 +1,6 @@
 import React, { RefObject } from 'react';
-import { ActiveSlot, BarContainer, Section, Tab } from '../../types';
+import { sectionColor } from '../../constants';
+import { ActiveSlot, BarContainer, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
@@ -10,7 +11,6 @@ export type BarGroupProps = {
   barContainers: BarContainer[];
   barsNumber: number;
   isEditMode: boolean;
-  inSection: Section | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -18,7 +18,7 @@ export type BarGroupProps = {
 
 export const BarGroup: React.FC<BarGroupProps> = (props) => {
   const { positionOperation, positionOperationApplicable, isValidPositionTarget } =
-    getPositionOperationConditions(props.tab, props.barsNumber, props.inSection);
+    getPositionOperationConditions(props.tab, props.barsNumber, undefined);
 
   return (
     <div className="bars" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -27,7 +27,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           <AddBar
             barIndex={0}
             disabled={positionOperation}
-            inSection={props.inSection}
+            parentSection={undefined}
             tab={props.tab}
             updateTab={props.updateTab}
           />
@@ -35,8 +35,35 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       )}
 
       {props.barContainers.map((barContainer) => {
+        const barsNumber = barContainer.parentSection?.bars?.length ?? 0;
+        const sectionConditions = barContainer.parentSection
+          ? getPositionOperationConditions(props.tab, barsNumber, barContainer.parentSection)
+          : undefined;
+
         return (
-          <BarContainerComponent {...props} container={barContainer} key={barContainer.position} />
+          <React.Fragment key={barContainer.displayIndex}>
+            <BarContainerComponent {...props} container={barContainer} />
+            {props.isEditMode &&
+              barContainer.isLastInSectionBar &&
+              sectionConditions?.positionOperationApplicable &&
+              sectionConditions?.isValidPositionTarget && (
+                <div
+                  style={{
+                    alignItems: 'center',
+                    backgroundColor: sectionColor,
+                    borderLeft: '1px solid black',
+                    display: 'flex',
+                  }}
+                >
+                  <BarDestination
+                    barIndex={barsNumber}
+                    parentSection={barContainer.parentSection}
+                    tab={props.tab}
+                    updateTab={props.updateTab}
+                  />
+                </div>
+              )}
+          </React.Fragment>
         );
       })}
 
@@ -44,7 +71,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
         <div style={{ alignItems: 'center', display: 'flex', marginLeft: 8 }}>
           <BarDestination
             barIndex={props.barsNumber}
-            inSection={props.inSection}
+            parentSection={undefined}
             tab={props.tab}
             updateTab={props.updateTab}
           />

@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
-import { BarGroup, RhythmList, SectionList, TabDetails, TabFooter, TabHeader } from '../components';
+import { BarGroup, RhythmList, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
@@ -57,7 +57,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
 
     return [];
-  }, [props.tab?.bars, props.tab?.rhythms, props.tab?.sections]);
+  }, [props.tab?.bars, props.tab?.rhythms]);
 
   if (!props.tab) {
     return <h3>Couldn't load tab</h3>;
@@ -88,7 +88,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         activeSlot={props.activeSlot}
         barContainers={barContainers}
         barsNumber={props.tab.bars.length}
-        inSection={undefined}
         isEditMode={props.isEditMode}
         scrollView={props.scrollView}
         tab={props.tab}
@@ -97,7 +96,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
       {props.isEditMode && (
         <React.Fragment>
-          <SectionList tab={props.tab} updateTab={updateTab} />
           <RhythmList tab={props.tab} updateTab={updateTab} />
         </React.Fragment>
       )}
