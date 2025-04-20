@@ -31,6 +31,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
 
   useEffect(() => {
     if (
+      props.activeSlot &&
       props.activeSlot?.barContainer.position === props.container.position &&
       props.scrollView?.current &&
       divRef.current
