@@ -1,12 +1,13 @@
 import React from 'react';
+import { ContainerType } from '../../constants';
 import { slotOperations, tabOperations } from '../../operations';
-import { BarContainer, PickingBar, Slot } from '../../types';
+import { BarContainer, Slot } from '../../types';
 import { SlotDivider } from '../common/slot-divider';
 import { SlotsValue } from '../common/slots-value';
 import { BarComponentBaseProps, getSlotBackgroundColor } from './bar-handlers';
 
 export type PickingBarComponentProps = BarComponentBaseProps & {
-  container: BarContainer<PickingBar>;
+  container: BarContainer<ContainerType.picking>;
 };
 
 export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) => {
@@ -31,7 +32,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
   const setSlotSize = (size: number, indexesPath: number[]) => {
     const nextTab = tabOperations.setPickingBarSlotsSize(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       size,
       indexesPath,
       props.container.parentSection,
@@ -43,7 +44,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
     (stringIndex: number | 'chordSupport') => (value: string, indexesPath: number[]) => {
       const nextTab = tabOperations.setPickingBarSlotValue(
         props.tab,
-        props.container.originalIndex,
+        props.container.barIndex,
         stringIndex,
         value,
         indexesPath,

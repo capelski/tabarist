@@ -1,6 +1,6 @@
-import { BarType } from '../constants';
+import { BarType, ContainerType } from '../constants';
 import { getTabRelativeUrl, tabOperations } from '../operations';
-import { ActiveSlot, BarContainer, ChordBar, PickingBar } from '../types';
+import { ActiveSlot, BarContainer } from '../types';
 import { ActionType } from './action-type';
 import { AppAction } from './app-action';
 import { AppState } from './app-state';
@@ -26,9 +26,9 @@ const getActiveSlot = (
   return barContainers.slice(startIndex).reduce<ActiveSlot | undefined>((reduced, barContainer) => {
     return (
       reduced ||
-      (barContainer.renderedBar
+      (barContainer.position !== undefined
         ? {
-            barContainer: barContainer as BarContainer<ChordBar | PickingBar>,
+            barContainer: barContainer as BarContainer<ContainerType.chord | ContainerType.picking>,
             repeats: repeats ?? barContainer.repeats ?? 0,
             slotIndex: 0,
           }
@@ -45,7 +45,7 @@ const getNextActiveSlot = (
     return getActiveSlot(barContainers, 0);
   }
 
-  const { isLastInSectionBar, parentSection, position, positionOfFirstBar, renderedBar } =
+  const { isLastInSectionBar, parentSection, position, firstSectionBarPosition, renderedBar } =
     activeSlot.barContainer;
 
   const slotsLength =
@@ -62,7 +62,7 @@ const getNextActiveSlot = (
   const hasRemainingRepeats = activeSlot.repeats > 1;
   const mustRepeat = hasRemainingRepeats && (!parentSection || isLastInSectionBar);
   if (mustRepeat) {
-    const repeatPosition = positionOfFirstBar ?? position;
+    const repeatPosition = firstSectionBarPosition ?? position;
     return getActiveSlot(barContainers, repeatPosition, activeSlot.repeats - 1);
   }
 

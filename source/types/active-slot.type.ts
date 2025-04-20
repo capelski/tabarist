@@ -1,8 +1,8 @@
+import { ContainerType } from '../constants';
 import { BarContainer } from './bar-container.type';
-import { ChordBar, PickingBar } from './bar.type';
 
 export type ActiveSlot = {
-  barContainer: BarContainer<ChordBar | PickingBar>;
+  barContainer: BarContainer<ContainerType.chord | ContainerType.picking>;
   repeats: number;
   slotIndex: number;
 };

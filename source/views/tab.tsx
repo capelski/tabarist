@@ -53,11 +53,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   const barContainers = useMemo(() => {
     if (props.tab?.bars) {
-      return barsToBarContainers(props.tab, props.tab.bars);
+      return barsToBarContainers(props.tab.bars, props.isEditMode);
     }
 
     return [];
-  }, [props.tab?.bars, props.tab?.rhythms]);
+  }, [props.isEditMode, props.tab?.bars, props.tab?.rhythms]);
 
   if (!props.tab) {
     return <h3>Couldn't load tab</h3>;

@@ -1,6 +1,6 @@
 import React, { RefObject } from 'react';
-import { sectionColor } from '../../constants';
-import { ActiveSlot, BarContainer, Tab } from '../../types';
+import { ContainerType } from '../../constants';
+import { ActiveSlot, BarContainer, SectionTailContainer, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
@@ -35,35 +35,59 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       )}
 
       {props.barContainers.map((barContainer) => {
-        const barsNumber = barContainer.parentSection?.bars?.length ?? 0;
-        const sectionConditions = barContainer.parentSection
-          ? getPositionOperationConditions(props.tab, barsNumber, barContainer.parentSection)
-          : undefined;
+        if (barContainer.type !== ContainerType.sectionTail) {
+          return (
+            <BarContainerComponent
+              {...props}
+              container={barContainer}
+              key={barContainer.displayIndex}
+            />
+          );
+        }
+
+        const { addToParent, appendBarIndex } = barContainer as SectionTailContainer;
+
+        const barsNumber = addToParent.bars.length;
+        const sectionConditions = getPositionOperationConditions(
+          props.tab,
+          barsNumber,
+          addToParent,
+        );
+
+        const isMovingTarget =
+          sectionConditions?.positionOperationApplicable &&
+          sectionConditions?.isValidPositionTarget;
+
+        const backgroundColor = isMovingTarget ? barContainer.backgroundColor : undefined;
 
         return (
-          <React.Fragment key={barContainer.displayIndex}>
-            <BarContainerComponent {...props} container={barContainer} />
-            {props.isEditMode &&
-              barContainer.isLastInSectionBar &&
-              sectionConditions?.positionOperationApplicable &&
-              sectionConditions?.isValidPositionTarget && (
-                <div
-                  style={{
-                    alignItems: 'center',
-                    backgroundColor: sectionColor,
-                    borderLeft: '1px solid black',
-                    display: 'flex',
-                  }}
-                >
-                  <BarDestination
-                    barIndex={barsNumber}
-                    parentSection={barContainer.parentSection}
-                    tab={props.tab}
-                    updateTab={props.updateTab}
-                  />
-                </div>
-              )}
-          </React.Fragment>
+          <div
+            key={barContainer.displayIndex}
+            style={{
+              alignItems: 'center',
+              backgroundColor: backgroundColor,
+              borderLeft: '1px solid black',
+              display: 'flex',
+              padding: '0 8px',
+            }}
+          >
+            {isMovingTarget ? (
+              <BarDestination
+                barIndex={barsNumber}
+                parentSection={barContainer.addToParent}
+                tab={props.tab}
+                updateTab={props.updateTab}
+              />
+            ) : (
+              <AddBar
+                barIndex={appendBarIndex + 1}
+                disabled={sectionConditions?.positionOperation}
+                parentSection={undefined}
+                tab={props.tab}
+                updateTab={props.updateTab}
+              />
+            )}
+          </div>
         );
       })}
 

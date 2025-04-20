@@ -1,15 +1,13 @@
 import React from 'react';
-import { BarType, cancelSymbol, optionsSymbol } from '../../constants';
+import { cancelSymbol, optionsSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
-import { BarContainer, SectionBar, Tab } from '../../types';
+import { BarContainer, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarDestination } from './bar-destination';
 import { getPositionOperationConditions } from './bar-handlers';
 
 export type BarControlsProps = {
-  barIndex: number;
   container: BarContainer;
-  parentSection: SectionBar | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -23,7 +21,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
   const copyBarStart = () => {
     const nextTab = tabOperations.copyBarStart(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       props.container.parentSection?.index,
     );
     props.updateTab(nextTab);
@@ -32,7 +30,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
   const moveBarStart = () => {
     const nextTab = tabOperations.moveBarStart(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       props.container.parentSection?.index,
     );
     props.updateTab(nextTab);
@@ -41,7 +39,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
   const removeBar = () => {
     const nextTab = tabOperations.removeBar(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       props.container.parentSection,
     );
     props.updateTab(nextTab);
@@ -52,7 +50,11 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     positionOperationApplicable,
     isPositionSource,
     isValidPositionTarget,
-  } = getPositionOperationConditions(props.tab, props.container.originalIndex, props.parentSection);
+  } = getPositionOperationConditions(
+    props.tab,
+    props.container.barIndex,
+    props.container.parentSection,
+  );
 
   return (
     <div
@@ -79,8 +81,8 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         ) : (
           isValidPositionTarget && (
             <BarDestination
-              barIndex={props.barIndex}
-              parentSection={props.parentSection}
+              barIndex={props.container.barIndex}
+              parentSection={props.container.parentSection}
               tab={props.tab}
               updateTab={props.updateTab}
             />
@@ -117,13 +119,8 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
           </ul>
 
           <AddBar
-            barIndex={props.container.originalBar.type === BarType.section ? 0 : props.barIndex + 1}
-            isSectionBar={props.container.originalBar.type === BarType.section}
-            parentSection={
-              props.container.originalBar.type === BarType.section
-                ? props.container.originalBar
-                : props.parentSection
-            }
+            barIndex={props.container.isParent ? 0 : props.container.barIndex + 1}
+            parentSection={props.container.addToParent}
             tab={props.tab}
             updateTab={props.updateTab}
           />

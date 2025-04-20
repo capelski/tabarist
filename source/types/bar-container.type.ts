@@ -1,22 +1,71 @@
-import { Bar, ChordBar, PickingBar, SectionBar } from './bar.type';
+import { ContainerType } from '../constants';
+import { ChordBar, PickingBar, SectionBar } from './bar.type';
 
-export type BarContainer<
-  TBar extends ChordBar | PickingBar | SectionBar = ChordBar | PickingBar | SectionBar,
-> = {
+export type ContainerBase<TContainer extends ContainerType> = {
+  backgroundColor: string;
+  barIndex: number;
+  canUpdate: boolean;
+  displayControls: boolean;
   displayIndex: string;
-  isFirstInSectionBar: boolean;
-  isLastInSectionBar: boolean;
-  isReference: boolean;
-  omitRhythm: boolean;
-  originalBar: Bar;
-  originalIndex: number;
-  parentIsReference: boolean | undefined;
-  parentSection: SectionBar | undefined;
-  position: number;
-  /** Used to find the position of the first bar of a section when repeating the active slot */
-  positionOfFirstBar: number | undefined;
-  /** An undefined value is used to represent a section bar for a section with no bars */
-  renderedBar: TBar extends SectionBar ? undefined : TBar;
-  repeats?: number;
+  repeats: number | undefined;
+  type: TContainer;
   width: number;
 };
+
+export type ChildBarBase<T extends ChordBar | PickingBar> = {
+  isParent?: undefined;
+  omitRhythm: boolean;
+  position: number;
+  renderedBar: T;
+  sectionName?: undefined;
+} & (
+  | {
+      addToParent?: undefined;
+      firstSectionBarPosition?: undefined;
+      isFirstInSectionBar?: undefined;
+      isLastInSectionBar?: undefined;
+      parentIndex?: undefined;
+      parentSection?: undefined;
+    }
+  | {
+      addToParent: SectionBar;
+      /** Used to find the position of the first bar of a section when repeating the active slot */
+      firstSectionBarPosition: number;
+      isFirstInSectionBar: boolean;
+      isLastInSectionBar: boolean;
+      parentIndex: number;
+      parentSection: SectionBar;
+    }
+);
+
+export type ParentBarBase = {
+  addToParent: SectionBar;
+  firstSectionBarPosition?: undefined;
+  isFirstInSectionBar?: undefined;
+  isLastInSectionBar?: undefined;
+  isParent: true;
+  parentIndex?: undefined;
+  parentSection?: undefined;
+  position?: undefined;
+  sectionName: string;
+};
+
+export type SectionTailContainer = ParentBarBase & {
+  appendBarIndex: number;
+};
+
+export type BarContainer<TContainer extends ContainerType = ContainerType> =
+  ContainerBase<TContainer> &
+    (TContainer extends ContainerType.chord
+      ? ChildBarBase<ChordBar>
+      : TContainer extends ContainerType.picking
+      ? ChildBarBase<PickingBar>
+      : TContainer extends ContainerType.reference
+      ? ChildBarBase<ChordBar | PickingBar>
+      : TContainer extends ContainerType.section
+      ? ParentBarBase
+      : TContainer extends ContainerType.sectionReference
+      ? ParentBarBase
+      : TContainer extends ContainerType.sectionTail
+      ? SectionTailContainer
+      : {});

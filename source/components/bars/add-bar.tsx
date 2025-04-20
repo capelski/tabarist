@@ -6,7 +6,6 @@ import { addBar } from './bar-handlers';
 export type AddBarProps = {
   barIndex: number;
   disabled?: boolean;
-  isSectionBar?: boolean;
   parentSection: SectionBar | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -49,7 +48,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
             🎼 Add picking bar
           </a>
         </li>
-        {!props.parentSection && !props.isSectionBar && (
+        {!props.parentSection && (
           <li>
             <a
               className="dropdown-item"

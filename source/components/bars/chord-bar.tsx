@@ -1,12 +1,13 @@
 import React from 'react';
+import { ContainerType } from '../../constants';
 import { tabOperations } from '../../operations';
-import { BarContainer, ChordBar, Rhythm, Slot } from '../../types';
+import { BarContainer, Rhythm, Slot } from '../../types';
 import { SlotsValue } from '../common/slots-value';
 import { BarComponentBaseProps, getSlotBackgroundColor } from './bar-handlers';
 import { RhythmPicker, RhythmPickerProps } from './rhythm-picker';
 
 export type ChordBarCoreProps = BarComponentBaseProps & {
-  container: BarContainer<ChordBar>;
+  container: BarContainer<ContainerType.chord>;
   rhythms: Rhythm[];
 };
 
@@ -26,7 +27,7 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const setRhythm: RhythmPickerProps['setRhythm'] = (rhythm) => {
     const nextTab = tabOperations.setChordBarRhythm(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       rhythm,
       props.container.parentSection,
     );
@@ -36,7 +37,7 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const setSlotValue = (value: string, indexesPath: number[]) => {
     const nextTab = tabOperations.setChordBarSlotValue(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       value,
       indexesPath,
       props.container.parentSection,

@@ -15,13 +15,13 @@ export const Repeats: React.FC<RepeatsProps> = (props) => {
   const { repeats } = props.container;
   const hasRepeats = repeats && repeats > 1;
   const remainingRepeats =
-    props.activeSlot?.barContainer.positionOfFirstBar === props.container.positionOfFirstBar &&
-    props.activeSlot?.repeats;
+    props.activeSlot?.barContainer.firstSectionBarPosition ===
+      props.container.firstSectionBarPosition && props.activeSlot?.repeats;
 
   const updateRepeats = (nextRepeats?: number) => {
     const nextTab = tabOperations.updateRepeats(
       props.tab,
-      props.container.originalIndex,
+      props.container.barIndex,
       nextRepeats,
       props.container.parentSection,
     );
