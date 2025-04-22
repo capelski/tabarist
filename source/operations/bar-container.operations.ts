@@ -43,9 +43,10 @@ const getDisplayIndex = (
       ? `${getIndexDisplayValue(options.parentIndex)}.${getIndexDisplayValue(barIndex)}`
       : `${getIndexDisplayValue(barIndex)}`;
 
-  const displayReferredIndex = options.referencedIndex
-    ? getIndexDisplayValue(options.referencedIndex)
-    : undefined;
+  const displayReferredIndex =
+    options.referencedIndex !== undefined
+      ? getIndexDisplayValue(options.referencedIndex)
+      : undefined;
 
   const displayIndex = displayReferredIndex
     ? `${base}=${
@@ -286,6 +287,8 @@ export const barsToBarContainers = (
     },
     { barContainers: [], lastChordBar: undefined },
   );
+
+  // console.log('barContainers', barContainers);
 
   return barContainers;
 };
