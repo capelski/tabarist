@@ -126,12 +126,12 @@ const processParentBar = (
 
 const processChildBar = (
   bar: ChordBar | PickingBar,
+  barIndex: number,
   type: ContainerType.chord | ContainerType.picking | ContainerType.reference,
   bars: Bar[],
   barContainers: BarContainer[],
   positionReference: { value: number },
   lastChordBar: ChordBar | undefined,
-  referenceIndex?: number,
   options:
     | {
         firstSectionBarPosition?: undefined;
@@ -151,11 +151,8 @@ const processChildBar = (
       } = {},
 ) => {
   const isReference = type === ContainerType.reference;
-  const { sourceIndex, referencedIndex } = referenceIndex
-    ? { sourceIndex: referenceIndex, referencedIndex: bar.index }
-    : { sourceIndex: bar.index };
-  const isFirstInSectionBar = !!options.parentSection && bar.index === 0;
-  const isLastInSectionBar = !!options.parentSection && bar.index === bars.length - 1;
+  const isFirstInSectionBar = !!options.parentSection && barIndex === 0;
+  const isLastInSectionBar = !!options.parentSection && barIndex === bars.length - 1;
 
   barContainers.push({
     backgroundColor: options.parentSection
@@ -167,12 +164,12 @@ const processChildBar = (
       : 'white',
     canUpdate: isReference ? false : !options.parentIsReference,
     displayControls: !options.parentSection || !options.parentIsReference,
-    displayIndex: getDisplayIndex(sourceIndex, {
+    displayIndex: getDisplayIndex(barIndex, {
       parentIndex: options.parentIndex,
-      referencedIndex,
+      referencedIndex: isReference ? bar.index : undefined,
     }),
     omitRhythm: bar.type === BarType.chord && bar.rhythmIndex === lastChordBar?.rhythmIndex,
-    barIndex: bar.index,
+    barIndex,
     position: positionReference.value++,
     renderedBar: bar,
     repeats: isFirstInSectionBar && options.parentRepeats ? options.parentRepeats : bar.repeats,
@@ -226,12 +223,12 @@ export const barsToBarContainers = (
       if (bar.type === BarType.chord || bar.type === BarType.picking) {
         processChildBar(
           bar,
+          bar.index,
           bar.type === BarType.chord ? ContainerType.chord : ContainerType.picking,
           bars,
           nextBarContainers,
           positionReference,
           reduced.lastChordBar,
-          undefined,
           options,
         );
 
@@ -247,12 +244,12 @@ export const barsToBarContainers = (
         if (referencedBar.type === BarType.chord || referencedBar.type === BarType.picking) {
           processChildBar(
             referencedBar,
+            bar.index,
             ContainerType.reference,
             bars,
             nextBarContainers,
             positionReference,
             reduced.lastChordBar,
-            bar.index,
             options,
           );
         } else {
