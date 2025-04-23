@@ -20,7 +20,7 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const getBackgroundColor = (slot: Slot) => {
     return (
       getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index) ??
-      props.backgroundColor
+      props.container.backgroundColor
     );
   };
 

@@ -69,11 +69,12 @@ const processParentBar = (
   repeats?: number,
 ) => {
   const isReference = type === ContainerType.sectionReference;
+  const backgroundColor = isEditMode ? (isReference ? referenceColor : sectionColor) : 'white';
 
   if (isEditMode) {
     barContainers.push({
       addToParent: sectionBar,
-      backgroundColor: isReference ? referenceColor : sectionColor,
+      backgroundColor,
       barIndex,
       canUpdate: !isReference,
       displayControls: true,
@@ -111,7 +112,7 @@ const processParentBar = (
     barContainers.push({
       addToParent: sectionBar,
       appendBarIndex: barIndex,
-      backgroundColor: isReference ? referenceColor : sectionColor,
+      backgroundColor,
       barIndex,
       canUpdate: false,
       displayControls: false,
@@ -128,6 +129,7 @@ const processParentBar = (
 const processChildBar = (
   bar: ChordBar | PickingBar,
   barIndex: number,
+  isEditMode: boolean,
   type: ContainerType.chord | ContainerType.picking | ContainerType.reference,
   bars: Bar[],
   barContainers: BarContainer[],
@@ -156,12 +158,14 @@ const processChildBar = (
   const isLastInSectionBar = !!options.parentSection && barIndex === bars.length - 1;
 
   barContainers.push({
-    backgroundColor: options.parentSection
-      ? options.parentIsReference
+    backgroundColor: isEditMode
+      ? options.parentSection
+        ? options.parentIsReference
+          ? referenceColor
+          : sectionColor
+        : isReference
         ? referenceColor
-        : sectionColor
-      : isReference
-      ? referenceColor
+        : 'white'
       : 'white',
     canUpdate: isReference ? false : !options.parentIsReference,
     displayControls: !options.parentSection || !options.parentIsReference,
@@ -225,6 +229,7 @@ export const barsToBarContainers = (
         processChildBar(
           bar,
           bar.index,
+          isEditMode,
           bar.type === BarType.chord ? ContainerType.chord : ContainerType.picking,
           bars,
           nextBarContainers,
@@ -246,6 +251,7 @@ export const barsToBarContainers = (
           processChildBar(
             referencedBar,
             bar.index,
+            isEditMode,
             ContainerType.reference,
             bars,
             nextBarContainers,

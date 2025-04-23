@@ -22,7 +22,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
 
   const barBaseProps: BarComponentBaseProps = {
     activeSlot: props.activeSlot,
-    backgroundColor: props.isEditMode ? props.container.backgroundColor : 'white',
     isEditMode: props.isEditMode,
     tab: props.tab,
     updateTab: props.updateTab,
@@ -47,7 +46,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
       className="bar-container"
       ref={divRef}
       style={{
-        backgroundColor: barBaseProps.backgroundColor,
+        backgroundColor: props.container.backgroundColor,
         alignSelf: 'stretch', // So chord bars next to picking bars have the same height
         display: 'flex',
         flexDirection: 'column',

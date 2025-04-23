@@ -4,7 +4,6 @@ import { ActiveSlot, SectionBar, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
   activeSlot: ActiveSlot | undefined;
-  backgroundColor: string;
   isEditMode: boolean;
   tab: Tab;
   updateTab: (tab: Tab) => void;
