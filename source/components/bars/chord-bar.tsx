@@ -15,7 +15,7 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const rhythm = props.rhythms.find(
     (rhythm) => rhythm.index === props.container.renderedBar.rhythmIndex,
   )!;
-  const canUpdate = props.isEditMode && props.canUpdate;
+  const canUpdate = props.isEditMode && props.container.canUpdate;
 
   const getBackgroundColor = (slot: Slot) => {
     return (

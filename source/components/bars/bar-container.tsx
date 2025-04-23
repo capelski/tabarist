@@ -23,7 +23,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
   const barBaseProps: BarComponentBaseProps = {
     activeSlot: props.activeSlot,
     backgroundColor: props.isEditMode ? props.container.backgroundColor : 'white',
-    canUpdate: props.container.canUpdate,
     isEditMode: props.isEditMode,
     tab: props.tab,
     updateTab: props.updateTab,

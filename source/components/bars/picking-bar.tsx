@@ -15,7 +15,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
   const displayChordSupport = props.container.renderedBar.chordSupport.some(
     (slot) => slotOperations.getSlotLength(slot, 0) > 0,
   );
-  const canUpdate = props.isEditMode && props.canUpdate;
+  const canUpdate = props.isEditMode && props.container.canUpdate;
 
   const getBackground = (slot: Slot) => {
     const backgroundColor = getBackgroundColor(slot);
@@ -64,7 +64,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
       }}
     >
       {props.isEditMode &&
-        (props.canUpdate ? (
+        (props.container.canUpdate ? (
           <div style={{ marginBottom: 8 }}>
             <SlotDivider
               denominator={undefined}
