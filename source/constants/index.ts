@@ -15,7 +15,7 @@ export const barControlsHeight = 45;
 export const characterWidth = 12;
 export const inputWidth = 30;
 export const repeatsHeight = 24;
-export const stringHeight = 20;
+export const stringHeight = 16;
 export const sectionNameMaxWidth = 250;
 
 export const activeColor = '#fff2cc';

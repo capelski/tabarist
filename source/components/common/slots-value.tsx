@@ -87,13 +87,16 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
                   </select>
                 )
               ) : (
-                <div
+                <span
                   style={{
+                    backgroundColor,
+                    color: props.color,
                     height: stringHeight,
+                    lineHeight: `${stringHeight}px`,
                   }}
                 >
-                  <span style={{ backgroundColor, color: props.color }}>{slot.value}</span>
-                </div>
+                  {slot.value}
+                </span>
               )
             ) : (
               <SlotsValue
