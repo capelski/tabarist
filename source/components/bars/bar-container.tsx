@@ -103,7 +103,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
             <ChordBarComponent
               {...barBaseProps}
               container={props.container as BarContainer<ContainerType.chord>}
-              rhythms={props.tab.rhythms}
             />
           ) : (
             <PickingBarComponent

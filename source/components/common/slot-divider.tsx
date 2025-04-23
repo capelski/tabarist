@@ -39,6 +39,7 @@ export const SlotDivider: React.FC<SlotDividerProps> = (props) => {
         display: 'flex',
         flexBasis: `${100 / props.parentSlotSize}%`,
         flexDirection: 'column',
+        width: '100%',
       }}
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>

@@ -1,10 +1,13 @@
-import React from 'react';
-import { cancelSymbol, optionsSymbol } from '../../constants';
+import React, { useState } from 'react';
+import { cancelSymbol, ContainerType, optionsSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
 import { BarContainer, Tab } from '../../types';
+import { Modal } from '../common/modal';
 import { AddBar } from './add-bar';
 import { BarDestination } from './bar-destination';
 import { getPositionOperationConditions } from './bar-handlers';
+import { ChordBarComponent } from './chord-bar';
+import { PickingBarComponent } from './picking-bar';
 
 export type BarControlsProps = {
   container: BarContainer;
@@ -13,9 +16,15 @@ export type BarControlsProps = {
 };
 
 export const BarControls: React.FC<BarControlsProps> = (props) => {
+  const [timeDivisionsModal, setTimeDivisionsModal] = useState(false);
+
   const cancelPositionOperation = () => {
     const nextTab = tabOperations.cancelPositionOperation(props.tab);
     props.updateTab(nextTab);
+  };
+
+  const cancelTimeDivisions = () => {
+    setTimeDivisionsModal(false);
   };
 
   const copyBarStart = () => {
@@ -67,6 +76,30 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         marginTop: 8,
       }}
     >
+      {timeDivisionsModal && (
+        <Modal closeHandler={cancelTimeDivisions}>
+          {props.container.type === ContainerType.chord && (
+            <ChordBarComponent
+              {...props}
+              activeSlot={undefined}
+              container={props.container as BarContainer<ContainerType.chord>}
+              displayRhythmPicker={true}
+              isEditMode={true}
+            />
+          )}
+
+          {props.container.type === ContainerType.picking && (
+            <PickingBarComponent
+              {...props}
+              activeSlot={undefined}
+              container={props.container as BarContainer<ContainerType.picking>}
+              displaySlotDivider={true}
+              isEditMode={true}
+            />
+          )}
+        </Modal>
+      )}
+
       <span style={{ marginRight: 8 }}>{props.container.displayIndex}</span>
 
       {positionOperationApplicable &&
@@ -101,6 +134,24 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
             {optionsSymbol}
           </button>
           <ul className="dropdown-menu">
+            {(props.container.type === ContainerType.chord ||
+              props.container.type === ContainerType.picking) && (
+              <React.Fragment>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    onClick={() => {
+                      setTimeDivisionsModal(true);
+                    }}
+                  >
+                    Time divisions
+                  </a>
+                </li>
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+              </React.Fragment>
+            )}
             <li>
               <a className="dropdown-item" onClick={copyBarStart}>
                 Copy

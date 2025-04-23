@@ -1,18 +1,18 @@
 import React from 'react';
 import { ContainerType } from '../../constants';
 import { tabOperations } from '../../operations';
-import { BarContainer, Rhythm, Slot } from '../../types';
+import { BarContainer, Slot } from '../../types';
 import { SlotsValue } from '../common/slots-value';
 import { BarComponentBaseProps, getSlotBackgroundColor } from './bar-handlers';
 import { RhythmPicker, RhythmPickerProps } from './rhythm-picker';
 
 export type ChordBarCoreProps = BarComponentBaseProps & {
   container: BarContainer<ContainerType.chord>;
-  rhythms: Rhythm[];
+  displayRhythmPicker?: boolean;
 };
 
 export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
-  const rhythm = props.rhythms.find(
+  const rhythm = props.tab.rhythms.find(
     (rhythm) => rhythm.index === props.container.renderedBar.rhythmIndex,
   )!;
   const canUpdate = props.isEditMode && props.container.canUpdate;
@@ -54,9 +54,10 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
         flexDirection: 'column',
         flexGrow: 1,
         justifyContent: 'center',
+        width: '100%',
       }}
     >
-      {canUpdate && (
+      {props.displayRhythmPicker && (
         <div
           style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 8 }}
         >

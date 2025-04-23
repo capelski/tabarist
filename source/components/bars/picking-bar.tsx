@@ -8,6 +8,7 @@ import { BarComponentBaseProps, getSlotBackgroundColor } from './bar-handlers';
 
 export type PickingBarComponentProps = BarComponentBaseProps & {
   container: BarContainer<ContainerType.picking>;
+  displaySlotDivider?: boolean;
 };
 
 export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) => {
@@ -61,23 +62,21 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
         display: 'flex',
         flexDirection: 'column',
         flexGrow: 1,
+        width: '100%',
       }}
     >
-      {props.isEditMode &&
-        (props.container.canUpdate ? (
-          <div style={{ marginBottom: 8 }}>
-            <SlotDivider
-              denominator={undefined}
-              indexesPath={[]}
-              isFirstSlot={true}
-              parentSlotSize={virtualSlot.slots.length}
-              setSlotSize={setSlotSize}
-              slot={virtualSlot}
-            />
-          </div>
-        ) : (
-          <div style={{ flexGrow: 1 }}></div>
-        ))}
+      {props.displaySlotDivider && (
+        <div style={{ marginBottom: 8 }}>
+          <SlotDivider
+            denominator={undefined}
+            indexesPath={[]}
+            isFirstSlot={true}
+            parentSlotSize={virtualSlot.slots.length}
+            setSlotSize={setSlotSize}
+            slot={virtualSlot}
+          />
+        </div>
+      )}
 
       {props.container.renderedBar.strings.map((string) => {
         return (

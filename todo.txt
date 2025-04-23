@@ -1,4 +1,4 @@
-- Move time divisions and section picker to an action in the dropdown options
+- Move the control bar inside the repeats
 - Check whether Stripe subscription is active
 - <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user
