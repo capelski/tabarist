@@ -69,6 +69,7 @@ export const getInitialState = (props: AppProps): AppState => ({
   },
   tab: {
     document: props.tab,
+    originalDocument: props.tab ? JSON.stringify(props.tab) : undefined,
   },
   user: {
     document: null,
