@@ -163,7 +163,7 @@ const processChildBar = (
     backgroundColor = options.parentIsReference ? referenceColor : sectionColor;
   } else if (isEditMode && isReference) {
     backgroundColor = referenceColor;
-  } else if (!isEditMode && options.parentSection && !options.parentIsReference) {
+  } else if (!isEditMode && options.parentSection) {
     backgroundColor = sectionColor;
   }
 
