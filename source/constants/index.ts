@@ -11,10 +11,9 @@ export const localStorageKey_tabRegistry = 'tabarist_tabRegistry';
 
 export const addBarWidth = 25;
 export const barMinWidth = 165;
-export const barControlsHeight = 45;
 export const characterWidth = 12;
 export const inputWidth = 30;
-export const repeatsHeight = 24;
+export const repeatsMinHeight = 20;
 export const stringHeight = 16;
 export const sectionNameMaxWidth = 250;
 

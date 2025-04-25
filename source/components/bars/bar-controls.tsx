@@ -73,7 +73,6 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        marginTop: 8,
       }}
     >
       {timeDivisionsModal && (
@@ -128,7 +127,7 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
             aria-expanded="false"
             className="btn btn-sm btn-outline-success"
             data-bs-toggle="dropdown"
-            style={{ marginRight: 8 }}
+            style={{ marginRight: 8, paddingBottom: 0, paddingTop: 0 }}
             type="button"
           >
             {optionsSymbol}

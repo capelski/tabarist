@@ -1,4 +1,4 @@
-- Move the control bar inside the repeats
+- Cancelling the edit mode after refresh blanks the screen
 - Check whether Stripe subscription is active
 - <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user

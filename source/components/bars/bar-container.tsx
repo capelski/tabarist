@@ -1,12 +1,11 @@
 import React, { RefObject, useEffect, useRef } from 'react';
-import { barControlsHeight, BarType, ContainerType } from '../../constants';
+import { BarType, ContainerType } from '../../constants';
 import { tabOperations } from '../../operations';
 import { ActiveSlot, BarContainer, Tab } from '../../types';
-import { BarControls } from './bar-controls';
 import { BarComponentBaseProps } from './bar-handlers';
+import { BarHeader } from './bar-header';
 import { ChordBarComponent } from './chord-bar';
 import { PickingBarComponent } from './picking-bar';
-import { Repeats } from './repeats';
 
 export type BarContainerComponentProps = {
   activeSlot: ActiveSlot | undefined;
@@ -68,7 +67,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
             padding: props.isEditMode ? '0 2px' : undefined,
           }}
         >
-          <Repeats
+          <BarHeader
             activeSlot={props.activeSlot}
             container={props.container}
             isEditMode={props.isEditMode}
@@ -112,12 +111,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
           )}
         </div>
       </div>
-
-      {props.isEditMode && props.container.displayControls && (
-        <div style={{ height: barControlsHeight }}>
-          <BarControls container={props.container} tab={props.tab} updateTab={props.updateTab} />
-        </div>
-      )}
     </div>
   );
 };
