@@ -15,6 +15,7 @@ export type SlotsValueProps = {
   color?: string;
   elementType: 'input' | 'select';
   indexesPath: number[];
+  isEditMode: boolean;
   setSlotValue: (value: string, indexesPath: number[]) => void;
   slots: Slot[];
 };
@@ -26,7 +27,8 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
         const isFirstSlot = slot.index === 0;
         const currenPath = [...props.indexesPath, slot.index];
         const background = props.background?.(slot);
-        const backgroundColor = props.backgroundColor?.(slot);
+        const backgroundColor =
+          props.isEditMode && !props.canUpdate ? '#f4f4f4' : props.backgroundColor?.(slot);
 
         return (
           <div
@@ -48,13 +50,15 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
             }}
           >
             {slot.type === SlotType.value ? (
-              props.canUpdate ? (
+              props.isEditMode && props.canUpdate ? (
                 props.elementType === 'input' ? (
                   <input
                     onChange={(event) => {
                       props.setSlotValue(event.target.value, currenPath);
                     }}
                     style={{
+                      backgroundColor,
+                      border: 'none',
                       boxSizing: 'border-box',
                       height: stringHeight,
                       padding: 0,
@@ -106,6 +110,7 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
                 color={props.color}
                 elementType={props.elementType}
                 indexesPath={currenPath}
+                isEditMode={props.isEditMode}
                 setSlotValue={props.setSlotValue}
                 slots={slot.slots}
               />

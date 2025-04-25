@@ -16,7 +16,6 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
   const displayChordSupport = props.container.renderedBar.chordSupport.some(
     (slot) => slotOperations.getSlotLength(slot, 0) > 0,
   );
-  const canUpdate = props.isEditMode && props.container.canUpdate;
 
   const getBackground = (slot: Slot) => {
     const backgroundColor = getBackgroundColor(slot);
@@ -26,7 +25,7 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
   const getBackgroundColor = (slot: Slot) => {
     return (
       getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index) ??
-      props.container.backgroundColor
+      'transparent'
     );
   };
 
@@ -83,9 +82,10 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
           <SlotsValue
             background={getBackground}
             backgroundColor={getBackgroundColor}
-            canUpdate={canUpdate}
+            canUpdate={props.container.canUpdate}
             elementType="input"
             indexesPath={[]}
+            isEditMode={props.isEditMode}
             key={string.index}
             setSlotValue={setSlotValue(string.index)}
             slots={string.slots}
@@ -97,9 +97,10 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
         <div style={{ marginTop: 8 }}>
           <SlotsValue
             backgroundColor={getBackgroundColor}
-            canUpdate={canUpdate}
+            canUpdate={props.container.canUpdate}
             elementType="input"
             indexesPath={[]}
+            isEditMode={props.isEditMode}
             setSlotValue={setSlotValue('chordSupport')}
             slots={props.container.renderedBar.chordSupport}
           />

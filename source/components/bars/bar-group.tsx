@@ -23,7 +23,15 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
   return (
     <div className="bars" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
       {props.isEditMode && (
-        <div style={{ alignItems: 'center', display: 'flex', marginRight: 8 }}>
+        <div
+          style={{
+            alignItems: 'center',
+            borderLeft: '1px solid black',
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '0 4px',
+          }}
+        >
           <AddBar
             barIndex={0}
             disabled={positionOperation}
@@ -68,7 +76,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
               backgroundColor: backgroundColor,
               borderLeft: '1px solid black',
               display: 'flex',
-              padding: '0 8px',
+              justifyContent: 'center',
+              padding: '0 4px',
             }}
           >
             {isMovingTarget ? (

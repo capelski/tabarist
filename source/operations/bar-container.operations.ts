@@ -69,7 +69,7 @@ const processParentBar = (
   repeats?: number,
 ) => {
   const isReference = type === ContainerType.sectionReference;
-  const backgroundColor = isEditMode ? (isReference ? referenceColor : sectionColor) : 'white';
+  const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
 
   if (isEditMode) {
     barContainers.push({
@@ -157,16 +157,18 @@ const processChildBar = (
   const isFirstInSectionBar = !!options.parentSection && barIndex === 0;
   const isLastInSectionBar = !!options.parentSection && barIndex === bars.length - 1;
 
+  let backgroundColor = 'white';
+
+  if (isEditMode && options.parentSection) {
+    backgroundColor = options.parentIsReference ? referenceColor : sectionColor;
+  } else if (isEditMode && isReference) {
+    backgroundColor = referenceColor;
+  } else if (!isEditMode && options.parentSection && !options.parentIsReference) {
+    backgroundColor = sectionColor;
+  }
+
   barContainers.push({
-    backgroundColor: isEditMode
-      ? options.parentSection
-        ? options.parentIsReference
-          ? referenceColor
-          : sectionColor
-        : isReference
-        ? referenceColor
-        : 'white'
-      : 'white',
+    backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
     displayControls: !options.parentSection || !options.parentIsReference,
     displayIndex: getDisplayIndex(barIndex, {

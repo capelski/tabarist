@@ -15,13 +15,9 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
   const rhythm = props.tab.rhythms.find(
     (rhythm) => rhythm.index === props.container.renderedBar.rhythmIndex,
   )!;
-  const canUpdate = props.isEditMode && props.container.canUpdate;
 
   const getBackgroundColor = (slot: Slot) => {
-    return (
-      getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index) ??
-      props.container.backgroundColor
-    );
+    return getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index);
   };
 
   const setRhythm: RhythmPickerProps['setRhythm'] = (rhythm) => {
@@ -71,9 +67,10 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
 
       <SlotsValue
         backgroundColor={getBackgroundColor}
-        canUpdate={canUpdate}
+        canUpdate={props.container.canUpdate}
         elementType="input"
         indexesPath={[]}
+        isEditMode={props.isEditMode}
         setSlotValue={setSlotValue}
         slots={props.container.renderedBar.slots}
       />
@@ -84,6 +81,7 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
         color={props.container.omitRhythm ? '#bbb' : undefined}
         elementType="input"
         indexesPath={[]}
+        isEditMode={false} // Setting to false to prevent the disabled background color
         setSlotValue={() => {}}
         slots={rhythm.slots}
       />

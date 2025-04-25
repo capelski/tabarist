@@ -23,7 +23,7 @@ export const AddBar: React.FC<AddBarProps> = (props) => {
         className="btn btn-sm btn-outline-primary"
         disabled={props.disabled}
         data-bs-toggle="dropdown"
-        style={{ marginRight: 8, paddingBottom: 0, paddingTop: 0 }}
+        style={{ paddingBottom: 0, paddingTop: 0 }}
         type="button"
       >
         {addSymbol}

@@ -45,7 +45,6 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
       className="bar-container"
       ref={divRef}
       style={{
-        backgroundColor: props.container.backgroundColor,
         alignSelf: 'stretch', // So chord bars next to picking bars have the same height
         display: 'flex',
         flexDirection: 'column',

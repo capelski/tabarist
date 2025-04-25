@@ -71,8 +71,9 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       style={{
         alignItems: 'center',
         display: 'flex',
+        flexGrow: 1,
         flexWrap: 'wrap',
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
       }}
     >
       {timeDivisionsModal && (

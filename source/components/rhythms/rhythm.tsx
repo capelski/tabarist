@@ -94,6 +94,7 @@ export const RhythmComponent: React.FC<RhythmProps> = (props) => {
               canUpdate={true}
               elementType="select"
               indexesPath={[]}
+              isEditMode={true}
               setSlotValue={setSlotValue}
               slots={props.rhythm.slots}
             />

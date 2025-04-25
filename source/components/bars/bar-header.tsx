@@ -1,5 +1,5 @@
 import React from 'react';
-import { inputWidth, repeatsMinHeight, sectionColor, sectionNameMaxWidth } from '../../constants';
+import { inputWidth, repeatsMinHeight, sectionNameMaxWidth } from '../../constants';
 import { tabOperations } from '../../operations';
 import { ActiveSlot, BarContainer, Tab } from '../../types';
 import { BarControls } from './bar-controls';
@@ -33,15 +33,17 @@ export const BarHeader: React.FC<BarHeaderProps> = (props) => {
     <div
       className="bar-header"
       style={{
-        backgroundColor: props.container.parentSection ? sectionColor : undefined,
-        marginRight: props.container.isLastInSectionBar ? 8 : undefined,
+        backgroundColor: props.container.backgroundColor,
+        borderBottom: props.isEditMode ? '1px solid black' : undefined,
         marginBottom: 4,
-        paddingLeft: 8,
+        marginRight: props.container.isLastInSectionBar ? 8 : undefined,
+        paddingBottom: props.isEditMode ? 4 : undefined,
+        paddingLeft: props.isEditMode ? undefined : 8,
         paddingTop: props.isEditMode ? 4 : undefined,
       }}
     >
       {props.isEditMode ? (
-        <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ alignItems: 'center', display: 'flex', height: repeatsMinHeight }}>
           {!props.container.parentSection && (
             <div>
               <input
