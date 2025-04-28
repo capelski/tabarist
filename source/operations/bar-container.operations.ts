@@ -135,6 +135,7 @@ const processChildBar = (
   barContainers: BarContainer[],
   positionReference: { value: number },
   lastChordBar: ChordBar | undefined,
+  repeats?: number,
   options:
     | {
         firstSectionBarPosition?: undefined;
@@ -179,7 +180,7 @@ const processChildBar = (
     barIndex,
     position: positionReference.value++,
     renderedBar: bar,
-    repeats: isFirstInSectionBar && options.parentRepeats ? options.parentRepeats : bar.repeats,
+    repeats: isFirstInSectionBar && options.parentRepeats ? options.parentRepeats : repeats,
     type,
     width: getBarWidth(bar),
     ...(options.parentSection
@@ -237,6 +238,7 @@ export const barsToBarContainers = (
           nextBarContainers,
           positionReference,
           reduced.lastChordBar,
+          bar.repeats,
           options,
         );
 
@@ -259,6 +261,7 @@ export const barsToBarContainers = (
             nextBarContainers,
             positionReference,
             reduced.lastChordBar,
+            bar.repeats,
             options,
           );
         } else {
