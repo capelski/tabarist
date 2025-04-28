@@ -43,13 +43,19 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   useEffect(() => {
     const { tab, user } = props;
     if (tab && user && props.isStarred === undefined) {
-      userRepository.getStarredTab(user.uid, tab.id).then((starredTab) => {
-        dispatch({ type: ActionType.setStarredTab, starredTab: !!starredTab });
-        if (starredTab && starredTab.title !== tab.title) {
-          // If the tab title has changed after it was starred, update the starred title
-          userRepository.setStarredTab(user.uid, tab);
-        }
-      });
+      userRepository
+        .getStarredTab(user.uid, tab.id)
+        .then((starredTab) => {
+          dispatch({ type: ActionType.setStarredTab, starredTab: !!starredTab });
+          if (starredTab && starredTab.title !== tab.title) {
+            // If the tab title has changed after it was starred, update the starred title
+            userRepository.setStarredTab(user.uid, tab);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          dispatch({ type: ActionType.setStarredTab, starredTab: false });
+        });
     }
   }, [props.isStarred, props.tab, props.user]);
 
