@@ -1,25 +1,29 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { positionSymbol } from '../../constants';
-import { SectionBar, Tab } from '../../types';
-import { copyBarEnd, moveBarEnd } from './bar-handlers';
+import { ActionType, DispatchProvider } from '../../state';
+import { PositionOperation, SectionBar, Tab } from '../../types';
 
 export type BarDestinationProps = {
   barIndex: number;
+  copying: PositionOperation | undefined;
+  moving: PositionOperation | undefined;
   parentSection: SectionBar | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
 
 export const BarDestination: React.FC<BarDestinationProps> = (props) => {
+  const dispatch = useContext(DispatchProvider);
+
   return (
     <button
       className="btn btn-sm btn-outline-primary"
       onClick={() => {
-        if (props.tab.copying) {
-          copyBarEnd(props.tab, props.updateTab, props.barIndex, props.parentSection);
-        } else if (props.tab.moving) {
-          moveBarEnd(props.tab, props.updateTab, props.barIndex, props.parentSection);
-        }
+        dispatch({
+          type: ActionType.positionOperationEnd,
+          endIndex: props.barIndex,
+          parentSection: props.parentSection,
+        });
       }}
     >
       {positionSymbol}

@@ -1,7 +1,7 @@
 import { Given, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { BarType, NonReferenceBarType } from '../constants';
-import { ChordBar, ReferenceBar, SectionBar } from '../types';
+import { ChordBar, PositionOperation, ReferenceBar, SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
@@ -18,14 +18,15 @@ Given(
 );
 
 Given(/^a reference bar in tab "(.*)" pointing at the previous bar/, function (tabName: string) {
-  globals.tabs[tabName] = tabOperations.copyBarStart(
-    globals.tabs[tabName],
-    globals.tabs[tabName].bars.length - 1,
-    undefined,
-  );
-  globals.tabs[tabName] = tabOperations.copyBarEnd(
+  const copying: PositionOperation = {
+    sectionIndex: undefined,
+    startIndex: globals.tabs[tabName].bars.length - 1,
+  };
+
+  globals.tabs[tabName] = tabOperations.copyBar(
     globals.tabs[tabName],
     globals.tabs[tabName].bars.length,
+    copying,
   );
 });
 

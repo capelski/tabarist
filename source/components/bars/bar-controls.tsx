@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { cancelSymbol, ContainerType, optionsSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
-import { BarContainer, Tab } from '../../types';
+import { ActionType, DispatchProvider } from '../../state';
+import { BarContainer, PositionOperation, Tab } from '../../types';
 import { Modal } from '../common/modal';
 import { AddBar } from './add-bar';
 import { BarDestination } from './bar-destination';
@@ -11,6 +12,8 @@ import { PickingBarComponent } from './picking-bar';
 
 export type BarControlsProps = {
   container: BarContainer;
+  copying: PositionOperation | undefined;
+  moving: PositionOperation | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -18,31 +21,25 @@ export type BarControlsProps = {
 export const BarControls: React.FC<BarControlsProps> = (props) => {
   const [timeDivisionsModal, setTimeDivisionsModal] = useState(false);
 
+  const dispatch = useContext(DispatchProvider);
+
   const cancelPositionOperation = () => {
-    const nextTab = tabOperations.cancelPositionOperation(props.tab);
-    props.updateTab(nextTab);
+    dispatch({ type: ActionType.positionOperationCancel });
   };
 
   const cancelTimeDivisions = () => {
     setTimeDivisionsModal(false);
   };
 
-  const copyBarStart = () => {
-    const nextTab = tabOperations.copyBarStart(
-      props.tab,
-      props.container.barIndex,
-      props.container.parentSection?.index,
-    );
-    props.updateTab(nextTab);
-  };
-
-  const moveBarStart = () => {
-    const nextTab = tabOperations.moveBarStart(
-      props.tab,
-      props.container.barIndex,
-      props.container.parentSection?.index,
-    );
-    props.updateTab(nextTab);
+  const startPositionOperation = (operation: 'copying' | 'moving') => {
+    dispatch({
+      type: ActionType.positionOperationStart,
+      operation,
+      positionOperation: {
+        sectionIndex: props.container.parentSection?.index,
+        startIndex: props.container.barIndex,
+      },
+    });
   };
 
   const removeBar = () => {
@@ -60,7 +57,8 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     isPositionSource,
     isValidPositionTarget,
   } = getPositionOperationConditions(
-    props.tab,
+    props.copying,
+    props.moving,
     props.container.barIndex,
     props.container.parentSection,
   );
@@ -115,6 +113,8 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
           isValidPositionTarget && (
             <BarDestination
               barIndex={props.container.barIndex}
+              copying={props.copying}
+              moving={props.moving}
               parentSection={props.container.parentSection}
               tab={props.tab}
               updateTab={props.updateTab}
@@ -153,12 +153,22 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
               </React.Fragment>
             )}
             <li>
-              <a className="dropdown-item" onClick={copyBarStart}>
+              <a
+                className="dropdown-item"
+                onClick={() => {
+                  startPositionOperation('copying');
+                }}
+              >
                 Copy
               </a>
             </li>
             <li>
-              <a className="dropdown-item" onClick={moveBarStart}>
+              <a
+                className="dropdown-item"
+                onClick={() => {
+                  startPositionOperation('moving');
+                }}
+              >
                 Move
               </a>
             </li>

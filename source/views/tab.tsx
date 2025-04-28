@@ -5,16 +5,18 @@ import { BarGroup, RhythmList, TabDetails, TabFooter, TabHeader } from '../compo
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
-import { ActiveSlot, Tab } from '../types';
+import { ActiveSlot, PositionOperation, Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
   activeSlot: ActiveSlot | undefined;
+  copying: PositionOperation | undefined;
   deletingTab?: Tab;
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean;
   isStarred?: boolean;
+  moving: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement>;
   tab?: Tab;
   user: User | null;
@@ -88,7 +90,9 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         activeSlot={props.activeSlot}
         barContainers={barContainers}
         barsNumber={props.tab.bars.length}
+        copying={props.copying}
         isEditMode={props.isEditMode}
+        moving={props.moving}
         scrollView={props.scrollView}
         tab={props.tab}
         updateTab={updateTab}

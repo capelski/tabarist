@@ -1,7 +1,7 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { BarType, NonReferenceBarType } from '../constants';
-import { SectionBar } from '../types';
+import { PositionOperation, SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
 import { globals } from './test-globals.cucumber';
 
@@ -41,14 +41,15 @@ When(
       (b) => b.type === BarType.section && b.name === sectionName,
     ) as SectionBar;
 
-    globals.tabs[tabName] = tabOperations.copyBarStart(
-      globals.tabs[tabName],
-      startPosition - 1,
-      section?.index,
-    );
-    globals.tabs[tabName] = tabOperations.copyBarEnd(
+    const copying: PositionOperation = {
+      sectionIndex: section?.index,
+      startIndex: startPosition - 1,
+    };
+
+    globals.tabs[tabName] = tabOperations.copyBar(
       globals.tabs[tabName],
       endPosition - 1,
+      copying,
       section,
     );
   },
@@ -72,14 +73,15 @@ When(
       (b) => b.type === BarType.section && b.name === sectionName,
     ) as SectionBar;
 
-    globals.tabs[tabName] = tabOperations.moveBarStart(
-      globals.tabs[tabName],
-      startPosition - 1,
-      section?.index,
-    );
-    globals.tabs[tabName] = tabOperations.moveBarEnd(
+    const moving: PositionOperation = {
+      sectionIndex: section?.index,
+      startIndex: startPosition - 1,
+    };
+
+    globals.tabs[tabName] = tabOperations.moveBar(
       globals.tabs[tabName],
       endPosition - 1,
+      moving,
       section,
     );
   },

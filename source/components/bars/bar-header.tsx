@@ -1,13 +1,15 @@
 import React from 'react';
 import { inputWidth, repeatsMinHeight, sectionNameMaxWidth } from '../../constants';
 import { tabOperations } from '../../operations';
-import { ActiveSlot, BarContainer, Tab } from '../../types';
+import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
 import { BarControls } from './bar-controls';
 
 export type BarHeaderProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
+  copying: PositionOperation | undefined;
   isEditMode: boolean;
+  moving: PositionOperation | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -62,9 +64,7 @@ export const BarHeader: React.FC<BarHeaderProps> = (props) => {
               x
             </div>
           )}
-          {props.container.displayControls && (
-            <BarControls container={props.container} tab={props.tab} updateTab={props.updateTab} />
-          )}
+          {props.container.displayControls && <BarControls {...props} />}
         </div>
       ) : (
         <div style={{ height: repeatsMinHeight }}>

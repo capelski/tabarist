@@ -3,6 +3,8 @@ import { RouteNames } from '../constants';
 import {
   BarContainer,
   PageResponse,
+  PositionOperation,
+  SectionBar,
   StarredListParameters,
   StarredTab,
   StripeSubscription,
@@ -79,6 +81,19 @@ export type AppAction =
     }
   | {
       type: ActionType.loaderHide;
+    }
+  | {
+      type: ActionType.positionOperationCancel;
+    }
+  | {
+      type: ActionType.positionOperationEnd;
+      endIndex: number;
+      parentSection?: SectionBar;
+    }
+  | {
+      type: ActionType.positionOperationStart;
+      operation: 'copying' | 'moving';
+      positionOperation: PositionOperation;
     }
   | {
       type: ActionType.searchParamsReady;

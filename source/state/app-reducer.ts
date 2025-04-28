@@ -171,10 +171,12 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       navigate: action.navigate,
       tab: {
         ...state.tab,
+        copying: undefined,
         discardChangesModal: undefined,
         document: JSON.parse(state.tab.originalDocument!),
         isDirty: false,
         isEditMode: undefined,
+        moving: undefined,
       },
     };
   }
@@ -256,17 +258,60 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.setTab) {
+  if (action.type === ActionType.positionOperationCancel) {
     return {
       ...state,
-      navigate: action.navigate,
       tab: {
         ...state.tab,
-        document: action.tab,
-        isDirty: undefined,
-        isDraft: undefined,
-        isStarred: undefined,
-        originalDocument: JSON.stringify(action.tab),
+        copying: undefined,
+        moving: undefined,
+      },
+    };
+  }
+
+  if (action.type === ActionType.positionOperationEnd) {
+    if (!state.tab.document) {
+      return {
+        ...state,
+        tab: {
+          ...state.tab,
+          copying: undefined,
+          moving: undefined,
+        },
+      };
+    }
+
+    return {
+      ...state,
+      tab: {
+        ...state.tab,
+        copying: undefined,
+        document: state.tab.copying
+          ? tabOperations.copyBar(
+              state.tab.document,
+              action.endIndex,
+              state.tab.copying,
+              action.parentSection,
+            )
+          : state.tab.moving
+          ? tabOperations.moveBar(
+              state.tab.document,
+              action.endIndex,
+              state.tab.moving,
+              action.parentSection,
+            )
+          : state.tab.document,
+        moving: undefined,
+      },
+    };
+  }
+
+  if (action.type === ActionType.positionOperationStart) {
+    return {
+      ...state,
+      tab: {
+        ...state.tab,
+        [action.operation]: action.positionOperation,
       },
     };
   }
@@ -282,17 +327,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     return {
       ...state,
       starredTabs: {
-        // Clearing data will trigger a fetch request
-        params: action.params,
-        skipUrlUpdate: action.skipUrlUpdate,
-      },
-    };
-  }
-
-  if (action.type === ActionType.setTabListParams) {
-    return {
-      ...state,
-      [action.route]: {
         // Clearing data will trigger a fetch request
         params: action.params,
         skipUrlUpdate: action.skipUrlUpdate,
@@ -323,6 +357,32 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       user: {
         ...state.user,
         stripeSubscription: action.subscription,
+      },
+    };
+  }
+
+  if (action.type === ActionType.setTab) {
+    return {
+      ...state,
+      navigate: action.navigate,
+      tab: {
+        ...state.tab,
+        document: action.tab,
+        isDirty: undefined,
+        isDraft: undefined,
+        isStarred: undefined,
+        originalDocument: JSON.stringify(action.tab),
+      },
+    };
+  }
+
+  if (action.type === ActionType.setTabListParams) {
+    return {
+      ...state,
+      [action.route]: {
+        // Clearing data will trigger a fetch request
+        params: action.params,
+        skipUrlUpdate: action.skipUrlUpdate,
       },
     };
   }

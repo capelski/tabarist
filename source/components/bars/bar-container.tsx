@@ -1,7 +1,7 @@
 import React, { RefObject, useEffect, useRef } from 'react';
 import { BarType, ContainerType } from '../../constants';
 import { tabOperations } from '../../operations';
-import { ActiveSlot, BarContainer, Tab } from '../../types';
+import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
 import { BarComponentBaseProps } from './bar-handlers';
 import { BarHeader } from './bar-header';
 import { ChordBarComponent } from './chord-bar';
@@ -10,7 +10,9 @@ import { PickingBarComponent } from './picking-bar';
 export type BarContainerComponentProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
+  copying: PositionOperation | undefined;
   isEditMode: boolean;
+  moving: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -66,13 +68,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
             padding: props.isEditMode ? '0 2px' : undefined,
           }}
         >
-          <BarHeader
-            activeSlot={props.activeSlot}
-            container={props.container}
-            isEditMode={props.isEditMode}
-            tab={props.tab}
-            updateTab={props.updateTab}
-          />
+          <BarHeader {...props} />
 
           {props.container.isParent ? (
             <div

@@ -2,7 +2,16 @@ import { User } from 'firebase/auth';
 import { nanoid } from 'nanoid';
 import { getTitleWords } from '../common';
 import { BarType, NonReferenceBarType } from '../constants';
-import { Bar, BarBase, DiminishedTab, NonSectionBar, Rhythm, SectionBar, Tab } from '../types';
+import {
+  Bar,
+  BarBase,
+  DiminishedTab,
+  NonSectionBar,
+  PositionOperation,
+  Rhythm,
+  SectionBar,
+  Tab,
+} from '../types';
 import { barOperations } from './bar.operations';
 import { getIndexDecrease } from './indexed-value.operations';
 import { rhythmOperations } from './rhythm.operations';
@@ -14,8 +23,6 @@ const applyBarsOperation = (
 ): Tab => {
   return {
     ...tab,
-    copying: undefined,
-    moving: undefined,
     bars: parentSection
       ? tab.bars.map((bar) =>
           bar.type === BarType.section && bar.index === parentSection.index
@@ -66,30 +73,22 @@ export const tabOperations = {
     return {
       ...diminishedTab,
       bars: diminishedTab.bars.map(barOperations.augmentBar),
-      copying: undefined,
-      moving: undefined,
       rhythms: diminishedTab.rhythms.map(rhythmOperations.augmentRhythm),
     };
   },
 
-  cancelPositionOperation: (tab: Tab): Tab => {
-    return {
-      ...tab,
-      copying: undefined,
-      moving: undefined,
-    };
-  },
-
-  copyBarEnd: (tab: Tab, endIndex: number, parentSection?: SectionBar): Tab => {
-    if (!tab.copying || !barOperations.isOperationInSection(tab.copying, parentSection)) {
+  copyBar: (
+    tab: Tab,
+    endIndex: number,
+    copying: PositionOperation,
+    parentSection?: SectionBar,
+  ): Tab => {
+    if (!barOperations.isOperationInSection(copying, parentSection)) {
       return tab;
     }
 
-    const { copying } = tab;
-    const nextTab = { ...tab, copying: undefined };
-
     return applyBarsOperation(
-      nextTab,
+      tab,
       (bars) => {
         const targetBar = bars[copying.startIndex];
         const newBar = barOperations.createReferenceBar(targetBar, endIndex);
@@ -99,24 +98,12 @@ export const tabOperations = {
     );
   },
 
-  copyBarStart: (tab: Tab, startIndex: number, sectionIndex: number | undefined): Tab => {
-    return {
-      ...tab,
-      copying: {
-        sectionIndex,
-        startIndex,
-      },
-    };
-  },
-
   create: (ownerId: User['uid']): Tab => {
     return {
       backingTrack: undefined,
       bars: [],
       capo: undefined,
-      copying: undefined,
       id: nanoid(),
-      moving: undefined,
       ownerId,
       rhythms: [],
       tempo: undefined,
@@ -126,38 +113,28 @@ export const tabOperations = {
   },
 
   diminishTab: (tab: Tab): DiminishedTab => {
-    const { copying, moving, ...rest } = tab;
-
     return {
-      ...rest,
+      ...tab,
       bars: tab.bars.map(barOperations.diminishBar),
       rhythms: tab.rhythms.map(rhythmOperations.diminishRhythm),
     };
   },
 
-  moveBarEnd: (tab: Tab, endIndex: number, parentSection?: SectionBar): Tab => {
-    if (!tab.moving || !barOperations.isOperationInSection(tab.moving, parentSection)) {
+  moveBar: (
+    tab: Tab,
+    endIndex: number,
+    moving: PositionOperation,
+    parentSection?: SectionBar,
+  ): Tab => {
+    if (!barOperations.isOperationInSection(moving, parentSection)) {
       return tab;
     }
 
-    const { moving } = tab;
-    const nextTab: Tab = { ...tab, moving: undefined };
-
     return applyBarsOperation(
-      nextTab,
+      tab,
       (bars) => barOperations.moveBar(bars, moving.startIndex, endIndex),
       parentSection,
     );
-  },
-
-  moveBarStart: (tab: Tab, startIndex: number, sectionIndex: number | undefined): Tab => {
-    return {
-      ...tab,
-      moving: {
-        sectionIndex,
-        startIndex,
-      },
-    };
   },
 
   removeBar: (tab: Tab, deletionIndex: number, parentSection?: SectionBar): Tab => {

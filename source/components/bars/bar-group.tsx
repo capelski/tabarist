@@ -1,6 +1,12 @@
 import React, { RefObject } from 'react';
 import { ContainerType } from '../../constants';
-import { ActiveSlot, BarContainer, SectionTailContainer, Tab } from '../../types';
+import {
+  ActiveSlot,
+  BarContainer,
+  PositionOperation,
+  SectionTailContainer,
+  Tab,
+} from '../../types';
 import { AddBar } from './add-bar';
 import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
@@ -10,7 +16,9 @@ export type BarGroupProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   barsNumber: number;
+  copying: PositionOperation | undefined;
   isEditMode: boolean;
+  moving: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -18,7 +26,7 @@ export type BarGroupProps = {
 
 export const BarGroup: React.FC<BarGroupProps> = (props) => {
   const { positionOperation, positionOperationApplicable, isValidPositionTarget } =
-    getPositionOperationConditions(props.tab, props.barsNumber, undefined);
+    getPositionOperationConditions(props.copying, props.moving, props.barsNumber, undefined);
 
   return (
     <div className="bars" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -57,7 +65,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
 
         const barsNumber = addToParent.bars.length;
         const sectionConditions = getPositionOperationConditions(
-          props.tab,
+          props.copying,
+          props.moving,
           barsNumber,
           addToParent,
         );
@@ -83,6 +92,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
             {isMovingTarget ? (
               <BarDestination
                 barIndex={barsNumber}
+                copying={props.copying}
+                moving={props.moving}
                 parentSection={barContainer.addToParent}
                 tab={props.tab}
                 updateTab={props.updateTab}
@@ -104,6 +115,8 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
         <div style={{ alignItems: 'center', display: 'flex', marginLeft: 8 }}>
           <BarDestination
             barIndex={props.barsNumber}
+            copying={props.copying}
+            moving={props.moving}
             parentSection={undefined}
             tab={props.tab}
             updateTab={props.updateTab}

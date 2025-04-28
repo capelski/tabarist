@@ -1,6 +1,6 @@
 import { activeColor, NonReferenceBarType } from '../../constants';
 import { barOperations, tabOperations } from '../../operations';
-import { ActiveSlot, SectionBar, Tab } from '../../types';
+import { ActiveSlot, PositionOperation, SectionBar, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
   activeSlot: ActiveSlot | undefined;
@@ -20,16 +20,6 @@ export const addBar = (
   updateTab(nextTab);
 };
 
-export const copyBarEnd = (
-  tab: Tab,
-  updateTab: (tab: Tab) => void,
-  destinationIndex: number,
-  parentSection?: SectionBar,
-) => {
-  const nextTab = tabOperations.copyBarEnd(tab, destinationIndex, parentSection);
-  updateTab(nextTab);
-};
-
 export const getSlotBackgroundColor = (
   activeSlot: ActiveSlot | undefined,
   position: number,
@@ -40,32 +30,23 @@ export const getSlotBackgroundColor = (
     : undefined;
 };
 
-export const moveBarEnd = (
-  tab: Tab,
-  updateTab: (tab: Tab) => void,
-  destinationIndex: number,
-  parentSection?: SectionBar,
-) => {
-  const nextTab = tabOperations.moveBarEnd(tab, destinationIndex, parentSection);
-  updateTab(nextTab);
-};
-
 export const getPositionOperationConditions = (
-  tab: Tab,
+  copying: PositionOperation | undefined,
+  moving: PositionOperation | undefined,
   barIndex: number,
   parentSection: SectionBar | undefined,
 ) => {
-  const positionOperation = tab.copying || tab.moving;
+  const positionOperation = copying || moving;
   const positionOperationApplicable =
-    (tab.copying && barOperations.isOperationInSection(tab.copying, parentSection)) ||
-    (tab.moving && barOperations.isOperationInSection(tab.moving, parentSection));
+    (copying && barOperations.isOperationInSection(copying, parentSection)) ||
+    (moving && barOperations.isOperationInSection(moving, parentSection));
 
   const isPositionSource =
     positionOperationApplicable &&
-    (tab.copying?.startIndex === barIndex || tab.moving?.startIndex === barIndex);
+    (copying?.startIndex === barIndex || moving?.startIndex === barIndex);
 
   const isValidPositionTarget =
-    !tab.moving || barOperations.canMoveBarToPosition(tab.moving.startIndex, barIndex);
+    !moving || barOperations.canMoveBarToPosition(moving.startIndex, barIndex);
 
   return {
     positionOperation: !!positionOperation,

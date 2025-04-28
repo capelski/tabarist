@@ -4,6 +4,7 @@ import { RouteNames } from '../constants';
 import {
   ActiveSlot,
   PageResponse,
+  PositionOperation,
   StarredListParameters,
   StarredTab,
   StripeSubscription,
@@ -40,12 +41,14 @@ export type AppState = {
   starredTabs: ListState<StarredTab, StarredListParameters>;
   tab: {
     activeSlot?: ActiveSlot;
+    copying?: PositionOperation;
     discardChangesModal?: boolean;
     document: Tab | undefined;
     isDirty?: boolean;
     isDraft?: boolean;
     isEditMode?: boolean;
     isStarred?: boolean;
+    moving?: PositionOperation;
     /** Snapshot of the unmodified document */
     originalDocument?: string;
   };

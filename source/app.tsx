@@ -98,11 +98,13 @@ export const App: React.FC<AppProps> = (props) => {
               element={
                 <TabView
                   activeSlot={state.tab.activeSlot}
+                  copying={state.tab.copying}
                   deletingTab={state.deletingTab}
                   isDirty={state.tab.isDirty}
                   isDraft={state.tab.isDraft}
                   isStarred={state.tab.isStarred}
                   isEditMode={!!state.tab.isEditMode}
+                  moving={state.tab.moving}
                   scrollView={scrollViewRef}
                   tab={state.tab.document}
                   user={state.user.document}
