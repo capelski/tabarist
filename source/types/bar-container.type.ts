@@ -39,7 +39,7 @@ export type ChildBarBase<T extends ChordBar | PickingBar> = {
 );
 
 export type ParentBarBase = {
-  addToParent: SectionBar;
+  addToParent: SectionBar | undefined;
   firstSectionBarPosition?: undefined;
   isFirstInSectionBar?: undefined;
   isLastInSectionBar?: undefined;

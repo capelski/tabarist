@@ -63,13 +63,14 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
 
         const { addToParent, appendBarIndex } = barContainer as SectionTailContainer;
 
-        const barsNumber = addToParent.bars.length;
-        const sectionConditions = getPositionOperationConditions(
-          props.copying,
-          props.moving,
-          barsNumber,
-          addToParent,
-        );
+        const sectionConditions = addToParent
+          ? getPositionOperationConditions(
+              props.copying,
+              props.moving,
+              addToParent.bars.length,
+              addToParent,
+            )
+          : undefined;
 
         const isMovingTarget =
           sectionConditions?.positionOperationApplicable &&
@@ -89,19 +90,19 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
               padding: '0 4px',
             }}
           >
-            {isMovingTarget ? (
+            {addToParent && isMovingTarget ? (
               <BarDestination
-                barIndex={barsNumber}
+                barIndex={addToParent.bars.length}
                 copying={props.copying}
                 moving={props.moving}
-                parentSection={barContainer.addToParent}
+                parentSection={addToParent}
                 tab={props.tab}
                 updateTab={props.updateTab}
               />
             ) : (
               <AddBar
                 barIndex={appendBarIndex + 1}
-                disabled={sectionConditions?.positionOperation}
+                disabled={!!props.copying || !!props.moving}
                 parentSection={undefined}
                 tab={props.tab}
                 updateTab={props.updateTab}

@@ -69,11 +69,12 @@ const processParentBar = (
   repeats?: number,
 ) => {
   const isReference = type === ContainerType.sectionReference;
+  const addToParent = isReference ? undefined : sectionBar;
   const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
 
   if (isEditMode) {
     barContainers.push({
-      addToParent: sectionBar,
+      addToParent,
       backgroundColor,
       barIndex,
       canUpdate: !isReference,
@@ -110,7 +111,7 @@ const processParentBar = (
 
   if (isEditMode) {
     barContainers.push({
-      addToParent: sectionBar,
+      addToParent,
       appendBarIndex: barIndex,
       backgroundColor,
       barIndex,
