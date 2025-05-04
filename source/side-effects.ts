@@ -57,10 +57,11 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
 
       if (
         !currentParams ||
-        titleParameter !== currentParams.titleFilter ||
-        aDParameter !== currentParams.anchorDocument?.direction ||
-        aIParameter !== currentParams.anchorDocument?.id ||
-        aTParameter !== currentParams.anchorDocument?.title
+        // Deliberately using loose equality to allow for null/undefined
+        titleParameter != currentParams.titleFilter ||
+        aDParameter != currentParams.anchorDocument?.direction ||
+        aIParameter != currentParams.anchorDocument?.id ||
+        aTParameter != currentParams.anchorDocument?.title
       ) {
         const nextParams: TabListParameters = {
           anchorDocument:
@@ -91,8 +92,9 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
 
       if (
         !currentParams ||
-        aDParameter !== currentParams.anchorDocument?.direction ||
-        aIParameter !== currentParams.anchorDocument?.id
+        // Deliberately using loose equality to allow for null/undefined
+        aDParameter != currentParams.anchorDocument?.direction ||
+        aIParameter != currentParams.anchorDocument?.id
       ) {
         const nextParams: StarredListParameters = {
           anchorDocument:
