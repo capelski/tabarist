@@ -135,7 +135,7 @@ const processChildBar = (
   bars: Bar[],
   barContainers: BarContainer[],
   positionReference: { value: number },
-  lastChordBar: ChordBar | undefined,
+  previousChordBar: ChordBar | undefined,
   repeats?: number,
   options:
     | {
@@ -177,7 +177,10 @@ const processChildBar = (
       parentIndex: options.parentIndex,
       referencedIndex: isReference ? bar.index : undefined,
     }),
-    omitRhythm: bar.type === BarType.chord && bar.rhythmIndex === lastChordBar?.rhythmIndex,
+    omitRhythm:
+      bar.type === BarType.chord &&
+      previousChordBar?.rhythmIndex !== undefined &&
+      bar.rhythmIndex === previousChordBar?.rhythmIndex,
     barIndex,
     position: positionReference.value++,
     renderedBar: bar,
@@ -223,11 +226,11 @@ export const barsToBarContainers = (
   const positionReference = options.positionReference || { value: 0 };
   const { barContainers } = bars.reduce<{
     barContainers: BarContainer[];
-    lastChordBar: ChordBar | undefined;
+    previousChordBar: ChordBar | undefined;
   }>(
     (reduced, bar) => {
       const nextBarContainers = [...reduced.barContainers];
-      let nextChordBar = reduced.lastChordBar;
+      let nextChordBar = reduced.previousChordBar;
 
       if (bar.type === BarType.chord || bar.type === BarType.picking) {
         processChildBar(
@@ -238,7 +241,7 @@ export const barsToBarContainers = (
           bars,
           nextBarContainers,
           positionReference,
-          reduced.lastChordBar,
+          reduced.previousChordBar,
           bar.repeats,
           options,
         );
@@ -261,7 +264,7 @@ export const barsToBarContainers = (
             bars,
             nextBarContainers,
             positionReference,
-            reduced.lastChordBar,
+            reduced.previousChordBar,
             bar.repeats,
             options,
           );
@@ -294,10 +297,10 @@ export const barsToBarContainers = (
 
       return {
         barContainers: nextBarContainers,
-        lastChordBar: nextChordBar,
+        previousChordBar: nextChordBar,
       };
     },
-    { barContainers: [], lastChordBar: undefined },
+    { barContainers: [], previousChordBar: undefined },
   );
 
   // console.log('barContainers', barContainers);

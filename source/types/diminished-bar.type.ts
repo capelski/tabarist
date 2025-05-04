@@ -12,13 +12,22 @@ export type DiminishedBarBase = {
 };
 
 export type DiminishedChordBar = DiminishedBarBase & {
-  rhythmIndex: number;
   slots: DiminishedSlot[];
   type: BarType.chord;
-};
+} & (
+    | {
+        rhythmIndex: number;
+        rhythmSlots?: undefined;
+      }
+    | {
+        rhythmIndex?: undefined;
+        rhythmSlots: DiminishedSlot[];
+      }
+  );
 
 export type DiminishedPickingBar = DiminishedBarBase & {
   chordSupport: DiminishedSlot[];
+  rhythmIndex?: number;
   strings: { slots: DiminishedSlot[] }[];
   type: BarType.picking;
 };

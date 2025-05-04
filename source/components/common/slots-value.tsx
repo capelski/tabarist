@@ -27,8 +27,12 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
         const isFirstSlot = slot.index === 0;
         const currenPath = [...props.indexesPath, slot.index];
         const background = props.background?.(slot);
-        const backgroundColor =
-          props.isEditMode && !props.canUpdate ? '#f4f4f4' : props.backgroundColor?.(slot);
+
+        const backgroundColor = props.isEditMode
+          ? props.canUpdate
+            ? '#fbfbfb'
+            : '#f2f2f2'
+          : props.backgroundColor?.(slot);
 
         return (
           <div
@@ -57,7 +61,7 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
                       props.setSlotValue(event.target.value, currenPath);
                     }}
                     style={{
-                      backgroundColor,
+                      backgroundColor: 'transparent',
                       border: 'none',
                       boxSizing: 'border-box',
                       height: stringHeight,
@@ -93,7 +97,7 @@ export const SlotsValue: React.FC<SlotsValueProps> = (props) => {
               ) : (
                 <span
                   style={{
-                    backgroundColor,
+                    backgroundColor: 'transparent',
                     color: props.color,
                     height: stringHeight,
                     lineHeight: `${stringHeight}px`,

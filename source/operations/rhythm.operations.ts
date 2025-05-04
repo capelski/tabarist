@@ -16,7 +16,10 @@ export const rhythmOperations = {
 
   canDelete: (tab: Tab, rhythmIndex: number) => {
     const isBarUsingRhythm = (bar: Bar) => {
-      return bar.type === BarType.chord && bar.rhythmIndex === rhythmIndex;
+      return (
+        (bar.type === BarType.chord || bar.type === BarType.picking) &&
+        bar.rhythmIndex === rhythmIndex
+      );
     };
 
     return !tab.bars.some((bar) =>
@@ -49,7 +52,7 @@ export const rhythmOperations = {
 
     return {
       ...tab,
-      bars: barOperations.setChordBarSlotSize(tab.bars, rhythmIndex, size, indexesPath),
+      bars: barOperations.setBarSlotSize(tab.bars, rhythmIndex, size, indexesPath),
       rhythms: tab.rhythms.map((rhythm) => {
         return rhythm.index !== rhythmIndex
           ? rhythm

@@ -7,8 +7,7 @@ import { Modal } from '../common/modal';
 import { AddBar } from './add-bar';
 import { BarDestination } from './bar-destination';
 import { getPositionOperationConditions } from './bar-handlers';
-import { ChordBarComponent } from './chord-bar';
-import { PickingBarComponent } from './picking-bar';
+import { TimeDivisionsComponent } from './time-divisions';
 
 export type BarControlsProps = {
   container: BarContainer;
@@ -75,26 +74,12 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       }}
     >
       {timeDivisionsModal && (
-        <Modal closeHandler={cancelTimeDivisions}>
-          {props.container.type === ContainerType.chord && (
-            <ChordBarComponent
-              {...props}
-              activeSlot={undefined}
-              container={props.container as BarContainer<ContainerType.chord>}
-              displayRhythmPicker={true}
-              isEditMode={true}
-            />
-          )}
-
-          {props.container.type === ContainerType.picking && (
-            <PickingBarComponent
-              {...props}
-              activeSlot={undefined}
-              container={props.container as BarContainer<ContainerType.picking>}
-              displaySlotDivider={true}
-              isEditMode={true}
-            />
-          )}
+        <Modal inset="10%" closeHandler={cancelTimeDivisions}>
+          <TimeDivisionsComponent
+            container={props.container as BarContainer<ContainerType.chord | ContainerType.picking>}
+            tab={props.tab}
+            updateTab={props.updateTab}
+          />
         </Modal>
       )}
 

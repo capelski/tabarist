@@ -32,3 +32,4 @@ export * from './container-type';
 export * from './route-names';
 export * from './slot-type';
 export * from './symbols';
+export * from './time-divisions';

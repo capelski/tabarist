@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { removeSymbol } from '../../constants';
 import { rhythmOperations, slotOperations, tabOperations } from '../../operations';
 import { Rhythm, Tab } from '../../types';
@@ -6,14 +6,14 @@ import { SlotDivider } from '../common/slot-divider';
 import { SlotsValue } from '../common/slots-value';
 
 export type RhythmProps = {
+  isSelected: boolean;
   rhythm: Rhythm;
+  setRhythm: () => void;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
 
 export const RhythmComponent: React.FC<RhythmProps> = (props) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const virtualSlot = slotOperations.createBlockSlot(0, props.rhythm.slots);
 
   const setSlotSize = (size: number, indexesPath: number[]) => {
@@ -42,16 +42,13 @@ export const RhythmComponent: React.FC<RhythmProps> = (props) => {
         }}
       >
         <div>
-          <button
-            onClick={() => {
-              setIsExpanded(!isExpanded);
-            }}
+          <input
+            defaultChecked={props.isSelected}
+            name="rhythm"
+            onChange={props.setRhythm}
             style={{ marginRight: 8 }}
-            type="button"
-          >
-            {isExpanded ? '⬇️' : '➡️'}
-          </button>
-
+            type="radio"
+          />
           <input
             onChange={(event) => {
               const nextTab = tabOperations.renameRhythm(
@@ -61,11 +58,14 @@ export const RhythmComponent: React.FC<RhythmProps> = (props) => {
               );
               props.updateTab(nextTab);
             }}
+            readOnly={!props.isSelected}
+            style={{ border: props.isSelected ? undefined : 'none', marginRight: 8 }}
             value={props.rhythm.name}
           />
         </div>
 
         <button
+          className="btn btn-outline-danger"
           disabled={!rhythmOperations.canDelete(props.tab, props.rhythm.index)}
           onClick={() => {
             const nextTab = tabOperations.removeRhythm(props.tab, props.rhythm.index);
@@ -78,7 +78,7 @@ export const RhythmComponent: React.FC<RhythmProps> = (props) => {
         </button>
       </div>
 
-      {isExpanded && (
+      {props.isSelected && (
         <React.Fragment>
           <SlotDivider
             denominator={1}

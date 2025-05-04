@@ -2,17 +2,14 @@ import React from 'react';
 import { ContainerType } from '../../constants';
 import { slotOperations, tabOperations } from '../../operations';
 import { BarContainer, Slot } from '../../types';
-import { SlotDivider } from '../common/slot-divider';
 import { SlotsValue } from '../common/slots-value';
 import { BarComponentBaseProps, getSlotBackgroundColor } from './bar-handlers';
 
 export type PickingBarComponentProps = BarComponentBaseProps & {
   container: BarContainer<ContainerType.picking>;
-  displaySlotDivider?: boolean;
 };
 
 export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) => {
-  const virtualSlot = slotOperations.createBlockSlot(0, props.container.renderedBar.chordSupport);
   const displayChordSupport = props.container.renderedBar.chordSupport.some(
     (slot) => slotOperations.getSlotLength(slot, 0) > 0,
   );
@@ -27,17 +24,6 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
       getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index) ??
       'transparent'
     );
-  };
-
-  const setSlotSize = (size: number, indexesPath: number[]) => {
-    const nextTab = tabOperations.setPickingBarSlotsSize(
-      props.tab,
-      props.container.barIndex,
-      size,
-      indexesPath,
-      props.container.parentSection,
-    );
-    props.updateTab(nextTab);
   };
 
   const setSlotValue =
@@ -64,19 +50,6 @@ export const PickingBarComponent: React.FC<PickingBarComponentProps> = (props) =
         width: '100%',
       }}
     >
-      {props.displaySlotDivider && (
-        <div style={{ marginBottom: 8 }}>
-          <SlotDivider
-            denominator={undefined}
-            indexesPath={[]}
-            isFirstSlot={true}
-            parentSlotSize={virtualSlot.slots.length}
-            setSlotSize={setSlotSize}
-            slot={virtualSlot}
-          />
-        </div>
-      )}
-
       {props.container.renderedBar.strings.map((string) => {
         return (
           <SlotsValue

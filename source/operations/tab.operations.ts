@@ -38,18 +38,12 @@ const applyBarsOperation = (
 
 export const tabOperations = {
   addBar: (tab: Tab, index: number, type: NonReferenceBarType, parentSection?: SectionBar): Tab => {
-    let nextTab = { ...tab };
-
-    if (type === BarType.chord && tab.rhythms.length === 0) {
-      nextTab.rhythms = [rhythmOperations.create(0)];
-    }
-
     return applyBarsOperation(
-      nextTab,
+      tab,
       (bars) => {
         const newBar =
           type === BarType.chord
-            ? barOperations.createChordBar(index, nextTab.rhythms[0])
+            ? barOperations.createChordBar(index)
             : type === BarType.picking
             ? barOperations.createPickingBar(index)
             : barOperations.createSectionBar(index);
@@ -152,7 +146,8 @@ export const tabOperations = {
 
     const processBars = <TBar extends Bar | NonSectionBar>(bars: TBar[]): TBar[] => {
       return bars.map((bar) => {
-        return bar.type === BarType.chord
+        return (bar.type === BarType.chord || bar.type === BarType.picking) &&
+          bar.rhythmIndex !== undefined
           ? { ...bar, rhythmIndex: getIndexDecrease(bar.rhythmIndex, deletionIndex, 1) }
           : bar.type === BarType.section
           ? {
@@ -198,15 +193,29 @@ export const tabOperations = {
     };
   },
 
-  setChordBarRhythm: (
+  setBarRhythm: (tab: Tab, barIndex: number, rhythm?: Rhythm, parentSection?: SectionBar): Tab => {
+    const nextTab: Tab =
+      tab.rhythms.length === 0 ? { ...tab, rhythms: [rhythmOperations.create(0)] } : tab;
+
+    return applyBarsOperation(
+      nextTab,
+      (bars) => barOperations.setBarRhythm(bars, barIndex, rhythm ?? nextTab.rhythms[0]),
+      parentSection,
+    );
+  },
+
+  setBarSlotsSize: (
     tab: Tab,
     barIndex: number,
-    rhythm: Rhythm,
+    size: number,
+    indexesPath: number[],
+    rhythmIndex: number | undefined,
     parentSection?: SectionBar,
   ): Tab => {
+    const rhythm = tab.rhythms.find((rhythm) => rhythm.index === rhythmIndex);
     return applyBarsOperation(
       tab,
-      (bars) => barOperations.setChordBarRhythm(bars, barIndex, rhythm),
+      (bars) => barOperations.setBarSlotsSize(bars, barIndex, size, indexesPath, rhythm),
       parentSection,
     );
   },
@@ -216,25 +225,12 @@ export const tabOperations = {
     barIndex: number,
     value: string,
     indexesPath: number[],
+    property: 'slots' | 'rhythmSlots',
     parentSection?: SectionBar,
   ): Tab => {
     return applyBarsOperation(
       tab,
-      (bars) => barOperations.setChordBarSlotValue(bars, barIndex, value, indexesPath),
-      parentSection,
-    );
-  },
-
-  setPickingBarSlotsSize: (
-    tab: Tab,
-    barIndex: number,
-    size: number,
-    indexesPath: number[],
-    parentSection?: SectionBar,
-  ): Tab => {
-    return applyBarsOperation(
-      tab,
-      (bars) => barOperations.setPickingBarSlotsSize(bars, barIndex, size, indexesPath),
+      (bars) => barOperations.setChordBarSlotValue(bars, barIndex, value, indexesPath, property),
       parentSection,
     );
   },

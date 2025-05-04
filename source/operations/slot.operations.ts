@@ -28,9 +28,9 @@ const createBlockSlot = (index: number, nestedSlots: Slot[]): BlockSlot => {
   };
 };
 
-const createSlots = (size: number, baseSlots: Slot[] = []): Slot[] => {
+const createSlots = (size: number, getSlot?: (index: number) => Slot | undefined): Slot[] => {
   return Array.from({ length: size }, (_, index) => {
-    return baseSlots[index] ?? createValueSlot(index, '');
+    return getSlot?.(index) ?? createValueSlot(index, '');
   });
 };
 
@@ -68,7 +68,7 @@ const getSlotLength = (slot: Slot, minimumLength = 1): number => {
 const setSlotSize = (slots: Slot[], size: number, indexesPath: number[]): Slot[] => {
   if (indexesPath.length === 0) {
     // Rebasing the number of beats in the rhythm/picking bar
-    return createSlots(size, slots);
+    return createSlots(size, (index) => slots[index]);
   }
 
   return slots.map((slot) => {

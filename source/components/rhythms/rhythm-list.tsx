@@ -1,10 +1,12 @@
 import React from 'react';
-import { addSymbol } from '../../constants';
+import { addSymbol, ContainerType } from '../../constants';
 import { tabOperations } from '../../operations';
-import { Tab } from '../../types';
+import { BarContainer, Rhythm, Tab } from '../../types';
 import { RhythmComponent } from './rhythm';
 
 export type RhythmListProps = {
+  container: BarContainer<ContainerType.chord | ContainerType.picking>;
+  selectedRhythmIndex: number;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -14,15 +16,25 @@ export const RhythmList: React.FC<RhythmListProps> = (props) => {
     props.updateTab(tabOperations.addRhythm(props.tab));
   };
 
+  const setRhythm = (rhythm: Rhythm) => {
+    const nextTab = tabOperations.setBarRhythm(
+      props.tab,
+      props.container.barIndex,
+      rhythm,
+      props.container.parentSection,
+    );
+    props.updateTab(nextTab);
+  };
+
   return (
     <div className="rhythm-list">
-      <h3>Rhythms</h3>
-
       {props.tab.rhythms.map((rhythm) => {
         return (
           <RhythmComponent
+            isSelected={rhythm.index === props.selectedRhythmIndex}
             key={rhythm.index}
             rhythm={rhythm}
+            setRhythm={() => setRhythm(rhythm)}
             tab={props.tab}
             updateTab={props.updateTab}
           />
@@ -30,7 +42,7 @@ export const RhythmList: React.FC<RhythmListProps> = (props) => {
       })}
 
       <p>
-        <button onClick={addRhythm} type="button">
+        <button className="btn btn-outline-primary" onClick={addRhythm} type="button">
           {addSymbol} rhythm
         </button>
       </p>

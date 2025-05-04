@@ -4,43 +4,40 @@ import { tabOperations } from '../../operations';
 import { BarContainer, Slot } from '../../types';
 import { SlotsValue } from '../common/slots-value';
 import { BarComponentBaseProps, getSlotBackgroundColor } from './bar-handlers';
-import { RhythmPicker, RhythmPickerProps } from './rhythm-picker';
 
 export type ChordBarCoreProps = BarComponentBaseProps & {
+  areRhythmSlotsEditable?: boolean;
   container: BarContainer<ContainerType.chord>;
-  displayRhythmPicker?: boolean;
 };
 
 export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
-  const rhythm = props.tab.rhythms.find(
-    (rhythm) => rhythm.index === props.container.renderedBar.rhythmIndex,
-  )!;
+  const rhythmSlots =
+    props.container.renderedBar.rhythmIndex !== undefined
+      ? props.tab.rhythms.find(
+          (rhythm) => rhythm.index === props.container.renderedBar.rhythmIndex,
+        )!.slots
+      : props.container.renderedBar.rhythmSlots;
+
+  const canEditRhythmSlots =
+    !!props.areRhythmSlotsEditable && props.container.renderedBar.rhythmIndex === undefined;
 
   const getBackgroundColor = (slot: Slot) => {
     return getSlotBackgroundColor(props.activeSlot, props.container.position, slot.index);
   };
 
-  const setRhythm: RhythmPickerProps['setRhythm'] = (rhythm) => {
-    const nextTab = tabOperations.setChordBarRhythm(
-      props.tab,
-      props.container.barIndex,
-      rhythm,
-      props.container.parentSection,
-    );
-    props.updateTab(nextTab);
-  };
+  const setSlotValue =
+    (property: 'slots' | 'rhythmSlots') => (value: string, indexesPath: number[]) => {
+      const nextTab = tabOperations.setChordBarSlotValue(
+        props.tab,
+        props.container.barIndex,
+        value,
+        indexesPath,
+        property,
+        props.container.parentSection,
+      );
 
-  const setSlotValue = (value: string, indexesPath: number[]) => {
-    const nextTab = tabOperations.setChordBarSlotValue(
-      props.tab,
-      props.container.barIndex,
-      value,
-      indexesPath,
-      props.container.parentSection,
-    );
-
-    props.updateTab(nextTab);
-  };
+      props.updateTab(nextTab);
+    };
 
   return (
     <div
@@ -53,37 +50,25 @@ export const ChordBarComponent: React.FC<ChordBarCoreProps> = (props) => {
         width: '100%',
       }}
     >
-      {props.displayRhythmPicker && (
-        <div
-          style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 8 }}
-        >
-          <RhythmPicker
-            setRhythm={setRhythm}
-            rhythmIndex={props.container.renderedBar.rhythmIndex}
-            rhythms={props.tab.rhythms}
-          />
-        </div>
-      )}
-
       <SlotsValue
         backgroundColor={getBackgroundColor}
         canUpdate={props.container.canUpdate}
         elementType="input"
         indexesPath={[]}
         isEditMode={props.isEditMode}
-        setSlotValue={setSlotValue}
+        setSlotValue={setSlotValue('slots')}
         slots={props.container.renderedBar.slots}
       />
 
       <SlotsValue
         backgroundColor={getBackgroundColor}
-        canUpdate={false}
+        canUpdate={canEditRhythmSlots}
         color={props.container.omitRhythm ? '#bbb' : undefined}
-        elementType="input"
+        elementType={canEditRhythmSlots ? 'select' : 'input'}
         indexesPath={[]}
-        isEditMode={false} // Setting to false to prevent the disabled background color
-        setSlotValue={() => {}}
-        slots={rhythm.slots}
+        isEditMode={canEditRhythmSlots}
+        setSlotValue={setSlotValue('rhythmSlots')}
+        slots={rhythmSlots}
       />
     </div>
   );

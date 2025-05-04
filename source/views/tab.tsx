@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
-import { BarGroup, RhythmList, TabDetails, TabFooter, TabHeader } from '../components';
+import { BarGroup, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, DispatchProvider } from '../state';
@@ -103,12 +103,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         tab={props.tab}
         updateTab={updateTab}
       />
-
-      {props.isEditMode && (
-        <React.Fragment>
-          <RhythmList tab={props.tab} updateTab={updateTab} />
-        </React.Fragment>
-      )}
 
       <TabFooter
         activeSlot={props.activeSlot}

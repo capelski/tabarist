@@ -15,9 +15,18 @@ export type BarBase = DiminishedBarBase & {
 };
 
 export type ChordBar = BarBase &
-  Omit<DiminishedChordBar, 'slots'> & {
+  Omit<DiminishedChordBar, 'rhythmIndex' | 'rhythmSlots' | 'slots'> & {
     slots: Slot[];
-  };
+  } & (
+    | {
+        rhythmIndex: number;
+        rhythmSlots?: undefined;
+      }
+    | {
+        rhythmIndex?: undefined;
+        rhythmSlots: Slot[];
+      }
+  );
 
 export type PickingBar = BarBase &
   Omit<DiminishedPickingBar, 'chordSupport' | 'strings'> & {

@@ -1,4 +1,4 @@
-import { BarType, slotsDefault, stringsNumber } from '../constants';
+import { BarType, slotsDefault, slotValueOptions, stringsNumber } from '../constants';
 import {
   Bar,
   BarBase,
@@ -19,7 +19,8 @@ import {
 import { debugBarMovements, getIndexAfterMove, getIndexIncrease } from './indexed-value.operations';
 import { slotOperations } from './slot.operations';
 
-const setChordBarSlotSize = <TBar extends Bar | NonSectionBar>(
+/** Used to propagate rhythm slot changes to the bars which use the rhythm  */
+const setBarSlotSize = <TBar extends Bar | NonSectionBar>(
   bars: TBar[],
   rhythmIndex: number,
   size: number,
@@ -31,10 +32,19 @@ const setChordBarSlotSize = <TBar extends Bar | NonSectionBar>(
           ...bar,
           slots: slotOperations.setSlotSize(bar.slots, size, indexesPath),
         }
+      : bar.type === BarType.picking && bar.rhythmIndex === rhythmIndex
+      ? {
+          ...bar,
+          chordSupport: slotOperations.setSlotSize(bar.chordSupport, size, indexesPath),
+          strings: bar.strings.map((string) => ({
+            index: string.index,
+            slots: slotOperations.setSlotSize(string.slots, size, indexesPath),
+          })),
+        }
       : bar.type === BarType.section
       ? {
           ...bar,
-          bars: setChordBarSlotSize(bar.bars, rhythmIndex, size, indexesPath),
+          bars: setBarSlotSize(bar.bars, rhythmIndex, size, indexesPath),
         }
       : bar;
   });
@@ -48,6 +58,15 @@ const augmentBar = <TDiminishedBar extends DiminishedBar | DiminishedNonSectionB
     const chordBar: ChordBar = {
       ...diminishedBar,
       index,
+      ...(diminishedBar.rhythmIndex !== undefined
+        ? {
+            rhythmIndex: diminishedBar.rhythmIndex,
+            rhythmSlots: undefined,
+          }
+        : {
+            rhythmIndex: undefined,
+            rhythmSlots: diminishedBar.rhythmSlots.map(slotOperations.augmentSlot),
+          }),
       slots: diminishedBar.slots.map(slotOperations.augmentSlot),
     };
     return chordBar;
@@ -86,10 +105,13 @@ const diminishBar = <TBar extends Bar | NonSectionBar>(
   bar: TBar,
 ): TBar extends NonSectionBar ? DiminishedNonSectionBar : DiminishedBar => {
   if (bar.type === BarType.chord) {
-    const { index, slots, ...rest } = bar as ChordBar;
+    const { index, slots, rhythmIndex, rhythmSlots, ...rest } = bar as ChordBar;
 
     const diminishedChordBar: DiminishedChordBar = {
       ...rest,
+      ...(rhythmIndex !== undefined
+        ? { rhythmIndex }
+        : { rhythmSlots: rhythmSlots.map(slotOperations.diminishSlot) }),
       slots: slots.map(slotOperations.diminishSlot),
     };
     return diminishedChordBar;
@@ -161,11 +183,14 @@ export const barOperations = {
     return startIndex !== endIndex && startIndex + 1 !== endIndex;
   },
 
-  createChordBar: (index: number, rhythm: Rhythm): ChordBar => {
+  createChordBar: (index: number): ChordBar => {
     return {
       index,
       repeats: undefined,
-      rhythmIndex: rhythm.index,
+      rhythmIndex: undefined,
+      rhythmSlots: slotOperations.createSlots(slotsDefault, (index) => {
+        return slotOperations.createValueSlot(index, slotValueOptions[1]);
+      }),
       slots: slotOperations.createSlots(slotsDefault),
       type: BarType.chord,
     };
@@ -312,59 +337,85 @@ export const barOperations = {
     return nextBars;
   },
 
-  setChordBarRhythm: <TBar extends Bar | NonSectionBar>(
+  setBarRhythm: <TBar extends Bar | NonSectionBar>(
     bars: TBar[],
     barIndex: number,
     rhythm: Rhythm,
   ): TBar[] => {
     return bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.index !== barIndex
-        ? bar
-        : {
+      return bar.type === BarType.chord && bar.index === barIndex
+        ? {
             ...bar,
             rhythmIndex: rhythm.index,
+            rhythmSlots: undefined,
             slots: slotOperations.copyStructure(rhythm.slots, bar.slots),
-          };
-    });
-  },
-
-  setChordBarSlotSize,
-
-  setChordBarSlotValue: <TBar extends Bar | NonSectionBar>(
-    bars: TBar[],
-    barIndex: number,
-    value: string,
-    indexesPath: number[],
-  ): TBar[] => {
-    return bars.map((bar) => {
-      return bar.type !== BarType.chord || bar.index !== barIndex
-        ? bar
-        : {
+          }
+        : bar.type === BarType.picking && bar.index === barIndex
+        ? {
             ...bar,
-            slots: slotOperations.setSlotValue(bar.slots, value, indexesPath),
-          };
+            chordSupport: slotOperations.copyStructure(rhythm.slots, bar.chordSupport),
+            rhythmIndex: rhythm.index,
+            strings: bar.strings.map((string) => ({
+              index: string.index,
+              slots: slotOperations.copyStructure(rhythm.slots, string.slots),
+            })),
+          }
+        : bar;
     });
   },
 
-  setPickingBarSlotsSize: <TBar extends Bar | NonSectionBar>(
+  setBarSlotSize,
+
+  setBarSlotsSize: <TBar extends Bar | NonSectionBar>(
     bars: TBar[],
     barIndex: number,
     size: number,
     indexesPath: number[],
+    rhythm: Rhythm | undefined,
   ): TBar[] => {
     return bars.map((bar) => {
-      return bar.type !== BarType.picking || bar.index !== barIndex
-        ? bar
-        : {
+      return bar.type === BarType.chord && bar.index === barIndex
+        ? {
+            ...bar,
+            rhythmIndex: undefined,
+            rhythmSlots: slotOperations.setSlotSize(
+              rhythm?.slots ?? bar.rhythmSlots ?? bar.slots,
+              size,
+              indexesPath,
+            ),
+            slots: slotOperations.setSlotSize(bar.slots, size, indexesPath),
+          }
+        : bar.type === BarType.picking && bar.index === barIndex
+        ? {
             ...bar,
             chordSupport: slotOperations.setSlotSize(bar.chordSupport, size, indexesPath),
+            rhythmIndex: undefined,
             strings: bar.strings.map((string) => {
               return {
                 index: string.index,
                 slots: slotOperations.setSlotSize(string.slots, size, indexesPath),
               };
             }),
-          };
+          }
+        : bar;
+    });
+  },
+
+  setChordBarSlotValue: <TBar extends Bar | NonSectionBar>(
+    bars: TBar[],
+    barIndex: number,
+    value: string,
+    indexesPath: number[],
+    property: 'slots' | 'rhythmSlots',
+  ): TBar[] => {
+    return bars.map((bar) => {
+      return bar.type === BarType.chord && bar.index === barIndex
+        ? {
+            ...bar,
+            [property]:
+              bar[property] && slotOperations.setSlotValue(bar[property], value, indexesPath),
+          }
+        : bar;
     });
   },
 

@@ -1,4 +1,7 @@
-- Cancelling the edit mode after refresh blanks the screen
+- Universal rhythms
+- Only push a section head if the section has no bars. Display section name in first bar...
+- Allow clicking on a slot to start playing from there
+- List of chords + chord display. Ability to define custom chords
 - Check whether Stripe subscription is active
 - <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user
