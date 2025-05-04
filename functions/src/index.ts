@@ -48,7 +48,7 @@ expressApp.get(routes, async (req, res) => {
       const params: TabListParameters = {};
       initialState.homeState = {
         data: {
-          hasNextPage: false,
+          hasNextPage: true,
           hasPreviousPage: false,
           documents: await getHomeTabs(params),
         },
