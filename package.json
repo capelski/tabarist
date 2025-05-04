@@ -12,7 +12,7 @@
     "dev": "webpack serve --config webpack/development.config.js",
     "firebase": "firebase",
     "firebase:dev": "firebase emulators:start --only functions",
-    "firebase:deploy": "npm run build && firebase deploy",
+    "firebase:deploy": "npm run build && firebase deploy && ./clean-registry.sh",
     "test": "cucumber-js --require-module ts-node/register --require 'source/**/*.cucumber.ts' source/**/*.feature"
   },
   "dependencies": {
