@@ -3,7 +3,7 @@ import { TabList, TabListBaseProps } from '../components';
 import { RouteNames } from '../constants';
 import { getTabListRelativeUrl } from '../operations';
 import { tabRepository } from '../repositories';
-import { ActionType, DispatchProvider } from '../state';
+import { ActionType, StateProvider } from '../state';
 import { MetaTags } from './common/meta-tags';
 
 export type HomeViewProps = TabListBaseProps & {
@@ -13,7 +13,7 @@ export type HomeViewProps = TabListBaseProps & {
 const currentRoute = RouteNames.home;
 
 export const HomeView: React.FC<HomeViewProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const fetchTabs = async () => {
     dispatch({ type: ActionType.fetchTabsStart, route: currentRoute });

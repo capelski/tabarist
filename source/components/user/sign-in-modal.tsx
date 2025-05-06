@@ -2,13 +2,13 @@ import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import React, { PropsWithChildren, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { getFirebaseContext } from '../../firebase-context';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { Modal } from '../common/modal';
 
 export type SignInModalProps = PropsWithChildren<{}>;
 
 export const SignInModal: React.FC<SignInModalProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const finishSignIn = () => {
     dispatch({ type: ActionType.signInFinish });

@@ -6,7 +6,7 @@ import { TabDiscardModal } from './components/tab/tab-discard-modal';
 import { UpgradeModal } from './components/user/upgrade-modal';
 import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
-import { appReducer, DispatchProvider, getInitialState, ListState } from './state';
+import { appReducer, getInitialState, ListState, StateProvider } from './state';
 import { Tab, TabListParameters } from './types';
 import { HomeView, MyTabsView, StarredTabsView, TabView } from './views';
 
@@ -22,7 +22,7 @@ export const App: React.FC<AppProps> = (props) => {
   useSideEffects(state, dispatch);
 
   return (
-    <DispatchProvider.Provider value={dispatch}>
+    <StateProvider.Provider value={{ dispatch, state }}>
       <div
         style={{
           boxSizing: 'border-box',
@@ -114,6 +114,6 @@ export const App: React.FC<AppProps> = (props) => {
           </Routes>
         </div>
       </div>
-    </DispatchProvider.Provider>
+    </StateProvider.Provider>
   );
 };

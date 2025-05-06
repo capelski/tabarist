@@ -3,7 +3,7 @@ import { TabList, TabListBaseProps } from '../components';
 import { RouteNames } from '../constants';
 import { getTabListRelativeUrl } from '../operations';
 import { tabRepository } from '../repositories';
-import { ActionType, DispatchProvider } from '../state';
+import { ActionType, StateProvider } from '../state';
 import { MetaTags } from './common/meta-tags';
 
 export type MyTabsViewProps = TabListBaseProps & {
@@ -13,7 +13,7 @@ export type MyTabsViewProps = TabListBaseProps & {
 const currentRoute = RouteNames.myTabs;
 
 export const MyTabsView: React.FC<MyTabsViewProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const fetchTabs = async () => {
     if (!props.user) {

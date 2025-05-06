@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { tabRepository } from '../../repositories';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { Tab } from '../../types';
 import { Modal } from '../common/modal';
 
@@ -10,7 +10,7 @@ export type TabDeletionModalProps = {
 };
 
 export const TabDeletionModal: React.FC<TabDeletionModalProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const cancelDelete = () => {
     dispatch({ type: ActionType.deleteCancel });

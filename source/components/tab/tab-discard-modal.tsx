@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { Modal } from '../common/modal';
 
 export const TabDiscardModal: React.FC = () => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const cancelDiscardChanges = () => {
     dispatch({ type: ActionType.discardChangesCancel });

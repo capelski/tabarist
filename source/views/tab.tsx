@@ -4,7 +4,7 @@ import { useParams } from 'react-router';
 import { BarGroup, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
-import { ActionType, DispatchProvider } from '../state';
+import { ActionType, StateProvider } from '../state';
 import { ActiveSlot, PositionOperation, Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
@@ -26,7 +26,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   // When entering edit mode from play mode we need to clear the next timeout
   const playTimeoutRef = useRef(0);
 
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
   const { tabId } = useParams();
 
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded

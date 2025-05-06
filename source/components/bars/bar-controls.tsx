@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { cancelSymbol, ContainerType, optionsSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { BarContainer, PositionOperation, Tab } from '../../types';
 import { Modal } from '../common/modal';
 import { AddBar } from './add-bar';
@@ -20,7 +20,7 @@ export type BarControlsProps = {
 export const BarControls: React.FC<BarControlsProps> = (props) => {
   const [timeDivisionsModal, setTimeDivisionsModal] = useState(false);
 
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const cancelPositionOperation = () => {
     dispatch({ type: ActionType.positionOperationCancel });

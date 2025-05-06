@@ -4,7 +4,7 @@ import { TabListItem } from '../components';
 import { ItemsList } from '../components/common/items-list';
 import { getStarredListRelativeUrl } from '../operations';
 import { userRepository } from '../repositories';
-import { ActionType, DispatchProvider, ListState } from '../state';
+import { ActionType, ListState, StateProvider } from '../state';
 import { StarredListParameters, StarredTab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
@@ -15,7 +15,7 @@ export type StarredTabsViewProps = {
 };
 
 export const StarredTabsView: React.FC<StarredTabsViewProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const fetchTabs = async () => {
     if (!props.user) {

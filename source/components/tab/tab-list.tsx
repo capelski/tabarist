@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
 import { RouteNames } from '../../constants';
-import { ActionType, DispatchProvider, ListState } from '../../state';
+import { ActionType, ListState, StateProvider } from '../../state';
 import { Tab, TabListParameters } from '../../types';
 import { ItemsList } from '../common/items-list';
 import { TextFilter } from '../common/text-filter';
@@ -19,7 +19,7 @@ export type TabListProps = TabListBaseProps & {
 };
 
 export const TabList: React.FC<TabListProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const removeTab = (tab: Tab) => {
     dispatch({ type: ActionType.deletePrompt, tab });

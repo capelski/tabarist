@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { RouteNames } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
-import { ActionType, DispatchProvider } from '../state';
+import { ActionType, StateProvider } from '../state';
 import { StripeSubscription } from '../types';
 
 export type NavBarProps = {
@@ -16,7 +16,7 @@ export type NavBarProps = {
 };
 
 export const NavBar: React.FC<NavBarProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 

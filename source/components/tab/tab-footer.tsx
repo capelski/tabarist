@@ -3,7 +3,7 @@ import React, { MutableRefObject, useContext, useEffect } from 'react';
 import { maxTempo, minTempo } from '../../constants';
 import { tabOperations } from '../../operations';
 import { userRepository } from '../../repositories';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { ActiveSlot, BarContainer, Tab } from '../../types';
 
 export type TabFooterProps = {
@@ -22,7 +22,7 @@ let activeSlotLastDelay = 0;
 let activeSlotLastRender = 0;
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const updateActiveSlot = () => {
     if (props.tab.tempo && props.activeSlot) {

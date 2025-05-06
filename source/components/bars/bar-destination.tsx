@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { positionSymbol } from '../../constants';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { PositionOperation, SectionBar, Tab } from '../../types';
 
 export type BarDestinationProps = {
@@ -13,7 +13,7 @@ export type BarDestinationProps = {
 };
 
 export const BarDestination: React.FC<BarDestinationProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   return (
     <button

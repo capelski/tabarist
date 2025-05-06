@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
 import { customerRepository } from '../../repositories';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { Modal } from '../common/modal';
 
 export type UpgradeModalProps = {
@@ -10,7 +10,7 @@ export type UpgradeModalProps = {
 };
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
 
   const cancelUpgrade = () => {
     dispatch({ type: ActionType.upgradeCancel });

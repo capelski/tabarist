@@ -3,7 +3,7 @@ import React, { MutableRefObject, useContext } from 'react';
 import { editSymbol, removeSymbol, RouteNames, saveSymbol } from '../../constants';
 import { getTabRelativeUrl, tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
-import { ActionType, DispatchProvider } from '../../state';
+import { ActionType, StateProvider } from '../../state';
 import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 
@@ -19,7 +19,7 @@ export type TabHeaderProps = {
 };
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
-  const dispatch = useContext(DispatchProvider);
+  const { dispatch } = useContext(StateProvider);
   const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
 
   const enterEditMode = () => {
