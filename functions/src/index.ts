@@ -7,10 +7,13 @@ import { renderToString } from 'react-dom/server';
 import { Helmet } from 'react-helmet';
 import { adSenseId } from './secrets.json';
 import {
+  AnchorDirection,
   AppProps,
   DiminishedTab,
   getHtml,
   pageSize,
+  parseTitle,
+  QueryParameters,
   RouteNames,
   routes,
   SsrApp,
@@ -29,10 +32,15 @@ const getDiminishedTab = async (tabId: string) => {
   return docSnap.exists ? (docSnap.data() as DiminishedTab) : undefined;
 };
 
-// Fetching some tabs for SEO purposes; ignoring the parameters
-const getHomeTabs = async (_params: TabListParameters) => {
-  const query = firestore.collection('tabs').orderBy('title').orderBy('id').limit(pageSize);
-  const tabs = await query.get();
+const getHomeTabs = async (params: TabListParameters) => {
+  let query = firestore.collection('tabs').orderBy('title').orderBy('id');
+  if (params.titleFilter) {
+    query = query.where('titleWords', 'array-contains', parseTitle(params.titleFilter));
+  }
+  if (params.anchorDocument) {
+    query = query.startAfter(params.anchorDocument.title, params.anchorDocument.id);
+  }
+  const tabs = await query.limit(pageSize).get();
   return tabs.docs.map((docSnapshot) => {
     const diminishedTab = docSnapshot.data() as DiminishedTab;
     return tabOperations.augmentTab(diminishedTab);
@@ -43,9 +51,26 @@ expressApp.get(routes, async (req, res) => {
   const { tabId } = req.params;
   const initialState: AppProps = {};
 
-  if (req.url === RouteNames.home) {
+  if (req.path === RouteNames.home) {
     try {
       const params: TabListParameters = {};
+
+      if (req.query?.[QueryParameters.title]) {
+        params.titleFilter = req.query.title as string;
+      }
+
+      if (
+        req.query?.[QueryParameters.anchorDirection] &&
+        req.query?.[QueryParameters.anchorId] &&
+        req.query?.[QueryParameters.anchorTitle]
+      ) {
+        params.anchorDocument = {
+          direction: req.query?.[QueryParameters.anchorDirection] as AnchorDirection,
+          id: req.query?.[QueryParameters.anchorId] as string,
+          title: req.query?.[QueryParameters.anchorTitle] as string,
+        };
+      }
+
       initialState.homeState = {
         data: {
           hasNextPage: true,
