@@ -58,59 +58,13 @@ export const App: React.FC<AppProps> = (props) => {
           style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
         >
           <Routes>
-            <Route
-              path={RouteNames.home}
-              element={
-                <HomeView
-                  deletingTab={state.deletingTab}
-                  listState={state[RouteNames.home]}
-                  searchParamsReady={state.searchParamsReady}
-                  user={state.user.document}
-                />
-              }
-            />
+            <Route path={RouteNames.home} element={<HomeView />} />
 
-            <Route
-              path={RouteNames.myTabs}
-              element={
-                <MyTabsView
-                  deletingTab={state.deletingTab}
-                  listState={state[RouteNames.myTabs]}
-                  searchParamsReady={state.searchParamsReady}
-                  user={state.user.document}
-                />
-              }
-            />
+            <Route path={RouteNames.myTabs} element={<MyTabsView />} />
 
-            <Route
-              path={RouteNames.starredTabs}
-              element={
-                <StarredTabsView
-                  listState={state.starredTabs}
-                  searchParamsReady={state.searchParamsReady}
-                  user={state.user.document}
-                />
-              }
-            />
+            <Route path={RouteNames.starredTabs} element={<StarredTabsView />} />
 
-            <Route
-              path={RouteNames.tabDetails}
-              element={
-                <TabView
-                  activeSlot={state.tab.activeSlot}
-                  copying={state.tab.copying}
-                  deletingTab={state.deletingTab}
-                  isDirty={state.tab.isDirty}
-                  isDraft={state.tab.isDraft}
-                  isStarred={state.tab.isStarred}
-                  isEditMode={!!state.tab.isEditMode}
-                  moving={state.tab.moving}
-                  scrollView={scrollViewRef}
-                  tab={state.tab.document}
-                  user={state.user.document}
-                />
-              }
-            />
+            <Route path={RouteNames.tabDetails} element={<TabView scrollView={scrollViewRef} />} />
           </Routes>
         </div>
       </div>

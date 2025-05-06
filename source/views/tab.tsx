@@ -1,37 +1,26 @@
-import { User } from 'firebase/auth';
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 import { BarGroup, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
-import { ActiveSlot, PositionOperation, Tab } from '../types';
+import { Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
 
 export type TabViewProps = {
-  activeSlot: ActiveSlot | undefined;
-  copying: PositionOperation | undefined;
-  deletingTab?: Tab;
-  isDirty?: boolean;
-  isDraft?: boolean;
-  isEditMode: boolean;
-  isStarred?: boolean;
-  moving: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement>;
-  tab?: Tab;
-  user: User | null;
 };
 
 export const TabView: React.FC<TabViewProps> = (props) => {
+  const { dispatch, state } = useContext(StateProvider);
+  const { tabId } = useParams();
+
   // When entering edit mode from play mode we need to clear the next timeout
   const playTimeoutRef = useRef(0);
 
-  const { dispatch } = useContext(StateProvider);
-  const { tabId } = useParams();
-
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded
   useEffect(() => {
-    if (tabId && props.tab?.id !== tabId) {
+    if (tabId && state.tab.document?.id !== tabId) {
       tabRepository.getById(tabId).then((nextTab) => {
         if (nextTab) {
           dispatch({ type: ActionType.setTab, tab: nextTab });
@@ -41,15 +30,14 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   }, [tabId]);
 
   useEffect(() => {
-    const { tab, user } = props;
-    if (tab && user && props.isStarred === undefined) {
+    if (state.tab.document && state.user.document && state.tab.isStarred === undefined) {
       userRepository
-        .getStarredTab(user.uid, tab.id)
+        .getStarredTab(state.user.document.uid, state.tab.document.id)
         .then((starredTab) => {
           dispatch({ type: ActionType.setStarredTab, starredTab: !!starredTab });
-          if (starredTab && starredTab.title !== tab.title) {
+          if (starredTab && starredTab.title !== state.tab.document!.title) {
             // If the tab title has changed after it was starred, update the starred title
-            userRepository.setStarredTab(user.uid, tab);
+            userRepository.setStarredTab(state.user.document!.uid, state.tab.document!);
           }
         })
         .catch((error) => {
@@ -57,17 +45,17 @@ export const TabView: React.FC<TabViewProps> = (props) => {
           dispatch({ type: ActionType.setStarredTab, starredTab: false });
         });
     }
-  }, [props.isStarred, props.tab, props.user]);
+  }, [state.tab.isStarred, state.tab.document, state.user.document]);
 
   const barContainers = useMemo(() => {
-    if (props.tab?.bars) {
-      return barsToBarContainers(props.tab.bars, props.isEditMode);
+    if (state.tab.document?.bars) {
+      return barsToBarContainers(state.tab.document.bars, state.tab.isEditMode);
     }
 
     return [];
-  }, [props.isEditMode, props.tab?.bars, props.tab?.rhythms]);
+  }, [state.tab.isEditMode, state.tab.document?.bars, state.tab.document?.rhythms]);
 
-  if (!props.tab) {
+  if (!state.tab.document) {
     return <h3>Couldn't load tab</h3>;
   }
 
@@ -77,43 +65,50 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   return (
     <div className="tab">
-      <MetaTags description={`Guitar tab for ${props.tab.title}`} title={props.tab.title} />
-
-      <TabHeader
-        deletingTab={props.deletingTab}
-        isDirty={props.isDirty}
-        isDraft={props.isDraft}
-        isEditMode={props.isEditMode}
-        playTimeoutRef={playTimeoutRef}
-        tab={props.tab}
-        updateTab={updateTab}
-        user={props.user}
+      <MetaTags
+        description={`Guitar tab for ${state.tab.document.title}`}
+        title={state.tab.document.title}
       />
 
-      <TabDetails isEditMode={props.isEditMode} tab={props.tab} updateTab={updateTab} />
+      <TabHeader
+        deletingTab={state.deletingTab}
+        isDirty={state.tab.isDirty}
+        isDraft={state.tab.isDraft}
+        isEditMode={state.tab.isEditMode}
+        playTimeoutRef={playTimeoutRef}
+        tab={state.tab.document}
+        updateTab={updateTab}
+        user={state.user.document}
+      />
+
+      <TabDetails
+        isEditMode={state.tab.isEditMode}
+        tab={state.tab.document}
+        updateTab={updateTab}
+      />
 
       <BarGroup
-        activeSlot={props.activeSlot}
+        activeSlot={state.tab.activeSlot}
         barContainers={barContainers}
-        barsNumber={props.tab.bars.length}
-        copying={props.copying}
-        isEditMode={props.isEditMode}
-        moving={props.moving}
+        barsNumber={state.tab.document.bars.length}
+        copying={state.tab.copying}
+        isEditMode={state.tab.isEditMode}
+        moving={state.tab.moving}
         scrollView={props.scrollView}
-        tab={props.tab}
+        tab={state.tab.document}
         updateTab={updateTab}
       />
 
       <TabFooter
-        activeSlot={props.activeSlot}
+        activeSlot={state.tab.activeSlot}
         barContainers={barContainers}
-        isDraft={props.isDraft}
-        isEditMode={props.isEditMode}
-        isStarred={props.isStarred}
+        isDraft={state.tab.isDraft}
+        isEditMode={state.tab.isEditMode}
+        isStarred={state.tab.isStarred}
         playTimeoutRef={playTimeoutRef}
-        tab={props.tab}
+        tab={state.tab.document}
         updateTab={updateTab}
-        user={props.user}
+        user={state.user.document}
       />
     </div>
   );

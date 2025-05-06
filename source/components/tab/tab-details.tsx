@@ -3,7 +3,7 @@ import { tabOperations } from '../../operations';
 import { Tab } from '../../types';
 
 export type TabDetailsProps = {
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };

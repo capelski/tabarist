@@ -4,7 +4,7 @@ import { ActiveSlot, PositionOperation, SectionBar, Tab } from '../../types';
 
 export type BarComponentBaseProps = {
   activeSlot: ActiveSlot | undefined;
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };

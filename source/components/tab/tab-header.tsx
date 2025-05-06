@@ -11,7 +11,7 @@ export type TabHeaderProps = {
   deletingTab?: Tab;
   isDirty?: boolean;
   isDraft?: boolean;
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   playTimeoutRef: MutableRefObject<number>;
   tab: Tab;
   updateTab: (tab: Tab) => void;

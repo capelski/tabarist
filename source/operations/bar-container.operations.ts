@@ -61,7 +61,7 @@ const getDisplayIndex = (
 
 const processParentBar = (
   barContainers: BarContainer[],
-  isEditMode: boolean,
+  isEditMode: boolean | undefined,
   barIndex: number,
   sectionBar: SectionBar,
   positionReference: { value: number },
@@ -130,7 +130,7 @@ const processParentBar = (
 const processChildBar = (
   bar: ChordBar | PickingBar,
   barIndex: number,
-  isEditMode: boolean,
+  isEditMode: boolean | undefined,
   type: ContainerType.chord | ContainerType.picking | ContainerType.reference,
   bars: Bar[],
   barContainers: BarContainer[],
@@ -204,7 +204,7 @@ const processChildBar = (
 
 export const barsToBarContainers = (
   bars: Bar[],
-  isEditMode: boolean,
+  isEditMode: boolean | undefined,
   options:
     | {
         firstSectionBarPosition?: undefined;

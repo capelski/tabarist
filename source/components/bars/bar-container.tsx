@@ -11,7 +11,7 @@ export type BarContainerComponentProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
   copying: PositionOperation | undefined;
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   moving: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;

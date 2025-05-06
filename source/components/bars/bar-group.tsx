@@ -17,7 +17,7 @@ export type BarGroupProps = {
   barContainers: BarContainer[];
   barsNumber: number;
   copying: PositionOperation | undefined;
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   moving: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;

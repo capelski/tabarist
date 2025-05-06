@@ -15,7 +15,7 @@ export type SlotsValueProps = {
   color?: string;
   elementType: 'input' | 'select';
   indexesPath: number[];
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   setSlotValue: (value: string, indexesPath: number[]) => void;
   slots: Slot[];
 };

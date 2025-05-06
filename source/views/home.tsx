@@ -1,46 +1,49 @@
 import React, { useContext, useEffect } from 'react';
-import { TabList, TabListBaseProps } from '../components';
+import { TabList } from '../components';
 import { RouteNames } from '../constants';
 import { getTabListRelativeUrl } from '../operations';
 import { tabRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
 import { MetaTags } from './common/meta-tags';
 
-export type HomeViewProps = TabListBaseProps & {
-  searchParamsReady: boolean;
-};
-
 const currentRoute = RouteNames.home;
 
-export const HomeView: React.FC<HomeViewProps> = (props) => {
-  const { dispatch } = useContext(StateProvider);
+export const HomeView: React.FC = () => {
+  const { dispatch, state } = useContext(StateProvider);
+
+  const listState = state[currentRoute];
 
   const fetchTabs = async () => {
     dispatch({ type: ActionType.fetchTabsStart, route: currentRoute });
 
-    const response = await tabRepository.getPublicTabs(props.listState.params);
+    const response = await tabRepository.getPublicTabs(listState.params);
 
     dispatch({
       type: ActionType.fetchTabsEnd,
-      navigate: props.listState.skipUrlUpdate
+      navigate: listState.skipUrlUpdate
         ? undefined
-        : { to: [getTabListRelativeUrl(currentRoute, props.listState.params)] },
+        : { to: [getTabListRelativeUrl(currentRoute, listState.params)] },
       response,
       route: currentRoute,
     });
   };
 
   useEffect(() => {
-    if (props.searchParamsReady && !props.listState.data && !props.listState.loading) {
+    if (state.searchParamsReady && !listState.data && !listState.loading) {
       fetchTabs();
     }
-  }, [props.listState, props.searchParamsReady]);
+  }, [listState, state.searchParamsReady]);
 
   return (
     <React.Fragment>
       <MetaTags title="Tabarist" />
 
-      <TabList {...props} route={currentRoute} />
+      <TabList
+        deletingTab={state.deletingTab}
+        listState={listState}
+        user={state.user.document}
+        route={currentRoute}
+      />
     </React.Fragment>
   );
 };

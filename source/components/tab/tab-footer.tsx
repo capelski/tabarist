@@ -10,7 +10,7 @@ export type TabFooterProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   isDraft?: boolean;
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   isStarred?: boolean;
   playTimeoutRef: MutableRefObject<number>;
   tab: Tab;

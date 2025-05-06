@@ -8,7 +8,7 @@ export type BarHeaderProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
   copying: PositionOperation | undefined;
-  isEditMode: boolean;
+  isEditMode: boolean | undefined;
   moving: PositionOperation | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
