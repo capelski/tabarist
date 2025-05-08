@@ -54,10 +54,12 @@ const getHomeTabs = async (params: TabListParameters): Promise<PagedResponse<Tab
     );
   };
 
-  const response = await fetchPagedData(pageSize, params?.cursor, fetcher, (document) => [
-    document.title,
-    document.id,
-  ]);
+  const response = await fetchPagedData(
+    pageSize,
+    params?.cursor?.direction,
+    fetcher,
+    (document) => [document.title, document.id],
+  );
 
   return response;
 };
