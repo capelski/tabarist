@@ -1,9 +1,9 @@
 import { Given, Then } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { BarType, NonReferenceBarType } from '../constants';
+import { globals } from '../test-globals.cucumber';
 import { ChordBar, PositionOperation, ReferenceBar, SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
-import { globals } from './test-globals.cucumber';
 
 Given(
   /^a (chord|picking|section) bar in (section "(.*)" of )?tab "(.*)"/,

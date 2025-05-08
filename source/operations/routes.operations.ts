@@ -2,12 +2,12 @@ import { QueryParameters, RouteNames } from '../constants';
 import { StarredListParameters, TabListParameters } from '../types';
 
 export const getStarredListRelativeUrl = (params: StarredListParameters) => {
-  const anchorParams = params.anchorDocument
-    ? `${QueryParameters.anchorDirection}=${params.anchorDocument.direction}&` +
-      `${QueryParameters.anchorId}=${params.anchorDocument.id}`
+  const cursorParams = params.cursor
+    ? `${QueryParameters.cursorDirection}=${params.cursor.direction}&` +
+      params.cursor.fields.map((field) => `${QueryParameters.cursorFields}[]=${field}`).join('&')
     : '';
 
-  return `${RouteNames.starredTabs}${anchorParams ? `?${anchorParams}` : ''}`;
+  return `${RouteNames.starredTabs}${cursorParams ? `?${cursorParams}` : ''}`;
 };
 
 export const getTabListRelativeUrl = (
@@ -15,14 +15,13 @@ export const getTabListRelativeUrl = (
   params: TabListParameters,
 ) => {
   const titleParam = params.titleFilter ? `${QueryParameters.title}=${params.titleFilter}&` : '';
-  const anchorParams = params.anchorDocument
-    ? `${QueryParameters.anchorDirection}=${params.anchorDocument.direction}&` +
-      `${QueryParameters.anchorId}=${params.anchorDocument.id}&` +
-      `${QueryParameters.anchorTitle}=${params.anchorDocument.title}&`
+  const cursorParams = params.cursor
+    ? `${QueryParameters.cursorDirection}=${params.cursor.direction}&` +
+      params.cursor.fields.map((field) => `${QueryParameters.cursorFields}[]=${field}`).join('&')
     : '';
 
-  const hasParams = titleParam || anchorParams;
-  return `${tabListRoute}${hasParams ? '?' : ''}${titleParam}${anchorParams}`;
+  const hasParams = titleParam || cursorParams;
+  return `${tabListRoute}${hasParams ? '?' : ''}${titleParam}${cursorParams}`;
 };
 
 export const getTabRelativeUrl = (tabId: string, editMode = false) => {

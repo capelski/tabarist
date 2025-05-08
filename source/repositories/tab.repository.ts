@@ -4,18 +4,17 @@ import {
   getDocs,
   limit,
   orderBy,
-  OrderByDirection,
   query,
   QueryFieldFilterConstraint,
-  startAfter,
+  startAt,
   where,
 } from 'firebase/firestore';
-import { parseTitle } from '../common';
+import { fetchPagedData, parseTitle } from '../common';
 import { pageSize } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { tabOperations } from '../operations';
-import { DiminishedTab, PageResponse, Tab, TabListParameters } from '../types';
+import { DiminishedTab, PagedResponse, Tab, TabListParameters } from '../types';
 
 const tabsCollection = 'tabs';
 
@@ -23,74 +22,37 @@ const getTabPath = (tabId: string) => {
   return [tabsCollection, tabId];
 };
 
-const getTabsQuery = (
-  whereClauses: QueryFieldFilterConstraint[] = [],
-  order: OrderByDirection,
-  documentsNumber: number,
-  titleFilter = '',
-  anchorDocument?: TabListParameters['anchorDocument'],
-) => {
-  return query(
-    collection(getFirebaseContext().firestore, tabsCollection),
-    orderBy('title', order),
-    orderBy('id', order),
-    ...(titleFilter ? [where('titleWords', 'array-contains', parseTitle(titleFilter))] : []),
-    ...whereClauses,
-    ...(anchorDocument ? [startAfter(anchorDocument.title, anchorDocument.id)] : []),
-    limit(documentsNumber),
-  );
-};
-
 const getTabs = async (
   params?: TabListParameters,
   whereClauses: QueryFieldFilterConstraint[] = [],
-): Promise<PageResponse<Tab>> => {
-  const order = params?.anchorDocument?.direction === 'previous' ? 'desc' : 'asc';
-
-  const queryData = getTabsQuery(
-    whereClauses,
-    order,
-    pageSize,
-    params?.titleFilter,
-    params?.anchorDocument,
-  );
-
-  const querySnapshot = await getDocs(queryData);
-  const tabs = querySnapshot.docs.map((snapshot) =>
-    tabOperations.augmentTab(snapshot.data() as DiminishedTab),
-  );
-  const sortedTabs = order === 'desc' ? tabs.reverse() : tabs;
-
-  let hasNextPage = false;
-  let hasPreviousPage = false;
-
-  if (sortedTabs.length > 0) {
-    const firstTab = sortedTabs[0];
-    const previousPage = await getDocs(
-      getTabsQuery(whereClauses, 'desc', 1, params?.titleFilter, {
-        direction: 'previous',
-        id: firstTab.id,
-        title: firstTab.title,
-      }),
+): Promise<PagedResponse<Tab>> => {
+  const fetcher = async (_pageSize: number) => {
+    const queryData = query(
+      collection(getFirebaseContext().firestore, tabsCollection),
+      orderBy('title', params?.cursor?.direction),
+      orderBy('id', params?.cursor?.direction),
+      ...(params?.titleFilter
+        ? [where('titleWords', 'array-contains', parseTitle(params.titleFilter))]
+        : []),
+      ...whereClauses,
+      ...(params?.cursor ? [startAt(...params?.cursor.fields)] : []),
+      limit(_pageSize),
     );
-    hasPreviousPage = previousPage.docs.length > 0;
 
-    const lastTab = sortedTabs[sortedTabs.length - 1];
-    const nextPage = await getDocs(
-      getTabsQuery(whereClauses, 'asc', 1, params?.titleFilter, {
-        direction: 'next',
-        id: lastTab.id,
-        title: lastTab.title,
-      }),
+    const querySnapshot = await getDocs(queryData);
+    return querySnapshot.docs.map((snapshot) =>
+      tabOperations.augmentTab(snapshot.data() as DiminishedTab),
     );
-    hasNextPage = nextPage.docs.length > 0;
-  }
-
-  return {
-    documents: sortedTabs,
-    hasNextPage,
-    hasPreviousPage,
   };
+
+  const response = await fetchPagedData(
+    pageSize,
+    params?.cursor?.direction,
+    fetcher,
+    (document) => [document.title, document.id],
+  );
+
+  return response;
 };
 
 export const tabRepository = {

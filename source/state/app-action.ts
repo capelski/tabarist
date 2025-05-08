@@ -2,7 +2,7 @@ import { User } from 'firebase/auth';
 import { RouteNames } from '../constants';
 import {
   BarContainer,
-  PageResponse,
+  PagedResponse,
   PositionOperation,
   SectionBar,
   StarredListParameters,
@@ -61,7 +61,7 @@ export type AppAction =
   | {
       type: ActionType.fetchStarredTabsEnd;
       navigate?: AppState['navigate'];
-      response: PageResponse<StarredTab>;
+      response: PagedResponse<StarredTab>;
     }
   | {
       type: ActionType.fetchStarredTabsStart;
@@ -69,7 +69,7 @@ export type AppAction =
   | {
       type: ActionType.fetchTabsEnd;
       navigate?: AppState['navigate'];
-      response: PageResponse<Tab>;
+      response: PagedResponse<Tab>;
       route: RouteNames.home | RouteNames.myTabs;
     }
   | {

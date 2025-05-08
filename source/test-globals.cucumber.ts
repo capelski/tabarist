@@ -1,5 +1,5 @@
 import { Before } from '@cucumber/cucumber';
-import { Tab } from '../types';
+import { Tab } from './types';
 
 export type TestGlobals = {
   tabs: { [key: string]: Tab };

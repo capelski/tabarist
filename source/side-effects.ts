@@ -6,7 +6,7 @@ import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl } from './operations';
 import { customerRepository } from './repositories';
 import { ActionType, AppAction, AppState } from './state';
-import { AnchorDirection, StarredListParameters, TabListParameters } from './types';
+import { CursorDirection, StarredListParameters, TabListParameters } from './types';
 
 export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) => {
   const navigate = useNavigate();
@@ -49,9 +49,8 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
 
     if (pathname === RouteNames.home || pathname === RouteNames.myTabs) {
       const titleParameter = searchParams.get(QueryParameters.title);
-      const aDParameter = searchParams.get(QueryParameters.anchorDirection);
-      const aIParameter = searchParams.get(QueryParameters.anchorId);
-      const aTParameter = searchParams.get(QueryParameters.anchorTitle);
+      const cDParameter = searchParams.get(QueryParameters.cursorDirection);
+      const cFParameters = searchParams.getAll(QueryParameters.cursorFields + '[]');
 
       const currentParams = state[pathname].params;
 
@@ -59,17 +58,15 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
         !currentParams ||
         // Deliberately using loose equality to allow for null/undefined
         titleParameter != currentParams.titleFilter ||
-        aDParameter != currentParams.anchorDocument?.direction ||
-        aIParameter != currentParams.anchorDocument?.id ||
-        aTParameter != currentParams.anchorDocument?.title
+        cDParameter != currentParams.cursor?.direction ||
+        cFParameters.some((field, index) => field != currentParams.cursor?.fields[index])
       ) {
         const nextParams: TabListParameters = {
-          anchorDocument:
-            aDParameter && aIParameter && aTParameter
+          cursor:
+            cDParameter && cFParameters.length
               ? {
-                  direction: aDParameter as AnchorDirection,
-                  id: aIParameter,
-                  title: aTParameter,
+                  direction: cDParameter as CursorDirection,
+                  fields: cFParameters,
                 }
               : undefined,
           titleFilter: titleParameter ?? undefined,
@@ -85,23 +82,23 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
     }
 
     if (pathname === RouteNames.starredTabs) {
-      const aDParameter = searchParams.get(QueryParameters.anchorDirection);
-      const aIParameter = searchParams.get(QueryParameters.anchorId);
+      const cDParameter = searchParams.get(QueryParameters.cursorDirection);
+      const cFParameters = searchParams.getAll(QueryParameters.cursorFields + '[]');
 
       const currentParams = state.starredTabs.params;
 
       if (
         !currentParams ||
         // Deliberately using loose equality to allow for null/undefined
-        aDParameter != currentParams.anchorDocument?.direction ||
-        aIParameter != currentParams.anchorDocument?.id
+        cDParameter != currentParams.cursor?.direction ||
+        cFParameters.some((field, index) => field != currentParams.cursor?.fields[index])
       ) {
         const nextParams: StarredListParameters = {
-          anchorDocument:
-            aDParameter && aIParameter
+          cursor:
+            cDParameter && cFParameters.length
               ? {
-                  direction: aDParameter as AnchorDirection,
-                  id: aIParameter,
+                  direction: cDParameter as CursorDirection,
+                  fields: cFParameters,
                 }
               : undefined,
         };

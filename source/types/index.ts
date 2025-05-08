@@ -1,5 +1,4 @@
 export * from './active-slot.type';
-export * from './anchor-direction.type';
 export * from './bar-container.type';
 export * from './bar.type';
 export * from './diminished-bar.type';
@@ -7,7 +6,8 @@ export * from './diminished-rhythm.type';
 export * from './diminished-slot.type';
 export * from './diminished-tab.type';
 export * from './indexed-value.type';
-export * from './page-response.type';
+export * from './paged-query-cursor.type';
+export * from './paged-response.type';
 export * from './position-operation.type';
 export * from './rhythm.type';
 export * from './slot.type';

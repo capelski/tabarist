@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { RouteNames } from '../../constants';
 import { ActionType, ListState, StateProvider } from '../../state';
 import { Tab, TabListParameters } from '../../types';
-import { ItemsList } from '../common/items-list';
+import { ItemsList, ItemsListProps } from '../common/items-list';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
 import { TabListItem } from './tab-list-item';
@@ -23,6 +23,35 @@ export const TabList: React.FC<TabListProps> = (props) => {
 
   const removeTab = (tab: Tab) => {
     dispatch({ type: ActionType.deletePrompt, tab });
+  };
+
+  const listProps: ItemsListProps<Tab, TabListParameters> = {
+    itemRenderer: (tab) => (
+      <TabListItem
+        allowRemoving={!!props.user && props.user.uid === tab.ownerId}
+        key={tab.id}
+        remove={() => removeTab(tab)}
+        tab={tab}
+      />
+    ),
+    listState: props.listState,
+    loadPage: (nextParams) => {
+      dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
+    },
+    noDocuments: (
+      <p style={{ textAlign: 'center' }}>
+        No tabs to display. Create a tab by clicking on{' '}
+        <a
+          onClick={() => {
+            dispatch({ type: ActionType.createTab });
+          }}
+          style={{ cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          New tab
+        </a>
+        .
+      </p>
+    ),
   };
 
   return (
@@ -49,60 +78,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
         }}
       />
 
-      <ItemsList
-        itemRenderer={(tab: Tab) => {
-          return (
-            <TabListItem
-              allowRemoving={!!props.user && props.user.uid === tab.ownerId}
-              key={tab.id}
-              remove={() => removeTab(tab)}
-              tab={tab}
-            />
-          );
-        }}
-        listState={props.listState}
-        loadNext={() => {
-          const lastTab =
-            props.listState.data!.documents[props.listState.data!.documents.length - 1];
-          const nextParams: TabListParameters = {
-            ...props.listState.params,
-            anchorDocument: {
-              direction: 'next',
-              id: lastTab.id,
-              title: lastTab.title,
-            },
-          };
-
-          dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
-        }}
-        loadPrevious={() => {
-          const firstTab = props.listState.data!.documents[0];
-          const nextParams: TabListParameters = {
-            ...props.listState.params,
-            anchorDocument: {
-              direction: 'previous',
-              id: firstTab.id,
-              title: firstTab.title,
-            },
-          };
-
-          dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
-        }}
-        noDocuments={
-          <p style={{ textAlign: 'center' }}>
-            No tabs to display. Create a tab by clicking on{' '}
-            <a
-              onClick={() => {
-                dispatch({ type: ActionType.createTab });
-              }}
-              style={{ cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              New tab
-            </a>
-            .
-          </p>
-        }
-      />
+      <ItemsList {...listProps} />
     </div>
   );
 };

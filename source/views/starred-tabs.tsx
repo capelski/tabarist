@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { TabListItem } from '../components';
-import { ItemsList } from '../components/common/items-list';
+import { ItemsList, ItemsListProps, TabListItem } from '../components';
 import { getStarredListRelativeUrl } from '../operations';
 import { userRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
@@ -36,56 +35,37 @@ export const StarredTabsView: React.FC = () => {
     }
   }, [listState, state.searchParamsReady, state.user.document]);
 
+  const listProps: ItemsListProps<StarredTab, StarredListParameters> = {
+    itemRenderer: (tab) => (
+      <TabListItem
+        allowRemoving={true}
+        key={tab.id}
+        remove={async () => {
+          if (!state.user.document) {
+            return;
+          }
+
+          await userRepository.removeStarredTab(state.user.document.uid, tab.id);
+          dispatch({
+            type: ActionType.setStarredListParameters,
+            params: listState.params,
+          });
+        }}
+        tab={tab}
+      />
+    ),
+    listState,
+    loadPage: (nextParams) => {
+      dispatch({ type: ActionType.setStarredListParameters, params: nextParams });
+    },
+    noDocuments: <p style={{ textAlign: 'center' }}>You don't have starred tabs</p>,
+  };
+
   return (
     <React.Fragment>
       <MetaTags title="Tabarist - Starred tabs" />
 
-      <ItemsList
-        itemRenderer={(tab: StarredTab) => {
-          return (
-            <TabListItem
-              allowRemoving={true}
-              key={tab.id}
-              remove={async () => {
-                if (!state.user.document) {
-                  return;
-                }
-
-                await userRepository.removeStarredTab(state.user.document.uid, tab.id);
-                dispatch({
-                  type: ActionType.setStarredListParameters,
-                  params: listState.params,
-                });
-              }}
-              tab={tab}
-            />
-          );
-        }}
-        listState={listState}
-        loadNext={() => {
-          const lastTab = listState.data!.documents[listState.data!.documents.length - 1];
-          const nextParams: StarredListParameters = {
-            anchorDocument: {
-              direction: 'next',
-              id: lastTab.id,
-            },
-          };
-
-          dispatch({ type: ActionType.setStarredListParameters, params: nextParams });
-        }}
-        loadPrevious={() => {
-          const firstTab = listState.data!.documents[0];
-          const nextParams: StarredListParameters = {
-            anchorDocument: {
-              direction: 'previous',
-              id: firstTab.id,
-            },
-          };
-
-          dispatch({ type: ActionType.setStarredListParameters, params: nextParams });
-        }}
-        noDocuments={<p style={{ textAlign: 'center' }}>You don't have starred tabs</p>}
-      />
+      <ItemsList {...listProps} />
     </React.Fragment>
   );
 };

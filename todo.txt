@@ -7,8 +7,6 @@
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
 - Add capacitor and build APP bundle. Integrate AdMob
-- Display total documents matching in tab-list component
-    https://firebase.google.com/docs/firestore/query-data/aggregation-queries
 - Consider section name length in bar container operations, getBarWidth
 
 - If search params change, clear them everywhere where they are stored

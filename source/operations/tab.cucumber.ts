@@ -1,9 +1,9 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { BarType, NonReferenceBarType } from '../constants';
+import { globals } from '../test-globals.cucumber';
 import { PositionOperation, SectionBar } from '../types';
 import { tabOperations } from './tab.operations';
-import { globals } from './test-globals.cucumber';
 
 Given(/^a tab "(.*)"/, function (tabName: string) {
   globals.tabs[tabName] = tabOperations.create('owner');

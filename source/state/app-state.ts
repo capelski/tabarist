@@ -3,7 +3,7 @@ import { AppProps } from '../app';
 import { RouteNames } from '../constants';
 import {
   ActiveSlot,
-  PageResponse,
+  PagedResponse,
   PositionOperation,
   StarredListParameters,
   StarredTab,
@@ -13,7 +13,7 @@ import {
 } from '../types';
 
 export type ListState<TData, TParams> = {
-  data?: PageResponse<TData>;
+  data?: PagedResponse<TData>;
   loading?: boolean;
   params: TParams;
   skipUrlUpdate?: boolean;

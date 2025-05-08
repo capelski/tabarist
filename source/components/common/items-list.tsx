@@ -1,30 +1,52 @@
 import React from 'react';
 import { ListState } from '../../state';
+import { PagedQueryCursor } from '../../types';
 
-export type ItemsListProps<T> = {
-  itemRenderer: (item: T) => React.ReactNode;
-  listState: ListState<T, any>;
-  loadNext: () => void;
-  loadPrevious: () => void;
+export type DefaultParams = { cursor?: PagedQueryCursor };
+
+export type ItemsListProps<TData, TParams extends DefaultParams> = {
+  itemRenderer: (item: TData) => React.ReactNode;
+  listState: ListState<TData, TParams>;
+  loadPage: (nextParams: ListState<TData, TParams>['params']) => void;
   noDocuments: React.ReactNode;
 };
 
-export const ItemsList: React.FC<ItemsListProps<any>> = (props) => {
+export const ItemsList: React.FC<ItemsListProps<any, DefaultParams>> = (props) => {
   return (
     <div className="items-list">
       <p style={{ display: 'flex', justifyContent: 'space-between' }}>
         <button
           className="btn btn-outline-secondary"
-          disabled={!props.listState.data?.hasPreviousPage}
-          onClick={props.loadPrevious}
+          disabled={!props.listState.data?.previousFields}
+          onClick={() => {
+            const nextParams: ListState<any, DefaultParams>['params'] = {
+              ...props.listState.params,
+              cursor: {
+                direction: 'desc',
+                fields: props.listState.data!.previousFields!,
+              },
+            };
+
+            props.loadPage(nextParams);
+          }}
           type="button"
         >
           ⏪️
         </button>
         <button
           className="btn btn-outline-secondary"
-          disabled={!props.listState.data?.hasNextPage}
-          onClick={props.loadNext}
+          disabled={!props.listState.data?.nextFields}
+          onClick={() => {
+            const nextParams: ListState<any, DefaultParams>['params'] = {
+              ...props.listState.params,
+              cursor: {
+                direction: 'asc',
+                fields: props.listState.data!.nextFields!,
+              },
+            };
+
+            props.loadPage(nextParams);
+          }}
           type="button"
         >
           ⏩
