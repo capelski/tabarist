@@ -16,7 +16,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const { tabId } = useParams();
 
   // When entering edit mode from play mode we need to clear the next timeout
-  const playTimeoutRef = useRef(0);
+  const playTimeoutRef = useRef<number>();
 
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded
   useEffect(() => {

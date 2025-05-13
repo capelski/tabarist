@@ -12,7 +12,7 @@ export type TabHeaderProps = {
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean | undefined;
-  playTimeoutRef: MutableRefObject<number>;
+  playTimeoutRef: MutableRefObject<number | undefined>;
   tab: Tab;
   updateTab: (tab: Tab) => void;
   user: User | null;
