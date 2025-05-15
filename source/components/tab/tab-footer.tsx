@@ -30,22 +30,20 @@ let activeSlotLastDelay = 0;
 let activeSlotLastRender = 0;
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
+  const [activeCountdown, setActiveCountdown] = useState<number>();
+  const [countdown, setCountdown] = useState<number>();
   const [playing, setPlaying] = useState(false);
   const [playMode, setPlayMode] = useState<PlayMode>();
 
   const { dispatch } = useContext(StateProvider);
 
   const clearPlayState = () => {
+    setActiveCountdown(countdown);
     setPlaying(false);
     clearTimeout(props.playTimeoutRef.current);
     activeSlotLastDelay = 0;
     activeSlotLastRender = 0;
     props.playTimeoutRef.current = undefined;
-  };
-
-  const resumePlayState = () => {
-    setPlaying(true);
-    updatePlayState();
   };
 
   const updatePlayState = () => {
@@ -57,10 +55,18 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   };
 
   useEffect(() => {
-    if (playMode) {
-      resumePlayState();
+    if (!playing) {
+      return;
     }
-  }, [playMode]);
+
+    if (activeCountdown) {
+      setTimeout(() => {
+        setActiveCountdown(activeCountdown - 1);
+      }, 1000);
+    } else {
+      updatePlayState();
+    }
+  }, [activeCountdown, playing]);
 
   const updateActiveSlot = () => {
     if (props.tab.tempo && props.activeSlot) {
@@ -78,8 +84,15 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
 
   useEffect(updateActiveSlot, [props.activeSlot]);
 
+  const enterPlayMode = (nextCountdown: number | undefined, nextPlayMode?: PlayMode) => {
+    setActiveCountdown(nextCountdown);
+    setPlaying(true);
+    if (nextPlayMode) {
+      setPlayMode(nextPlayMode);
+    }
+  };
+
   const exitPlayMode = () => {
-    setPlayMode(undefined);
     clearPlayState();
     dispatch({ type: ActionType.activeSlotClear });
   };
@@ -121,7 +134,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         ★
       </button>
 
-      <div className="input-group" style={{ marginRight: 8, maxWidth: 120 }}>
+      <div className="input-group" style={{ marginRight: 8, maxWidth: 100 }}>
         <span className="input-group-text">♫</span>
         <input
           className="form-control"
@@ -140,38 +153,21 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
             props.updateTab(tabOperations.updateTempo(props.tab, nextTempo));
           }}
           value={props.tab.tempo ?? ''}
-          style={{ textAlign: 'center' }}
+          style={{ padding: 8, textAlign: 'center' }}
           type="number"
         />
       </div>
 
-      {!props.isEditMode && props.activeSlot && (
-        <div className="btn-group" role="group">
-          {playing ? (
-            <button className="btn btn-outline-success" onClick={clearPlayState} type="button">
-              Pause
-            </button>
-          ) : (
-            <button className="btn btn-outline-success" onClick={resumePlayState} type="button">
-              Play
-            </button>
-          )}
-          <button className="btn btn-outline-danger" onClick={exitPlayMode} type="button">
-            Stop
-          </button>
-        </div>
-      )}
-
       <div
         className="btn-group"
         // Hiding instead of not rendering, as the bootstrap dropdown doesn't show after the first time otherwise
-        style={{ display: !props.isEditMode && props.activeSlot ? 'none' : undefined }}
+        style={{ display: props.isEditMode || props.activeSlot ? 'none' : undefined }}
       >
         <button
           className="btn btn-success"
           disabled={!props.tab.tempo}
           onClick={() => {
-            setPlayMode(PlayMode.metronome);
+            enterPlayMode(countdown, PlayMode.metronome);
           }}
           type="button"
         >
@@ -190,7 +186,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                 <a
                   className="dropdown-item"
                   onClick={() => {
-                    setPlayMode(option);
+                    enterPlayMode(countdown, option);
                   }}
                   href="#"
                 >
@@ -200,6 +196,55 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
             );
           })}
         </ul>
+      </div>
+
+      {!props.isEditMode && props.activeSlot && (
+        <div className="btn-group" role="group">
+          {playing ? (
+            <button className="btn btn-outline-success" onClick={clearPlayState} type="button">
+              Pause
+            </button>
+          ) : (
+            <button
+              className="btn btn-outline-success"
+              onClick={() => {
+                enterPlayMode(countdown);
+              }}
+              type="button"
+            >
+              Play
+            </button>
+          )}
+          <button className="btn btn-outline-danger" onClick={exitPlayMode} type="button">
+            Stop
+          </button>
+        </div>
+      )}
+
+      <div className="input-group" style={{ marginLeft: 8, maxWidth: 100 }}>
+        <span className="input-group-text">⏱️</span>
+        <input
+          className="form-control"
+          disabled={playing}
+          onBlur={() => {
+            if (countdown) {
+              const validCountdown = Math.max(Math.min(countdown, 15), 0);
+              if (validCountdown === 0) {
+                setCountdown(undefined);
+              } else if (validCountdown !== countdown) {
+                setCountdown(validCountdown);
+              }
+            }
+          }}
+          onChange={(event) => {
+            const parsedCountdown = parseInt(event.target.value);
+            const nextCountdown = isNaN(parsedCountdown) ? undefined : parsedCountdown;
+            setCountdown(nextCountdown);
+          }}
+          value={(playing ? activeCountdown : countdown) ?? ''}
+          style={{ padding: 8, textAlign: 'center' }}
+          type="number"
+        />
       </div>
     </div>
   );
