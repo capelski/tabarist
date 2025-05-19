@@ -124,15 +124,17 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         position: 'sticky',
       }}
     >
-      <button
-        className={`btn ${props.isStarred ? 'btn-primary' : 'btn-outline-primary'}`}
-        disabled={props.isDraft}
-        onClick={toggleStarredTab}
-        style={{ marginRight: 8 }}
-        type="button"
-      >
-        ★
-      </button>
+      {!props.isEditMode && (
+        <button
+          className={`btn ${props.isStarred ? 'btn-primary' : 'btn-outline-primary'}`}
+          disabled={props.isDraft}
+          onClick={toggleStarredTab}
+          style={{ marginRight: 8 }}
+          type="button"
+        >
+          ★
+        </button>
+      )}
 
       <div className="input-group" style={{ marginRight: 8, maxWidth: 100 }}>
         <span className="input-group-text">♫</span>
@@ -157,6 +159,34 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
           type="number"
         />
       </div>
+
+      {!props.isEditMode && (
+        <div className="input-group" style={{ marginRight: 8, maxWidth: 100 }}>
+          <span className="input-group-text">⏱️</span>
+          <input
+            className="form-control"
+            disabled={playing}
+            onBlur={() => {
+              if (countdown) {
+                const validCountdown = Math.max(Math.min(countdown, 15), 0);
+                if (validCountdown === 0) {
+                  setCountdown(undefined);
+                } else if (validCountdown !== countdown) {
+                  setCountdown(validCountdown);
+                }
+              }
+            }}
+            onChange={(event) => {
+              const parsedCountdown = parseInt(event.target.value);
+              const nextCountdown = isNaN(parsedCountdown) ? undefined : parsedCountdown;
+              setCountdown(nextCountdown);
+            }}
+            value={(playing ? activeCountdown : countdown) ?? ''}
+            style={{ padding: 8, textAlign: 'center' }}
+            type="number"
+          />
+        </div>
+      )}
 
       <div
         className="btn-group"
@@ -220,32 +250,6 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
           </button>
         </div>
       )}
-
-      <div className="input-group" style={{ marginLeft: 8, maxWidth: 100 }}>
-        <span className="input-group-text">⏱️</span>
-        <input
-          className="form-control"
-          disabled={playing}
-          onBlur={() => {
-            if (countdown) {
-              const validCountdown = Math.max(Math.min(countdown, 15), 0);
-              if (validCountdown === 0) {
-                setCountdown(undefined);
-              } else if (validCountdown !== countdown) {
-                setCountdown(validCountdown);
-              }
-            }
-          }}
-          onChange={(event) => {
-            const parsedCountdown = parseInt(event.target.value);
-            const nextCountdown = isNaN(parsedCountdown) ? undefined : parsedCountdown;
-            setCountdown(nextCountdown);
-          }}
-          value={(playing ? activeCountdown : countdown) ?? ''}
-          style={{ padding: 8, textAlign: 'center' }}
-          type="number"
-        />
-      </div>
     </div>
   );
 };
