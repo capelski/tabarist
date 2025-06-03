@@ -1,6 +1,6 @@
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
-import { BarGroup, TabDetails, TabFooter, TabHeader } from '../components';
+import { BarGroup, getYoutubeCode, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
@@ -63,6 +63,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     dispatch({ type: ActionType.updateTab, tab: nextTab });
   };
 
+  const youtubeVideoCode = getYoutubeCode(state.tab.document.backingTrack);
+
   return (
     <div className="tab">
       <MetaTags
@@ -85,6 +87,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         isEditMode={state.tab.isEditMode}
         tab={state.tab.document}
         updateTab={updateTab}
+        youtubeVideoCode={youtubeVideoCode}
       />
 
       <BarGroup
@@ -106,9 +109,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         isEditMode={state.tab.isEditMode}
         isStarred={state.tab.isStarred}
         playTimeoutRef={playTimeoutRef}
+        subscription={state.user.stripeSubscription}
         tab={state.tab.document}
         updateTab={updateTab}
         user={state.user.document}
+        youtubeVideoCode={youtubeVideoCode}
       />
     </div>
   );

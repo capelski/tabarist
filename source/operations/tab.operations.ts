@@ -103,6 +103,7 @@ export const tabOperations = {
       tempo: undefined,
       title: 'Unnamed tab',
       titleWords: ['unnamed', 'tab', 'unnamed tab', 'tab unnamed'],
+      trackStart: undefined,
     };
   },
 
@@ -290,6 +291,13 @@ export const tabOperations = {
       ...tab,
       title,
       titleWords: getTitleWords(title),
+    };
+  },
+
+  updateTrackStart: (tab: Tab, trackStart: number | undefined): Tab => {
+    return {
+      ...tab,
+      trackStart,
     };
   },
 };

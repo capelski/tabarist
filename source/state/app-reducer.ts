@@ -367,6 +367,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       navigate: action.navigate,
       tab: {
         ...state.tab,
+        activeSlot: undefined,
         document: action.tab,
         isDirty: undefined,
         isDraft: undefined,

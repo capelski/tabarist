@@ -30,6 +30,7 @@ export const pageSize = 10;
 export * from './bar-type';
 export * from './container-type';
 export * from './play-mode';
+export * from './play-phase';
 export * from './route-names';
 export * from './slot-type';
 export * from './symbols';

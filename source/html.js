@@ -30,11 +30,15 @@ module.exports = {
         ></script>`
         : ''
     }
+
+    <script src="https://www.youtube.com/iframe_api"></script>
   </head>
 
   <body style="margin: 0">
     <div id="app-placeholder">${options.appHtml || ''}</div>
   </body>
+
+  <div id="youtube-player" style="display: none"></div>
 </html>
 `,
   routes: [/^\/$/, '/my-tabs', '/starred-tabs', '/tab/:tabId'],

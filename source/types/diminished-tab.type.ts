@@ -13,4 +13,5 @@ export type DiminishedTab = {
   /** Used to match text via Firestore queries.
    * Contains all the possible combinations of words in the title */
   titleWords: string[];
+  trackStart: number | undefined;
 };

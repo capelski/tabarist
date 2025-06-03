@@ -24,6 +24,13 @@ const AppWithRouter: React.FC<AppProps> = (props) => {
 
 const container = document.getElementById('app-placeholder')!;
 Modal.setAppElement(container);
+Modal.defaultStyles = {
+  ...Modal.defaultStyles,
+  overlay: {
+    ...Modal.defaultStyles.overlay,
+    zIndex: 10, // Necessary since Bootstrap buttons have zIndex: 2 inside input groups
+  },
+};
 
 if ('initialState' in window) {
   const initialState = window.initialState as AppProps;

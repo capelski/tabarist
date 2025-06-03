@@ -8,6 +8,7 @@ export * from './diminished-tab.type';
 export * from './indexed-value.type';
 export * from './paged-query-cursor.type';
 export * from './paged-response.type';
+export * from './play-state.type';
 export * from './position-operation.type';
 export * from './rhythm.type';
 export * from './slot.type';
