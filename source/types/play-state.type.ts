@@ -6,7 +6,7 @@ export type PlayState =
       remaining: number;
     }
   | {
-      phase: PlayPhase.initializing;
+      phase: PlayPhase.loadingYoutube;
     }
   | {
       phase: PlayPhase.paused;
