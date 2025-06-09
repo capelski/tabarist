@@ -24,7 +24,6 @@ export type TabFooterProps = {
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
   const [countdownTimeout, setCountdownTimeout] = useState<number>();
-  const [playMode, setPlayMode] = useState(PlayMode.metronome);
   const [playState, setPlayState] = useState<PlayState>();
   const [youtubePlayer, setYoutubePlayer] = useState<YT.Player>();
   const [youtubeDelayTimeout, setYoutubeDelayTimeout] = useState<number>();
@@ -163,11 +162,8 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
 
   useEffect(updateActiveSlot, [props.activeSlot]);
 
-  const enterPlayMode = (
-    effectivePlayMode: PlayMode,
-    nextPhase: PlayPhase.playing | PlayPhase.resuming,
-  ) => {
-    if (effectivePlayMode === PlayMode.youtubeTrack && !youtubePlayer) {
+  const enterPlayMode = (nextPhase: PlayPhase.playing | PlayPhase.resuming) => {
+    if (props.beatEngine.options.playMode === PlayMode.youtubeTrack && !youtubePlayer) {
       setPlayState({ phase: PlayPhase.loadingYoutube });
     } else if (countdown) {
       setPlayState({
@@ -184,11 +180,11 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   };
 
   const resumePlayMode = () => {
-    enterPlayMode(playMode, PlayPhase.resuming);
+    enterPlayMode(PlayPhase.resuming);
   };
 
-  const startPlayMode = (effectivePlayMode: PlayMode) => {
-    enterPlayMode(effectivePlayMode, PlayPhase.playing);
+  const startPlayMode = () => {
+    enterPlayMode(PlayPhase.playing);
   };
 
   const stopPlayMode = () => {
@@ -303,7 +299,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         <button
           className="btn btn-success"
           disabled={!props.tab.tempo}
-          onClick={() => startPlayMode(playMode)}
+          onClick={startPlayMode}
           type="button"
         >
           Play
@@ -325,8 +321,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                       dispatch({ type: ActionType.upgradeStart });
                     } else {
                       props.beatEngine.options.playMode = option;
-                      setPlayMode(option);
-                      startPlayMode(option);
+                      startPlayMode();
                     }
                   }}
                 >
