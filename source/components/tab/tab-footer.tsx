@@ -1,35 +1,25 @@
 import { User } from 'firebase/auth';
-import React, { MutableRefObject, useContext, useEffect, useState } from 'react';
-import clickSound from '../../assets/click.mp3';
+import React, { useContext, useEffect, useState } from 'react';
+import { BeatEngine } from '../../classes';
 import { maxTempo, minTempo, PlayMode, PlayPhase } from '../../constants';
 import { tabOperations } from '../../operations';
 import { userRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
 import { ActiveSlot, BarContainer, PlayState, StripeSubscription, Tab } from '../../types';
 
-// Audio is not available on the server side
-declare const Audio: {
-  new (src?: string): HTMLAudioElement;
-};
-
-const clickAudio = typeof Audio !== 'undefined' ? new Audio(clickSound) : undefined;
-
 export type TabFooterProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
+  beatEngine: BeatEngine;
   isDraft?: boolean;
   isEditMode: boolean | undefined;
   isStarred?: boolean;
-  playTimeoutRef: MutableRefObject<number | undefined>;
   subscription?: StripeSubscription;
   tab: Tab;
   updateTab: (tab: Tab) => void;
   user: User | null;
   youtubeVideoCode: string | undefined;
 };
-
-let activeSlotLastDelay = 0;
-let activeSlotLastRender = 0;
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
@@ -46,20 +36,9 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const clearPlayState = () => {
     clearTimeout(countdownTimeout);
     clearTimeout(youtubeDelayTimeout);
-    clearTimeout(props.playTimeoutRef.current);
-    activeSlotLastDelay = 0;
-    activeSlotLastRender = 0;
-    props.playTimeoutRef.current = undefined;
+    props.beatEngine.stop();
 
     youtubePlayer?.pauseVideo();
-  };
-
-  const updatePlayState = () => {
-    if (playMode === PlayMode.metronome) {
-      clickAudio?.play();
-    }
-    dispatch({ type: ActionType.activeSlotUpdate, barContainers: props.barContainers });
-    activeSlotLastRender = Date.now();
   };
 
   useEffect(() => {
@@ -155,13 +134,13 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     }
 
     if (playState.phase === PlayPhase.playing) {
-      updatePlayState();
+      props.beatEngine.start();
       return;
     }
 
     if (playState.phase === PlayPhase.resuming) {
       youtubePlayer?.playVideo();
-      updatePlayState();
+      props.beatEngine.start();
       return;
     }
 
@@ -176,15 +155,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   }, [playState]);
 
   const updateActiveSlot = () => {
-    if (props.tab.tempo && props.activeSlot) {
-      const msPerBeat = 60_000 / props.tab.tempo;
-      activeSlotLastDelay = Date.now() - activeSlotLastRender;
-
-      props.playTimeoutRef.current = window.setTimeout(
-        updatePlayState,
-        msPerBeat - activeSlotLastDelay,
-      );
-    } else {
+    if (!props.activeSlot) {
       clearPlayState();
       setPlayState({ phase: PlayPhase.stopping });
     }
@@ -279,6 +250,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
               const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
               if (validTempo !== props.tab.tempo) {
                 props.updateTab(tabOperations.updateTempo(props.tab, validTempo));
+                props.beatEngine.options.tempo = validTempo;
               }
             }
           }}
@@ -352,6 +324,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                     if (option === PlayMode.youtubeTrack && !props.subscription) {
                       dispatch({ type: ActionType.upgradeStart });
                     } else {
+                      props.beatEngine.options.playMode = option;
                       setPlayMode(option);
                       startPlayMode(option);
                     }

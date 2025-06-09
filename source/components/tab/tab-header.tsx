@@ -1,5 +1,6 @@
 import { User } from 'firebase/auth';
-import React, { MutableRefObject, useContext } from 'react';
+import React, { useContext } from 'react';
+import { BeatEngine } from '../../classes';
 import { editSymbol, removeSymbol, RouteNames, saveSymbol } from '../../constants';
 import { getTabRelativeUrl, tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
@@ -8,11 +9,11 @@ import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
 
 export type TabHeaderProps = {
+  beatEngine: BeatEngine;
   deletingTab?: Tab;
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean | undefined;
-  playTimeoutRef: MutableRefObject<number | undefined>;
   tab: Tab;
   updateTab: (tab: Tab) => void;
   user: User | null;
@@ -27,7 +28,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
       return;
     }
 
-    clearTimeout(props.playTimeoutRef.current);
+    props.beatEngine.stop();
 
     dispatch({
       type: ActionType.enterEditMode,

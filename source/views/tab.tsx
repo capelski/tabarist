@@ -1,6 +1,8 @@
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
+import { BeatEngine } from '../classes';
 import { BarGroup, getYoutubeCode, TabDetails, TabFooter, TabHeader } from '../components';
+import { PlayMode } from '../constants';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
@@ -16,7 +18,9 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const { tabId } = useParams();
 
   // When entering edit mode from play mode we need to clear the next timeout
-  const playTimeoutRef = useRef<number>();
+  const beatEngine = useRef(
+    new BeatEngine({ playMode: PlayMode.metronome, tempo: state.tab.document?.tempo }),
+  );
 
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded
   useEffect(() => {
@@ -49,7 +53,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   const barContainers = useMemo(() => {
     if (state.tab.document?.bars) {
-      return barsToBarContainers(state.tab.document.bars, state.tab.isEditMode);
+      const barContainers = barsToBarContainers(state.tab.document.bars, state.tab.isEditMode);
+
+      beatEngine.current.options.onBeatUpdate = () => {
+        dispatch({ type: ActionType.activeSlotUpdate, barContainers });
+      };
+
+      return barContainers;
     }
 
     return [];
@@ -73,11 +83,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       />
 
       <TabHeader
+        beatEngine={beatEngine.current}
         deletingTab={state.deletingTab}
         isDirty={state.tab.isDirty}
         isDraft={state.tab.isDraft}
         isEditMode={state.tab.isEditMode}
-        playTimeoutRef={playTimeoutRef}
         tab={state.tab.document}
         updateTab={updateTab}
         user={state.user.document}
@@ -103,12 +113,12 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       />
 
       <TabFooter
+        beatEngine={beatEngine.current}
         activeSlot={state.tab.activeSlot}
         barContainers={barContainers}
         isDraft={state.tab.isDraft}
         isEditMode={state.tab.isEditMode}
         isStarred={state.tab.isStarred}
-        playTimeoutRef={playTimeoutRef}
         subscription={state.user.stripeSubscription}
         tab={state.tab.document}
         updateTab={updateTab}
