@@ -8,7 +8,8 @@ export class BeatEngine extends BeatEngineCore {
     super(
       {
         clearTimeout: window.clearTimeout.bind(window),
-        getCurrentTimestamp: Date.now.bind(Date),
+        getLastDelay: Date.now.bind(Date),
+        getLastRendered: Date.now.bind(Date),
         setTimeout: window.setTimeout.bind(window),
         triggerSound: () => clickAudio?.play(),
       },

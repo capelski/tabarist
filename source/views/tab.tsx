@@ -19,7 +19,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   // When entering edit mode from play mode we need to clear the next timeout
   const beatEngine = useRef(
-    new BeatEngine({ playMode: PlayMode.metronome, tempo: state.tab.document?.tempo }),
+    new BeatEngine({ playMode: PlayMode.metronome, tempo: state.tab.document?.tempo ?? 100 }),
   );
 
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded

@@ -2,22 +2,22 @@ import { PlayMode } from '../constants';
 
 export type BeatEngineHandlers = {
   clearTimeout: (id?: number) => void;
-  getCurrentTimestamp: () => number;
-  setTimeout: (handler: TimerHandler, delay?: number) => number;
+  getLastDelay: () => number;
+  getLastRendered: () => number;
+  setTimeout: (handler: Function, delay?: number) => number;
   triggerSound: () => void | Promise<void>;
 };
 
 export type BeatEngineOptions = {
   onBeatUpdate?: () => void;
   playMode: PlayMode;
-  /** Defaults to 100 */
-  tempo?: number;
+  tempo: number;
 };
 
 export class BeatEngineCore {
-  lastDelay = 0;
-  lastRender = 0;
-  nextTimeout: number | undefined;
+  protected lastDelay = 0;
+  protected lastRender = 0;
+  protected nextTimeout: number | undefined;
 
   constructor(protected handlers: BeatEngineHandlers, public options: BeatEngineOptions) {}
 
@@ -26,14 +26,14 @@ export class BeatEngineCore {
       this.handlers.triggerSound();
     }
     this.options.onBeatUpdate?.();
-    this.lastRender = this.handlers.getCurrentTimestamp();
-    this.scheduleNext();
+    this.lastRender = this.handlers.getLastRendered();
+    this.scheduleNextBeat();
   }
 
-  protected scheduleNext() {
-    const msPerBeat = 60_000 / (this.options.tempo ?? 100);
-    this.lastDelay = this.handlers.getCurrentTimestamp() - this.lastRender;
-    this.nextTimeout = window.setTimeout(() => {
+  protected scheduleNextBeat() {
+    const msPerBeat = 60_000 / this.options.tempo;
+    this.lastDelay = this.handlers.getLastDelay() - this.lastRender;
+    this.nextTimeout = this.handlers.setTimeout(() => {
       this.processCurrentBeat();
     }, msPerBeat - this.lastDelay);
   }
