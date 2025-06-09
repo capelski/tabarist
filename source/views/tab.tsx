@@ -17,11 +17,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const { dispatch, state } = useContext(StateProvider);
   const { tabId } = useParams();
 
-  // When entering edit mode from play mode we need to clear the next timeout
-  const beatEngine = useRef(
-    new BeatEngine({ playMode: PlayMode.metronome, tempo: state.tab.document?.tempo ?? 100 }),
-  );
-
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded
   useEffect(() => {
     if (tabId && state.tab.document?.id !== tabId) {
@@ -51,6 +46,11 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
   }, [state.tab.isStarred, state.tab.document, state.user.document]);
 
+  // When entering edit mode from play mode we need to exit the play mode
+  const beatEngine = useRef(
+    new BeatEngine({ playMode: PlayMode.metronome, tempo: state.tab.document?.tempo ?? 100 }),
+  );
+
   const barContainers = useMemo(() => {
     if (state.tab.document?.bars) {
       const barContainers = barsToBarContainers(state.tab.document.bars, state.tab.isEditMode);
@@ -58,6 +58,9 @@ export const TabView: React.FC<TabViewProps> = (props) => {
       beatEngine.current.options.onBeatUpdate = () => {
         dispatch({ type: ActionType.activeSlotUpdate, barContainers });
       };
+      if (state.tab.document.tempo) {
+        beatEngine.current.options.tempo = state.tab.document.tempo;
+      }
 
       return barContainers;
     }
