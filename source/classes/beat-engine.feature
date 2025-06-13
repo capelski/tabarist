@@ -7,14 +7,15 @@ Feature: Beat engine
    Scenario: The first beat is processed when starting to play
       Given a beat engine with tempo 100
       When starting to play
-      Then the onBeatUpdate handler has been called called 1 time(s)
+      Then the beforeStart handler has been called called 1 time(s)
+      And the onBeatUpdate handler has been called called 1 time(s)
       And the last rendered date is set to timestamp 100
       And beat 2 is scheduled via timeout 1 within 600ms
 
    Scenario: The second beat is processed when the schedule kicks in
       Given a beat engine with tempo 100
       When starting to play
-      And the schedule for the beat 2 kicks in
+      And the schedule element 1 kicks in
       Then the onBeatUpdate handler has been called called 2 time(s)
       And the last rendered date is set to timestamp 200
       And beat 3 is scheduled via timeout 2 within 600ms
@@ -29,3 +30,15 @@ Feature: Beat engine
       And a render delay of 17ms
       When starting to play
       Then beat 2 is scheduled via timeout 1 within 583ms
+
+   Scenario: Supports delayed start via countdown
+      Given a beat engine with tempo 100
+      When starting to play with countdown 3
+      Then the onBeatUpdate handler has been called called 0 time(s)
+      When the schedule element 1 kicks in
+      And the schedule element 2 kicks in
+      And the schedule element 3 kicks in
+      Then the onCountdownUpdate handler has been called called 4 time(s)
+      Then the beforeStart handler has been called called 1 time(s)
+      And the onBeatUpdate handler has been called called 1 time(s)
+      

@@ -23,7 +23,7 @@ export type TabFooterProps = {
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
-  const [countdownTimeout, setCountdownTimeout] = useState<number>();
+  const [countdownRemaining, setCountdownRemaining] = useState<number>();
   const [playState, setPlayState] = useState<PlayState>();
   const [youtubePlayer, setYoutubePlayer] = useState<YT.Player>();
   const [youtubeDelayTimeout, setYoutubeDelayTimeout] = useState<number>();
@@ -33,12 +33,15 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const trackStartSeconds = Math.floor((props.tab.trackStart ?? 0) / 1000);
 
   const clearPlayState = () => {
-    clearTimeout(countdownTimeout);
     clearTimeout(youtubeDelayTimeout);
     props.beatEngine.stop();
 
     youtubePlayer?.pauseVideo();
   };
+
+  useEffect(() => {
+    props.beatEngine.options.onCountdownUpdate = setCountdownRemaining;
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -51,79 +54,45 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       return;
     }
 
-    const startVideo = (player: YT.Player) => {
-      const millisecondsDelay = (props.tab.trackStart ?? 0) % 1000;
-
-      const nextYoutubeDelayTimeout = window.setTimeout(() => {
+    if (playState.phase === PlayPhase.initializing) {
+      if (props.beatEngine.options.playMode !== PlayMode.youtubeTrack) {
         setPlayState({ phase: PlayPhase.playing });
-      }, millisecondsDelay);
-
-      player.playVideo();
-
-      setYoutubeDelayTimeout(nextYoutubeDelayTimeout);
-    };
-
-    if (playState.phase === PlayPhase.countdown) {
-      const nextCountdownTimeout = window.setTimeout(() => {
-        const nextRemaining = playState.remaining - 1;
-        if (nextRemaining > 0) {
-          setPlayState({ phase: PlayPhase.countdown, remaining: nextRemaining });
-        } else {
-          if (youtubePlayer) {
-            startVideo(youtubePlayer);
-          } else {
-            setPlayState({ phase: PlayPhase.playing });
-          }
-        }
-      }, 1000);
-      setCountdownTimeout(nextCountdownTimeout);
-      return;
-    }
-
-    if (playState.phase === PlayPhase.loadingYoutube) {
-      const startVideoWithCountdown = (player: YT.Player) => {
-        if (countdown) {
-          setPlayState({
-            phase: PlayPhase.countdown,
-            remaining: countdown,
-          });
-        } else {
-          startVideo(player);
-        }
-      };
+        return;
+      }
 
       if (youtubePlayer) {
         // When playing a second time, the youtube player will have already been initialized
-        startVideoWithCountdown(youtubePlayer);
-      } else {
-        // https://developers.google.com/youtube/iframe_api_reference
-        new YT.Player('youtube-player', {
-          events: {
-            onReady: (event) => {
-              const nextYoutubePlayer = event.target;
-              setYoutubePlayer(nextYoutubePlayer);
+        setPlayState({ phase: PlayPhase.playing });
+        return;
+      }
 
-              // On mobile, it takes a while for the video to start playing
-              nextYoutubePlayer.mute();
-              nextYoutubePlayer.playVideo();
+      // https://developers.google.com/youtube/iframe_api_reference
+      new YT.Player('youtube-player', {
+        events: {
+          onReady: (event) => {
+            const nextYoutubePlayer = event.target;
+            setYoutubePlayer(nextYoutubePlayer);
+
+            // On mobile, it takes a while for the video to start playing
+            nextYoutubePlayer.mute();
+            nextYoutubePlayer.playVideo();
+
+            setTimeout(() => {
+              nextYoutubePlayer.pauseVideo();
+              nextYoutubePlayer.unMute();
+              nextYoutubePlayer.seekTo(trackStartSeconds, true);
 
               setTimeout(() => {
-                nextYoutubePlayer.pauseVideo();
-                nextYoutubePlayer.unMute();
-                nextYoutubePlayer.seekTo(trackStartSeconds, true);
-
-                setTimeout(() => {
-                  startVideoWithCountdown(nextYoutubePlayer);
-                }, 2000);
+                setPlayState({ phase: PlayPhase.playing });
               }, 2000);
-            },
+            }, 2000);
           },
-          playerVars: {
-            start: trackStartSeconds,
-          },
-          videoId: props.youtubeVideoCode,
-        });
-      }
+        },
+        playerVars: {
+          start: trackStartSeconds,
+        },
+        videoId: props.youtubeVideoCode,
+      });
       return;
     }
 
@@ -133,17 +102,36 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     }
 
     if (playState.phase === PlayPhase.playing) {
-      props.beatEngine.start();
+      props.beatEngine.options.beforeStart = () => {
+        if (!youtubePlayer) {
+          return undefined;
+        }
+
+        return new Promise<void>((resolve) => {
+          const millisecondsDelay = (props.tab.trackStart ?? 0) % 1000;
+
+          const nextYoutubeDelayTimeout = window.setTimeout(resolve, millisecondsDelay);
+
+          youtubePlayer.playVideo();
+
+          setYoutubeDelayTimeout(nextYoutubeDelayTimeout);
+        });
+      };
+      props.beatEngine.start(countdown);
       return;
     }
 
     if (playState.phase === PlayPhase.resuming) {
-      youtubePlayer?.playVideo();
-      props.beatEngine.start();
+      props.beatEngine.options.beforeStart = () => {
+        youtubePlayer?.playVideo();
+      };
+      props.beatEngine.start(countdown);
       return;
     }
 
     if (playState.phase === PlayPhase.stopping) {
+      clearPlayState();
+      setCountdownRemaining(undefined);
       setPlayState(undefined);
       dispatch({ type: ActionType.activeSlotClear });
       // Instead of stopping the video, get it ready to play again
@@ -153,42 +141,25 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     }
   }, [playState]);
 
-  const updateActiveSlot = () => {
-    if (!props.activeSlot) {
-      clearPlayState();
+  useEffect(() => {
+    if (!props.activeSlot && playState && playState.phase !== PlayPhase.stopping) {
       setPlayState({ phase: PlayPhase.stopping });
     }
-  };
-
-  useEffect(updateActiveSlot, [props.activeSlot]);
-
-  const enterPlayMode = (nextPhase: PlayPhase.playing | PlayPhase.resuming) => {
-    if (props.beatEngine.options.playMode === PlayMode.youtubeTrack && !youtubePlayer) {
-      setPlayState({ phase: PlayPhase.loadingYoutube });
-    } else if (countdown) {
-      setPlayState({
-        phase: PlayPhase.countdown,
-        remaining: countdown,
-      });
-    } else {
-      setPlayState({ phase: nextPhase });
-    }
-  };
+  }, [props.activeSlot]);
 
   const pausePlayMode = () => {
     setPlayState({ phase: PlayPhase.paused });
   };
 
   const resumePlayMode = () => {
-    enterPlayMode(PlayPhase.resuming);
+    setPlayState({ phase: PlayPhase.resuming });
   };
 
   const startPlayMode = () => {
-    enterPlayMode(PlayPhase.playing);
+    setPlayState({ phase: PlayPhase.initializing });
   };
 
   const stopPlayMode = () => {
-    clearPlayState();
     setPlayState({ phase: PlayPhase.stopping });
   };
 
@@ -282,9 +253,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
               const nextCountdown = isNaN(parsedCountdown) ? undefined : parsedCountdown;
               setCountdown(nextCountdown);
             }}
-            value={
-              (playState?.phase === PlayPhase.countdown ? playState.remaining : countdown) ?? ''
-            }
+            value={(countdownRemaining || countdown) ?? ''}
             style={{ padding: 8, textAlign: 'center' }}
             type="number"
           />
@@ -333,7 +302,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         </ul>
       </div>
 
-      {playState?.phase === PlayPhase.loadingYoutube && <span style={{ marginRight: 8 }}>⏳</span>}
+      {playState?.phase === PlayPhase.initializing && <span style={{ marginRight: 8 }}>⏳</span>}
 
       {!props.isEditMode && playState && (
         <div className="btn-group" role="group">

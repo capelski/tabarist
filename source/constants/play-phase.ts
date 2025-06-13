@@ -1,6 +1,5 @@
 export enum PlayPhase {
-  countdown = 'countdown',
-  loadingYoutube = 'loadingYoutube',
+  initializing = 'initializing',
   playing = 'playing',
   paused = 'paused',
   resuming = 'resuming',
