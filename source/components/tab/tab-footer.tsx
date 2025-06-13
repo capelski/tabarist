@@ -5,7 +5,7 @@ import { maxTempo, minTempo, PlayMode, PlayPhase } from '../../constants';
 import { tabOperations } from '../../operations';
 import { userRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
-import { ActiveSlot, BarContainer, PlayState, StripeSubscription, Tab } from '../../types';
+import { ActiveSlot, BarContainer, StripeSubscription, Tab } from '../../types';
 
 export type TabFooterProps = {
   activeSlot: ActiveSlot | undefined;
@@ -24,7 +24,7 @@ export type TabFooterProps = {
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
   const [countdownRemaining, setCountdownRemaining] = useState<number>();
-  const [playState, setPlayState] = useState<PlayState>();
+  const [playPhase, setPlayPhase] = useState<PlayPhase>();
   const [youtubePlayer, setYoutubePlayer] = useState<YT.Player>();
   const [youtubeDelayTimeout, setYoutubeDelayTimeout] = useState<number>();
 
@@ -50,19 +50,19 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   }, [youtubePlayer]);
 
   useEffect(() => {
-    if (!playState) {
+    if (!playPhase) {
       return;
     }
 
-    if (playState.phase === PlayPhase.initializing) {
+    if (playPhase === PlayPhase.initializing) {
       if (props.beatEngine.options.playMode !== PlayMode.youtubeTrack) {
-        setPlayState({ phase: PlayPhase.playing });
+        setPlayPhase(PlayPhase.playing);
         return;
       }
 
       if (youtubePlayer) {
         // When playing a second time, the youtube player will have already been initialized
-        setPlayState({ phase: PlayPhase.playing });
+        setPlayPhase(PlayPhase.playing);
         return;
       }
 
@@ -83,7 +83,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
               nextYoutubePlayer.seekTo(trackStartSeconds, true);
 
               setTimeout(() => {
-                setPlayState({ phase: PlayPhase.playing });
+                setPlayPhase(PlayPhase.playing);
               }, 2000);
             }, 2000);
           },
@@ -96,12 +96,12 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       return;
     }
 
-    if (playState.phase === PlayPhase.paused) {
+    if (playPhase === PlayPhase.paused) {
       clearPlayState();
       return;
     }
 
-    if (playState.phase === PlayPhase.playing) {
+    if (playPhase === PlayPhase.playing) {
       props.beatEngine.options.beforeStart = () => {
         if (!youtubePlayer) {
           return undefined;
@@ -121,7 +121,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       return;
     }
 
-    if (playState.phase === PlayPhase.resuming) {
+    if (playPhase === PlayPhase.resuming) {
       props.beatEngine.options.beforeStart = () => {
         youtubePlayer?.playVideo();
       };
@@ -129,38 +129,38 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       return;
     }
 
-    if (playState.phase === PlayPhase.stopping) {
+    if (playPhase === PlayPhase.stopping) {
       clearPlayState();
       setCountdownRemaining(undefined);
-      setPlayState(undefined);
+      setPlayPhase(undefined);
       dispatch({ type: ActionType.activeSlotClear });
       // Instead of stopping the video, get it ready to play again
       youtubePlayer?.pauseVideo();
       youtubePlayer?.seekTo(trackStartSeconds, true);
       return;
     }
-  }, [playState]);
+  }, [playPhase]);
 
   useEffect(() => {
-    if (!props.activeSlot && playState && playState.phase !== PlayPhase.stopping) {
-      setPlayState({ phase: PlayPhase.stopping });
+    if (!props.activeSlot && playPhase && playPhase !== PlayPhase.stopping) {
+      setPlayPhase(PlayPhase.stopping);
     }
   }, [props.activeSlot]);
 
   const pausePlayMode = () => {
-    setPlayState({ phase: PlayPhase.paused });
+    setPlayPhase(PlayPhase.paused);
   };
 
   const resumePlayMode = () => {
-    setPlayState({ phase: PlayPhase.resuming });
+    setPlayPhase(PlayPhase.resuming);
   };
 
   const startPlayMode = () => {
-    setPlayState({ phase: PlayPhase.initializing });
+    setPlayPhase(PlayPhase.initializing);
   };
 
   const stopPlayMode = () => {
-    setPlayState({ phase: PlayPhase.stopping });
+    setPlayPhase(PlayPhase.stopping);
   };
 
   const toggleStarredTab = async () => {
@@ -237,7 +237,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
           <span className="input-group-text">⏱️</span>
           <input
             className="form-control"
-            disabled={playState && playState.phase !== PlayPhase.paused}
+            disabled={playPhase && playPhase !== PlayPhase.paused}
             onBlur={() => {
               if (countdown) {
                 const validCountdown = Math.max(Math.min(countdown, 15), 0);
@@ -263,7 +263,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       <div
         className="btn-group"
         // Hiding instead of not rendering, as the bootstrap dropdown doesn't show after the first time otherwise
-        style={{ display: props.isEditMode || playState ? 'none' : undefined }}
+        style={{ display: props.isEditMode || playPhase ? 'none' : undefined }}
       >
         <button
           className="btn btn-success"
@@ -302,11 +302,11 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         </ul>
       </div>
 
-      {playState?.phase === PlayPhase.initializing && <span style={{ marginRight: 8 }}>⏳</span>}
+      {playPhase === PlayPhase.initializing && <span style={{ marginRight: 8 }}>⏳</span>}
 
-      {!props.isEditMode && playState && (
+      {!props.isEditMode && playPhase && (
         <div className="btn-group" role="group">
-          {playState.phase === PlayPhase.paused ? (
+          {playPhase === PlayPhase.paused ? (
             <button className="btn btn-outline-success" onClick={resumePlayMode} type="button">
               Play
             </button>
