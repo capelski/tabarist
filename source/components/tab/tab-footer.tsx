@@ -1,8 +1,8 @@
 import { User } from 'firebase/auth';
 import React, { useContext, useEffect, useState } from 'react';
 import { BeatEngine } from '../../classes';
-import { PlayMode } from '../../classes/beat-engine-core';
-import { maxTempo, minTempo, PlayPhase } from '../../constants';
+import { BeatEngineMode, BeatEnginePhase } from '../../classes/beat-engine-core';
+import { maxTempo, minTempo } from '../../constants';
 import { tabOperations } from '../../operations';
 import { userRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
@@ -23,15 +23,21 @@ export type TabFooterProps = {
 };
 
 const PlayModeMap = {
-  [PlayMode.metronome]: 'Ⓜ️ Metronome',
-  [PlayMode.silent]: '🔇 Silent',
-  [PlayMode.youtubeTrack]: '🎵 Youtube Track',
+  [BeatEngineMode.metronome]: 'Ⓜ️ Metronome',
+  [BeatEngineMode.silent]: '🔇 Silent',
+  [BeatEngineMode.youtubeTrack]: '🎵 Youtube Track',
 };
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
   const [countdownRemaining, setCountdownRemaining] = useState<number>();
-  const [playPhase, setPlayPhase] = useState<PlayPhase>();
+  const [phase, setPhase] = useState<BeatEnginePhase>(BeatEnginePhase.new);
+
+  const isBeatEngineActive =
+    phase === BeatEnginePhase.countdown ||
+    phase === BeatEnginePhase.initializing ||
+    phase === BeatEnginePhase.playing;
+  const isBeatEngineIdle = phase === BeatEnginePhase.new || phase === BeatEnginePhase.stopped;
 
   const { dispatch } = useContext(StateProvider);
 
@@ -39,13 +45,12 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     props.beatEngine.tempo = props.tab.tempo ?? 100;
 
     props.beatEngine.onBeatUpdate = () => {
-      if (playPhase !== PlayPhase.playing) {
-        setPlayPhase(PlayPhase.playing);
-      }
       dispatch({ type: ActionType.activeSlotUpdate, barContainers: props.barContainers });
     };
 
     props.beatEngine.onCountdownUpdate = setCountdownRemaining;
+
+    props.beatEngine.onPhaseChange = setPhase;
 
     return props.beatEngine.destroy.bind(props.beatEngine);
   }, []);
@@ -60,55 +65,28 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   }, [props.youtubeVideoId]);
 
   useEffect(() => {
-    if (!playPhase) {
-      return;
-    }
-
-    if (playPhase === PlayPhase.initializing) {
-      props.beatEngine.start(countdown);
-      return;
-    }
-
-    if (playPhase === PlayPhase.paused) {
-      props.beatEngine.pause();
-      return;
-    }
-
-    if (playPhase === PlayPhase.resuming) {
-      props.beatEngine.resume(countdown);
-      return;
-    }
-
-    if (playPhase === PlayPhase.stopping) {
-      props.beatEngine.stop();
-      setCountdownRemaining(undefined);
-      setPlayPhase(undefined);
-      dispatch({ type: ActionType.activeSlotClear });
-      return;
-    }
-  }, [playPhase]);
-
-  useEffect(() => {
     // Stop playing when reaching the end of the tab
-    if (!props.activeSlot && playPhase && playPhase !== PlayPhase.stopping) {
-      setPlayPhase(PlayPhase.stopping);
+    if (!props.activeSlot && !isBeatEngineIdle) {
+      stopPlayMode();
     }
   }, [props.activeSlot]);
 
   const pausePlayMode = () => {
-    setPlayPhase(PlayPhase.paused);
+    props.beatEngine.pause();
   };
 
   const resumePlayMode = () => {
-    setPlayPhase(PlayPhase.resuming);
+    props.beatEngine.resume(countdown);
   };
 
   const startPlayMode = () => {
-    setPlayPhase(PlayPhase.initializing);
+    props.beatEngine.start(countdown);
   };
 
   const stopPlayMode = () => {
-    setPlayPhase(PlayPhase.stopping);
+    props.beatEngine.stop();
+    setCountdownRemaining(undefined);
+    dispatch({ type: ActionType.activeSlotClear });
   };
 
   const toggleStarredTab = async () => {
@@ -126,8 +104,8 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     }
   };
 
-  const availablePlayModes = Object.values(PlayMode).filter(
-    (p) => p !== PlayMode.youtubeTrack || props.youtubeVideoId,
+  const availablePlayModes = Object.values(BeatEngineMode).filter(
+    (p) => p !== BeatEngineMode.youtubeTrack || props.youtubeVideoId,
   );
 
   return (
@@ -185,7 +163,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
           <span className="input-group-text">⏱️</span>
           <input
             className="form-control"
-            disabled={playPhase && playPhase !== PlayPhase.paused}
+            disabled={isBeatEngineActive}
             onBlur={() => {
               if (countdown) {
                 const validCountdown = Math.max(Math.min(countdown, 15), 0);
@@ -211,7 +189,9 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       <div
         className="btn-group"
         // Hiding instead of not rendering, as the bootstrap dropdown doesn't show after the first time otherwise
-        style={{ display: props.isEditMode || playPhase ? 'none' : undefined }}
+        style={{
+          display: props.isEditMode || !isBeatEngineIdle ? 'none' : undefined,
+        }}
       >
         <button
           className="btn btn-success"
@@ -234,10 +214,10 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                 <button
                   className="dropdown-item"
                   onClick={() => {
-                    if (option === PlayMode.youtubeTrack && !props.subscription) {
+                    if (option === BeatEngineMode.youtubeTrack && !props.subscription) {
                       dispatch({ type: ActionType.upgradeStart });
                     } else {
-                      props.beatEngine.playMode = option;
+                      props.beatEngine.mode = option;
                       startPlayMode();
                     }
                   }}
@@ -250,11 +230,11 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
         </ul>
       </div>
 
-      {playPhase === PlayPhase.initializing && <span style={{ marginRight: 8 }}>⏳</span>}
+      {phase === BeatEnginePhase.initializing && <span style={{ marginRight: 8 }}>⏳</span>}
 
-      {!props.isEditMode && playPhase && (
+      {!props.isEditMode && !isBeatEngineIdle && (
         <div className="btn-group" role="group">
-          {playPhase === PlayPhase.paused ? (
+          {phase === BeatEnginePhase.paused ? (
             <button className="btn btn-outline-success" onClick={resumePlayMode} type="button">
               Play
             </button>

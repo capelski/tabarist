@@ -8,24 +8,35 @@ export type BeatEngineHandlers = {
   triggerSound: () => void | Promise<void>;
 };
 
-export enum PlayMode {
+export enum BeatEngineMode {
   metronome = 'metronome',
   silent = 'silent',
   youtubeTrack = 'youtubeTrack',
+}
+
+export enum BeatEnginePhase {
+  countdown = 'countdown',
+  initializing = 'initializing',
+  new = 'new',
+  playing = 'playing',
+  paused = 'paused',
+  stopped = 'stopped',
 }
 
 export class BeatEngineCore {
   protected countdownTimeout: number | undefined;
   protected lastDelay = 0;
   protected lastRender = 0;
+  protected phase: BeatEnginePhase = BeatEnginePhase.new;
   protected nextBeatTimeout: number | undefined;
   protected youtubePlayer: YT.Player | undefined;
   protected youtubeDelayTimeout: number | undefined;
 
   public onBeatUpdate?: () => void;
   public onCountdownUpdate?: (remainingCount: number) => void;
+  public onPhaseChange?: (phase: BeatEnginePhase) => void;
   /** Defaults to PlayMode.metronome */
-  public playMode: PlayMode = PlayMode.metronome;
+  public mode: BeatEngineMode = BeatEngineMode.metronome;
   /** Defaults to 100 */
   public tempo = 100;
   public youtubeTrack?: {
@@ -48,12 +59,6 @@ export class BeatEngineCore {
     }, 1000);
   }
 
-  protected decreaseCountdown(countdownRemaining: number) {
-    return new Promise<void>((resolve) => {
-      this.decreaseCountdownInternal(resolve, countdownRemaining);
-    });
-  }
-
   protected getTrackStartMilliseconds = () => {
     return (this.youtubeTrack?.start ?? 0) % 1000;
   };
@@ -63,7 +68,7 @@ export class BeatEngineCore {
   };
 
   protected processCurrentBeat() {
-    if (this.playMode === PlayMode.metronome) {
+    if (this.mode === BeatEngineMode.metronome) {
       this.handlers.triggerSound();
     }
     this.onBeatUpdate?.();
@@ -77,6 +82,19 @@ export class BeatEngineCore {
     this.nextBeatTimeout = this.handlers.setTimeout(() => {
       this.processCurrentBeat();
     }, msPerBeat - this.lastDelay);
+  }
+
+  protected setPhase(nextPhase: BeatEnginePhase) {
+    this.phase = nextPhase;
+    this.onPhaseChange?.(this.phase);
+  }
+
+  protected setCountdown(countdownRemaining: number) {
+    this.setPhase(BeatEnginePhase.countdown);
+
+    return new Promise<void>((resolve) => {
+      this.decreaseCountdownInternal(resolve, countdownRemaining);
+    });
   }
 
   protected stopCore() {
@@ -98,19 +116,24 @@ export class BeatEngineCore {
   pause() {
     this.stopCore();
     this.youtubePlayer?.pauseVideo();
+
+    this.setPhase(BeatEnginePhase.paused);
   }
 
   async resume(countdown?: number) {
     if (countdown) {
-      await this.decreaseCountdown(countdown);
+      await this.setCountdown(countdown);
     }
 
     this.youtubePlayer?.playVideo();
+    this.setPhase(BeatEnginePhase.playing);
     this.processCurrentBeat();
   }
 
   async start(countdown?: number) {
-    if (this.playMode === PlayMode.youtubeTrack && this.youtubeTrack && !this.youtubePlayer) {
+    this.setPhase(BeatEnginePhase.initializing);
+
+    if (this.mode === BeatEngineMode.youtubeTrack && this.youtubeTrack && !this.youtubePlayer) {
       this.youtubePlayer = await this.handlers.initializeYoutubePlayer(
         this.youtubeTrack.videoId,
         this.getTrackStartSeconds(),
@@ -118,12 +141,14 @@ export class BeatEngineCore {
     }
 
     if (countdown) {
-      await this.decreaseCountdown(countdown);
+      await this.setCountdown(countdown);
     }
 
-    if (this.playMode === PlayMode.youtubeTrack) {
+    if (this.mode === BeatEngineMode.youtubeTrack) {
       await this.handlers.startYoutubeTrack(this.getTrackStartMilliseconds());
     }
+
+    this.setPhase(BeatEnginePhase.playing);
 
     this.processCurrentBeat();
   }
@@ -133,5 +158,7 @@ export class BeatEngineCore {
     // Instead of stopping the video, get it ready to play again
     this.youtubePlayer?.pauseVideo();
     this.youtubePlayer?.seekTo(this.getTrackStartSeconds(), true);
+
+    this.setPhase(BeatEnginePhase.stopped);
   }
 }

@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BeatEngineCore, PlayMode } from './beat-engine-core';
+import { BeatEngineCore, BeatEngineMode } from './beat-engine-core';
 
 export type TimeoutElement = {
   id: number;
@@ -74,7 +74,7 @@ Given(/a beat engine with tempo (\d+)/, function (tempo: number) {
   beatEngine.onCountdownUpdate = () => {
     ++beatEngine.onCountdownUpdateCount;
   };
-  beatEngine.playMode = PlayMode.silent;
+  beatEngine.mode = BeatEngineMode.silent;
   beatEngine.tempo = tempo;
 });
 
@@ -83,7 +83,7 @@ Given(/a render delay of (\d+)ms/, function (delay: number) {
 });
 
 When('a youtube track with id {string} at start {int}', function (videoId: string, start: number) {
-  beatEngine.playMode = PlayMode.youtubeTrack;
+  beatEngine.mode = BeatEngineMode.youtubeTrack;
   beatEngine.youtubeTrack = {
     videoId,
     start,
