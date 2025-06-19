@@ -58,7 +58,9 @@ Feature: Beat engine
       Given a beat engine with tempo 100
       And a youtube track with id "youtube-id" at start 4000
       When starting to play
+      Then the beat engine is in phase "initializing"
       Then the initializeYoutubePlayer handler has been called called 1 time(s)
+      When the youtube player is ready
       When the beat engine is ready
       Then the beat engine is in phase "playing"
       And the startYoutubeTrack handler has been called called 1 time(s)
@@ -67,12 +69,26 @@ Feature: Beat engine
       Given a beat engine with tempo 100
       And a youtube track with id "youtube-id" at start 4000
       When starting to play with countdown 3
-      Then the beat engine is in phase "countdown"
+      Then the beat engine is in phase "initializing"
       Then the initializeYoutubePlayer handler has been called called 1 time(s)
       And the startYoutubeTrack handler has been called called 0 time(s)
+      When the youtube player is ready
+      Then the beat engine is in phase "countdown"
       When the schedule element 1 kicks in
       And the schedule element 2 kicks in
       And the schedule element 3 kicks in
       And the beat engine is ready
       Then the beat engine is in phase "playing"
       And the startYoutubeTrack handler has been called called 1 time(s)
+
+   Scenario: Cancels start operation when stopping during youtube initialization
+      Given a beat engine with tempo 100
+      And a youtube track with id "youtube-id" at start 4000
+      When starting to play
+      Then the beat engine is in phase "initializing"
+      When stopping the beat engine
+      When the youtube player is ready
+      When the beat engine is ready
+      And the startYoutubeTrack handler has been called called 0 time(s)
+      Then the beat engine is in phase "stopped"
+

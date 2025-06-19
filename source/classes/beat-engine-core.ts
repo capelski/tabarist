@@ -140,6 +140,10 @@ export class BeatEngineCore {
       );
     }
 
+    if (this.phase === BeatEnginePhase.stopped) {
+      return;
+    }
+
     if (countdown) {
       await this.setCountdown(countdown);
     }

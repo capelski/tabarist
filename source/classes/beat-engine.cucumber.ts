@@ -22,6 +22,8 @@ export class BeatEngineTest extends BeatEngineCore {
   startPromise: undefined | Promise<void>;
   startYoutubeTrackCount = 0;
 
+  initializeYoutubePlayerResolver: undefined | ((player: YT.Player) => void);
+
   constructor() {
     super({
       clearTimeout: (_id?: number) => {},
@@ -34,14 +36,9 @@ export class BeatEngineTest extends BeatEngineCore {
       },
       initializeYoutubePlayer: () => {
         ++this.initializeYoutubePlayerCount;
-        return Promise.resolve({
-          playVideo: () => {},
-          pauseVideo: () => {},
-          seekTo: () => {},
-          destroy: () => {},
-          mute: () => {},
-          unMute: () => {},
-        } as unknown as YT.Player);
+        return new Promise((resolve) => {
+          this.initializeYoutubePlayerResolver = resolve;
+        });
       },
       setTimeout: (handler: () => void, delay?: number) => {
         const id = this.nextTimeoutId++;
@@ -109,6 +106,21 @@ When('the beat engine is ready', async function () {
 When('the schedule element {int} kicks in', function (beatNumber: number) {
   const timeoutElement = beatEngine.timeoutElements[beatNumber - 1];
   timeoutElement.handler();
+});
+
+When('the youtube player is ready', function () {
+  beatEngine.initializeYoutubePlayerResolver!({
+    playVideo: () => {},
+    pauseVideo: () => {},
+    seekTo: () => {},
+    destroy: () => {},
+    mute: () => {},
+    unMute: () => {},
+  } as unknown as YT.Player);
+});
+
+When('stopping the beat engine', function () {
+  beatEngine.stop();
 });
 
 Then('the beat engine is in phase {string}', function (phase: BeatEnginePhase) {

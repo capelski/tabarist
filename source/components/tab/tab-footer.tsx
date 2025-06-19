@@ -239,7 +239,12 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
               Play
             </button>
           ) : (
-            <button className="btn btn-outline-success" onClick={pausePlayMode} type="button">
+            <button
+              className="btn btn-outline-success"
+              disabled={phase !== BeatEnginePhase.playing}
+              onClick={pausePlayMode}
+              type="button"
+            >
               Pause
             </button>
           )}
