@@ -3,6 +3,13 @@ Feature: Beat engine
 
    The beat engine creates a continues stream of callbacks, with the frequency corresponding
    to the provided tempo
+
+   Scenario: The beat engine phase is updated on start
+      Given a beat engine with tempo 100
+      Then the beat engine is in phase "new"
+      When starting to play
+      When the beat engine is ready
+      Then the beat engine is in phase "playing"
    
    Scenario: The first beat is processed when starting to play
       Given a beat engine with tempo 100
@@ -37,12 +44,14 @@ Feature: Beat engine
    Scenario: Supports delayed start via countdown
       Given a beat engine with tempo 100
       When starting to play with countdown 3
-      Then the onBeatUpdate handler has been called called 0 time(s)
+      Then the beat engine is in phase "countdown"
+      And the onBeatUpdate handler has been called called 0 time(s)
       When the schedule element 1 kicks in
       And the schedule element 2 kicks in
       And the schedule element 3 kicks in
       And the beat engine is ready
-      Then the onCountdownUpdate handler has been called called 4 time(s)
+      Then the beat engine is in phase "playing"
+      And the onCountdownUpdate handler has been called called 4 time(s)
       And the onBeatUpdate handler has been called called 1 time(s)
 
    Scenario: Supports youtube backing tracks
@@ -51,16 +60,19 @@ Feature: Beat engine
       When starting to play
       Then the initializeYoutubePlayer handler has been called called 1 time(s)
       When the beat engine is ready
+      Then the beat engine is in phase "playing"
       And the startYoutubeTrack handler has been called called 1 time(s)
 
    Scenario: Supports youtube backing tracks with countdown
       Given a beat engine with tempo 100
       And a youtube track with id "youtube-id" at start 4000
       When starting to play with countdown 3
+      Then the beat engine is in phase "countdown"
       Then the initializeYoutubePlayer handler has been called called 1 time(s)
       And the startYoutubeTrack handler has been called called 0 time(s)
       When the schedule element 1 kicks in
       And the schedule element 2 kicks in
       And the schedule element 3 kicks in
       And the beat engine is ready
+      Then the beat engine is in phase "playing"
       And the startYoutubeTrack handler has been called called 1 time(s)

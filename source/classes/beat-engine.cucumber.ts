@@ -1,6 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BeatEngineCore, BeatEngineMode } from './beat-engine-core';
+import { BeatEngineCore, BeatEngineMode, BeatEnginePhase } from './beat-engine-core';
 
 export type TimeoutElement = {
   id: number;
@@ -63,6 +63,10 @@ export class BeatEngineTest extends BeatEngineCore {
   getLastRender() {
     return this.lastRender;
   }
+
+  getPhase() {
+    return this.phase;
+  }
 }
 
 Given(/a beat engine with tempo (\d+)/, function (tempo: number) {
@@ -105,6 +109,10 @@ When('the beat engine is ready', async function () {
 When('the schedule element {int} kicks in', function (beatNumber: number) {
   const timeoutElement = beatEngine.timeoutElements[beatNumber - 1];
   timeoutElement.handler();
+});
+
+Then('the beat engine is in phase {string}', function (phase: BeatEnginePhase) {
+  expect(beatEngine.getPhase()).to.equal(phase);
 });
 
 Then('the onBeatUpdate handler has been called called {int} time\\(s)', function (count: number) {
