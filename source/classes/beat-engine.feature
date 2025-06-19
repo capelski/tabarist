@@ -60,7 +60,8 @@ Feature: Beat engine
       When starting to play
       Then the beat engine is in phase "initializing"
       Then the initializeYoutubePlayer handler has been called called 1 time(s)
-      When the youtube player is ready
+      When the youtube player is initialized
+      And the youtube track starts
       When the beat engine is ready
       Then the beat engine is in phase "playing"
       And the startYoutubeTrack handler has been called called 1 time(s)
@@ -71,12 +72,14 @@ Feature: Beat engine
       When starting to play with countdown 3
       Then the beat engine is in phase "initializing"
       Then the initializeYoutubePlayer handler has been called called 1 time(s)
-      And the startYoutubeTrack handler has been called called 0 time(s)
-      When the youtube player is ready
+      When the youtube player is initialized
       Then the beat engine is in phase "countdown"
+      And the startYoutubeTrack handler has been called called 0 time(s)
       When the schedule element 1 kicks in
       And the schedule element 2 kicks in
       And the schedule element 3 kicks in
+      And the schedule element 4 kicks in
+      And the youtube track starts
       And the beat engine is ready
       Then the beat engine is in phase "playing"
       And the startYoutubeTrack handler has been called called 1 time(s)
@@ -87,8 +90,18 @@ Feature: Beat engine
       When starting to play
       Then the beat engine is in phase "initializing"
       When stopping the beat engine
-      When the youtube player is ready
-      When the beat engine is ready
-      And the startYoutubeTrack handler has been called called 0 time(s)
-      Then the beat engine is in phase "stopped"
+      When the youtube player is initialized
+      And the beat engine is ready
+      Then the startYoutubeTrack handler has been called called 0 time(s)
+      And the beat engine is in phase "stopped"
 
+   Scenario: The last interval of a countdown considers youtube track delay
+      Given a beat engine with tempo 100
+      And a youtube track with id "youtube-id" at start 4500
+      When starting to play with countdown 1
+      And the youtube player is initialized
+      And the schedule element 1 kicks in
+      Then the startYoutubeTrack handler has been called called 0 time(s)
+      And the schedule element 2 kicks in
+      Then the startYoutubeTrack handler has been called called 1 time(s)
+      And the schedule element 2 is set with delay 500ms

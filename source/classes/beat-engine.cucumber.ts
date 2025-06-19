@@ -23,6 +23,7 @@ export class BeatEngineTest extends BeatEngineCore {
   startYoutubeTrackCount = 0;
 
   initializeYoutubePlayerResolver: undefined | ((player: YT.Player) => void);
+  startYoutubeTrackResolver: undefined | (() => void);
 
   constructor() {
     super({
@@ -51,7 +52,9 @@ export class BeatEngineTest extends BeatEngineCore {
       },
       startYoutubeTrack: () => {
         ++this.startYoutubeTrackCount;
-        return Promise.resolve();
+        return new Promise((resolve) => {
+          this.startYoutubeTrackResolver = resolve;
+        });
       },
       triggerSound: () => {},
     });
@@ -108,7 +111,7 @@ When('the schedule element {int} kicks in', function (beatNumber: number) {
   timeoutElement.handler();
 });
 
-When('the youtube player is ready', function () {
+When('the youtube player is initialized', function () {
   beatEngine.initializeYoutubePlayerResolver!({
     playVideo: () => {},
     pauseVideo: () => {},
@@ -117,6 +120,10 @@ When('the youtube player is ready', function () {
     mute: () => {},
     unMute: () => {},
   } as unknown as YT.Player);
+});
+
+When('the youtube track starts', function () {
+  beatEngine.startYoutubeTrackResolver!();
 });
 
 When('stopping the beat engine', function () {
@@ -164,6 +171,14 @@ Then(
     const timeoutElement = beatEngine.timeoutElements[beatNumber - 2];
 
     expect(timeoutElement.id).to.equal(timeoutId);
+    expect(timeoutElement.delay).to.equal(delay);
+  },
+);
+
+When(
+  'the schedule element {int} is set with delay {int}ms',
+  function (scheduleElement: number, delay: number) {
+    const timeoutElement = beatEngine.timeoutElements[scheduleElement - 1];
     expect(timeoutElement.delay).to.equal(delay);
   },
 );

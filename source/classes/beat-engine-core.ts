@@ -4,7 +4,7 @@ export type BeatEngineHandlers = {
   getLastRendered: () => number;
   initializeYoutubePlayer: (videoId: string, start?: number) => Promise<YT.Player>;
   setTimeout: (handler: () => void, delay?: number) => number;
-  startYoutubeTrack: (start?: number) => void;
+  startYoutubeTrack: (start?: number) => Promise<void>;
   triggerSound: () => void | Promise<void>;
 };
 
@@ -30,7 +30,7 @@ export class BeatEngineCore {
   protected phase: BeatEnginePhase = BeatEnginePhase.new;
   protected nextBeatTimeout: number | undefined;
   protected youtubePlayer: YT.Player | undefined;
-  protected youtubeDelayTimeout: number | undefined;
+  protected youtubeCountdownTimeout: number | undefined;
 
   public onBeatUpdate?: () => void;
   public onCountdownUpdate?: (remainingCount: number) => void;
@@ -48,6 +48,7 @@ export class BeatEngineCore {
 
   protected decreaseCountdownInternal(resolve: () => void, countdownRemaining: number) {
     this.onCountdownUpdate?.(countdownRemaining);
+
     this.countdownTimeout = this.handlers.setTimeout(async () => {
       const nextCountdownRemaining = countdownRemaining - 1;
       if (nextCountdownRemaining > 0) {
@@ -57,6 +58,13 @@ export class BeatEngineCore {
         resolve();
       }
     }, 1000);
+
+    if (countdownRemaining === 1 && this.mode === BeatEngineMode.youtubeTrack) {
+      const startTrackDelay = 1000 - this.getTrackStartMilliseconds();
+      this.youtubeCountdownTimeout = this.handlers.setTimeout(() => {
+        this.handlers.startYoutubeTrack(this.getTrackStartMilliseconds());
+      }, startTrackDelay);
+    }
   }
 
   protected getTrackStartMilliseconds = () => {
@@ -100,13 +108,13 @@ export class BeatEngineCore {
   protected stopCore() {
     this.handlers.clearTimeout(this.countdownTimeout);
     this.handlers.clearTimeout(this.nextBeatTimeout);
-    this.handlers.clearTimeout(this.youtubeDelayTimeout);
+    this.handlers.clearTimeout(this.youtubeCountdownTimeout);
 
     this.countdownTimeout = undefined;
     this.lastDelay = 0;
     this.lastRender = 0;
     this.nextBeatTimeout = undefined;
-    this.youtubeDelayTimeout = undefined;
+    this.youtubeCountdownTimeout = undefined;
   }
 
   destroy() {
@@ -146,9 +154,7 @@ export class BeatEngineCore {
 
     if (countdown) {
       await this.setCountdown(countdown);
-    }
-
-    if (this.mode === BeatEngineMode.youtubeTrack) {
+    } else if (this.mode === BeatEngineMode.youtubeTrack) {
       await this.handlers.startYoutubeTrack(this.getTrackStartMilliseconds());
     }
 

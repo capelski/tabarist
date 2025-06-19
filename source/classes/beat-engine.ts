@@ -4,6 +4,8 @@ import { BeatEngineCore } from './beat-engine-core';
 const clickAudio = typeof Audio !== 'undefined' ? new Audio(clickSound) : undefined;
 
 export class BeatEngine extends BeatEngineCore {
+  protected youtubeDelayTimeout: number | undefined;
+
   constructor() {
     super({
       clearTimeout: window.clearTimeout.bind(window),
@@ -48,5 +50,13 @@ export class BeatEngine extends BeatEngineCore {
       },
       triggerSound: () => clickAudio?.play(),
     });
+  }
+
+  protected stopCore(): void {
+    this.handlers.clearTimeout(this.youtubeDelayTimeout);
+
+    super.stopCore();
+
+    this.youtubeDelayTimeout = undefined;
   }
 }
