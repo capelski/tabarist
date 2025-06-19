@@ -1,7 +1,6 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { PlayMode } from '../constants';
-import { BeatEngineCore } from './beat-engine-core';
+import { BeatEngineCore, PlayMode } from './beat-engine-core';
 
 export type TimeoutElement = {
   id: number;

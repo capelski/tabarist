@@ -1,5 +1,3 @@
-import { PlayMode } from '../constants';
-
 export type BeatEngineHandlers = {
   clearTimeout: (id?: number) => void;
   getLastDelay: () => number;
@@ -9,6 +7,12 @@ export type BeatEngineHandlers = {
   startYoutubeTrack: (start?: number) => void;
   triggerSound: () => void | Promise<void>;
 };
+
+export enum PlayMode {
+  metronome = 'metronome',
+  silent = 'silent',
+  youtubeTrack = 'youtubeTrack',
+}
 
 export class BeatEngineCore {
   protected countdownTimeout: number | undefined;

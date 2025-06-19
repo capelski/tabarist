@@ -1,7 +1,8 @@
 import { User } from 'firebase/auth';
 import React, { useContext, useEffect, useState } from 'react';
 import { BeatEngine } from '../../classes';
-import { maxTempo, minTempo, PlayMode, PlayPhase } from '../../constants';
+import { PlayMode } from '../../classes/beat-engine-core';
+import { maxTempo, minTempo, PlayPhase } from '../../constants';
 import { tabOperations } from '../../operations';
 import { userRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
@@ -19,6 +20,12 @@ export type TabFooterProps = {
   updateTab: (tab: Tab) => void;
   user: User | null;
   youtubeVideoId: string | undefined;
+};
+
+const PlayModeMap = {
+  [PlayMode.metronome]: 'Ⓜ️ Metronome',
+  [PlayMode.silent]: '🔇 Silent',
+  [PlayMode.youtubeTrack]: '🎵 Youtube Track',
 };
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
@@ -235,7 +242,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                     }
                   }}
                 >
-                  {option}
+                  {PlayModeMap[option]}
                 </button>
               </li>
             );
