@@ -41,10 +41,12 @@ export class BeatEngine extends BeatEngineCore {
           });
         });
       },
-      setTimeout: window.setTimeout.bind(window),
+      scheduleBeat: window.setTimeout.bind(window),
+      scheduleCountdown: window.setTimeout.bind(window),
+      scheduleTrackStart: window.setTimeout.bind(window),
       startYoutubeTrack: (start) => {
         return new Promise<void>((resolve) => {
-          this.youtubeDelayTimeout = this.handlers.setTimeout(resolve, start);
+          this.youtubeDelayTimeout = window.setTimeout(resolve, start);
           this.youtubePlayer!.playVideo();
         });
       },

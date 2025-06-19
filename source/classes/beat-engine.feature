@@ -17,38 +17,38 @@ Feature: Beat engine
       And the beat engine is ready
       Then the onBeatUpdate handler has been called called 1 time(s)
       And the last rendered date is set to timestamp 100
-      And beat 2 is scheduled via timeout 1 within 600ms
+      And beat schedule 1 is set with delay 600ms
 
    Scenario: The second beat is processed when the schedule kicks in
       Given a beat engine with tempo 100
       When starting to play
       And the beat engine is ready
-      And the schedule element 1 kicks in
+      And the scheduled beat 1 kicks in
       Then the onBeatUpdate handler has been called called 2 time(s)
       And the last rendered date is set to timestamp 200
-      And beat 3 is scheduled via timeout 2 within 600ms
+      And beat schedule 2 is set with delay 600ms
 
    Scenario: The tempo drives the beats schedule
       Given a beat engine with tempo 200
       When starting to play
       And the beat engine is ready
-      Then beat 2 is scheduled via timeout 1 within 300ms
+      Then beat schedule 1 is set with delay 300ms
 
    Scenario: The render delay is considered in the beats schedule
       Given a beat engine with tempo 100
       And a render delay of 17ms
       When starting to play
       And the beat engine is ready
-      Then beat 2 is scheduled via timeout 1 within 583ms
+      Then beat schedule 1 is set with delay 583ms
 
    Scenario: Supports delayed start via countdown
       Given a beat engine with tempo 100
       When starting to play with countdown 3
       Then the beat engine is in phase "countdown"
       And the onBeatUpdate handler has been called called 0 time(s)
-      When the schedule element 1 kicks in
-      And the schedule element 2 kicks in
-      And the schedule element 3 kicks in
+      When the scheduled countdown 1 kicks in
+      And the scheduled countdown 2 kicks in
+      And the scheduled countdown 3 kicks in
       And the beat engine is ready
       Then the beat engine is in phase "playing"
       And the onCountdownUpdate handler has been called called 4 time(s)
@@ -75,10 +75,10 @@ Feature: Beat engine
       When the youtube player is initialized
       Then the beat engine is in phase "countdown"
       And the startYoutubeTrack handler has been called called 0 time(s)
-      When the schedule element 1 kicks in
-      And the schedule element 2 kicks in
-      And the schedule element 3 kicks in
-      And the schedule element 4 kicks in
+      When the scheduled countdown 1 kicks in
+      And the scheduled countdown 2 kicks in
+      And the scheduled countdown 3 kicks in
+      And the scheduled track start 1 kicks in
       And the youtube track starts
       And the beat engine is ready
       Then the beat engine is in phase "playing"
@@ -97,11 +97,12 @@ Feature: Beat engine
 
    Scenario: The last interval of a countdown considers youtube track delay
       Given a beat engine with tempo 100
-      And a youtube track with id "youtube-id" at start 4500
+      And a youtube track with id "youtube-id" at start 4225
       When starting to play with countdown 1
       And the youtube player is initialized
-      And the schedule element 1 kicks in
+      Then countdown schedule 1 is set with delay 1000ms 
+      And track start schedule 1 is set with delay 775ms 
+      When the scheduled countdown 1 kicks in
       Then the startYoutubeTrack handler has been called called 0 time(s)
-      And the schedule element 2 kicks in
+      When the scheduled track start 1 kicks in
       Then the startYoutubeTrack handler has been called called 1 time(s)
-      And the schedule element 2 is set with delay 500ms

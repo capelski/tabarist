@@ -2,21 +2,37 @@ import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { BeatEngineCore, BeatEngineMode, BeatEnginePhase } from './beat-engine-core';
 
-export type TimeoutElement = {
-  id: number;
+type Schedule = {
   delay?: number;
   handler: Function;
+  id: number;
+};
+
+type SchedulesCollection = {
+  nextId: number;
+  schedules: Schedule[];
 };
 
 let beatEngine: BeatEngineTest;
 
+const addSchedule = (collection: SchedulesCollection, handler: () => void, delay?: number) => {
+  const id = collection.nextId++;
+  collection.schedules.push({
+    delay,
+    handler,
+    id,
+  });
+  return id;
+};
+
 export class BeatEngineTest extends BeatEngineCore {
-  timeoutElements: TimeoutElement[] = [];
+  beatSchedules: SchedulesCollection = { nextId: 1, schedules: [] };
+  countdownSchedules: SchedulesCollection = { nextId: 1, schedules: [] };
+  trackStartSchedules: SchedulesCollection = { nextId: 1, schedules: [] };
 
   currentLastRendered = 0;
   initializeYoutubePlayerCount = 0;
   mockedDelay = 0;
-  nextTimeoutId = 1;
   onBeatUpdateCount = 0;
   onCountdownUpdateCount = 0;
   startPromise: undefined | Promise<void>;
@@ -41,15 +57,9 @@ export class BeatEngineTest extends BeatEngineCore {
           this.initializeYoutubePlayerResolver = resolve;
         });
       },
-      setTimeout: (handler: () => void, delay?: number) => {
-        const id = this.nextTimeoutId++;
-        this.timeoutElements.push({
-          delay,
-          handler,
-          id,
-        });
-        return id;
-      },
+      scheduleBeat: (handler, delay) => addSchedule(this.beatSchedules, handler, delay),
+      scheduleCountdown: (handler, delay) => addSchedule(this.countdownSchedules, handler, delay),
+      scheduleTrackStart: (handler, delay) => addSchedule(this.trackStartSchedules, handler, delay),
       startYoutubeTrack: () => {
         ++this.startYoutubeTrackCount;
         return new Promise((resolve) => {
@@ -106,8 +116,18 @@ When('the beat engine is ready', async function () {
   await beatEngine.startPromise;
 });
 
-When('the schedule element {int} kicks in', function (beatNumber: number) {
-  const timeoutElement = beatEngine.timeoutElements[beatNumber - 1];
+When('the scheduled beat {int} kicks in', function (scheduleIndex: number) {
+  const timeoutElement = beatEngine.beatSchedules.schedules[scheduleIndex - 1];
+  timeoutElement.handler();
+});
+
+When('the scheduled countdown {int} kicks in', function (scheduleIndex: number) {
+  const timeoutElement = beatEngine.countdownSchedules.schedules[scheduleIndex - 1];
+  timeoutElement.handler();
+});
+
+When('the scheduled track start {int} kicks in', function (scheduleIndex: number) {
+  const timeoutElement = beatEngine.trackStartSchedules.schedules[scheduleIndex - 1];
   timeoutElement.handler();
 });
 
@@ -164,21 +184,25 @@ Then('the last rendered date is set to timestamp {int}', function (lastRendered:
 });
 
 Then(
-  'beat {int} is scheduled via timeout {int} within {int}ms',
-  function (beatNumber: number, timeoutId: number, delay: number) {
-    // Subtracting 2; one to turn the number into a zero-based index, and another one
-    // because the first beat doesn't schedule a timeout
-    const timeoutElement = beatEngine.timeoutElements[beatNumber - 2];
-
-    expect(timeoutElement.id).to.equal(timeoutId);
+  'beat schedule {int} is set with delay {int}ms',
+  function (scheduleElement: number, delay: number) {
+    const timeoutElement = beatEngine.beatSchedules.schedules[scheduleElement - 1];
     expect(timeoutElement.delay).to.equal(delay);
   },
 );
 
-When(
-  'the schedule element {int} is set with delay {int}ms',
+Then(
+  'countdown schedule {int} is set with delay {int}ms',
   function (scheduleElement: number, delay: number) {
-    const timeoutElement = beatEngine.timeoutElements[scheduleElement - 1];
+    const timeoutElement = beatEngine.countdownSchedules.schedules[scheduleElement - 1];
+    expect(timeoutElement.delay).to.equal(delay);
+  },
+);
+
+Then(
+  'track start schedule {int} is set with delay {int}ms',
+  function (scheduleElement: number, delay: number) {
+    const timeoutElement = beatEngine.trackStartSchedules.schedules[scheduleElement - 1];
     expect(timeoutElement.delay).to.equal(delay);
   },
 );

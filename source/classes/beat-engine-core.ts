@@ -3,7 +3,9 @@ export type BeatEngineHandlers = {
   getLastDelay: () => number;
   getLastRendered: () => number;
   initializeYoutubePlayer: (videoId: string, start?: number) => Promise<YT.Player>;
-  setTimeout: (handler: () => void, delay?: number) => number;
+  scheduleBeat: (handler: () => void, delay?: number) => number;
+  scheduleCountdown: (handler: () => void, delay?: number) => number;
+  scheduleTrackStart: (handler: () => void, delay?: number) => number;
   startYoutubeTrack: (start?: number) => Promise<void>;
   triggerSound: () => void | Promise<void>;
 };
@@ -49,7 +51,7 @@ export class BeatEngineCore {
   protected decreaseCountdownInternal(resolve: () => void, countdownRemaining: number) {
     this.onCountdownUpdate?.(countdownRemaining);
 
-    this.countdownTimeout = this.handlers.setTimeout(async () => {
+    this.countdownTimeout = this.handlers.scheduleCountdown(async () => {
       const nextCountdownRemaining = countdownRemaining - 1;
       if (nextCountdownRemaining > 0) {
         this.decreaseCountdownInternal(resolve, nextCountdownRemaining);
@@ -61,7 +63,7 @@ export class BeatEngineCore {
 
     if (countdownRemaining === 1 && this.mode === BeatEngineMode.youtubeTrack) {
       const startTrackDelay = 1000 - this.getTrackStartMilliseconds();
-      this.youtubeCountdownTimeout = this.handlers.setTimeout(() => {
+      this.youtubeCountdownTimeout = this.handlers.scheduleTrackStart(() => {
         this.handlers.startYoutubeTrack(this.getTrackStartMilliseconds());
       }, startTrackDelay);
     }
@@ -87,7 +89,7 @@ export class BeatEngineCore {
   protected scheduleNextBeat() {
     const msPerBeat = 60_000 / this.tempo;
     this.lastDelay = this.handlers.getLastDelay() - this.lastRender;
-    this.nextBeatTimeout = this.handlers.setTimeout(() => {
+    this.nextBeatTimeout = this.handlers.scheduleBeat(() => {
       this.processCurrentBeat();
     }, msPerBeat - this.lastDelay);
   }
