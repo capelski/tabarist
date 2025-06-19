@@ -1,8 +1,7 @@
 import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 import { BeatEngine } from '../classes';
-import { BarGroup, getYoutubeCode, TabDetails, TabFooter, TabHeader } from '../components';
-import { PlayMode } from '../constants';
+import { BarGroup, getYoutubeId, TabDetails, TabFooter, TabHeader } from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
@@ -46,22 +45,12 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     }
   }, [state.tab.isStarred, state.tab.document, state.user.document]);
 
-  // When entering edit mode from play mode we need to exit the play mode
-  const beatEngine = useRef(
-    new BeatEngine({ playMode: PlayMode.metronome, tempo: state.tab.document?.tempo ?? 100 }),
-  );
+  // The beat engine must be available to both tab header and tab footer
+  const beatEngine = useRef(new BeatEngine());
 
   const barContainers = useMemo(() => {
     if (state.tab.document?.bars) {
       const barContainers = barsToBarContainers(state.tab.document.bars, state.tab.isEditMode);
-
-      beatEngine.current.options.onBeatUpdate = () => {
-        dispatch({ type: ActionType.activeSlotUpdate, barContainers });
-      };
-      if (state.tab.document.tempo) {
-        beatEngine.current.options.tempo = state.tab.document.tempo;
-      }
-
       return barContainers;
     }
 
@@ -76,7 +65,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     dispatch({ type: ActionType.updateTab, tab: nextTab });
   };
 
-  const youtubeVideoCode = getYoutubeCode(state.tab.document.backingTrack);
+  const youtubeVideoId = getYoutubeId(state.tab.document.backingTrack);
 
   return (
     <div className="tab">
@@ -100,7 +89,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         isEditMode={state.tab.isEditMode}
         tab={state.tab.document}
         updateTab={updateTab}
-        youtubeVideoCode={youtubeVideoCode}
+        youtubeVideoId={youtubeVideoId}
       />
 
       <BarGroup
@@ -126,7 +115,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         tab={state.tab.document}
         updateTab={updateTab}
         user={state.user.document}
-        youtubeVideoCode={youtubeVideoCode}
+        youtubeVideoId={youtubeVideoId}
       />
     </div>
   );

@@ -18,36 +18,39 @@ export type TabFooterProps = {
   tab: Tab;
   updateTab: (tab: Tab) => void;
   user: User | null;
-  youtubeVideoCode: string | undefined;
+  youtubeVideoId: string | undefined;
 };
 
 export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
   const [countdownRemaining, setCountdownRemaining] = useState<number>();
   const [playPhase, setPlayPhase] = useState<PlayPhase>();
-  const [youtubePlayer, setYoutubePlayer] = useState<YT.Player>();
-  const [youtubeDelayTimeout, setYoutubeDelayTimeout] = useState<number>();
 
   const { dispatch } = useContext(StateProvider);
 
-  const trackStartSeconds = Math.floor((props.tab.trackStart ?? 0) / 1000);
-
-  const clearPlayState = () => {
-    clearTimeout(youtubeDelayTimeout);
-    props.beatEngine.stop();
-
-    youtubePlayer?.pauseVideo();
-  };
-
   useEffect(() => {
-    props.beatEngine.options.onCountdownUpdate = setCountdownRemaining;
+    props.beatEngine.tempo = props.tab.tempo ?? 100;
+
+    props.beatEngine.onBeatUpdate = () => {
+      if (playPhase !== PlayPhase.playing) {
+        setPlayPhase(PlayPhase.playing);
+      }
+      dispatch({ type: ActionType.activeSlotUpdate, barContainers: props.barContainers });
+    };
+
+    props.beatEngine.onCountdownUpdate = setCountdownRemaining;
+
+    return props.beatEngine.destroy.bind(props.beatEngine);
   }, []);
 
   useEffect(() => {
-    return () => {
-      youtubePlayer?.destroy();
-    };
-  }, [youtubePlayer]);
+    if (props.youtubeVideoId) {
+      props.beatEngine.youtubeTrack = {
+        videoId: props.youtubeVideoId,
+        start: props.tab.trackStart,
+      };
+    }
+  }, [props.youtubeVideoId]);
 
   useEffect(() => {
     if (!playPhase) {
@@ -55,93 +58,31 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     }
 
     if (playPhase === PlayPhase.initializing) {
-      if (props.beatEngine.options.playMode !== PlayMode.youtubeTrack) {
-        setPlayPhase(PlayPhase.playing);
-        return;
-      }
-
-      if (youtubePlayer) {
-        // When playing a second time, the youtube player will have already been initialized
-        setPlayPhase(PlayPhase.playing);
-        return;
-      }
-
-      // https://developers.google.com/youtube/iframe_api_reference
-      new YT.Player('youtube-player', {
-        events: {
-          onReady: (event) => {
-            const nextYoutubePlayer = event.target;
-            setYoutubePlayer(nextYoutubePlayer);
-
-            // On mobile, it takes a while for the video to start playing
-            nextYoutubePlayer.mute();
-            nextYoutubePlayer.playVideo();
-
-            setTimeout(() => {
-              nextYoutubePlayer.pauseVideo();
-              nextYoutubePlayer.unMute();
-              nextYoutubePlayer.seekTo(trackStartSeconds, true);
-
-              setTimeout(() => {
-                setPlayPhase(PlayPhase.playing);
-              }, 2000);
-            }, 2000);
-          },
-        },
-        playerVars: {
-          start: trackStartSeconds,
-        },
-        videoId: props.youtubeVideoCode,
-      });
+      props.beatEngine.start(countdown);
       return;
     }
 
     if (playPhase === PlayPhase.paused) {
-      clearPlayState();
-      return;
-    }
-
-    if (playPhase === PlayPhase.playing) {
-      props.beatEngine.options.beforeStart = () => {
-        if (!youtubePlayer) {
-          return undefined;
-        }
-
-        return new Promise<void>((resolve) => {
-          const millisecondsDelay = (props.tab.trackStart ?? 0) % 1000;
-
-          const nextYoutubeDelayTimeout = window.setTimeout(resolve, millisecondsDelay);
-
-          youtubePlayer.playVideo();
-
-          setYoutubeDelayTimeout(nextYoutubeDelayTimeout);
-        });
-      };
-      props.beatEngine.start(countdown);
+      props.beatEngine.pause();
       return;
     }
 
     if (playPhase === PlayPhase.resuming) {
-      props.beatEngine.options.beforeStart = () => {
-        youtubePlayer?.playVideo();
-      };
-      props.beatEngine.start(countdown);
+      props.beatEngine.resume(countdown);
       return;
     }
 
     if (playPhase === PlayPhase.stopping) {
-      clearPlayState();
+      props.beatEngine.stop();
       setCountdownRemaining(undefined);
       setPlayPhase(undefined);
       dispatch({ type: ActionType.activeSlotClear });
-      // Instead of stopping the video, get it ready to play again
-      youtubePlayer?.pauseVideo();
-      youtubePlayer?.seekTo(trackStartSeconds, true);
       return;
     }
   }, [playPhase]);
 
   useEffect(() => {
+    // Stop playing when reaching the end of the tab
     if (!props.activeSlot && playPhase && playPhase !== PlayPhase.stopping) {
       setPlayPhase(PlayPhase.stopping);
     }
@@ -179,7 +120,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   };
 
   const availablePlayModes = Object.values(PlayMode).filter(
-    (p) => p !== PlayMode.youtubeTrack || props.youtubeVideoCode,
+    (p) => p !== PlayMode.youtubeTrack || props.youtubeVideoId,
   );
 
   return (
@@ -217,7 +158,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
               const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
               if (validTempo !== props.tab.tempo) {
                 props.updateTab(tabOperations.updateTempo(props.tab, validTempo));
-                props.beatEngine.options.tempo = validTempo;
+                props.beatEngine.tempo = validTempo;
               }
             }
           }}
@@ -289,7 +230,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                     if (option === PlayMode.youtubeTrack && !props.subscription) {
                       dispatch({ type: ActionType.upgradeStart });
                     } else {
-                      props.beatEngine.options.playMode = option;
+                      props.beatEngine.playMode = option;
                       startPlayMode();
                     }
                   }}

@@ -1,7 +1,7 @@
-import { Before, Given, Then, When } from '@cucumber/cucumber';
+import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { PlayMode } from '../constants';
-import { BeatEngineCore, BeatEngineOptions } from './beat-engine-core';
+import { BeatEngineCore } from './beat-engine-core';
 
 export type TimeoutElement = {
   id: number;
@@ -10,41 +10,55 @@ export type TimeoutElement = {
 };
 
 let beatEngine: BeatEngineTest;
-let beforeStartCount: number;
-let mockedDelay = 0;
-let onBeatUpdateCount: number;
-let onCountdownUpdateCount: number;
 
 export class BeatEngineTest extends BeatEngineCore {
   timeoutElements: TimeoutElement[] = [];
 
-  static currentLastRendered = 0;
-  static nextTimeoutId = 1;
+  currentLastRendered = 0;
+  initializeYoutubePlayerCount = 0;
+  mockedDelay = 0;
+  nextTimeoutId = 1;
+  onBeatUpdateCount = 0;
+  onCountdownUpdateCount = 0;
+  startPromise: undefined | Promise<void>;
+  startYoutubeTrackCount = 0;
 
-  constructor(public options: BeatEngineOptions) {
-    super(
-      {
-        clearTimeout: (_id?: number) => {},
-        getLastDelay: () => {
-          return BeatEngineTest.currentLastRendered + mockedDelay;
-        },
-        getLastRendered: () => {
-          BeatEngineTest.currentLastRendered += 100;
-          return BeatEngineTest.currentLastRendered;
-        },
-        setTimeout: (handler: Function, delay?: number) => {
-          const id = BeatEngineTest.nextTimeoutId++;
-          this.timeoutElements.push({
-            delay,
-            handler,
-            id,
-          });
-          return id;
-        },
-        triggerSound: () => {},
+  constructor() {
+    super({
+      clearTimeout: (_id?: number) => {},
+      getLastDelay: () => {
+        return this.currentLastRendered + this.mockedDelay;
       },
-      options,
-    );
+      getLastRendered: () => {
+        this.currentLastRendered += 100;
+        return this.currentLastRendered;
+      },
+      initializeYoutubePlayer: () => {
+        ++this.initializeYoutubePlayerCount;
+        return Promise.resolve({
+          playVideo: () => {},
+          pauseVideo: () => {},
+          seekTo: () => {},
+          destroy: () => {},
+          mute: () => {},
+          unMute: () => {},
+        } as unknown as YT.Player);
+      },
+      setTimeout: (handler: () => void, delay?: number) => {
+        const id = this.nextTimeoutId++;
+        this.timeoutElements.push({
+          delay,
+          handler,
+          id,
+        });
+        return id;
+      },
+      startYoutubeTrack: () => {
+        ++this.startYoutubeTrackCount;
+        return Promise.resolve();
+      },
+      triggerSound: () => {},
+    });
   }
 
   getLastRender() {
@@ -52,41 +66,41 @@ export class BeatEngineTest extends BeatEngineCore {
   }
 }
 
-Before(() => {
-  BeatEngineTest.currentLastRendered = 0;
-  BeatEngineTest.nextTimeoutId = 1;
-  beforeStartCount = 0;
-  mockedDelay = 0;
-  onBeatUpdateCount = 0;
-  onCountdownUpdateCount = 0;
-});
-
 Given(/a beat engine with tempo (\d+)/, function (tempo: number) {
-  beatEngine = new BeatEngineTest({
-    beforeStart: () => {
-      ++beforeStartCount;
-    },
-    onBeatUpdate: () => {
-      ++onBeatUpdateCount;
-    },
-    onCountdownUpdate: () => {
-      ++onCountdownUpdateCount;
-    },
-    playMode: PlayMode.silent,
-    tempo,
-  });
+  beatEngine = new BeatEngineTest();
+
+  beatEngine.onBeatUpdate = () => {
+    ++beatEngine.onBeatUpdateCount;
+  };
+  beatEngine.onCountdownUpdate = () => {
+    ++beatEngine.onCountdownUpdateCount;
+  };
+  beatEngine.playMode = PlayMode.silent;
+  beatEngine.tempo = tempo;
 });
 
 Given(/a render delay of (\d+)ms/, function (delay: number) {
-  mockedDelay = delay;
+  beatEngine.mockedDelay = delay;
 });
 
-When('starting to play', async function () {
-  await beatEngine.start();
+When('a youtube track with id {string} at start {int}', function (videoId: string, start: number) {
+  beatEngine.playMode = PlayMode.youtubeTrack;
+  beatEngine.youtubeTrack = {
+    videoId,
+    start,
+  };
 });
 
-When('starting to play with countdown {int}', async function (countdown: number) {
-  await beatEngine.start(countdown);
+When('starting to play', function () {
+  beatEngine.startPromise = beatEngine.start();
+});
+
+When('starting to play with countdown {int}', function (countdown: number) {
+  beatEngine.startPromise = beatEngine.start(countdown);
+});
+
+When('the beat engine is ready', async function () {
+  await beatEngine.startPromise;
 });
 
 When('the schedule element {int} kicks in', function (beatNumber: number) {
@@ -94,18 +108,28 @@ When('the schedule element {int} kicks in', function (beatNumber: number) {
   timeoutElement.handler();
 });
 
-Then('the beforeStart handler has been called called {int} time\\(s)', function (count: number) {
-  expect(count).to.equal(beforeStartCount);
-});
-
 Then('the onBeatUpdate handler has been called called {int} time\\(s)', function (count: number) {
-  expect(count).to.equal(onBeatUpdateCount);
+  expect(count).to.equal(beatEngine.onBeatUpdateCount);
 });
 
 Then(
   'the onCountdownUpdate handler has been called called {int} time\\(s)',
   function (count: number) {
-    expect(count).to.equal(onCountdownUpdateCount);
+    expect(count).to.equal(beatEngine.onCountdownUpdateCount);
+  },
+);
+
+Then(
+  'the initializeYoutubePlayer handler has been called called {int} time\\(s)',
+  function (count: number) {
+    expect(count).to.equal(beatEngine.initializeYoutubePlayerCount);
+  },
+);
+
+Then(
+  'the startYoutubeTrack handler has been called called {int} time\\(s)',
+  function (count: number) {
+    expect(count).to.equal(beatEngine.startYoutubeTrackCount);
   },
 );
 

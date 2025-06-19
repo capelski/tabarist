@@ -7,7 +7,7 @@ export type TabDetailsProps = {
   isEditMode: boolean | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
-  youtubeVideoCode: string | undefined;
+  youtubeVideoId: string | undefined;
 };
 
 export const TabDetails: React.FC<TabDetailsProps> = (props) => {
@@ -50,7 +50,7 @@ export const TabDetails: React.FC<TabDetailsProps> = (props) => {
           />
           {props.isEditMode ? (
             <button
-              className={`btn${props.youtubeVideoCode ? ' btn-success' : ' btn-outline-secondary'}`}
+              className={`btn${props.youtubeVideoId ? ' btn-success' : ' btn-outline-secondary'}`}
               type="button"
               onClick={() => {
                 setBackingTrackModal(true);
@@ -72,7 +72,7 @@ export const TabDetails: React.FC<TabDetailsProps> = (props) => {
         </div>
       )}
 
-      {props.isEditMode && props.youtubeVideoCode && (
+      {props.isEditMode && props.youtubeVideoId && (
         <div className="input-group mb-2" style={{ maxWidth: 300 }}>
           <span className="input-group-text">Track start (ms)</span>
           <input

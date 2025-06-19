@@ -4,76 +4,130 @@ export type BeatEngineHandlers = {
   clearTimeout: (id?: number) => void;
   getLastDelay: () => number;
   getLastRendered: () => number;
-  setTimeout: (handler: Function, delay?: number) => number;
+  initializeYoutubePlayer: (videoId: string, start?: number) => Promise<YT.Player>;
+  setTimeout: (handler: () => void, delay?: number) => number;
+  startYoutubeTrack: (start?: number) => void;
   triggerSound: () => void | Promise<void>;
 };
 
-export type BeatEngineOptions = {
-  beforeStart?: () => void | Promise<void>;
-  onBeatUpdate?: () => void;
-  onCountdownUpdate?: (remainingCount: number) => void;
-  playMode: PlayMode;
-  tempo: number;
-};
-
 export class BeatEngineCore {
-  protected countdownRemaining: number = 0;
   protected countdownTimeout: number | undefined;
   protected lastDelay = 0;
   protected lastRender = 0;
   protected nextBeatTimeout: number | undefined;
+  protected youtubePlayer: YT.Player | undefined;
+  protected youtubeDelayTimeout: number | undefined;
 
-  constructor(protected handlers: BeatEngineHandlers, public options: BeatEngineOptions) {}
+  public onBeatUpdate?: () => void;
+  public onCountdownUpdate?: (remainingCount: number) => void;
+  /** Defaults to PlayMode.metronome */
+  public playMode: PlayMode = PlayMode.metronome;
+  /** Defaults to 100 */
+  public tempo = 100;
+  public youtubeTrack?: {
+    videoId: string;
+    start?: number;
+  };
 
-  protected decreaseCountdown() {
+  constructor(protected handlers: BeatEngineHandlers) {}
+
+  protected decreaseCountdownInternal(resolve: () => void, countdownRemaining: number) {
+    this.onCountdownUpdate?.(countdownRemaining);
     this.countdownTimeout = this.handlers.setTimeout(async () => {
-      this.countdownRemaining = this.countdownRemaining - 1;
-      this.options.onCountdownUpdate?.(this.countdownRemaining);
-      if (this.countdownRemaining > 0) {
-        this.decreaseCountdown();
+      const nextCountdownRemaining = countdownRemaining - 1;
+      if (nextCountdownRemaining > 0) {
+        this.decreaseCountdownInternal(resolve, nextCountdownRemaining);
       } else {
-        await this.options.beforeStart?.();
-        this.processCurrentBeat();
+        this.onCountdownUpdate?.(nextCountdownRemaining);
+        resolve();
       }
     }, 1000);
   }
 
+  protected decreaseCountdown(countdownRemaining: number) {
+    return new Promise<void>((resolve) => {
+      this.decreaseCountdownInternal(resolve, countdownRemaining);
+    });
+  }
+
+  protected getTrackStartMilliseconds = () => {
+    return (this.youtubeTrack?.start ?? 0) % 1000;
+  };
+
+  protected getTrackStartSeconds = () => {
+    return Math.floor((this.youtubeTrack?.start ?? 0) / 1000);
+  };
+
   protected processCurrentBeat() {
-    if (this.options.playMode === PlayMode.metronome) {
+    if (this.playMode === PlayMode.metronome) {
       this.handlers.triggerSound();
     }
-    this.options.onBeatUpdate?.();
+    this.onBeatUpdate?.();
     this.lastRender = this.handlers.getLastRendered();
     this.scheduleNextBeat();
   }
 
   protected scheduleNextBeat() {
-    const msPerBeat = 60_000 / this.options.tempo;
+    const msPerBeat = 60_000 / this.tempo;
     this.lastDelay = this.handlers.getLastDelay() - this.lastRender;
     this.nextBeatTimeout = this.handlers.setTimeout(() => {
       this.processCurrentBeat();
     }, msPerBeat - this.lastDelay);
   }
 
-  async start(countdown?: number) {
+  protected stopCore() {
+    this.handlers.clearTimeout(this.countdownTimeout);
+    this.handlers.clearTimeout(this.nextBeatTimeout);
+    this.handlers.clearTimeout(this.youtubeDelayTimeout);
+
+    this.countdownTimeout = undefined;
+    this.lastDelay = 0;
+    this.lastRender = 0;
+    this.nextBeatTimeout = undefined;
+    this.youtubeDelayTimeout = undefined;
+  }
+
+  destroy() {
+    this.youtubePlayer?.destroy();
+  }
+
+  pause() {
+    this.stopCore();
+    this.youtubePlayer?.pauseVideo();
+  }
+
+  async resume(countdown?: number) {
     if (countdown) {
-      this.countdownRemaining = countdown;
-      this.options.onCountdownUpdate?.(this.countdownRemaining);
-      this.decreaseCountdown();
-    } else {
-      await this.options.beforeStart?.();
-      this.processCurrentBeat();
+      await this.decreaseCountdown(countdown);
     }
+
+    this.youtubePlayer?.playVideo();
+    this.processCurrentBeat();
+  }
+
+  async start(countdown?: number) {
+    if (this.playMode === PlayMode.youtubeTrack && this.youtubeTrack && !this.youtubePlayer) {
+      this.youtubePlayer = await this.handlers.initializeYoutubePlayer(
+        this.youtubeTrack.videoId,
+        this.getTrackStartSeconds(),
+      );
+    }
+
+    if (countdown) {
+      await this.decreaseCountdown(countdown);
+    }
+
+    if (this.playMode === PlayMode.youtubeTrack) {
+      await this.handlers.startYoutubeTrack(this.getTrackStartMilliseconds());
+    }
+
+    this.processCurrentBeat();
   }
 
   stop() {
-    this.handlers.clearTimeout(this.countdownTimeout);
-    this.handlers.clearTimeout(this.nextBeatTimeout);
-    this.countdownTimeout = undefined;
-    this.nextBeatTimeout = undefined;
-
-    this.countdownRemaining = 0;
-    this.lastDelay = 0;
-    this.lastRender = 0;
+    this.stopCore();
+    // Instead of stopping the video, get it ready to play again
+    this.youtubePlayer?.pauseVideo();
+    this.youtubePlayer?.seekTo(this.getTrackStartSeconds(), true);
   }
 }
