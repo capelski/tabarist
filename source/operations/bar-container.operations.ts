@@ -78,6 +78,7 @@ const processParentBar = (
       backgroundColor,
       barIndex,
       canUpdate: !isReference,
+      displayAddButton: !isReference,
       displayControls: true,
       displayIndex: getDisplayIndex(barIndex, {
         referencedIndex: isReference ? sectionBar.index : undefined,
@@ -116,6 +117,7 @@ const processParentBar = (
       backgroundColor,
       barIndex,
       canUpdate: false,
+      displayAddButton: false,
       displayControls: false,
       displayIndex: getDisplayIndex(barIndex) + 'tail',
       isParent: true,
@@ -172,6 +174,7 @@ const processChildBar = (
   barContainers.push({
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
+    displayAddButton: !options.parentSection || !options.parentIsReference,
     displayControls: !options.parentSection || !options.parentIsReference,
     displayIndex: getDisplayIndex(barIndex, {
       parentIndex: options.parentIndex,
