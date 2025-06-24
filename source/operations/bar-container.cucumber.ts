@@ -1,6 +1,6 @@
 import { Before, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BarType } from '../constants';
+import { BarType, referenceColor, sectionColor } from '../constants';
 import {
   Bar,
   BarContainer,
@@ -111,10 +111,20 @@ When('transforming the bar with index {int}', (index: number) => {
 });
 
 Then(
-  /the resulting bar container with displayIndex (.+) has displayAddButton set to (true|false)/,
-  (displayIndex: string, result: string) => {
+  /the resulting bar container with displayIndex (.+) has backgroundColor set to (default|reference|section)/,
+  (displayIndex: string, expected: 'default' | 'reference' | 'section') => {
     const barContainer = barContainers.find((b) => b.displayIndex === displayIndex);
-    const parsedResult = result === 'true';
-    expect(barContainer?.displayAddButton).to.equal(parsedResult);
+    const parsedExpected =
+      expected === 'default' ? 'white' : expected === 'reference' ? referenceColor : sectionColor;
+    expect(barContainer?.backgroundColor).to.equal(parsedExpected);
+  },
+);
+
+Then(
+  /the resulting bar container with displayIndex (.+) has displayAddButton set to (true|false)/,
+  (displayIndex: string, expected: string) => {
+    const barContainer = barContainers.find((b) => b.displayIndex === displayIndex);
+    const parsedExpected = expected === 'true';
+    expect(barContainer?.displayAddButton).to.equal(parsedExpected);
   },
 );

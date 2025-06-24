@@ -47,5 +47,3 @@ Feature: Display add button
         And a reference bar with index 1 for bar with index 0 in section bar with index 0
         When transforming the bar with index 0
         Then the resulting bar container with displayIndex 1.2=1.1 has displayAddButton set to true
-
-        
