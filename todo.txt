@@ -1,13 +1,17 @@
-- Universal rhythms
 - Only push a section head if the section has no bars. Display section name in first bar...
+    - Consider section name length in bar container operations, getBarWidth
+    
+- Cron job to build a dynamic sitemap
+- Universal rhythms
 - Allow clicking on a slot to start playing from there
 - List of chords + chord display. Ability to define custom chords
+    - Allow display chords in Spanish format
 - Check whether Stripe subscription is active
 - <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user
 - Support lyrics underneath the bars
 - Add capacitor and build APP bundle. Integrate AdMob
-- Consider section name length in bar container operations, getBarWidth
+- When changing speed on YouTube, adjust play speed?
 
 - If search params change, clear them everywhere where they are stored
     E.g. navigating from my-tabs?params to home, and then clicking on my-tabs,
