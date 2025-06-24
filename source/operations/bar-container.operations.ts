@@ -13,6 +13,31 @@ import { Bar, BarContainer, ChordBar, PickingBar, SectionBar } from '../types';
 import { getIndexDisplayValue } from './indexed-value.operations';
 import { slotOperations } from './slot.operations';
 
+export type ReducedBarContainers = {
+  barContainers: BarContainer[];
+  previousChordBar: ChordBar | undefined;
+};
+
+type ChildBarOptions = {
+  firstSectionBarPosition: number;
+  positionReference: { value: number };
+  parentIndex: number;
+  parentIsReference: boolean;
+  parentRepeats?: number;
+  parentSection: SectionBar;
+};
+
+type ContainerBarOptions =
+  | {
+      firstSectionBarPosition?: undefined;
+      positionReference?: undefined;
+      parentIndex?: undefined;
+      parentIsReference?: undefined;
+      parentRepeats?: number;
+      parentSection?: undefined;
+    }
+  | ChildBarOptions;
+
 const getBarWidth = (bar: ChordBar | PickingBar) => {
   const width =
     bar.type === BarType.chord
@@ -60,14 +85,14 @@ const getDisplayIndex = (
 };
 
 const processParentBar = (
-  barContainers: BarContainer[],
   isEditMode: boolean | undefined,
   barIndex: number,
   sectionBar: SectionBar,
   positionReference: { value: number },
   type: ContainerType.section | ContainerType.sectionReference,
   repeats?: number,
-) => {
+): BarContainer[] => {
+  const barContainers: BarContainer[] = [];
   const isReference = type === ContainerType.sectionReference;
   const addToParent = isReference ? undefined : sectionBar;
   const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
@@ -99,7 +124,7 @@ const processParentBar = (
 
   if (sectionBar.bars.length > 0) {
     barContainers.push(
-      ...barsToBarContainers(sectionBar.bars, isEditMode, {
+      ...childBarsToBarContainers(sectionBar.bars, isEditMode, {
         firstSectionBarPosition: positionReference.value,
         positionReference,
         parentIndex: barIndex,
@@ -127,6 +152,8 @@ const processParentBar = (
       width: 0,
     });
   }
+
+  return barContainers;
 };
 
 const processChildBar = (
@@ -135,28 +162,11 @@ const processChildBar = (
   isEditMode: boolean | undefined,
   type: ContainerType.chord | ContainerType.picking | ContainerType.reference,
   bars: Bar[],
-  barContainers: BarContainer[],
   positionReference: { value: number },
   previousChordBar: ChordBar | undefined,
   repeats?: number,
-  options:
-    | {
-        firstSectionBarPosition?: undefined;
-        positionReference?: undefined;
-        parentIndex?: undefined;
-        parentIsReference?: undefined;
-        parentRepeats?: number;
-        parentSection?: undefined;
-      }
-    | {
-        firstSectionBarPosition: number;
-        positionReference: { value: number };
-        parentIndex: number;
-        parentIsReference: boolean;
-        parentRepeats?: number;
-        parentSection: SectionBar;
-      } = {},
-) => {
+  options: ContainerBarOptions = {},
+): BarContainer => {
   const isReference = type === ContainerType.reference;
   const isFirstInSectionBar = !!options.parentSection && barIndex === 0;
   const isLastInSectionBar = !!options.parentSection && barIndex === bars.length - 1;
@@ -171,7 +181,7 @@ const processChildBar = (
     backgroundColor = sectionColor;
   }
 
-  barContainers.push({
+  return {
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
     displayAddButton: !options.parentSection || !options.parentIsReference,
@@ -202,105 +212,113 @@ const processChildBar = (
       : {
           firstSectionBarPosition: undefined,
         }),
-  });
+  };
 };
 
-export const barsToBarContainers = (
+export const barToBarContainers = (
   bars: Bar[],
+  bar: Bar,
   isEditMode: boolean | undefined,
-  options:
-    | {
-        firstSectionBarPosition?: undefined;
-        positionReference?: undefined;
-        parentIndex?: undefined;
-        parentIsReference?: undefined;
-        parentRepeats?: number;
-        parentSection?: undefined;
-      }
-    | {
-        firstSectionBarPosition: number;
-        positionReference: { value: number };
-        parentIndex: number;
-        parentIsReference: boolean;
-        parentRepeats?: number;
-        parentSection: SectionBar;
-      } = {},
-): BarContainer[] => {
-  const positionReference = options.positionReference || { value: 0 };
-  const { barContainers } = bars.reduce<{
-    barContainers: BarContainer[];
-    previousChordBar: ChordBar | undefined;
-  }>(
-    (reduced, bar) => {
-      const nextBarContainers = [...reduced.barContainers];
-      let nextChordBar = reduced.previousChordBar;
+  positionReference: { value: number },
+  previousChordBar: ChordBar | undefined,
+  options: ContainerBarOptions = {},
+): ReducedBarContainers => {
+  let nextChordBar = previousChordBar;
+  const barContainers: BarContainer[] = [];
 
-      if (bar.type === BarType.chord || bar.type === BarType.picking) {
+  if (bar.type === BarType.chord || bar.type === BarType.picking) {
+    barContainers.push(
+      processChildBar(
+        bar,
+        bar.index,
+        isEditMode,
+        bar.type === BarType.chord ? ContainerType.chord : ContainerType.picking,
+        bars,
+        positionReference,
+        previousChordBar,
+        bar.repeats,
+        options,
+      ),
+    );
+
+    if (bar.type === BarType.chord) {
+      nextChordBar = bar;
+    }
+  } else if (bar.type === BarType.reference) {
+    const referencedBar = bars.find((b) => b.index === bar.barIndex) as
+      | ChordBar
+      | PickingBar
+      | SectionBar;
+
+    if (referencedBar.type === BarType.chord || referencedBar.type === BarType.picking) {
+      barContainers.push(
         processChildBar(
-          bar,
+          referencedBar,
           bar.index,
           isEditMode,
-          bar.type === BarType.chord ? ContainerType.chord : ContainerType.picking,
+          ContainerType.reference,
           bars,
-          nextBarContainers,
           positionReference,
-          reduced.previousChordBar,
+          previousChordBar,
           bar.repeats,
           options,
-        );
-
-        if (bar.type === BarType.chord) {
-          nextChordBar = bar;
-        }
-      } else if (bar.type === BarType.reference) {
-        const referencedBar = bars.find((b) => b.index === bar.barIndex) as
-          | ChordBar
-          | PickingBar
-          | SectionBar;
-
-        if (referencedBar.type === BarType.chord || referencedBar.type === BarType.picking) {
-          processChildBar(
-            referencedBar,
-            bar.index,
-            isEditMode,
-            ContainerType.reference,
-            bars,
-            nextBarContainers,
-            positionReference,
-            reduced.previousChordBar,
-            bar.repeats,
-            options,
-          );
-        } else {
-          processParentBar(
-            nextBarContainers,
-            isEditMode,
-            bar.index,
-            referencedBar,
-            positionReference,
-            ContainerType.sectionReference,
-            bar.repeats,
-          );
-        }
-
-        if (referencedBar.type === BarType.chord) {
-          nextChordBar = referencedBar;
-        }
-      } else {
-        processParentBar(
-          nextBarContainers,
+        ),
+      );
+    } else {
+      barContainers.push(
+        ...processParentBar(
           isEditMode,
           bar.index,
-          bar,
+          referencedBar,
           positionReference,
-          ContainerType.section,
+          ContainerType.sectionReference,
           bar.repeats,
-        );
-      }
+        ),
+      );
+    }
+
+    if (referencedBar.type === BarType.chord) {
+      nextChordBar = referencedBar;
+    }
+  } else {
+    barContainers.push(
+      ...processParentBar(
+        isEditMode,
+        bar.index,
+        bar,
+        positionReference,
+        ContainerType.section,
+        bar.repeats,
+      ),
+    );
+  }
+
+  return {
+    barContainers,
+    previousChordBar: nextChordBar,
+  };
+};
+
+const childBarsToBarContainers = (
+  bars: Bar[],
+  isEditMode: boolean | undefined,
+  options: ContainerBarOptions = {},
+): BarContainer[] => {
+  const positionReference = options.positionReference || { value: 0 };
+  const { barContainers } = bars.reduce<ReducedBarContainers>(
+    (reduced, bar) => {
+      const currentBarContainers = barToBarContainers(
+        bars,
+        bar,
+        isEditMode,
+        positionReference,
+        reduced.previousChordBar,
+        options,
+      );
 
       return {
-        barContainers: nextBarContainers,
-        previousChordBar: nextChordBar,
+        barContainers: [...reduced.barContainers, ...currentBarContainers.barContainers],
+        previousChordBar: currentBarContainers.previousChordBar,
       };
     },
     { barContainers: [], previousChordBar: undefined },
@@ -309,4 +327,11 @@ export const barsToBarContainers = (
   // console.log('barContainers', barContainers);
 
   return barContainers;
+};
+
+export const barsToBarContainers = (
+  bars: Bar[],
+  isEditMode: boolean | undefined,
+): BarContainer[] => {
+  return childBarsToBarContainers(bars, isEditMode, {});
 };
