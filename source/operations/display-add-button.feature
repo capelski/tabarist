@@ -47,3 +47,26 @@ Feature: Display add button
         And a reference bar with index 1 for bar with index 0 in section bar with index 0
         When transforming the bar with index 0
         Then the resulting bar container with displayIndex 1.2=1.1 has displayAddButton set to true
+
+    Scenario: A chord bar does NOT display the add button when inside a section reference
+        Given a section bar with index 0
+        And a chord bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0
+        When transforming the bar with index 1
+        Then the resulting bar container with displayIndex 2.1 has displayAddButton set to false
+
+    Scenario: A picking bar does NOT display the add button when inside a section reference
+        Given a section bar with index 0
+        And a picking bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0
+        When transforming the bar with index 1
+        Then the resulting bar container with displayIndex 2.1 has displayAddButton set to false
+
+    Scenario: A reference bar does NOT display the add button when inside a section reference
+        Given a section bar with index 0
+        And a chord bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0
+        When transforming the bar with index 1
+        Then the resulting bar container with displayIndex 2.2=2.1 has displayAddButton set to false
+

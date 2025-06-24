@@ -47,3 +47,25 @@ Feature: Background color
         And a reference bar with index 1 for bar with index 0 in section bar with index 0
         When transforming the bar with index 0
         Then the resulting bar container with displayIndex 1.2=1.1 has backgroundColor set to section
+
+    Scenario: A chord bar has reference background color when inside a section reference
+        Given a section bar with index 0
+        And a chord bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0
+        When transforming the bar with index 1
+        Then the resulting bar container with displayIndex 2.1 has backgroundColor set to reference
+
+    Scenario: A picking bar has reference background color when inside a section reference
+        Given a section bar with index 0
+        And a picking bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0
+        When transforming the bar with index 1
+        Then the resulting bar container with displayIndex 2.1 has backgroundColor set to reference
+
+    Scenario: A reference bar has reference background color when inside a section reference
+        Given a section bar with index 0
+        And a chord bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0 in section bar with index 0
+        And a reference bar with index 1 for bar with index 0
+        When transforming the bar with index 1
+        Then the resulting bar container with displayIndex 2.2=2.1 has backgroundColor set to reference
