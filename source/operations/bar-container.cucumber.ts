@@ -1,4 +1,4 @@
-import { Before, Given, Then, When } from '@cucumber/cucumber';
+import { Before, DataTable, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
 import { BarType, referenceColor, sectionColor } from '../constants';
 import {
@@ -10,16 +10,38 @@ import {
   ReferenceBar,
   SectionBar,
 } from '../types';
-import { barToBarContainers } from './bar-container.operations';
+import { barsToBarContainers, barToBarContainers } from './bar-container.operations';
 
 let bars: Bar[] = [];
 let barContainers: BarContainer[];
-let isEditMode: boolean;
+const isEditMode = true;
+
+enum BarTypeScenarios {
+  standaloneChordBar = 'standaloneChordBar',
+  standalonePickingBar = 'standalonePickingBar',
+  standaloneReferenceBar = 'standaloneReferenceBar',
+  standaloneReferenceBarForSection = 'standaloneReferenceBarForSection',
+  sectionBar = 'sectionBar',
+  inSectionChordBar = 'inSectionChordBar',
+  inSectionPickingBar = 'inSectionPickingBar',
+  inSectionReferenceBar = 'inSectionReferenceBar',
+  inSectionRefChordBar = 'inSectionRefChordBar',
+  inSectionRefPickingBar = 'inSectionRefPickingBar',
+  inSectionRefReferenceBar = 'inSectionRefReferenceBar',
+}
+
+let barTypeScenarios: {
+  [key in BarTypeScenarios]: {
+    bars: Bar[];
+    barContainers: BarContainer[];
+    targetBarContainer: BarContainer;
+  };
+};
 
 Before(() => {
   bars = [];
   barContainers = [];
-  isEditMode = true;
+  barTypeScenarios = undefined!;
 });
 
 const createChordBar = (index: number): ChordBar => {
@@ -51,12 +73,93 @@ const createReferenceBar = (index: number, barIndex: number): ReferenceBar => {
   };
 };
 
+const createSectionBar = (index: number, bars: NonSectionBar[] = []): SectionBar => {
+  return {
+    bars,
+    index,
+    name: 'Name',
+    repeats: undefined,
+    type: BarType.section,
+  };
+};
+
 const addBarToSection = (bar: NonSectionBar, sectionBarIndex: number) => {
   const section = bars.find((b) => b.index === sectionBarIndex);
   if (section && section.type === BarType.section) {
     section.bars.push(bar);
   }
 };
+
+const getBackgroundColor = (cucumberValue: string) => {
+  return cucumberValue === 'default'
+    ? 'white'
+    : cucumberValue === 'reference'
+    ? referenceColor
+    : sectionColor;
+};
+
+Given('every possible type of bar', () => {
+  barTypeScenarios = {
+    [BarTypeScenarios.standaloneChordBar]: {
+      bars: [createChordBar(0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.standalonePickingBar]: {
+      bars: [createPickingBar(0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.standaloneReferenceBar]: {
+      bars: [createChordBar(0), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.standaloneReferenceBarForSection]: {
+      bars: [createSectionBar(0), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.sectionBar]: {
+      bars: [createSectionBar(0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.inSectionChordBar]: {
+      bars: [createSectionBar(0, [createChordBar(0)])],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.inSectionPickingBar]: {
+      bars: [createSectionBar(0, [createPickingBar(0)])],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.inSectionReferenceBar]: {
+      bars: [createSectionBar(0, [createChordBar(0), createReferenceBar(1, 0)])],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.inSectionRefChordBar]: {
+      bars: [createSectionBar(0, [createChordBar(0)]), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.inSectionRefPickingBar]: {
+      bars: [createSectionBar(0, [createPickingBar(0)]), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+    [BarTypeScenarios.inSectionRefReferenceBar]: {
+      bars: [
+        createSectionBar(0, [createPickingBar(0), createReferenceBar(1, 0)]),
+        createReferenceBar(1, 0),
+      ],
+      barContainers: [],
+      targetBarContainer: undefined!,
+    },
+  };
+});
 
 Given('a chord bar with index {int}', (index: number) => {
   bars.push(createChordBar(index));
@@ -95,14 +198,49 @@ Given(
 );
 
 Given('a section bar with index {int}', (index: number) => {
-  const sectionBar: SectionBar = {
-    bars: [],
-    index,
-    name: 'Name',
-    repeats: undefined,
-    type: BarType.section,
-  };
-  bars.push(sectionBar);
+  bars.push(createSectionBar(index));
+});
+
+When('transforming all bars to bar containers', () => {
+  for (const key in barTypeScenarios) {
+    barTypeScenarios[key as BarTypeScenarios].barContainers = barsToBarContainers(
+      barTypeScenarios[key as BarTypeScenarios].bars,
+      isEditMode,
+    );
+  }
+
+  barTypeScenarios[BarTypeScenarios.standaloneChordBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.standaloneChordBar].barContainers[0];
+
+  barTypeScenarios[BarTypeScenarios.standalonePickingBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.standalonePickingBar].barContainers[0];
+
+  barTypeScenarios[BarTypeScenarios.standaloneReferenceBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.standaloneReferenceBar].barContainers[1];
+
+  barTypeScenarios[BarTypeScenarios.standaloneReferenceBarForSection].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.standaloneReferenceBarForSection].barContainers[2];
+
+  barTypeScenarios[BarTypeScenarios.sectionBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.sectionBar].barContainers[0];
+
+  barTypeScenarios[BarTypeScenarios.inSectionChordBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.inSectionChordBar].barContainers[1];
+
+  barTypeScenarios[BarTypeScenarios.inSectionPickingBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.inSectionPickingBar].barContainers[1];
+
+  barTypeScenarios[BarTypeScenarios.inSectionReferenceBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.inSectionReferenceBar].barContainers[2];
+
+  barTypeScenarios[BarTypeScenarios.inSectionRefChordBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.inSectionRefChordBar].barContainers[4];
+
+  barTypeScenarios[BarTypeScenarios.inSectionRefPickingBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.inSectionRefPickingBar].barContainers[4];
+
+  barTypeScenarios[BarTypeScenarios.inSectionRefReferenceBar].targetBarContainer =
+    barTypeScenarios[BarTypeScenarios.inSectionRefReferenceBar].barContainers[6];
 });
 
 When('transforming the bar with index {int}', (index: number) => {
@@ -114,8 +252,7 @@ Then(
   /the resulting bar container with displayIndex (.+) has backgroundColor set to (default|reference|section)/,
   (displayIndex: string, expected: 'default' | 'reference' | 'section') => {
     const barContainer = barContainers.find((b) => b.displayIndex === displayIndex);
-    const parsedExpected =
-      expected === 'default' ? 'white' : expected === 'reference' ? referenceColor : sectionColor;
+    const parsedExpected = getBackgroundColor(expected);
     expect(barContainer?.backgroundColor).to.equal(parsedExpected);
   },
 );
@@ -126,5 +263,28 @@ Then(
     const barContainer = barContainers.find((b) => b.displayIndex === displayIndex);
     const parsedExpected = expected === 'true';
     expect(barContainer?.displayAddButton).to.equal(parsedExpected);
+  },
+);
+
+Then('the corresponding bar containers have the following properties', (dataTable: DataTable) => {
+  const data = dataTable.raw() as [BarTypeScenarios, keyof BarContainer, string][];
+  for (const [type, property, value] of data) {
+    expect(String(barTypeScenarios[type].targetBarContainer[property])).to.equal(
+      value,
+      `"${property}" on bar type ${type} did not equal ${value}`,
+    );
+  }
+});
+
+Then(
+  'the corresponding bar containers have the following backgroundColor property',
+  (dataTable: DataTable) => {
+    const data = dataTable.raw() as [BarTypeScenarios, string][];
+    for (const [type, value] of data) {
+      expect(String(barTypeScenarios[type].targetBarContainer.backgroundColor)).to.equal(
+        getBackgroundColor(value),
+        `"backgroundColor" on bar type ${type} did not equal ${value}`,
+      );
+    }
   },
 );
