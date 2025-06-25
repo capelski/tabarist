@@ -1,7 +1,8 @@
 import React, { RefObject, useEffect, useRef } from 'react';
-import { BarType, ContainerType } from '../../constants';
+import { AddMode, BarType, ContainerType } from '../../constants';
 import { tabOperations } from '../../operations';
 import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
+import { AddBar } from './add-bar';
 import { BarComponentBaseProps } from './bar-handlers';
 import { BarHeader } from './bar-header';
 import { ChordBarComponent } from './chord-bar';
@@ -75,6 +76,7 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
               style={{
                 alignItems: 'center',
                 display: 'flex',
+                flexDirection: 'column',
                 flexGrow: 1,
                 justifyContent: 'center',
               }}
@@ -92,6 +94,18 @@ export const BarContainerComponent: React.FC<BarContainerComponentProps> = (prop
                 style={{ width: '100%' }}
                 value={props.container.sectionName}
               />
+
+              {props.container.type === ContainerType.section && (
+                <div style={{ marginBottom: 8 }}>
+                  <AddBar
+                    addMode={AddMode.single}
+                    barIndex={0}
+                    parentSection={props.container.addToParent}
+                    tab={props.tab}
+                    updateTab={props.updateTab}
+                  />
+                </div>
+              )}
             </div>
           ) : props.container.renderedBar.type === BarType.chord ? (
             <ChordBarComponent

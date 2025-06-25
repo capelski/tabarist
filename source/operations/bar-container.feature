@@ -2,6 +2,22 @@ Feature: Bar containers
 
     The properties of a bar container are set according to their type
 
+    Scenario: addMode
+        Given every possible type of bar
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | standaloneChordBar                 | addMode | dualWithSection |
+            | standalonePickingBar               | addMode | dualWithSection |
+            | standaloneReferenceBar             | addMode | dualWithSection |
+            | standaloneReferenceBarForSection   | addMode | none            |
+            | sectionBar                         | addMode | none            |
+            | inSectionChordBar                  | addMode | dual            |
+            | inSectionPickingBar                | addMode | dual            |
+            | inSectionReferenceBar              | addMode | dual            |
+            | inSectionRefChordBar               | addMode | none            |
+            | inSectionRefPickingBar             | addMode | none            |
+            | inSectionRefReferenceBar           | addMode | none            |
+
     Scenario: backgroundColor
         Given every possible type of bar
         When transforming all bars to bar containers
@@ -50,19 +66,3 @@ Feature: Bar containers
             | inSectionRefChordBar               | display | true  |
             | inSectionRefPickingBar             | display | true  |
             | inSectionRefReferenceBar           | display | true  |
-
-    Scenario: displayAddButton
-        Given every possible type of bar
-        When transforming all bars to bar containers
-        Then the corresponding bar containers have the following properties
-            | standaloneChordBar                 | displayAddButton | true  |
-            | standalonePickingBar               | displayAddButton | true  |
-            | standaloneReferenceBar             | displayAddButton | true  |
-            | standaloneReferenceBarForSection   | displayAddButton | false |
-            | sectionBar                         | displayAddButton | true  |
-            | inSectionChordBar                  | displayAddButton | true  |
-            | inSectionPickingBar                | displayAddButton | true  |
-            | inSectionReferenceBar              | displayAddButton | true  |
-            | inSectionRefChordBar               | displayAddButton | false |
-            | inSectionRefPickingBar             | displayAddButton | false |
-            | inSectionRefReferenceBar           | displayAddButton | false |

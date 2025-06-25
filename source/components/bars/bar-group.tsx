@@ -1,5 +1,5 @@
 import React, { RefObject } from 'react';
-import { ContainerType } from '../../constants';
+import { AddMode, ContainerType } from '../../constants';
 import {
   ActiveSlot,
   BarContainer,
@@ -41,6 +41,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           }}
         >
           <AddBar
+            addMode={AddMode.singleWithSection}
             barIndex={0}
             disabled={positionOperation}
             parentSection={undefined}
@@ -104,6 +105,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
                 />
               ) : (
                 <AddBar
+                  addMode={AddMode.singleWithSection}
                   barIndex={appendBarIndex + 1}
                   disabled={!!props.copying || !!props.moving}
                   parentSection={undefined}

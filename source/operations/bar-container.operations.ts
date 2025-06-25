@@ -1,5 +1,6 @@
 import {
   addBarWidth,
+  AddMode,
   barMinWidth,
   BarType,
   characterWidth,
@@ -103,7 +104,7 @@ const processParentBar = (
     barIndex,
     canUpdate: !isReference,
     display: !!isEditMode,
-    displayAddButton: !isReference,
+    addMode: AddMode.none,
     displayControls: true,
     displayIndex: getDisplayIndex(barIndex, {
       referencedIndex: isReference ? sectionBar.index : undefined,
@@ -141,7 +142,7 @@ const processParentBar = (
     barIndex,
     canUpdate: false,
     display: !!isEditMode,
-    displayAddButton: false,
+    addMode: AddMode.none,
     displayControls: false,
     displayIndex: getDisplayIndex(barIndex) + 'tail',
     isParent: true,
@@ -183,7 +184,11 @@ const processChildBar = (
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
     display: true,
-    displayAddButton: !options.parentSection || !options.parentIsReference,
+    addMode: options.parentSection
+      ? options.parentIsReference
+        ? AddMode.none
+        : AddMode.dual
+      : AddMode.dualWithSection,
     displayControls: !options.parentSection || !options.parentIsReference,
     displayIndex: getDisplayIndex(barIndex, {
       parentIndex: options.parentIndex,

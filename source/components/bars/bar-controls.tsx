@@ -164,14 +164,13 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
             </li>
           </ul>
 
-          {props.container.displayAddButton && (
-            <AddBar
-              barIndex={props.container.isParent ? 0 : props.container.barIndex + 1}
-              parentSection={props.container.addToParent}
-              tab={props.tab}
-              updateTab={props.updateTab}
-            />
-          )}
+          <AddBar
+            addMode={props.container.addMode}
+            barIndex={props.container.isParent ? 0 : props.container.barIndex + 1}
+            parentSection={props.container.addToParent}
+            tab={props.tab}
+            updateTab={props.updateTab}
+          />
         </React.Fragment>
       )}
     </div>

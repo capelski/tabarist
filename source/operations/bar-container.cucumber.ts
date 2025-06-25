@@ -262,15 +262,6 @@ Then(
   },
 );
 
-Then(
-  /the resulting bar container with displayIndex (.+) has displayAddButton set to (true|false)/,
-  (displayIndex: string, expected: string) => {
-    const barContainer = barContainers.find((b) => b.displayIndex === displayIndex);
-    const parsedExpected = expected === 'true';
-    expect(barContainer?.displayAddButton).to.equal(parsedExpected);
-  },
-);
-
 Then('the corresponding bar containers have the following properties', (dataTable: DataTable) => {
   const data = dataTable.raw() as [BarTypeScenarios, keyof BarContainer, string][];
   for (const [type, property, value] of data) {

@@ -1,12 +1,12 @@
-import { ContainerType } from '../constants';
+import { AddMode, ContainerType } from '../constants';
 import { ChordBar, PickingBar, SectionBar } from './bar.type';
 
 export type ContainerBase<TContainer extends ContainerType> = {
+  addMode: AddMode;
   backgroundColor: string;
   barIndex: number;
   canUpdate: boolean;
   display: boolean;
-  displayAddButton: boolean;
   displayControls: boolean;
   displayIndex: string;
   repeats: number | undefined;
