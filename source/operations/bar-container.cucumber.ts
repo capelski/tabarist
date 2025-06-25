@@ -14,7 +14,7 @@ import { barsToBarContainers, barToBarContainers } from './bar-container.operati
 
 let bars: Bar[] = [];
 let barContainers: BarContainer[];
-const isEditMode = true;
+let isEditMode: boolean;
 
 enum BarTypeScenarios {
   standaloneChordBar = 'standaloneChordBar',
@@ -42,6 +42,7 @@ Before(() => {
   bars = [];
   barContainers = [];
   barTypeScenarios = undefined!;
+  isEditMode = true;
 });
 
 const createChordBar = (index: number): ChordBar => {
@@ -97,6 +98,10 @@ const getBackgroundColor = (cucumberValue: string) => {
     ? referenceColor
     : sectionColor;
 };
+
+Given(/edit mode set to (true|false)/, (strValue: string) => {
+  isEditMode = strValue === 'true';
+});
 
 Given('every possible type of bar', () => {
   barTypeScenarios = {
@@ -269,9 +274,10 @@ Then(
 Then('the corresponding bar containers have the following properties', (dataTable: DataTable) => {
   const data = dataTable.raw() as [BarTypeScenarios, keyof BarContainer, string][];
   for (const [type, property, value] of data) {
-    expect(String(barTypeScenarios[type].targetBarContainer[property])).to.equal(
+    const target = barTypeScenarios[type].targetBarContainer;
+    expect(String(target[property])).to.equal(
       value,
-      `"${property}" on bar type ${type} did not equal ${value}`,
+      `"${property}" on bar type ${type} (${target.displayIndex}) did not equal ${value}`,
     );
   }
 });
@@ -281,9 +287,10 @@ Then(
   (dataTable: DataTable) => {
     const data = dataTable.raw() as [BarTypeScenarios, string][];
     for (const [type, value] of data) {
-      expect(String(barTypeScenarios[type].targetBarContainer.backgroundColor)).to.equal(
+      const target = barTypeScenarios[type].targetBarContainer;
+      expect(String(target.backgroundColor)).to.equal(
         getBackgroundColor(value),
-        `"backgroundColor" on bar type ${type} did not equal ${value}`,
+        `"backgroundColor" on bar type ${type} (${target.displayIndex}) did not equal ${value}`,
       );
     }
   },

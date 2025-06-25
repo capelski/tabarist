@@ -5,6 +5,7 @@ export type ContainerBase<TContainer extends ContainerType> = {
   backgroundColor: string;
   barIndex: number;
   canUpdate: boolean;
+  display: boolean;
   displayAddButton: boolean;
   displayControls: boolean;
   displayIndex: string;

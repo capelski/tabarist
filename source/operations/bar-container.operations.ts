@@ -97,30 +97,29 @@ const processParentBar = (
   const addToParent = isReference ? undefined : sectionBar;
   const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
 
-  if (isEditMode) {
-    barContainers.push({
-      addToParent,
-      backgroundColor,
-      barIndex,
-      canUpdate: !isReference,
-      displayAddButton: !isReference,
-      displayControls: true,
-      displayIndex: getDisplayIndex(barIndex, {
-        referencedIndex: isReference ? sectionBar.index : undefined,
-      }),
-      isParent: true,
-      repeats,
-      sectionName: sectionBar.name,
-      type,
-      width: Math.min(
-        Math.max(
-          addBarWidth + inputWidth + (sectionBar.name?.length ?? 0) * characterWidth,
-          barMinWidth,
-        ),
-        sectionNameMaxWidth,
+  barContainers.push({
+    addToParent,
+    backgroundColor,
+    barIndex,
+    canUpdate: !isReference,
+    display: !!isEditMode,
+    displayAddButton: !isReference,
+    displayControls: true,
+    displayIndex: getDisplayIndex(barIndex, {
+      referencedIndex: isReference ? sectionBar.index : undefined,
+    }),
+    isParent: true,
+    repeats,
+    sectionName: sectionBar.name,
+    type,
+    width: Math.min(
+      Math.max(
+        addBarWidth + inputWidth + (sectionBar.name?.length ?? 0) * characterWidth,
+        barMinWidth,
       ),
-    });
-  }
+      sectionNameMaxWidth,
+    ),
+  });
 
   if (sectionBar.bars.length > 0) {
     barContainers.push(
@@ -135,23 +134,22 @@ const processParentBar = (
     );
   }
 
-  if (isEditMode) {
-    barContainers.push({
-      addToParent,
-      appendBarIndex: barIndex,
-      backgroundColor,
-      barIndex,
-      canUpdate: false,
-      displayAddButton: false,
-      displayControls: false,
-      displayIndex: getDisplayIndex(barIndex) + 'tail',
-      isParent: true,
-      repeats: undefined,
-      type: ContainerType.sectionTail,
-      sectionName: '',
-      width: 0,
-    });
-  }
+  barContainers.push({
+    addToParent,
+    appendBarIndex: barIndex,
+    backgroundColor,
+    barIndex,
+    canUpdate: false,
+    display: !!isEditMode,
+    displayAddButton: false,
+    displayControls: false,
+    displayIndex: getDisplayIndex(barIndex) + 'tail',
+    isParent: true,
+    repeats: undefined,
+    type: ContainerType.sectionTail,
+    sectionName: '',
+    width: 0,
+  });
 
   return barContainers;
 };
@@ -184,6 +182,7 @@ const processChildBar = (
   return {
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
+    display: true,
     displayAddButton: !options.parentSection || !options.parentIsReference,
     displayControls: !options.parentSection || !options.parentIsReference,
     displayIndex: getDisplayIndex(barIndex, {

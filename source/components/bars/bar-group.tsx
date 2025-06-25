@@ -53,11 +53,13 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       {props.barContainers.map((barContainer) => {
         if (barContainer.type !== ContainerType.sectionTail) {
           return (
-            <BarContainerComponent
-              {...props}
-              container={barContainer}
-              key={barContainer.displayIndex}
-            />
+            barContainer.display && (
+              <BarContainerComponent
+                {...props}
+                container={barContainer}
+                key={barContainer.displayIndex}
+              />
+            )
           );
         }
 
@@ -79,36 +81,38 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
         const backgroundColor = isMovingTarget ? barContainer.backgroundColor : undefined;
 
         return (
-          <div
-            key={barContainer.displayIndex}
-            style={{
-              alignItems: 'center',
-              backgroundColor: backgroundColor,
-              borderLeft: '1px solid black',
-              display: 'flex',
-              justifyContent: 'center',
-              padding: '0 4px',
-            }}
-          >
-            {addToParent && isMovingTarget ? (
-              <BarDestination
-                barIndex={addToParent.bars.length}
-                copying={props.copying}
-                moving={props.moving}
-                parentSection={addToParent}
-                tab={props.tab}
-                updateTab={props.updateTab}
-              />
-            ) : (
-              <AddBar
-                barIndex={appendBarIndex + 1}
-                disabled={!!props.copying || !!props.moving}
-                parentSection={undefined}
-                tab={props.tab}
-                updateTab={props.updateTab}
-              />
-            )}
-          </div>
+          barContainer.display && (
+            <div
+              key={barContainer.displayIndex}
+              style={{
+                alignItems: 'center',
+                backgroundColor: backgroundColor,
+                borderLeft: '1px solid black',
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '0 4px',
+              }}
+            >
+              {addToParent && isMovingTarget ? (
+                <BarDestination
+                  barIndex={addToParent.bars.length}
+                  copying={props.copying}
+                  moving={props.moving}
+                  parentSection={addToParent}
+                  tab={props.tab}
+                  updateTab={props.updateTab}
+                />
+              ) : (
+                <AddBar
+                  barIndex={appendBarIndex + 1}
+                  disabled={!!props.copying || !!props.moving}
+                  parentSection={undefined}
+                  tab={props.tab}
+                  updateTab={props.updateTab}
+                />
+              )}
+            </div>
+          )
         );
       })}
 

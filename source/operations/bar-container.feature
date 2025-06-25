@@ -34,6 +34,23 @@ Feature: Bar containers
             | inSectionRefPickingBar             | canUpdate | false |
             | inSectionRefReferenceBar           | canUpdate | false |
 
+    Scenario: display
+        Given every possible type of bar
+        And edit mode set to false
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | standaloneChordBar                 | display | true  |
+            | standalonePickingBar               | display | true  |
+            | standaloneReferenceBar             | display | true  |
+            | standaloneReferenceBarForSection   | display | false |
+            | sectionBar                         | display | false |
+            | inSectionChordBar                  | display | true  |
+            | inSectionPickingBar                | display | true  |
+            | inSectionReferenceBar              | display | true  |
+            | inSectionRefChordBar               | display | true  |
+            | inSectionRefPickingBar             | display | true  |
+            | inSectionRefReferenceBar           | display | true  |
+
     Scenario: displayAddButton
         Given every possible type of bar
         When transforming all bars to bar containers
