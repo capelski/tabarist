@@ -143,8 +143,8 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
               const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
               if (validTempo !== props.tab.tempo) {
                 props.updateTab(tabOperations.updateTempo(props.tab, validTempo));
-                props.beatEngine.tempo = validTempo;
               }
+              props.beatEngine.tempo = validTempo;
             }
           }}
           onChange={(event) => {
