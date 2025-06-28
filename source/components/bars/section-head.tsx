@@ -34,7 +34,7 @@ export const SectionHead: React.FC<SectionHeadProps> = (props) => {
           }}
         >
           <input
-            disabled={props.container.type === ContainerType.sectionReference}
+            disabled={props.container.type === ContainerType.sectionReferenceHead}
             onChange={(event) => {
               const nextTab = tabOperations.renameSection(
                 props.tab,
@@ -47,7 +47,7 @@ export const SectionHead: React.FC<SectionHeadProps> = (props) => {
             value={props.container.sectionName}
           />
 
-          {props.container.type === ContainerType.section && (
+          {props.container.type === ContainerType.sectionHead && (
             <div style={{ marginBottom: 8 }}>
               <AddBar
                 addMode={AddMode.single}

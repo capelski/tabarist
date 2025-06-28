@@ -90,12 +90,12 @@ const processParentBar = (
   barIndex: number,
   sectionBar: SectionBar,
   positionReference: { value: number },
-  type: ContainerType.section | ContainerType.sectionReference,
+  type: ContainerType.sectionHead | ContainerType.sectionReferenceHead,
   repeats: number | undefined,
   previousChordBar: ChordBar | undefined,
 ): ReducedBarContainers => {
   const barContainers: BarContainer[] = [];
-  const isReference = type === ContainerType.sectionReference;
+  const isReference = type === ContainerType.sectionReferenceHead;
   const addToParent = isReference ? undefined : sectionBar;
   const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
   let nextChordBar = previousChordBar;
@@ -281,7 +281,7 @@ export const barToBarContainers = (
         bar.index,
         referencedBar,
         positionReference,
-        ContainerType.sectionReference,
+        ContainerType.sectionReferenceHead,
         bar.repeats,
         previousChordBar,
       );
@@ -298,7 +298,7 @@ export const barToBarContainers = (
       bar.index,
       bar,
       positionReference,
-      ContainerType.section,
+      ContainerType.sectionHead,
       bar.repeats,
       previousChordBar,
     );

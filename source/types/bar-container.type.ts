@@ -64,9 +64,9 @@ export type BarContainer<TContainer extends ContainerType = ContainerType> =
       ? ChildBarBase<PickingBar>
       : TContainer extends ContainerType.reference
       ? ChildBarBase<ChordBar | PickingBar>
-      : TContainer extends ContainerType.section
+      : TContainer extends ContainerType.sectionHead
       ? ParentBarBase
-      : TContainer extends ContainerType.sectionReference
+      : TContainer extends ContainerType.sectionReferenceHead
       ? ParentBarBase
       : TContainer extends ContainerType.sectionTail
       ? SectionTailContainer
