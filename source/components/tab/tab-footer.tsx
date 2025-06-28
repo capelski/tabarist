@@ -32,6 +32,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   const [countdown, setCountdown] = useState<number>();
   const [countdownRemaining, setCountdownRemaining] = useState<number>();
   const [phase, setPhase] = useState<BeatEnginePhase>(BeatEnginePhase.new);
+  const [tempo, setTempo] = useState(props.tab.tempo);
 
   const isBeatEngineActive =
     phase === BeatEnginePhase.countdown ||
@@ -54,6 +55,12 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
 
     return props.beatEngine.destroy.bind(props.beatEngine);
   }, []);
+
+  useEffect(() => {
+    if (props.isEditMode && tempo !== props.tab.tempo) {
+      setTempo(props.tab.tempo);
+    }
+  }, [props.isEditMode]);
 
   useEffect(() => {
     if (props.youtubeVideoId) {
@@ -108,6 +115,16 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     (p) => p !== BeatEngineMode.youtubeTrack || props.youtubeVideoId,
   );
 
+  const updateTempo = (nextTempo: number | undefined) => {
+    if (nextTempo !== tempo) {
+      setTempo(nextTempo);
+
+      if (props.isEditMode) {
+        props.updateTab(tabOperations.updateTempo(props.tab, nextTempo));
+      }
+    }
+  };
+
   return (
     <div
       className="tab-play"
@@ -139,20 +156,18 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
           className="form-control"
           disabled={!!props.activeSlot}
           onBlur={() => {
-            if (props.tab.tempo) {
-              const validTempo = Math.max(Math.min(props.tab.tempo, maxTempo), minTempo);
-              if (validTempo !== props.tab.tempo) {
-                props.updateTab(tabOperations.updateTempo(props.tab, validTempo));
-              }
+            if (tempo) {
+              const validTempo = Math.max(Math.min(tempo, maxTempo), minTempo);
               props.beatEngine.tempo = validTempo;
+              updateTempo(validTempo);
             }
           }}
           onChange={(event) => {
             const parsedTempo = parseInt(event.target.value);
             const nextTempo = isNaN(parsedTempo) ? undefined : parsedTempo;
-            props.updateTab(tabOperations.updateTempo(props.tab, nextTempo));
+            updateTempo(nextTempo);
           }}
-          value={props.tab.tempo ?? ''}
+          value={tempo ?? ''}
           style={{ padding: 8, textAlign: 'center' }}
           type="number"
         />
@@ -193,18 +208,13 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
           display: props.isEditMode || !isBeatEngineIdle ? 'none' : undefined,
         }}
       >
-        <button
-          className="btn btn-success"
-          disabled={!props.tab.tempo}
-          onClick={startPlayMode}
-          type="button"
-        >
+        <button className="btn btn-success" disabled={!tempo} onClick={startPlayMode} type="button">
           Play
         </button>
         <button
           className="btn btn-success dropdown-toggle dropdown-toggle-split"
           data-bs-toggle="dropdown"
-          disabled={!props.tab.tempo}
+          disabled={!tempo}
           type="button"
         />
         <ul className="dropdown-menu">
