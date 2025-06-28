@@ -1,15 +1,9 @@
 import React, { RefObject } from 'react';
-import { AddMode, ContainerType } from '../../constants';
-import {
-  ActiveSlot,
-  BarContainer,
-  PositionOperation,
-  SectionTailContainer,
-  Tab,
-} from '../../types';
+import { AddMode } from '../../constants';
+import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
 import { AddBar } from './add-bar';
-import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
+import { BarElement } from './bar-element';
 import { getPositionOperationConditions } from './bar-handlers';
 
 export type BarGroupProps = {
@@ -52,70 +46,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       )}
 
       {props.barContainers.map((barContainer) => {
-        if (barContainer.type !== ContainerType.sectionTail) {
-          return (
-            barContainer.display && (
-              <BarContainerComponent
-                {...props}
-                container={barContainer}
-                key={barContainer.displayIndex}
-              />
-            )
-          );
-        }
-
-        const { addToParent, appendBarIndex } = barContainer as SectionTailContainer;
-
-        const sectionConditions = addToParent
-          ? getPositionOperationConditions(
-              props.copying,
-              props.moving,
-              addToParent.bars.length,
-              addToParent,
-            )
-          : undefined;
-
-        const isMovingTarget =
-          sectionConditions?.positionOperationApplicable &&
-          sectionConditions?.isValidPositionTarget;
-
-        const backgroundColor = isMovingTarget ? barContainer.backgroundColor : undefined;
-
-        return (
-          barContainer.display && (
-            <div
-              key={barContainer.displayIndex}
-              style={{
-                alignItems: 'center',
-                backgroundColor: backgroundColor,
-                borderLeft: '1px solid black',
-                display: 'flex',
-                justifyContent: 'center',
-                padding: '0 4px',
-              }}
-            >
-              {addToParent && isMovingTarget ? (
-                <BarDestination
-                  barIndex={addToParent.bars.length}
-                  copying={props.copying}
-                  moving={props.moving}
-                  parentSection={addToParent}
-                  tab={props.tab}
-                  updateTab={props.updateTab}
-                />
-              ) : (
-                <AddBar
-                  addMode={AddMode.singleWithSection}
-                  barIndex={appendBarIndex + 1}
-                  disabled={!!props.copying || !!props.moving}
-                  parentSection={undefined}
-                  tab={props.tab}
-                  updateTab={props.updateTab}
-                />
-              )}
-            </div>
-          )
-        );
+        return <BarElement {...props} container={barContainer} key={barContainer.displayIndex} />;
       })}
 
       {props.isEditMode && positionOperationApplicable && isValidPositionTarget && (
