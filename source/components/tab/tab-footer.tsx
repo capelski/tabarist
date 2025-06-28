@@ -59,6 +59,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
   useEffect(() => {
     if (props.isEditMode && tempo !== props.tab.tempo) {
       setTempo(props.tab.tempo);
+      props.beatEngine.setYoutubePlaybackRate(1);
     }
   }, [props.isEditMode]);
 
@@ -121,6 +122,8 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
 
       if (props.isEditMode) {
         props.updateTab(tabOperations.updateTempo(props.tab, nextTempo));
+      } else if (nextTempo && props.tab.tempo && nextTempo !== props.tab.tempo) {
+        props.beatEngine.setYoutubePlaybackRate(nextTempo / props.tab.tempo);
       }
     }
   };

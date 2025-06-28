@@ -140,6 +140,10 @@ export class BeatEngineCore {
     this.processCurrentBeat();
   }
 
+  setYoutubePlaybackRate(playbackRate: number) {
+    this.youtubePlayer?.setPlaybackRate(playbackRate);
+  }
+
   async start(countdown?: number) {
     this.setPhase(BeatEnginePhase.initializing);
 
