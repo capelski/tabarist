@@ -91,12 +91,14 @@ const processParentBar = (
   sectionBar: SectionBar,
   positionReference: { value: number },
   type: ContainerType.section | ContainerType.sectionReference,
-  repeats?: number,
-): BarContainer[] => {
+  repeats: number | undefined,
+  previousChordBar: ChordBar | undefined,
+): ReducedBarContainers => {
   const barContainers: BarContainer[] = [];
   const isReference = type === ContainerType.sectionReference;
   const addToParent = isReference ? undefined : sectionBar;
   const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
+  let nextChordBar = previousChordBar;
 
   barContainers.push({
     addToParent,
@@ -123,16 +125,21 @@ const processParentBar = (
   });
 
   if (sectionBar.bars.length > 0) {
-    barContainers.push(
-      ...childBarsToBarContainers(sectionBar.bars, isEditMode, {
+    const childContainers = childBarsToBarContainers(
+      sectionBar.bars,
+      isEditMode,
+      previousChordBar,
+      {
         firstSectionBarPosition: positionReference.value,
         positionReference,
         parentIndex: barIndex,
         parentIsReference: isReference,
         parentSection: sectionBar,
         parentRepeats: repeats,
-      }),
+      },
     );
+    barContainers.push(...childContainers.barContainers);
+    nextChordBar = childContainers.previousChordBar;
   }
 
   barContainers.push({
@@ -152,7 +159,7 @@ const processParentBar = (
     width: 0,
   });
 
-  return barContainers;
+  return { barContainers, previousChordBar: nextChordBar };
 };
 
 const processChildBar = (
@@ -269,32 +276,34 @@ export const barToBarContainers = (
         ),
       );
     } else {
-      barContainers.push(
-        ...processParentBar(
-          isEditMode,
-          bar.index,
-          referencedBar,
-          positionReference,
-          ContainerType.sectionReference,
-          bar.repeats,
-        ),
+      const childContainers = processParentBar(
+        isEditMode,
+        bar.index,
+        referencedBar,
+        positionReference,
+        ContainerType.sectionReference,
+        bar.repeats,
+        previousChordBar,
       );
+      barContainers.push(...childContainers.barContainers);
+      nextChordBar = childContainers.previousChordBar;
     }
 
     if (referencedBar.type === BarType.chord) {
       nextChordBar = referencedBar;
     }
   } else {
-    barContainers.push(
-      ...processParentBar(
-        isEditMode,
-        bar.index,
-        bar,
-        positionReference,
-        ContainerType.section,
-        bar.repeats,
-      ),
+    const childContainers = processParentBar(
+      isEditMode,
+      bar.index,
+      bar,
+      positionReference,
+      ContainerType.section,
+      bar.repeats,
+      previousChordBar,
     );
+    barContainers.push(...childContainers.barContainers);
+    nextChordBar = childContainers.previousChordBar;
   }
 
   return {
@@ -306,10 +315,11 @@ export const barToBarContainers = (
 const childBarsToBarContainers = (
   bars: Bar[],
   isEditMode: boolean | undefined,
+  previousChordBar: ChordBar | undefined,
   options: ContainerBarOptions = {},
-): BarContainer[] => {
+): ReducedBarContainers => {
   const positionReference = options.positionReference || { value: 0 };
-  const { barContainers } = bars.reduce<ReducedBarContainers>(
+  const result = bars.reduce<ReducedBarContainers>(
     (reduced, bar) => {
       const currentBarContainers = barToBarContainers(
         bars,
@@ -325,17 +335,17 @@ const childBarsToBarContainers = (
         previousChordBar: currentBarContainers.previousChordBar,
       };
     },
-    { barContainers: [], previousChordBar: undefined },
+    { barContainers: [], previousChordBar },
   );
 
-  // console.log('barContainers', barContainers);
+  // console.log('barContainers', result.barContainers);
 
-  return barContainers;
+  return result;
 };
 
 export const barsToBarContainers = (
   bars: Bar[],
   isEditMode: boolean | undefined,
 ): BarContainer[] => {
-  return childBarsToBarContainers(bars, isEditMode, {});
+  return childBarsToBarContainers(bars, isEditMode, undefined, {}).barContainers;
 };
