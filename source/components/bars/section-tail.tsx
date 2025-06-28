@@ -8,11 +8,10 @@ import {
   Tab,
 } from '../../types';
 import { AddBar } from './add-bar';
-import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
 import { getPositionOperationConditions } from './bar-handlers';
 
-export type BarElementProps = {
+export type SectionTailProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
   copying: PositionOperation | undefined;
@@ -23,17 +22,9 @@ export type BarElementProps = {
   updateTab: (tab: Tab) => void;
 };
 
-export const BarElement: React.FC<BarElementProps> = (props) => {
+export const SectionTail: React.FC<SectionTailProps> = (props) => {
   if (props.container.type !== ContainerType.sectionTail) {
-    return (
-      props.container.display && (
-        <BarContainerComponent
-          {...props}
-          container={props.container}
-          key={props.container.displayIndex}
-        />
-      )
-    );
+    return undefined;
   }
 
   const { addToParent, appendBarIndex } = props.container as SectionTailContainer;
@@ -55,7 +46,6 @@ export const BarElement: React.FC<BarElementProps> = (props) => {
   return (
     props.container.display && (
       <div
-        key={props.container.displayIndex}
         style={{
           alignItems: 'center',
           backgroundColor: backgroundColor,

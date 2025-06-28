@@ -2,8 +2,8 @@ import React, { RefObject } from 'react';
 import { AddMode } from '../../constants';
 import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
 import { AddBar } from './add-bar';
+import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
-import { BarElement } from './bar-element';
 import { getPositionOperationConditions } from './bar-handlers';
 
 export type BarGroupProps = {
@@ -46,7 +46,13 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
       )}
 
       {props.barContainers.map((barContainer) => {
-        return <BarElement {...props} container={barContainer} key={barContainer.displayIndex} />;
+        return (
+          <BarContainerComponent
+            {...props}
+            container={barContainer}
+            key={barContainer.displayIndex}
+          />
+        );
       })}
 
       {props.isEditMode && positionOperationApplicable && isValidPositionTarget && (
