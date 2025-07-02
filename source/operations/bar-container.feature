@@ -66,3 +66,35 @@ Feature: Bar containers
             | inSectionRefChordBar               | display | true  |
             | inSectionRefPickingBar             | display | true  |
             | inSectionRefReferenceBar           | display | true  |
+
+    Scenario: displayRepeats
+        Given every possible type of bar
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | standaloneChordBar                 | displayRepeats | true  |
+            | standalonePickingBar               | displayRepeats | true  |
+            | standaloneReferenceBar             | displayRepeats | true  |
+            | standaloneReferenceBarForSection   | displayRepeats | false |
+            | sectionBar                         | displayRepeats | false |
+            | inSectionChordBar                  | displayRepeats | true  |
+            | inSectionPickingBar                | displayRepeats | true  |
+            | inSectionReferenceBar              | displayRepeats | false |
+            | inSectionRefChordBar               | displayRepeats | true  |
+            | inSectionRefPickingBar             | displayRepeats | true |
+            | inSectionRefReferenceBar           | displayRepeats | false |
+
+    Scenario: displayRepeatsInput
+        Given every possible type of bar
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | standaloneChordBar                 | displayRepeatsInput | true  |
+            | standalonePickingBar               | displayRepeatsInput | true  |
+            | standaloneReferenceBar             | displayRepeatsInput | true  |
+            | standaloneReferenceBarForSection   | displayRepeatsInput | true  |
+            | sectionBar                         | displayRepeatsInput | true  |
+            | inSectionChordBar                  | displayRepeatsInput | false |
+            | inSectionPickingBar                | displayRepeatsInput | false |
+            | inSectionReferenceBar              | displayRepeatsInput | false |
+            | inSectionRefChordBar               | displayRepeatsInput | false |
+            | inSectionRefPickingBar             | displayRepeatsInput | false |
+            | inSectionRefReferenceBar           | displayRepeatsInput | false |

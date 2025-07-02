@@ -46,7 +46,7 @@ export const BarHeader: React.FC<BarHeaderProps> = (props) => {
     >
       {props.isEditMode ? (
         <div style={{ alignItems: 'center', display: 'flex', height: repeatsMinHeight }}>
-          {!props.container.parentSection && (
+          {props.container.displayRepeatsInput && (
             <div>
               <input
                 onChange={(event) => {
@@ -68,7 +68,7 @@ export const BarHeader: React.FC<BarHeaderProps> = (props) => {
         </div>
       ) : (
         <div style={{ height: repeatsMinHeight }}>
-          {(!props.container.parentSection || props.container.isFirstInSectionBar) && (
+          {props.container.displayRepeats && (
             <span
               style={{
                 display: 'inline-block',

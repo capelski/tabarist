@@ -101,16 +101,18 @@ const processParentBar = (
   let nextChordBar = previousChordBar;
 
   barContainers.push({
+    addMode: AddMode.none,
     addToParent,
     backgroundColor,
     barIndex,
     canUpdate: !isReference,
     display: !!isEditMode,
-    addMode: AddMode.none,
     displayControls: true,
     displayIndex: getDisplayIndex(barIndex, {
       referencedIndex: isReference ? sectionBar.index : undefined,
     }),
+    displayRepeats: false,
+    displayRepeatsInput: true,
     isParent: true,
     repeats,
     sectionName: sectionBar.name,
@@ -143,15 +145,17 @@ const processParentBar = (
   }
 
   barContainers.push({
+    addMode: AddMode.none,
     addToParent,
     appendBarIndex: barIndex,
     backgroundColor,
     barIndex,
     canUpdate: false,
     display: !!isEditMode,
-    addMode: AddMode.none,
     displayControls: false,
     displayIndex: getDisplayIndex(barIndex) + 'tail',
+    displayRepeats: false,
+    displayRepeatsInput: false,
     isParent: true,
     repeats: undefined,
     type: ContainerType.sectionTail,
@@ -188,19 +192,21 @@ const processChildBar = (
   }
 
   return {
-    backgroundColor,
-    canUpdate: isReference ? false : !options.parentIsReference,
-    display: true,
     addMode: options.parentSection
       ? options.parentIsReference
         ? AddMode.none
         : AddMode.dual
       : AddMode.dualWithSection,
+    backgroundColor,
+    canUpdate: isReference ? false : !options.parentIsReference,
+    display: true,
     displayControls: !options.parentSection || !options.parentIsReference,
     displayIndex: getDisplayIndex(barIndex, {
       parentIndex: options.parentIndex,
       referencedIndex: isReference ? bar.index : undefined,
     }),
+    displayRepeats: !options.parentSection || isFirstInSectionBar,
+    displayRepeatsInput: !options.parentSection,
     omitRhythm:
       bar.type === BarType.chord &&
       previousChordBar?.rhythmIndex !== undefined &&

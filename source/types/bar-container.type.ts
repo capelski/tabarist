@@ -9,6 +9,8 @@ export type ContainerBase<TContainer extends ContainerType> = {
   display: boolean;
   displayControls: boolean;
   displayIndex: string;
+  displayRepeats: boolean;
+  displayRepeatsInput: boolean;
   repeats: number | undefined;
   type: TContainer;
   width: number;
