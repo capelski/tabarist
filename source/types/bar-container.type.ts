@@ -1,4 +1,4 @@
-import { AddMode, ContainerType } from '../constants';
+import { AddMode, ContainerDiscriminator, ContainerType } from '../constants';
 import { ChordBar, PickingBar, SectionBar } from './bar.type';
 
 export type ContainerBase<TContainer extends ContainerType> = {
@@ -6,6 +6,7 @@ export type ContainerBase<TContainer extends ContainerType> = {
   backgroundColor: string;
   barIndex: number;
   canUpdate: boolean;
+  discriminator: ContainerDiscriminator;
   display: boolean;
   displayControls: boolean;
   displayIndex: string;

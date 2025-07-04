@@ -1,6 +1,6 @@
 import { Before, DataTable, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
-import { BarType, referenceColor, sectionColor } from '../constants';
+import { BarType, ContainerDiscriminator, referenceColor, sectionColor } from '../constants';
 import {
   Bar,
   BarContainer,
@@ -16,25 +16,11 @@ let bars: Bar[] = [];
 let barContainers: BarContainer[];
 let isEditMode: boolean;
 
-enum BarTypeScenarios {
-  standaloneChordBar = 'standaloneChordBar',
-  standalonePickingBar = 'standalonePickingBar',
-  standaloneReferenceBar = 'standaloneReferenceBar',
-  standaloneReferenceBarForSection = 'standaloneReferenceBarForSection',
-  sectionBar = 'sectionBar',
-  inSectionChordBar = 'inSectionChordBar',
-  inSectionPickingBar = 'inSectionPickingBar',
-  inSectionReferenceBar = 'inSectionReferenceBar',
-  inSectionRefChordBar = 'inSectionRefChordBar',
-  inSectionRefPickingBar = 'inSectionRefPickingBar',
-  inSectionRefReferenceBar = 'inSectionRefReferenceBar',
-}
-
 let barTypeScenarios: {
-  [key in BarTypeScenarios]: {
+  [key in ContainerDiscriminator]: {
     bars: Bar[];
     barContainers: BarContainer[];
-    targetBarContainer: BarContainer;
+    targetBarContainer: BarContainer | undefined;
   };
 };
 
@@ -105,63 +91,101 @@ Given(/edit mode set to (true|false)/, (strValue: string) => {
 
 Given('every possible type of bar', () => {
   barTypeScenarios = {
-    [BarTypeScenarios.standaloneChordBar]: {
+    // PickingBar and ChordBar scenarios
+    [ContainerDiscriminator.core_standalone]: {
       bars: [createChordBar(0)],
       barContainers: [],
-      targetBarContainer: undefined!,
+      targetBarContainer: undefined,
     },
-    [BarTypeScenarios.standalonePickingBar]: {
-      bars: [createPickingBar(0)],
+    [ContainerDiscriminator.core_section_child]: {
+      bars: [createSectionBar(0, [createPickingBar(0), createChordBar(1)])],
       barContainers: [],
-      targetBarContainer: undefined!,
+      targetBarContainer: undefined,
     },
-    [BarTypeScenarios.standaloneReferenceBar]: {
-      bars: [createChordBar(0), createReferenceBar(1, 0)],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.standaloneReferenceBarForSection]: {
-      bars: [createSectionBar(0), createReferenceBar(1, 0)],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.sectionBar]: {
-      bars: [createSectionBar(0)],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.inSectionChordBar]: {
+    [ContainerDiscriminator.core_section_child_first]: {
       bars: [createSectionBar(0, [createChordBar(0)])],
       barContainers: [],
-      targetBarContainer: undefined!,
+      targetBarContainer: undefined,
     },
-    [BarTypeScenarios.inSectionPickingBar]: {
-      bars: [createSectionBar(0, [createPickingBar(0)])],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.inSectionReferenceBar]: {
-      bars: [createSectionBar(0, [createChordBar(0), createReferenceBar(1, 0)])],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.inSectionRefChordBar]: {
-      bars: [createSectionBar(0, [createChordBar(0)]), createReferenceBar(1, 0)],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.inSectionRefPickingBar]: {
-      bars: [createSectionBar(0, [createPickingBar(0)]), createReferenceBar(1, 0)],
-      barContainers: [],
-      targetBarContainer: undefined!,
-    },
-    [BarTypeScenarios.inSectionRefReferenceBar]: {
+    [ContainerDiscriminator.core_mirror_child]: {
       bars: [
-        createSectionBar(0, [createPickingBar(0), createReferenceBar(1, 0)]),
+        createSectionBar(0, [createPickingBar(0), createChordBar(1)]),
         createReferenceBar(1, 0),
       ],
       barContainers: [],
-      targetBarContainer: undefined!,
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.core_mirror_child_first]: {
+      bars: [createSectionBar(0, [createChordBar(0)]), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+
+    // Reference scenarios
+    [ContainerDiscriminator.reference_standalone]: {
+      bars: [createChordBar(0), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.reference_section_child]: {
+      bars: [createSectionBar(0, [createChordBar(0), createReferenceBar(1, 0)])],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.reference_section_child_first]: {
+      bars: [createSectionBar(0, [createReferenceBar(0, 1), createChordBar(1)])],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.reference_mirror_child]: {
+      bars: [
+        createSectionBar(0, [createChordBar(0), createReferenceBar(1, 0)]),
+        createReferenceBar(1, 0),
+      ],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.reference_mirror_child_first]: {
+      bars: [
+        createSectionBar(0, [createReferenceBar(0, 1), createChordBar(1)]),
+        createReferenceBar(1, 0),
+      ],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+
+    // Section scenarios
+    [ContainerDiscriminator.section_head]: {
+      bars: [createSectionBar(0, [createChordBar(1)])],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.section_head_empty]: {
+      bars: [createSectionBar(0, [])],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.section_tail]: {
+      bars: [createSectionBar(0, [])],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+
+    // Section reference (mirror) scenarios
+    [ContainerDiscriminator.mirror_head]: {
+      bars: [createSectionBar(0, [createChordBar(1)]), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.mirror_head_empty]: {
+      bars: [createSectionBar(0, []), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined,
+    },
+    [ContainerDiscriminator.mirror_tail]: {
+      bars: [createSectionBar(0, []), createReferenceBar(1, 0)],
+      barContainers: [],
+      targetBarContainer: undefined,
     },
   };
 });
@@ -208,44 +232,15 @@ Given('a section bar with index {int}', (index: number) => {
 
 When('transforming all bars to bar containers', () => {
   for (const key in barTypeScenarios) {
-    barTypeScenarios[key as BarTypeScenarios].barContainers = barsToBarContainers(
-      barTypeScenarios[key as BarTypeScenarios].bars,
+    barTypeScenarios[key as ContainerDiscriminator].barContainers = barsToBarContainers(
+      barTypeScenarios[key as ContainerDiscriminator].bars,
       isEditMode,
     );
+
+    barTypeScenarios[key as ContainerDiscriminator].targetBarContainer = barTypeScenarios[
+      key as ContainerDiscriminator
+    ].barContainers.find((c) => c.discriminator === key);
   }
-
-  barTypeScenarios[BarTypeScenarios.standaloneChordBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.standaloneChordBar].barContainers[0];
-
-  barTypeScenarios[BarTypeScenarios.standalonePickingBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.standalonePickingBar].barContainers[0];
-
-  barTypeScenarios[BarTypeScenarios.standaloneReferenceBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.standaloneReferenceBar].barContainers[1];
-
-  barTypeScenarios[BarTypeScenarios.standaloneReferenceBarForSection].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.standaloneReferenceBarForSection].barContainers[2];
-
-  barTypeScenarios[BarTypeScenarios.sectionBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.sectionBar].barContainers[0];
-
-  barTypeScenarios[BarTypeScenarios.inSectionChordBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.inSectionChordBar].barContainers[1];
-
-  barTypeScenarios[BarTypeScenarios.inSectionPickingBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.inSectionPickingBar].barContainers[1];
-
-  barTypeScenarios[BarTypeScenarios.inSectionReferenceBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.inSectionReferenceBar].barContainers[2];
-
-  barTypeScenarios[BarTypeScenarios.inSectionRefChordBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.inSectionRefChordBar].barContainers[4];
-
-  barTypeScenarios[BarTypeScenarios.inSectionRefPickingBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.inSectionRefPickingBar].barContainers[4];
-
-  barTypeScenarios[BarTypeScenarios.inSectionRefReferenceBar].targetBarContainer =
-    barTypeScenarios[BarTypeScenarios.inSectionRefReferenceBar].barContainers[6];
 });
 
 When('transforming the bar with index {int}', (index: number) => {
@@ -263,12 +258,12 @@ Then(
 );
 
 Then('the corresponding bar containers have the following properties', (dataTable: DataTable) => {
-  const data = dataTable.raw() as [BarTypeScenarios, keyof BarContainer, string][];
+  const data = dataTable.raw() as [ContainerDiscriminator, keyof BarContainer, string][];
   for (const [type, property, value] of data) {
     const target = barTypeScenarios[type].targetBarContainer;
-    expect(String(target[property])).to.equal(
+    expect(String(target?.[property])).to.equal(
       value,
-      `"${property}" on bar type ${type} (${target.displayIndex}) did not equal ${value}`,
+      `"${property}" on bar type ${type} (${target?.displayIndex}) did not equal ${value}`,
     );
   }
 });
@@ -276,12 +271,18 @@ Then('the corresponding bar containers have the following properties', (dataTabl
 Then(
   'the corresponding bar containers have the following backgroundColor property',
   (dataTable: DataTable) => {
-    const data = dataTable.raw() as [BarTypeScenarios, string][];
+    const data = dataTable.raw() as [ContainerDiscriminator, string][];
     for (const [type, value] of data) {
       const target = barTypeScenarios[type].targetBarContainer;
-      expect(String(target.backgroundColor)).to.equal(
-        getBackgroundColor(value),
-        `"backgroundColor" on bar type ${type} (${target.displayIndex}) did not equal ${value}`,
+      const symbolicTarget =
+        target?.backgroundColor === sectionColor
+          ? 'section'
+          : target?.backgroundColor === referenceColor
+          ? 'reference'
+          : 'default';
+      expect(symbolicTarget).to.equal(
+        value,
+        `"backgroundColor" on bar type ${type} (${target?.displayIndex}) did not equal ${value}`,
       );
     }
   },

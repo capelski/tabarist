@@ -4,6 +4,7 @@ import {
   barMinWidth,
   BarType,
   characterWidth,
+  ContainerDiscriminator,
   ContainerType,
   inputWidth,
   referenceColor,
@@ -95,9 +96,10 @@ const processParentBar = (
   previousChordBar: ChordBar | undefined,
 ): ReducedBarContainers => {
   const barContainers: BarContainer[] = [];
+  const isEmpty = sectionBar.bars.length === 0;
   const isReference = type === ContainerType.sectionReferenceHead;
   const addToParent = isReference ? undefined : sectionBar;
-  const backgroundColor = isReference ? (isEditMode ? referenceColor : 'white') : sectionColor;
+  const backgroundColor = isEditMode ? (isReference ? referenceColor : sectionColor) : 'white';
   let nextChordBar = previousChordBar;
 
   barContainers.push({
@@ -105,7 +107,14 @@ const processParentBar = (
     addToParent,
     backgroundColor,
     barIndex,
-    canUpdate: !isReference,
+    canUpdate: false,
+    discriminator: isReference
+      ? isEmpty
+        ? ContainerDiscriminator.mirror_head_empty
+        : ContainerDiscriminator.mirror_head
+      : isEmpty
+      ? ContainerDiscriminator.section_head_empty
+      : ContainerDiscriminator.section_head,
     display: !!isEditMode,
     displayControls: true,
     displayIndex: getDisplayIndex(barIndex, {
@@ -126,7 +135,7 @@ const processParentBar = (
     ),
   });
 
-  if (sectionBar.bars.length > 0) {
+  if (!isEmpty) {
     const childContainers = childBarsToBarContainers(
       sectionBar.bars,
       isEditMode,
@@ -151,6 +160,9 @@ const processParentBar = (
     backgroundColor,
     barIndex,
     canUpdate: false,
+    discriminator: isReference
+      ? ContainerDiscriminator.mirror_tail
+      : ContainerDiscriminator.section_tail,
     display: !!isEditMode,
     displayControls: false,
     displayIndex: getDisplayIndex(barIndex) + 'tail',
@@ -199,6 +211,25 @@ const processChildBar = (
       : AddMode.dualWithSection,
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
+    discriminator: isReference
+      ? options.parentSection
+        ? options.parentIsReference
+          ? isFirstInSectionBar
+            ? ContainerDiscriminator.reference_mirror_child_first
+            : ContainerDiscriminator.reference_mirror_child
+          : isFirstInSectionBar
+          ? ContainerDiscriminator.reference_section_child_first
+          : ContainerDiscriminator.reference_section_child
+        : ContainerDiscriminator.reference_standalone
+      : options.parentSection
+      ? options.parentIsReference
+        ? isFirstInSectionBar
+          ? ContainerDiscriminator.core_mirror_child_first
+          : ContainerDiscriminator.core_mirror_child
+        : isFirstInSectionBar
+        ? ContainerDiscriminator.core_section_child_first
+        : ContainerDiscriminator.core_section_child
+      : ContainerDiscriminator.core_standalone,
     display: true,
     displayControls: !options.parentSection || !options.parentIsReference,
     displayIndex: getDisplayIndex(barIndex, {

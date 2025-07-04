@@ -29,6 +29,7 @@ export const pageSize = 10;
 
 export * from './add-mode';
 export * from './bar-type';
+export * from './container-discriminator';
 export * from './container-type';
 export * from './route-names';
 export * from './slot-type';
