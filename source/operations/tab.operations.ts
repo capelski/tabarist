@@ -266,17 +266,11 @@ export const tabOperations = {
     };
   },
 
-  updateRepeats: (
-    tab: Tab,
-    barIndex: number,
-    repeats: BarBase['repeats'],
-    parentSection?: SectionBar,
-  ): Tab => {
-    return applyBarsOperation(
-      tab,
-      (bars) => barOperations.updateRepeats(bars, barIndex, repeats),
-      parentSection,
-    );
+  updateRepeats: (tab: Tab, barIndex: number, repeats: BarBase['repeats']): Tab => {
+    return {
+      ...tab,
+      bars: barOperations.updateRepeats(tab.bars, barIndex, repeats),
+    };
   },
 
   updateTempo: (tab: Tab, tempo: number | undefined): Tab => {

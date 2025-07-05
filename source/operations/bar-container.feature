@@ -80,8 +80,8 @@ Feature: Bar containers
             | reference_section_child_first   | canUpdate | false |
             | reference_mirror_child          | canUpdate | false |
             | reference_mirror_child_first    | canUpdate | false |
-            | section_head                    | canUpdate | false |
-            | section_head_empty              | canUpdate | false |
+            | section_head                    | canUpdate | true  |
+            | section_head_empty              | canUpdate | true  |
             | section_tail                    | canUpdate | false |
             | mirror_head                     | canUpdate | false |
             | mirror_head_empty               | canUpdate | false |
@@ -152,24 +152,87 @@ Feature: Bar containers
             | mirror_head_empty               | displayRepeats | false |
             | mirror_tail                     | displayRepeats | false |
 
-    Scenario: displayRepeatsInput (edit mode)
+    Scenario: displayRepeats (edit mode)
         Given every possible type of bar
         When transforming all bars to bar containers
         Then the corresponding bar containers have the following properties
-            | core_standalone                 | displayRepeatsInput | true  |
-            | core_section_child              | displayRepeatsInput | false |
-            | core_section_child_first        | displayRepeatsInput | false |
-            | core_mirror_child               | displayRepeatsInput | false |
-            | core_mirror_child_first         | displayRepeatsInput | false |
-            | reference_standalone            | displayRepeatsInput | true  |
-            | reference_section_child         | displayRepeatsInput | false |
-            | reference_section_child_first   | displayRepeatsInput | false |
-            | reference_mirror_child          | displayRepeatsInput | false |
-            | reference_mirror_child_first    | displayRepeatsInput | false |
-            | section_head                    | displayRepeatsInput | true  |
-            | section_head_empty              | displayRepeatsInput | true  |
-            | section_tail                    | displayRepeatsInput | false |
-            | mirror_head                     | displayRepeatsInput | true  |
-            | mirror_head_empty               | displayRepeatsInput | true  |
-            | mirror_tail                     | displayRepeatsInput | false |
+            | core_standalone                 | displayRepeats | true  |
+            | core_section_child              | displayRepeats | false |
+            | core_section_child_first        | displayRepeats | true  |
+            | core_mirror_child               | displayRepeats | false |
+            | core_mirror_child_first         | displayRepeats | true  |
+            | reference_standalone            | displayRepeats | true  |
+            | reference_section_child         | displayRepeats | false |
+            | reference_section_child_first   | displayRepeats | true  |
+            | reference_mirror_child          | displayRepeats | false |
+            | reference_mirror_child_first    | displayRepeats | true  |
+            | section_head                    | displayRepeats | false |
+            | section_head_empty              | displayRepeats | false |
+            | section_tail                    | displayRepeats | false |
+            | mirror_head                     | displayRepeats | false |
+            | mirror_head_empty               | displayRepeats | false |
+            | mirror_tail                     | displayRepeats | false |
+
+    Scenario: repeatsBarIndex
+        Given every possible type of bar
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | core_standalone                 | repeatsBarIndex | 0         |
+            | core_section_child              | repeatsBarIndex | undefined |
+            | core_section_child_first        | repeatsBarIndex | 0         |
+            | core_mirror_child               | repeatsBarIndex | undefined |
+            | core_mirror_child_first         | repeatsBarIndex | 1         |
+            | reference_standalone            | repeatsBarIndex | 1         |
+            | reference_section_child         | repeatsBarIndex | undefined |
+            | reference_section_child_first   | repeatsBarIndex | 0         |
+            | reference_mirror_child          | repeatsBarIndex | undefined |
+            | reference_mirror_child_first    | repeatsBarIndex | 1         |
+            | section_head                    | repeatsBarIndex | undefined |
+            | section_head_empty              | repeatsBarIndex | undefined |
+            | section_tail                    | repeatsBarIndex | undefined |
+            | mirror_head                     | repeatsBarIndex | undefined |
+            | mirror_head_empty               | repeatsBarIndex | undefined |
+            | mirror_tail                     | repeatsBarIndex | undefined |
+
+    Scenario: repeatsValue
+        Given every possible type of bar
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | core_standalone                 | repeatsValue | 1         |
+            | core_section_child              | repeatsValue | undefined |
+            | core_section_child_first        | repeatsValue | 1         |
+            | core_mirror_child               | repeatsValue | undefined |
+            | core_mirror_child_first         | repeatsValue | 1         |
+            | reference_standalone            | repeatsValue | 1         |
+            | reference_section_child         | repeatsValue | undefined |
+            | reference_section_child_first   | repeatsValue | 1         |
+            | reference_mirror_child          | repeatsValue | undefined |
+            | reference_mirror_child_first    | repeatsValue | 1         |
+            | section_head                    | repeatsValue | undefined |
+            | section_head_empty              | repeatsValue | undefined |
+            | section_tail                    | repeatsValue | undefined |
+            | mirror_head                     | repeatsValue | undefined |
+            | mirror_head_empty               | repeatsValue | undefined |
+            | mirror_tail                     | repeatsValue | undefined |
+
+    Scenario: sectionName
+        Given every possible type of bar
+        When transforming all bars to bar containers
+        Then the corresponding bar containers have the following properties
+            | core_standalone                 | sectionName | undefined |
+            | core_section_child              | sectionName | undefined |
+            | core_section_child_first        | sectionName | Name      |
+            | core_mirror_child               | sectionName | undefined |
+            | core_mirror_child_first         | sectionName | Name      |
+            | reference_standalone            | sectionName | undefined |
+            | reference_section_child         | sectionName | undefined |
+            | reference_section_child_first   | sectionName | Name      |
+            | reference_mirror_child          | sectionName | undefined |
+            | reference_mirror_child_first    | sectionName | Name      |
+            | section_head                    | sectionName | Name      |
+            | section_head_empty              | sectionName | Name      |
+            | section_tail                    | sectionName | undefined |
+            | mirror_head                     | sectionName | Name      |
+            | mirror_head_empty               | sectionName | Name      |
+            | mirror_tail                     | sectionName | undefined |
 

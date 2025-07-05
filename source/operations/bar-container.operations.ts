@@ -107,7 +107,7 @@ const processParentBar = (
     addToParent,
     backgroundColor,
     barIndex,
-    canUpdate: false,
+    canUpdate: !isReference,
     discriminator: isReference
       ? isEmpty
         ? ContainerDiscriminator.mirror_head_empty
@@ -115,15 +115,15 @@ const processParentBar = (
       : isEmpty
       ? ContainerDiscriminator.section_head_empty
       : ContainerDiscriminator.section_head,
-    display: !!isEditMode,
+    display: !!isEditMode && sectionBar.bars.length === 0,
     displayControls: true,
     displayIndex: getDisplayIndex(barIndex, {
       referencedIndex: isReference ? sectionBar.index : undefined,
     }),
     displayRepeats: false,
-    displayRepeatsInput: true,
     isParent: true,
-    repeats,
+    repeatsBarIndex: undefined,
+    repeatsValue: undefined,
     sectionName: sectionBar.name,
     type,
     width: Math.min(
@@ -167,11 +167,10 @@ const processParentBar = (
     displayControls: false,
     displayIndex: getDisplayIndex(barIndex) + 'tail',
     displayRepeats: false,
-    displayRepeatsInput: false,
     isParent: true,
-    repeats: undefined,
+    repeatsBarIndex: undefined,
+    repeatsValue: undefined,
     type: ContainerType.sectionTail,
-    sectionName: '',
     width: 0,
   });
 
@@ -231,13 +230,12 @@ const processChildBar = (
         : ContainerDiscriminator.core_section_child
       : ContainerDiscriminator.core_standalone,
     display: true,
-    displayControls: !options.parentSection || !options.parentIsReference,
+    displayControls: !options.parentSection || !options.parentIsReference || isFirstInSectionBar,
     displayIndex: getDisplayIndex(barIndex, {
       parentIndex: options.parentIndex,
       referencedIndex: isReference ? bar.index : undefined,
     }),
     displayRepeats: !options.parentSection || isFirstInSectionBar,
-    displayRepeatsInput: !options.parentSection,
     omitRhythm:
       bar.type === BarType.chord &&
       previousChordBar?.rhythmIndex !== undefined &&
@@ -245,7 +243,17 @@ const processChildBar = (
     barIndex,
     position: positionReference.value++,
     renderedBar: bar,
-    repeats: isFirstInSectionBar && options.parentRepeats ? options.parentRepeats : repeats,
+    repeatsBarIndex: options.parentSection
+      ? isFirstInSectionBar
+        ? options.parentIndex
+        : undefined
+      : barIndex,
+    repeatsValue: options.parentSection
+      ? isFirstInSectionBar
+        ? options.parentRepeats
+        : undefined
+      : repeats,
+    sectionName: isFirstInSectionBar ? options.parentSection?.name : undefined,
     type,
     width: getBarWidth(bar),
     ...(options.parentSection

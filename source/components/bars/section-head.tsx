@@ -1,6 +1,5 @@
 import React, { RefObject } from 'react';
 import { AddMode, ContainerType } from '../../constants';
-import { tabOperations } from '../../operations';
 import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarCore } from './bar-core';
@@ -33,20 +32,6 @@ export const SectionHead: React.FC<SectionHeadProps> = (props) => {
             justifyContent: 'center',
           }}
         >
-          <input
-            disabled={props.container.type === ContainerType.sectionReferenceHead}
-            onChange={(event) => {
-              const nextTab = tabOperations.renameSection(
-                props.tab,
-                props.container.barIndex,
-                event.target.value,
-              );
-              props.updateTab(nextTab);
-            }}
-            style={{ width: '100%' }}
-            value={props.container.sectionName}
-          />
-
           {props.container.type === ContainerType.sectionHead && (
             <div style={{ marginBottom: 8 }}>
               <AddBar

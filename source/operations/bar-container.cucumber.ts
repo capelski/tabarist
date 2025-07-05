@@ -34,7 +34,7 @@ Before(() => {
 const createChordBar = (index: number): ChordBar => {
   return {
     index,
-    repeats: undefined,
+    repeats: 1,
     slots: [],
     type: BarType.chord,
     rhythmSlots: [],
@@ -45,7 +45,7 @@ const createPickingBar = (index: number): PickingBar => {
   return {
     chordSupport: [],
     index,
-    repeats: undefined,
+    repeats: 1,
     strings: [],
     type: BarType.picking,
   };
@@ -55,7 +55,7 @@ const createReferenceBar = (index: number, barIndex: number): ReferenceBar => {
   return {
     barIndex,
     index,
-    repeats: undefined,
+    repeats: 1,
     type: BarType.reference,
   };
 };
@@ -65,7 +65,7 @@ const createSectionBar = (index: number, bars: NonSectionBar[] = []): SectionBar
     bars,
     index,
     name: 'Name',
-    repeats: undefined,
+    repeats: 1,
     type: BarType.section,
   };
 };

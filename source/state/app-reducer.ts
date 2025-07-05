@@ -29,7 +29,7 @@ const getActiveSlot = (
       (barContainer.position !== undefined
         ? {
             barContainer: barContainer as BarContainer<ContainerType.chord | ContainerType.picking>,
-            repeats: repeats ?? barContainer.repeats ?? 0,
+            repeats: repeats ?? barContainer.repeatsValue ?? 0,
             slotIndex: 0,
           }
         : undefined)

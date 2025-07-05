@@ -15,18 +15,34 @@ export type BarHeaderProps = {
 };
 
 export const BarHeader: React.FC<BarHeaderProps> = (props) => {
-  const { repeats } = props.container;
-  const hasRepeats = repeats && repeats > 1;
+  const { repeatsValue } = props.container;
+  const hasRepeats = repeatsValue && repeatsValue > 1;
   const remainingRepeats =
     props.activeSlot?.barContainer.firstSectionBarPosition ===
       props.container.firstSectionBarPosition && props.activeSlot?.repeats;
 
-  const updateRepeats = (nextRepeats?: number) => {
+  const updateRepeats = (nextRepeats: number) => {
+    if (props.container.repeatsBarIndex === undefined) {
+      return;
+    }
+
     const nextTab = tabOperations.updateRepeats(
       props.tab,
-      props.container.barIndex,
-      nextRepeats,
-      props.container.parentSection,
+      props.container.repeatsBarIndex,
+      isNaN(nextRepeats) ? undefined : nextRepeats,
+    );
+    props.updateTab(nextTab);
+  };
+
+  const updateSectionName = (sectionName: string) => {
+    if (!props.container.parentSection) {
+      return;
+    }
+
+    const nextTab = tabOperations.renameSection(
+      props.tab,
+      props.container.parentSection.index,
+      sectionName,
     );
     props.updateTab(nextTab);
   };
@@ -45,27 +61,40 @@ export const BarHeader: React.FC<BarHeaderProps> = (props) => {
       }}
     >
       {props.isEditMode ? (
-        <div style={{ alignItems: 'center', display: 'flex', height: repeatsMinHeight }}>
-          {props.container.displayRepeatsInput && (
-            <div>
-              <input
-                onChange={(event) => {
-                  const nextRepeats = parseInt(event.target.value);
-                  updateRepeats(isNaN(nextRepeats) ? undefined : nextRepeats);
-                }}
-                style={{
-                  boxSizing: 'border-box',
-                  marginRight: 4,
-                  maxHeight: repeatsMinHeight,
-                  maxWidth: inputWidth,
-                }}
-                value={repeats ?? ''}
-              />
-              x
-            </div>
+        <React.Fragment>
+          <div style={{ alignItems: 'center', display: 'flex', height: repeatsMinHeight }}>
+            {props.container.displayRepeats && (
+              <div>
+                <input
+                  onChange={(event) => {
+                    const nextRepeats = parseInt(event.target.value);
+                    updateRepeats(nextRepeats);
+                  }}
+                  style={{
+                    boxSizing: 'border-box',
+                    marginRight: 4,
+                    maxHeight: repeatsMinHeight,
+                    maxWidth: inputWidth,
+                  }}
+                  value={repeatsValue ?? ''}
+                />
+                x
+              </div>
+            )}
+            {props.container.displayControls && <BarControls {...props} />}
+          </div>
+
+          {props.container.sectionName && (
+            <input
+              disabled={!props.container.canUpdate}
+              onChange={(event) => {
+                updateSectionName(event.target.value);
+              }}
+              style={{ marginTop: 4, width: '100%' }}
+              value={props.container.sectionName}
+            />
           )}
-          {props.container.displayControls && <BarControls {...props} />}
-        </div>
+        </React.Fragment>
       ) : (
         <div style={{ height: repeatsMinHeight }}>
           {props.container.displayRepeats && (
@@ -83,7 +112,7 @@ export const BarHeader: React.FC<BarHeaderProps> = (props) => {
               {remainingRepeats ? (
                 <span style={{ fontWeight: 'bold' }}>{remainingRepeats}x </span>
               ) : (
-                hasRepeats && <span>{repeats}x </span>
+                hasRepeats && <span>{repeatsValue}x </span>
               )}
               {props.container.parentSection?.name}
             </span>

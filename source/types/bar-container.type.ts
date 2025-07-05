@@ -11,8 +11,9 @@ export type ContainerBase<TContainer extends ContainerType> = {
   displayControls: boolean;
   displayIndex: string;
   displayRepeats: boolean;
-  displayRepeatsInput: boolean;
-  repeats: number | undefined;
+  repeatsBarIndex: number | undefined;
+  repeatsValue: number | undefined;
+  sectionName?: string;
   type: TContainer;
   width: number;
 };
@@ -22,14 +23,12 @@ export type ChildBarBase<T extends ChordBar | PickingBar> = {
   omitRhythm: boolean;
   position: number;
   renderedBar: T;
-  sectionName?: undefined;
 } & (
   | {
       addToParent?: undefined;
       firstSectionBarPosition?: undefined;
       isFirstInSectionBar?: undefined;
       isLastInSectionBar?: undefined;
-      parentIndex?: undefined;
       parentSection?: undefined;
     }
   | {
@@ -38,7 +37,6 @@ export type ChildBarBase<T extends ChordBar | PickingBar> = {
       firstSectionBarPosition: number;
       isFirstInSectionBar: boolean;
       isLastInSectionBar: boolean;
-      parentIndex: number;
       parentSection: SectionBar;
     }
 );
@@ -52,7 +50,6 @@ export type ParentBarBase = {
   parentIndex?: undefined;
   parentSection?: undefined;
   position?: undefined;
-  sectionName: string;
 };
 
 export type SectionTailContainer = ParentBarBase & {
