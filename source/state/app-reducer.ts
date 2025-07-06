@@ -171,12 +171,11 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       navigate: action.navigate,
       tab: {
         ...state.tab,
-        copying: undefined,
         discardChangesModal: undefined,
         document: JSON.parse(state.tab.originalDocument!),
         isDirty: false,
         isEditMode: undefined,
-        moving: undefined,
+        positionOperation: undefined,
       },
     };
   }
@@ -263,8 +262,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       ...state,
       tab: {
         ...state.tab,
-        copying: undefined,
-        moving: undefined,
+        positionOperation: undefined,
       },
     };
   }
@@ -275,33 +273,35 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state,
         tab: {
           ...state.tab,
-          copying: undefined,
-          moving: undefined,
+          positionOperation: undefined,
         },
       };
     }
+
+    const nextDocument =
+      state.tab.positionOperation?.type === 'copying'
+        ? tabOperations.copyBar(
+            state.tab.document,
+            action.endIndex,
+            state.tab.positionOperation,
+            action.parentSection,
+          )
+        : state.tab.positionOperation?.type === 'moving'
+        ? tabOperations.moveBar(
+            state.tab.document,
+            action.endIndex,
+            state.tab.positionOperation,
+            action.parentSection,
+          )
+        : state.tab.document;
 
     return {
       ...state,
       tab: {
         ...state.tab,
-        copying: undefined,
-        document: state.tab.copying
-          ? tabOperations.copyBar(
-              state.tab.document,
-              action.endIndex,
-              state.tab.copying,
-              action.parentSection,
-            )
-          : state.tab.moving
-          ? tabOperations.moveBar(
-              state.tab.document,
-              action.endIndex,
-              state.tab.moving,
-              action.parentSection,
-            )
-          : state.tab.document,
-        moving: undefined,
+        document: nextDocument,
+        isDirty: JSON.stringify(nextDocument) !== state.tab.originalDocument,
+        positionOperation: undefined,
       },
     };
   }
@@ -311,7 +311,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       ...state,
       tab: {
         ...state.tab,
-        [action.operation]: action.positionOperation,
+        positionOperation: action.positionOperation,
       },
     };
   }

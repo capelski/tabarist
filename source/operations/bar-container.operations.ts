@@ -11,7 +11,8 @@ import {
   sectionColor,
   sectionNameMaxWidth,
 } from '../constants';
-import { Bar, BarContainer, ChordBar, PickingBar, SectionBar } from '../types';
+import { Bar, BarContainer, ChordBar, PickingBar, PositionOperation, SectionBar } from '../types';
+import { barOperations } from './bar.operations';
 import { getIndexDisplayValue } from './indexed-value.operations';
 import { slotOperations } from './slot.operations';
 
@@ -94,6 +95,7 @@ const processParentBar = (
   type: ContainerType.sectionHead | ContainerType.sectionReferenceHead,
   repeats: number | undefined,
   previousChordBar: ChordBar | undefined,
+  positionOperation: PositionOperation | undefined,
 ): ReducedBarContainers => {
   const barContainers: BarContainer[] = [];
   const isEmpty = sectionBar.bars.length === 0;
@@ -108,6 +110,8 @@ const processParentBar = (
     backgroundColor,
     barIndex,
     canUpdate: !isReference,
+    destinationBarIndex: barIndex,
+    destinationParentSection: undefined,
     discriminator: isReference
       ? isEmpty
         ? ContainerDiscriminator.mirror_head_empty
@@ -122,8 +126,17 @@ const processParentBar = (
     }),
     displayRepeats: false,
     isParent: true,
+    parentIndex: undefined,
     repeatsBarIndex: undefined,
     repeatsValue: undefined,
+    isOperationSource:
+      !!positionOperation &&
+      !positionOperation.sectionIndex &&
+      positionOperation.startIndex === barIndex,
+    isOperationTarget:
+      !!positionOperation &&
+      !positionOperation.sectionIndex &&
+      barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex),
     sectionName: sectionBar.name,
     type,
     width: Math.min(
@@ -140,6 +153,7 @@ const processParentBar = (
       sectionBar.bars,
       isEditMode,
       previousChordBar,
+      positionOperation,
       {
         firstSectionBarPosition: positionReference.value,
         positionReference,
@@ -160,6 +174,8 @@ const processParentBar = (
     backgroundColor,
     barIndex,
     canUpdate: false,
+    destinationBarIndex: barIndex,
+    destinationParentSection: undefined,
     discriminator: isReference
       ? ContainerDiscriminator.mirror_tail
       : ContainerDiscriminator.section_tail,
@@ -168,8 +184,14 @@ const processParentBar = (
     displayIndex: getDisplayIndex(barIndex) + 'tail',
     displayRepeats: false,
     isParent: true,
+    parentIndex: undefined,
     repeatsBarIndex: undefined,
     repeatsValue: undefined,
+    isOperationSource: false,
+    isOperationTarget:
+      !!positionOperation &&
+      positionOperation.sectionIndex === barIndex &&
+      positionOperation.startIndex !== sectionBar.bars.length - 1,
     type: ContainerType.sectionTail,
     width: 0,
   });
@@ -185,6 +207,7 @@ const processChildBar = (
   bars: Bar[],
   positionReference: { value: number },
   previousChordBar: ChordBar | undefined,
+  positionOperation: PositionOperation | undefined,
   repeats?: number,
   options: ContainerBarOptions = {},
 ): BarContainer => {
@@ -210,6 +233,14 @@ const processChildBar = (
       : AddMode.dualWithSection,
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
+    destinationBarIndex:
+      isFirstInSectionBar && positionOperation?.sectionIndex === undefined
+        ? options.parentIndex
+        : barIndex,
+    destinationParentSection:
+      isFirstInSectionBar && positionOperation?.sectionIndex === undefined
+        ? undefined
+        : options.parentSection,
     discriminator: isReference
       ? options.parentSection
         ? options.parentIsReference
@@ -243,6 +274,21 @@ const processChildBar = (
     barIndex,
     position: positionReference.value++,
     renderedBar: bar,
+    isOperationSource:
+      !!positionOperation &&
+      ((positionOperation.sectionIndex === options.parentIndex &&
+        positionOperation.startIndex === barIndex) ||
+        (positionOperation.sectionIndex === undefined &&
+          isFirstInSectionBar &&
+          positionOperation.startIndex === options.parentIndex)),
+    isOperationTarget:
+      !!positionOperation &&
+      ((positionOperation.sectionIndex === options.parentIndex &&
+        barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex)) ||
+        (positionOperation.sectionIndex === undefined &&
+          isFirstInSectionBar &&
+          barOperations.canMoveBarToPosition(positionOperation.startIndex, options.parentIndex))),
+    parentIndex: options.parentIndex,
     repeatsBarIndex: options.parentSection
       ? isFirstInSectionBar
         ? options.parentIndex
@@ -263,7 +309,6 @@ const processChildBar = (
           isFirstInSectionBar,
           isLastInSectionBar,
           parentSection: options.parentSection,
-          parentIndex: options.parentIndex,
         }
       : {
           firstSectionBarPosition: undefined,
@@ -277,6 +322,7 @@ export const barToBarContainers = (
   isEditMode: boolean | undefined,
   positionReference: { value: number },
   previousChordBar: ChordBar | undefined,
+  positionOperation: PositionOperation | undefined,
   options: ContainerBarOptions = {},
 ): ReducedBarContainers => {
   let nextChordBar = previousChordBar;
@@ -292,6 +338,7 @@ export const barToBarContainers = (
         bars,
         positionReference,
         previousChordBar,
+        positionOperation,
         bar.repeats,
         options,
       ),
@@ -316,6 +363,7 @@ export const barToBarContainers = (
           bars,
           positionReference,
           previousChordBar,
+          positionOperation,
           bar.repeats,
           options,
         ),
@@ -329,6 +377,7 @@ export const barToBarContainers = (
         ContainerType.sectionReferenceHead,
         bar.repeats,
         previousChordBar,
+        positionOperation,
       );
       barContainers.push(...childContainers.barContainers);
       nextChordBar = childContainers.previousChordBar;
@@ -346,6 +395,7 @@ export const barToBarContainers = (
       ContainerType.sectionHead,
       bar.repeats,
       previousChordBar,
+      positionOperation,
     );
     barContainers.push(...childContainers.barContainers);
     nextChordBar = childContainers.previousChordBar;
@@ -361,6 +411,7 @@ const childBarsToBarContainers = (
   bars: Bar[],
   isEditMode: boolean | undefined,
   previousChordBar: ChordBar | undefined,
+  positionOperation: PositionOperation | undefined,
   options: ContainerBarOptions = {},
 ): ReducedBarContainers => {
   const positionReference = options.positionReference || { value: 0 };
@@ -372,6 +423,7 @@ const childBarsToBarContainers = (
         isEditMode,
         positionReference,
         reduced.previousChordBar,
+        positionOperation,
         options,
       );
 
@@ -391,6 +443,7 @@ const childBarsToBarContainers = (
 export const barsToBarContainers = (
   bars: Bar[],
   isEditMode: boolean | undefined,
+  positionOperation?: PositionOperation,
 ): BarContainer[] => {
-  return childBarsToBarContainers(bars, isEditMode, undefined, {}).barContainers;
+  return childBarsToBarContainers(bars, isEditMode, undefined, positionOperation, {}).barContainers;
 };

@@ -1,15 +1,11 @@
 import React, { useContext } from 'react';
 import { positionSymbol } from '../../constants';
 import { ActionType, StateProvider } from '../../state';
-import { PositionOperation, SectionBar, Tab } from '../../types';
+import { SectionBar } from '../../types';
 
 export type BarDestinationProps = {
   barIndex: number;
-  copying: PositionOperation | undefined;
-  moving: PositionOperation | undefined;
   parentSection: SectionBar | undefined;
-  tab: Tab;
-  updateTab: (tab: Tab) => void;
 };
 
 export const BarDestination: React.FC<BarDestinationProps> = (props) => {

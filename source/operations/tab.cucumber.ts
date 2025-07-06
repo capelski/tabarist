@@ -44,6 +44,7 @@ When(
     const copying: PositionOperation = {
       sectionIndex: section?.index,
       startIndex: startPosition - 1,
+      type: 'copying',
     };
 
     globals.tabs[tabName] = tabOperations.copyBar(
@@ -76,6 +77,7 @@ When(
     const moving: PositionOperation = {
       sectionIndex: section?.index,
       startIndex: startPosition - 1,
+      type: 'moving',
     };
 
     globals.tabs[tabName] = tabOperations.moveBar(

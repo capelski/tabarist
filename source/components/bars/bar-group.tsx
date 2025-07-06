@@ -4,24 +4,19 @@ import { ActiveSlot, BarContainer, PositionOperation, Tab } from '../../types';
 import { AddBar } from './add-bar';
 import { BarContainerComponent } from './bar-container';
 import { BarDestination } from './bar-destination';
-import { getPositionOperationConditions } from './bar-handlers';
 
 export type BarGroupProps = {
   activeSlot: ActiveSlot | undefined;
   barContainers: BarContainer[];
   barsNumber: number;
-  copying: PositionOperation | undefined;
   isEditMode: boolean | undefined;
-  moving: PositionOperation | undefined;
+  positionOperation: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
 
 export const BarGroup: React.FC<BarGroupProps> = (props) => {
-  const { positionOperation, positionOperationApplicable, isValidPositionTarget } =
-    getPositionOperationConditions(props.copying, props.moving, props.barsNumber, undefined);
-
   return (
     <div className="bars" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
       {props.isEditMode && (
@@ -37,7 +32,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
           <AddBar
             addMode={AddMode.singleWithSection}
             barIndex={0}
-            disabled={positionOperation}
+            disabled={!!props.positionOperation}
             parentSection={undefined}
             tab={props.tab}
             updateTab={props.updateTab}
@@ -55,18 +50,14 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
         );
       })}
 
-      {props.isEditMode && positionOperationApplicable && isValidPositionTarget && (
-        <div style={{ alignItems: 'center', display: 'flex', marginLeft: 8 }}>
-          <BarDestination
-            barIndex={props.barsNumber}
-            copying={props.copying}
-            moving={props.moving}
-            parentSection={undefined}
-            tab={props.tab}
-            updateTab={props.updateTab}
-          />
-        </div>
-      )}
+      {props.isEditMode &&
+        props.positionOperation &&
+        !props.positionOperation.sectionIndex &&
+        props.positionOperation.startIndex !== props.barsNumber - 1 && (
+          <div style={{ alignItems: 'center', display: 'flex', marginLeft: 8 }}>
+            <BarDestination barIndex={props.barsNumber} parentSection={undefined} />
+          </div>
+        )}
 
       {/* Prevent last line from overstretching the bars */}
       <div style={{ height: 1, flexGrow: 1000000 }}></div>

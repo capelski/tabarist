@@ -6,11 +6,16 @@ export type ContainerBase<TContainer extends ContainerType> = {
   backgroundColor: string;
   barIndex: number;
   canUpdate: boolean;
+  destinationBarIndex: number | undefined;
+  destinationParentSection: SectionBar | undefined;
   discriminator: ContainerDiscriminator;
   display: boolean;
   displayControls: boolean;
   displayIndex: string;
   displayRepeats: boolean;
+  isOperationSource: boolean;
+  isOperationTarget: boolean;
+  parentIndex: number | undefined;
   repeatsBarIndex: number | undefined;
   repeatsValue: number | undefined;
   sectionName?: string;
@@ -47,7 +52,6 @@ export type ParentBarBase = {
   isFirstInSectionBar?: undefined;
   isLastInSectionBar?: undefined;
   isParent: true;
-  parentIndex?: undefined;
   parentSection?: undefined;
   position?: undefined;
 };

@@ -21,6 +21,7 @@ Given(/^a reference bar in tab "(.*)" pointing at the previous bar/, function (t
   const copying: PositionOperation = {
     sectionIndex: undefined,
     startIndex: globals.tabs[tabName].bars.length - 1,
+    type: 'copying',
   };
 
   globals.tabs[tabName] = tabOperations.copyBar(

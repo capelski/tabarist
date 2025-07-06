@@ -5,10 +5,9 @@ import { BarHeader } from './bar-header';
 export type BarCoreProps = PropsWithChildren<{
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
-  copying: PositionOperation | undefined;
   divRef?: RefObject<HTMLDivElement>;
   isEditMode: boolean | undefined;
-  moving: PositionOperation | undefined;
+  positionOperation: PositionOperation | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 }>;

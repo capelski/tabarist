@@ -92,7 +92,6 @@ export type AppAction =
     }
   | {
       type: ActionType.positionOperationStart;
-      operation: 'copying' | 'moving';
       positionOperation: PositionOperation;
     }
   | {

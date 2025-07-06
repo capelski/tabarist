@@ -9,14 +9,12 @@ import {
 } from '../../types';
 import { AddBar } from './add-bar';
 import { BarDestination } from './bar-destination';
-import { getPositionOperationConditions } from './bar-handlers';
 
 export type SectionTailProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
-  copying: PositionOperation | undefined;
   isEditMode: boolean | undefined;
-  moving: PositionOperation | undefined;
+  positionOperation: PositionOperation | undefined;
   scrollView: RefObject<HTMLDivElement> | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -29,19 +27,9 @@ export const SectionTail: React.FC<SectionTailProps> = (props) => {
 
   const { addToParent, appendBarIndex } = props.container as SectionTailContainer;
 
-  const sectionConditions = addToParent
-    ? getPositionOperationConditions(
-        props.copying,
-        props.moving,
-        addToParent.bars.length,
-        addToParent,
-      )
+  const backgroundColor = props.container.isOperationTarget
+    ? props.container.backgroundColor
     : undefined;
-
-  const isMovingTarget =
-    sectionConditions?.positionOperationApplicable && sectionConditions?.isValidPositionTarget;
-
-  const backgroundColor = isMovingTarget ? props.container.backgroundColor : undefined;
 
   return (
     props.container.display && (
@@ -55,20 +43,13 @@ export const SectionTail: React.FC<SectionTailProps> = (props) => {
           padding: '0 4px',
         }}
       >
-        {addToParent && isMovingTarget ? (
-          <BarDestination
-            barIndex={addToParent.bars.length}
-            copying={props.copying}
-            moving={props.moving}
-            parentSection={addToParent}
-            tab={props.tab}
-            updateTab={props.updateTab}
-          />
+        {addToParent && props.container.isOperationTarget ? (
+          <BarDestination barIndex={addToParent.bars.length} parentSection={addToParent} />
         ) : (
           <AddBar
             addMode={AddMode.singleWithSection}
             barIndex={appendBarIndex + 1}
-            disabled={!!props.copying || !!props.moving}
+            disabled={!!props.positionOperation}
             parentSection={undefined}
             tab={props.tab}
             updateTab={props.updateTab}

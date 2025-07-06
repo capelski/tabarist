@@ -245,7 +245,14 @@ When('transforming all bars to bar containers', () => {
 
 When('transforming the bar with index {int}', (index: number) => {
   const bar = bars.find((b) => b.index === index)!;
-  barContainers = barToBarContainers(bars, bar, isEditMode, { value: 0 }, undefined).barContainers;
+  barContainers = barToBarContainers(
+    bars,
+    bar,
+    isEditMode,
+    { value: 0 },
+    undefined,
+    undefined,
+  ).barContainers;
 });
 
 Then(

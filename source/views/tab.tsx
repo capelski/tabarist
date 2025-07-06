@@ -50,12 +50,21 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   const barContainers = useMemo(() => {
     if (state.tab.document?.bars) {
-      const barContainers = barsToBarContainers(state.tab.document.bars, state.tab.isEditMode);
+      const barContainers = barsToBarContainers(
+        state.tab.document.bars,
+        state.tab.isEditMode,
+        state.tab.positionOperation,
+      );
       return barContainers;
     }
 
     return [];
-  }, [state.tab.isEditMode, state.tab.document?.bars, state.tab.document?.rhythms]);
+  }, [
+    state.tab.isEditMode,
+    state.tab.document?.bars,
+    state.tab.positionOperation,
+    state.tab.document?.rhythms,
+  ]);
 
   if (!state.tab.document) {
     return <h3>Couldn't load tab</h3>;
@@ -96,9 +105,8 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         activeSlot={state.tab.activeSlot}
         barContainers={barContainers}
         barsNumber={state.tab.document.bars.length}
-        copying={state.tab.copying}
         isEditMode={state.tab.isEditMode}
-        moving={state.tab.moving}
+        positionOperation={state.tab.positionOperation}
         scrollView={props.scrollView}
         tab={state.tab.document}
         updateTab={updateTab}

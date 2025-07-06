@@ -7,9 +7,8 @@ import { BarControls } from './bar-controls';
 export type BarHeaderProps = {
   activeSlot: ActiveSlot | undefined;
   container: BarContainer;
-  copying: PositionOperation | undefined;
   isEditMode: boolean | undefined;
-  moving: PositionOperation | undefined;
+  positionOperation: PositionOperation | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };

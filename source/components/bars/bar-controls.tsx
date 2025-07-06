@@ -6,13 +6,11 @@ import { BarContainer, PositionOperation, Tab } from '../../types';
 import { Modal } from '../common/modal';
 import { AddBar } from './add-bar';
 import { BarDestination } from './bar-destination';
-import { getPositionOperationConditions } from './bar-handlers';
 import { TimeDivisionsComponent } from './time-divisions';
 
 export type BarControlsProps = {
   container: BarContainer;
-  copying: PositionOperation | undefined;
-  moving: PositionOperation | undefined;
+  positionOperation: PositionOperation | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -30,13 +28,28 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     setTimeDivisionsModal(false);
   };
 
-  const startPositionOperation = (operation: 'copying' | 'moving') => {
+  const startPositionOperation = (type: 'copying' | 'moving') => {
     dispatch({
       type: ActionType.positionOperationStart,
-      operation,
       positionOperation: {
         sectionIndex: props.container.parentSection?.index,
         startIndex: props.container.barIndex,
+        type,
+      },
+    });
+  };
+
+  const startSectionPositionOperation = (type: 'copying' | 'moving') => {
+    if (props.container.parentIndex === undefined) {
+      return;
+    }
+
+    dispatch({
+      type: ActionType.positionOperationStart,
+      positionOperation: {
+        sectionIndex: undefined,
+        startIndex: props.container.parentIndex,
+        type,
       },
     });
   };
@@ -50,17 +63,14 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
     props.updateTab(nextTab);
   };
 
-  const {
-    positionOperation,
-    positionOperationApplicable,
-    isPositionSource,
-    isValidPositionTarget,
-  } = getPositionOperationConditions(
-    props.copying,
-    props.moving,
-    props.container.barIndex,
-    props.container.parentSection,
-  );
+  const removeSectionBar = () => {
+    if (props.container.parentIndex === undefined) {
+      return;
+    }
+
+    const nextTab = tabOperations.removeBar(props.tab, props.container.parentIndex, undefined);
+    props.updateTab(nextTab);
+  };
 
   return (
     <div
@@ -85,29 +95,24 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
 
       <span style={{ marginRight: 8 }}>{props.container.displayIndex}</span>
 
-      {positionOperationApplicable &&
-        (isPositionSource ? (
-          <button
-            className="btn btn-sm btn-outline-secondary"
-            onClick={cancelPositionOperation}
-            type="button"
-          >
-            {cancelSymbol}
-          </button>
-        ) : (
-          isValidPositionTarget && (
-            <BarDestination
-              barIndex={props.container.barIndex}
-              copying={props.copying}
-              moving={props.moving}
-              parentSection={props.container.parentSection}
-              tab={props.tab}
-              updateTab={props.updateTab}
-            />
-          )
-        ))}
+      {props.container.isOperationSource && (
+        <button
+          className="btn btn-sm btn-outline-secondary"
+          onClick={cancelPositionOperation}
+          type="button"
+        >
+          {cancelSymbol}
+        </button>
+      )}
 
-      {!positionOperation && (
+      {props.container.isOperationTarget && (
+        <BarDestination
+          barIndex={props.container.destinationBarIndex!}
+          parentSection={props.container.destinationParentSection!}
+        />
+      )}
+
+      {!props.positionOperation && (
         <React.Fragment>
           <button
             aria-expanded="false"
@@ -162,6 +167,39 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
                 Remove
               </a>
             </li>
+
+            {props.container.isFirstInSectionBar && (
+              <React.Fragment>
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    onClick={() => {
+                      startSectionPositionOperation('copying');
+                    }}
+                  >
+                    Copy section
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className="dropdown-item"
+                    onClick={() => {
+                      startSectionPositionOperation('moving');
+                    }}
+                  >
+                    Move section
+                  </a>
+                </li>
+                <li>
+                  <a className="dropdown-item" onClick={removeSectionBar}>
+                    Remove section
+                  </a>
+                </li>
+              </React.Fragment>
+            )}
           </ul>
 
           <AddBar
