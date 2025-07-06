@@ -107,8 +107,8 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
 
       {props.container.isOperationTarget && (
         <BarDestination
-          barIndex={props.container.destinationBarIndex!}
-          parentSection={props.container.destinationParentSection!}
+          barIndex={props.container.destinationBarIndex}
+          parentSection={props.container.destinationParentSection}
         />
       )}
 

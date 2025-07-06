@@ -2,6 +2,13 @@ Feature: Bar containers
 
     The properties of a bar container are set according to their type
 
+    # Add tests for position operations
+    # destinationBarIndex: number | undefined;
+    # destinationParentSection: SectionBar | undefined;
+    # isOperationSource: boolean;
+    # isOperationTarget: boolean;
+    # parentIndex: number | undefined;
+
     Scenario: addMode
         Given every possible type of bar
         When transforming all bars to bar containers

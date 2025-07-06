@@ -6,22 +6,30 @@ export type ContainerBase<TContainer extends ContainerType> = {
   backgroundColor: string;
   barIndex: number;
   canUpdate: boolean;
-  destinationBarIndex: number | undefined;
-  destinationParentSection: SectionBar | undefined;
   discriminator: ContainerDiscriminator;
   display: boolean;
   displayControls: boolean;
   displayIndex: string;
   displayRepeats: boolean;
   isOperationSource: boolean;
-  isOperationTarget: boolean;
   parentIndex: number | undefined;
   repeatsBarIndex: number | undefined;
   repeatsValue: number | undefined;
   sectionName?: string;
   type: TContainer;
   width: number;
-};
+} & (
+  | {
+      destinationBarIndex: number;
+      destinationParentSection: SectionBar | undefined;
+      isOperationTarget: true;
+    }
+  | {
+      destinationBarIndex?: undefined;
+      destinationParentSection?: undefined;
+      isOperationTarget: false;
+    }
+);
 
 export type ChildBarBase<T extends ChordBar | PickingBar> = {
   isParent?: undefined;

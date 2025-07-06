@@ -104,14 +104,17 @@ const processParentBar = (
   const backgroundColor = isEditMode ? (isReference ? referenceColor : sectionColor) : 'white';
   let nextChordBar = previousChordBar;
 
+  const isOperationTargetHead =
+    !!positionOperation &&
+    !positionOperation.sectionIndex &&
+    barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex);
+
   barContainers.push({
     addMode: AddMode.none,
     addToParent,
     backgroundColor,
     barIndex,
     canUpdate: !isReference,
-    destinationBarIndex: barIndex,
-    destinationParentSection: undefined,
     discriminator: isReference
       ? isEmpty
         ? ContainerDiscriminator.mirror_head_empty
@@ -133,10 +136,6 @@ const processParentBar = (
       !!positionOperation &&
       !positionOperation.sectionIndex &&
       positionOperation.startIndex === barIndex,
-    isOperationTarget:
-      !!positionOperation &&
-      !positionOperation.sectionIndex &&
-      barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex),
     sectionName: sectionBar.name,
     type,
     width: Math.min(
@@ -146,6 +145,17 @@ const processParentBar = (
       ),
       sectionNameMaxWidth,
     ),
+    ...(isOperationTargetHead
+      ? {
+          destinationBarIndex: barIndex,
+          destinationParentSection: undefined,
+          isOperationTarget: isOperationTargetHead,
+        }
+      : {
+          destinationBarIndex: undefined,
+          destinationParentSection: undefined,
+          isOperationTarget: isOperationTargetHead,
+        }),
   });
 
   if (!isEmpty) {
@@ -167,6 +177,11 @@ const processParentBar = (
     nextChordBar = childContainers.previousChordBar;
   }
 
+  const isOperationTargetTail =
+    !!positionOperation &&
+    positionOperation.sectionIndex === barIndex &&
+    positionOperation.startIndex !== sectionBar.bars.length - 1;
+
   barContainers.push({
     addMode: AddMode.none,
     addToParent,
@@ -174,8 +189,6 @@ const processParentBar = (
     backgroundColor,
     barIndex,
     canUpdate: false,
-    destinationBarIndex: barIndex,
-    destinationParentSection: undefined,
     discriminator: isReference
       ? ContainerDiscriminator.mirror_tail
       : ContainerDiscriminator.section_tail,
@@ -188,12 +201,19 @@ const processParentBar = (
     repeatsBarIndex: undefined,
     repeatsValue: undefined,
     isOperationSource: false,
-    isOperationTarget:
-      !!positionOperation &&
-      positionOperation.sectionIndex === barIndex &&
-      positionOperation.startIndex !== sectionBar.bars.length - 1,
     type: ContainerType.sectionTail,
     width: 0,
+    ...(isOperationTargetTail
+      ? {
+          destinationBarIndex: barIndex,
+          destinationParentSection: undefined,
+          isOperationTarget: isOperationTargetTail,
+        }
+      : {
+          destinationBarIndex: undefined,
+          destinationParentSection: undefined,
+          isOperationTarget: isOperationTargetTail,
+        }),
   });
 
   return { barContainers, previousChordBar: nextChordBar };
@@ -225,6 +245,14 @@ const processChildBar = (
     backgroundColor = sectionColor;
   }
 
+  const isOperationTarget =
+    !!positionOperation &&
+    ((positionOperation.sectionIndex === options.parentIndex &&
+      barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex)) ||
+      (positionOperation.sectionIndex === undefined &&
+        isFirstInSectionBar &&
+        barOperations.canMoveBarToPosition(positionOperation.startIndex, options.parentIndex)));
+
   return {
     addMode: options.parentSection
       ? options.parentIsReference
@@ -233,14 +261,6 @@ const processChildBar = (
       : AddMode.dualWithSection,
     backgroundColor,
     canUpdate: isReference ? false : !options.parentIsReference,
-    destinationBarIndex:
-      isFirstInSectionBar && positionOperation?.sectionIndex === undefined
-        ? options.parentIndex
-        : barIndex,
-    destinationParentSection:
-      isFirstInSectionBar && positionOperation?.sectionIndex === undefined
-        ? undefined
-        : options.parentSection,
     discriminator: isReference
       ? options.parentSection
         ? options.parentIsReference
@@ -281,13 +301,6 @@ const processChildBar = (
         (positionOperation.sectionIndex === undefined &&
           isFirstInSectionBar &&
           positionOperation.startIndex === options.parentIndex)),
-    isOperationTarget:
-      !!positionOperation &&
-      ((positionOperation.sectionIndex === options.parentIndex &&
-        barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex)) ||
-        (positionOperation.sectionIndex === undefined &&
-          isFirstInSectionBar &&
-          barOperations.canMoveBarToPosition(positionOperation.startIndex, options.parentIndex))),
     parentIndex: options.parentIndex,
     repeatsBarIndex: options.parentSection
       ? isFirstInSectionBar
@@ -302,6 +315,23 @@ const processChildBar = (
     sectionName: isFirstInSectionBar ? options.parentSection?.name : undefined,
     type,
     width: getBarWidth(bar),
+    ...(isOperationTarget
+      ? {
+          destinationBarIndex:
+            isFirstInSectionBar && positionOperation?.sectionIndex === undefined
+              ? options.parentIndex
+              : barIndex,
+          destinationParentSection:
+            isFirstInSectionBar && positionOperation?.sectionIndex === undefined
+              ? undefined
+              : options.parentSection,
+          isOperationTarget,
+        }
+      : {
+          destinationBarIndex: undefined,
+          destinationParentSection: undefined,
+          isOperationTarget,
+        }),
     ...(options.parentSection
       ? {
           addToParent: options.parentSection,
