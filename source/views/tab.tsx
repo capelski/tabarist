@@ -94,13 +94,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         user={state.user.document}
       />
 
-      <TabDetails
-        isEditMode={state.tab.isEditMode}
-        tab={state.tab.document}
-        updateTab={updateTab}
-        youtubeVideoId={youtubeVideoId}
-      />
-
       <BarGroup
         activeSlot={state.tab.activeSlot}
         barContainers={barContainers}
@@ -110,6 +103,13 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         scrollView={props.scrollView}
         tab={state.tab.document}
         updateTab={updateTab}
+      />
+
+      <TabDetails
+        isEditMode={state.tab.isEditMode}
+        tab={state.tab.document}
+        updateTab={updateTab}
+        youtubeVideoId={youtubeVideoId}
       />
 
       <TabFooter
