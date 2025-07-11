@@ -24,6 +24,7 @@ export const BarCore: React.FC<BarCoreProps> = (props) => {
         flexGrow: 1,
         marginBottom: 8,
         width: props.container.width,
+        maxWidth: '100%',
       }}
     >
       <div className="bar-content" style={{ display: 'flex', flexGrow: 1, flexDirection: 'row' }}>
@@ -36,6 +37,7 @@ export const BarCore: React.FC<BarCoreProps> = (props) => {
             flexDirection: 'column',
             flexGrow: 1,
             justifyContent: 'end',
+            maxWidth: '100%',
             padding: props.isEditMode ? '0 2px' : undefined,
           }}
         >

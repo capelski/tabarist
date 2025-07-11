@@ -15,7 +15,6 @@ export type ContainerBase<TContainer extends ContainerType> = {
   parentIndex: number | undefined;
   repeatsBarIndex: number | undefined;
   repeatsValue: number | undefined;
-  sectionName?: string;
   type: TContainer;
   width: number;
 } & (
@@ -29,7 +28,17 @@ export type ContainerBase<TContainer extends ContainerType> = {
       destinationParentSection?: undefined;
       isOperationTarget: false;
     }
-);
+) &
+  (
+    | {
+        sectionName: string;
+        sectionNameBarIndex: number;
+      }
+    | {
+        sectionName?: undefined;
+        sectionNameBarIndex?: undefined;
+      }
+  );
 
 export type ChildBarBase<T extends ChordBar | PickingBar> = {
   isParent?: undefined;

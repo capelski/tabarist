@@ -8,8 +8,9 @@ import {
   ContainerType,
   inputWidth,
   referenceColor,
+  sectionCharacterWidth,
   sectionColor,
-  sectionNameMaxWidth,
+  sectionControlsWidth,
 } from '../constants';
 import { Bar, BarContainer, ChordBar, PickingBar, PositionOperation, SectionBar } from '../types';
 import { barOperations } from './bar.operations';
@@ -41,7 +42,7 @@ type ContainerBarOptions =
     }
   | ChildBarOptions;
 
-const getBarWidth = (bar: ChordBar | PickingBar) => {
+const getBarWidth = (bar: ChordBar | PickingBar, sectionName: string | undefined) => {
   const width =
     bar.type === BarType.chord
       ? bar.slots.reduce((barReduced, slot) => {
@@ -59,7 +60,12 @@ const getBarWidth = (bar: ChordBar | PickingBar) => {
           0,
         );
 
-  return Math.max(width + addBarWidth, barMinWidth);
+  const widthWithSectionName =
+    sectionName !== undefined
+      ? Math.max(width, sectionName.length * sectionCharacterWidth + sectionControlsWidth)
+      : width;
+
+  return Math.max(widthWithSectionName + addBarWidth, barMinWidth);
 };
 
 const getDisplayIndex = (
@@ -128,22 +134,20 @@ const processParentBar = (
       referencedIndex: isReference ? sectionBar.index : undefined,
     }),
     displayRepeats: false,
-    isParent: true,
-    parentIndex: undefined,
-    repeatsBarIndex: undefined,
-    repeatsValue: undefined,
     isOperationSource:
       !!positionOperation &&
       !positionOperation.sectionIndex &&
       positionOperation.startIndex === barIndex,
+    isParent: true,
+    parentIndex: undefined,
+    repeatsBarIndex: undefined,
+    repeatsValue: undefined,
     sectionName: sectionBar.name,
+    sectionNameBarIndex: barIndex,
     type,
-    width: Math.min(
-      Math.max(
-        addBarWidth + inputWidth + (sectionBar.name?.length ?? 0) * characterWidth,
-        barMinWidth,
-      ),
-      sectionNameMaxWidth,
+    width: Math.max(
+      addBarWidth + inputWidth + (sectionBar.name?.length ?? 0) * characterWidth,
+      barMinWidth,
     ),
     ...(isOperationTargetHead
       ? {
@@ -196,11 +200,13 @@ const processParentBar = (
     displayControls: false,
     displayIndex: getDisplayIndex(barIndex) + 'tail',
     displayRepeats: false,
+    isOperationSource: false,
     isParent: true,
     parentIndex: undefined,
     repeatsBarIndex: undefined,
     repeatsValue: undefined,
-    isOperationSource: false,
+    sectionName: undefined,
+    sectionNameBarIndex: undefined,
     type: ContainerType.sectionTail,
     width: 0,
     ...(isOperationTargetTail
@@ -252,6 +258,7 @@ const processChildBar = (
       (positionOperation.sectionIndex === undefined &&
         isFirstInSectionBar &&
         barOperations.canMoveBarToPosition(positionOperation.startIndex, options.parentIndex)));
+  const sectionName = isFirstInSectionBar ? options.parentSection.name : undefined;
 
   return {
     addMode: options.parentSection
@@ -260,6 +267,7 @@ const processChildBar = (
         : AddMode.dual
       : AddMode.dualWithSection,
     backgroundColor,
+    barIndex,
     canUpdate: isReference ? false : !options.parentIsReference,
     discriminator: isReference
       ? options.parentSection
@@ -287,13 +295,6 @@ const processChildBar = (
       referencedIndex: isReference ? bar.index : undefined,
     }),
     displayRepeats: !options.parentSection || isFirstInSectionBar,
-    omitRhythm:
-      bar.type === BarType.chord &&
-      previousChordBar?.rhythmIndex !== undefined &&
-      bar.rhythmIndex === previousChordBar?.rhythmIndex,
-    barIndex,
-    position: positionReference.value++,
-    renderedBar: bar,
     isOperationSource:
       !!positionOperation &&
       ((positionOperation.sectionIndex === options.parentIndex &&
@@ -301,7 +302,13 @@ const processChildBar = (
         (positionOperation.sectionIndex === undefined &&
           isFirstInSectionBar &&
           positionOperation.startIndex === options.parentIndex)),
+    omitRhythm:
+      bar.type === BarType.chord &&
+      previousChordBar?.rhythmIndex !== undefined &&
+      bar.rhythmIndex === previousChordBar?.rhythmIndex,
     parentIndex: options.parentIndex,
+    position: positionReference.value++,
+    renderedBar: bar,
     repeatsBarIndex: options.parentSection
       ? isFirstInSectionBar
         ? options.parentIndex
@@ -312,9 +319,8 @@ const processChildBar = (
         ? options.parentRepeats
         : undefined
       : repeats,
-    sectionName: isFirstInSectionBar ? options.parentSection?.name : undefined,
     type,
-    width: getBarWidth(bar),
+    width: getBarWidth(bar, sectionName),
     ...(isOperationTarget
       ? {
           destinationBarIndex:
@@ -343,6 +349,12 @@ const processChildBar = (
       : {
           firstSectionBarPosition: undefined,
         }),
+    ...(isFirstInSectionBar
+      ? {
+          sectionName: options.parentSection.name,
+          sectionNameBarIndex: options.parentSection.index,
+        }
+      : { sectionName: undefined, sectionNameBarIndex: undefined }),
   };
 };
 

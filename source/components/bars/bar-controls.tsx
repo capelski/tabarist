@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { CSSProperties, useContext, useState } from 'react';
 import { cancelSymbol, ContainerType, optionsSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
 import { ActionType, StateProvider } from '../../state';
@@ -11,6 +11,7 @@ import { TimeDivisionsComponent } from './time-divisions';
 export type BarControlsProps = {
   container: BarContainer;
   positionOperation: PositionOperation | undefined;
+  style?: CSSProperties;
   tab: Tab;
   updateTab: (tab: Tab) => void;
 };
@@ -78,9 +79,9 @@ export const BarControls: React.FC<BarControlsProps> = (props) => {
       style={{
         alignItems: 'center',
         display: 'flex',
-        flexGrow: 1,
         flexWrap: 'wrap',
         justifyContent: 'flex-end',
+        ...props.style,
       }}
     >
       {timeDivisionsModal && (

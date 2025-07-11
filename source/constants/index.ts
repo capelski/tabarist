@@ -15,7 +15,8 @@ export const characterWidth = 12;
 export const inputWidth = 30;
 export const repeatsMinHeight = 20;
 export const stringHeight = 16;
-export const sectionNameMaxWidth = 250;
+export const sectionCharacterWidth = 9;
+export const sectionControlsWidth = 140;
 
 export const activeColor = '#fff2cc';
 export const addBarColor = '#fff8e5';
