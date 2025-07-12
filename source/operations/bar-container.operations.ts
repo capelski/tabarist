@@ -112,7 +112,7 @@ const processParentBar = (
 
   const isOperationTargetHead =
     !!positionOperation &&
-    !positionOperation.sectionIndex &&
+    positionOperation.sectionIndex === undefined &&
     barOperations.canMoveBarToPosition(positionOperation.startIndex, barIndex);
 
   barContainers.push({
@@ -136,7 +136,7 @@ const processParentBar = (
     displayRepeats: false,
     isOperationSource:
       !!positionOperation &&
-      !positionOperation.sectionIndex &&
+      positionOperation.sectionIndex === undefined &&
       positionOperation.startIndex === barIndex,
     isParent: true,
     parentIndex: undefined,

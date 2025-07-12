@@ -52,7 +52,7 @@ export const BarGroup: React.FC<BarGroupProps> = (props) => {
 
       {props.isEditMode &&
         props.positionOperation &&
-        !props.positionOperation.sectionIndex &&
+        props.positionOperation.sectionIndex === undefined &&
         props.positionOperation.startIndex !== props.barsNumber - 1 && (
           <div style={{ alignItems: 'center', display: 'flex', marginLeft: 8 }}>
             <BarDestination barIndex={props.barsNumber} parentSection={undefined} />
