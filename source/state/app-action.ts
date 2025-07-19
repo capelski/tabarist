@@ -137,4 +137,5 @@ export type AppAction =
     }
   | {
       type: ActionType.upgradeStart;
+      message?: string;
     };

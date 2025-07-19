@@ -425,7 +425,9 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.upgradeStart) {
     return {
       ...state,
-      upgradeModal: true,
+      upgradeModal: {
+        message: action.message,
+      },
     };
   }
 

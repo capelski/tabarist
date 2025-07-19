@@ -1,13 +1,13 @@
 import { User } from 'firebase/auth';
-import React, { useContext } from 'react';
+import React, { PropsWithChildren, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { customerRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
 import { Modal } from '../common/modal';
 
-export type UpgradeModalProps = {
+export type UpgradeModalProps = PropsWithChildren<{
   user: User | null;
-};
+}>;
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = (props) => {
   const { dispatch } = useContext(StateProvider);

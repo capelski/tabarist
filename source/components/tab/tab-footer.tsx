@@ -227,8 +227,16 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
                 <button
                   className="dropdown-item"
                   onClick={() => {
-                    if (option === BeatEngineMode.youtubeTrack && !props.subscription) {
-                      dispatch({ type: ActionType.upgradeStart });
+                    if (option === BeatEngineMode.youtubeTrack && !props.user) {
+                      dispatch({
+                        type: ActionType.signInStart,
+                        message: 'Sign in and upgrade to play youtube tracks',
+                      });
+                    } else if (option === BeatEngineMode.youtubeTrack && !props.subscription) {
+                      dispatch({
+                        type: ActionType.upgradeStart,
+                        message: 'Upgrade to play youtube tracks',
+                      });
                     } else {
                       props.beatEngine.mode = option;
                       startPlayMode();

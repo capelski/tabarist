@@ -42,7 +42,11 @@ export const App: React.FC<AppProps> = (props) => {
 
         {state.tab.discardChangesModal && <TabDiscardModal />}
 
-        {state.upgradeModal && <UpgradeModal user={state.user.document} />}
+        {state.upgradeModal && (
+          <UpgradeModal user={state.user.document}>
+            {state.upgradeModal.message && <p>{state.upgradeModal.message}</p>}
+          </UpgradeModal>
+        )}
 
         <ToastContainer position="bottom-center" />
 

@@ -51,7 +51,9 @@ export type AppState = {
     originalDocument?: string;
     positionOperation?: PositionOperation;
   };
-  upgradeModal?: boolean;
+  upgradeModal?: {
+    message?: string;
+  };
   user: {
     document: User | null;
     stripeSubscription?: StripeSubscription;
