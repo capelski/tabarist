@@ -1,6 +1,3 @@
-- Only push a section head if the section has no bars. Display section name in first bar...
-    - Consider section name length in bar container operations, getBarWidth
-    
 - Cron job to build a dynamic sitemap
 - Universal rhythms
 - Allow clicking on a slot to start playing from there
