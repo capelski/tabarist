@@ -1,9 +1,7 @@
 import React, { useReducer, useRef } from 'react';
 import { Route, Routes } from 'react-router';
 import { ToastContainer } from 'react-toastify';
-import { BlockingLoader, NavBar, SignInModal } from './components';
-import { TabDiscardModal } from './components/tab/tab-discard-modal';
-import { UpgradeModal } from './components/user/upgrade-modal';
+import { BlockingLoader, NavBar, SignInModal, TabDiscardModal, UpgradeModal } from './components';
 import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
 import { appReducer, getInitialState, ListState, StateProvider } from './state';
