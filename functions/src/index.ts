@@ -124,4 +124,4 @@ expressApp.get(routes, async (req, res) => {
   res.send(indexHtml);
 });
 
-exports.app = onRequest({ region: 'europe-west3' }, expressApp);
+exports.serverSideRendering = onRequest({ region: 'europe-west3' }, expressApp);
