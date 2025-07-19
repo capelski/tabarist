@@ -4,6 +4,8 @@ import { Firestore, initializeFirestore, persistentLocalCache } from 'firebase/f
 import { Functions, getFunctions } from 'firebase/functions';
 import firebaseConfig from '../firebase-config.json';
 
+export const functionsRegion = 'europe-west3';
+
 export const getFirebaseContext = (function () {
   let firebaseContext:
     | {
@@ -19,7 +21,7 @@ export const getFirebaseContext = (function () {
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const firestore = initializeFirestore(app, { localCache: persistentLocalCache() });
-      const functions = getFunctions(app, 'europe-west3');
+      const functions = getFunctions(app, functionsRegion);
 
       firebaseContext = {
         app,

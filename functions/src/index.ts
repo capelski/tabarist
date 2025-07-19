@@ -10,6 +10,7 @@ import {
   AppProps,
   DiminishedTab,
   fetchPagedData,
+  functionsRegion,
   getHtml,
   PagedResponse,
   pageSize,
@@ -124,4 +125,4 @@ expressApp.get(routes, async (req, res) => {
   res.send(indexHtml);
 });
 
-exports.serverSideRendering = onRequest({ region: 'europe-west3' }, expressApp);
+exports.serverSideRendering = onRequest({ region: functionsRegion }, expressApp);
