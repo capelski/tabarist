@@ -6,9 +6,6 @@ export const maxTempo = 200;
 export const minTempo = 30;
 export const stringsNumber = 6;
 
-export const localStorageKey_tab = 'tabarist_tab_ID';
-export const localStorageKey_tabRegistry = 'tabarist_tabRegistry';
-
 export const addBarWidth = 25;
 export const barMinWidth = 165;
 export const characterWidth = 12;
@@ -32,6 +29,7 @@ export * from './add-mode';
 export * from './bar-type';
 export * from './container-discriminator';
 export * from './container-type';
+export * from './query-parameters';
 export * from './route-names';
 export * from './slot-type';
 export * from './symbols';

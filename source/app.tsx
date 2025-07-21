@@ -6,7 +6,7 @@ import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
 import { appReducer, getInitialState, ListState, StateProvider } from './state';
 import { Tab, TabListParameters } from './types';
-import { HomeView, MyTabsView, StarredTabsView, TabView } from './views';
+import { HomeView, MyTabsView, NotFound, StarredTabsView, TabView } from './views';
 
 export type AppProps = {
   homeState?: ListState<Tab, TabListParameters>;
@@ -67,6 +67,8 @@ export const App: React.FC<AppProps> = (props) => {
             <Route path={RouteNames.starredTabs} element={<StarredTabsView />} />
 
             <Route path={RouteNames.tabDetails} element={<TabView scrollView={scrollViewRef} />} />
+
+            <Route path="/*" Component={NotFound} />
           </Routes>
         </div>
       </div>

@@ -4,10 +4,3 @@ export enum RouteNames {
   starredTabs = '/starred-tabs',
   tabDetails = '/tab/:tabId',
 }
-
-export enum QueryParameters {
-  cursorDirection = 'cD',
-  cursorFields = 'cF',
-  editMode = 'editMode',
-  title = 'title',
-}

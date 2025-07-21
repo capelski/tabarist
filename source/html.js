@@ -4,7 +4,12 @@
 // This file is deliberately written in JS and module.exports, as it needs to be imported
 // by webpack development configuration
 
+const assetsFolder = 'assets';
+const assetsPath = `/${assetsFolder}/`;
+
 module.exports = {
+  assetsFolder,
+  assetsPath,
   getHtml: (options = {}) =>
     `<!DOCTYPE html>
 <html lang="en">
@@ -15,13 +20,13 @@ module.exports = {
     <meta name="robots" content="index, follow" />
     ${options.headTags || ''}
 
-    <link rel="stylesheet" href="/main.css">
+    <link rel="stylesheet" href="${assetsPath}main.css">
     ${
       options.initialState
         ? `<script>window.initialState = ${JSON.stringify(options.initialState)};</script>`
         : ''
     }
-    <script defer="defer" src="/main.js"></script>
+    <script defer="defer" src="${assetsPath}main.js"></script>
 
     ${
       options.adSenseId
@@ -41,5 +46,4 @@ module.exports = {
   <div id="youtube-player" style="display: none"></div>
 </html>
 `,
-  routes: [/^\/$/, '/my-tabs', '/starred-tabs', '/tab/:tabId'],
 };
