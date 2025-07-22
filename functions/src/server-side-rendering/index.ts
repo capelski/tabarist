@@ -3,9 +3,12 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { assetsPath, functionsRegion, RouteNames } from '../ssr/ssr';
 import { renderHtml } from './common';
 import { homeHandler } from './home';
+import { sitemapHandler } from './sitemap';
 import { tabDetailsHandler } from './tab-details';
 
 export const expressApp = express();
+
+expressApp.get(/^\/sitemap.xml$/, sitemapHandler);
 
 expressApp.get(new RegExp(`^${RouteNames.home}$`), homeHandler);
 

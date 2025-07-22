@@ -7,6 +7,7 @@ import { AppProps, SsrApp, SsrAppProps, getHtml } from '../ssr/ssr';
 
 export const firebaseApp = admin.initializeApp();
 export const firestore = firebaseApp.firestore();
+export const storage = firebaseApp.storage();
 
 export const renderHtml = (originalUrl: string, initialState: AppProps = {}): string => {
   const ssrAppProps: SsrAppProps = {
