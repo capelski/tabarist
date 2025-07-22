@@ -37,6 +37,9 @@ export const TabList: React.FC<TabListProps> = (props) => {
       />
     ),
     listState: props.listState,
+    loadPage: (nextParams) => {
+      dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
+    },
     noDocuments: (
       <p style={{ textAlign: 'center' }}>
         No tabs to display. Create a tab by clicking on{' '}

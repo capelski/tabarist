@@ -8,6 +8,7 @@ export type ItemsListProps<TData, TParams extends DefaultParams> = {
   getNavigationUrl: (nextParams: ListState<TData, TParams>['params']) => string;
   itemRenderer: (item: TData) => React.ReactNode;
   listState: ListState<TData, TParams>;
+  loadPage: (nextParams: ListState<TData, TParams>['params']) => void;
   noDocuments: React.ReactNode;
 };
 
@@ -35,16 +36,44 @@ export const ItemsList: React.FC<ItemsListProps<any, DefaultParams>> = (props) =
   return (
     <div className="items-list">
       <p style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <a href={previousParams ? props.getNavigationUrl(previousParams) : undefined}>
-          <button className="btn btn-outline-secondary" disabled={!previousParams} type="button">
+        <button
+          className="btn btn-outline-secondary"
+          disabled={!previousParams}
+          onClick={() => {
+            if (previousParams) {
+              props.loadPage(previousParams);
+            }
+          }}
+          type="button"
+        >
+          <a
+            href={previousParams ? props.getNavigationUrl(previousParams) : undefined}
+            onClick={(event) => {
+              event.preventDefault();
+            }}
+          >
             ⏪️
-          </button>
-        </a>
-        <a href={nextParams ? props.getNavigationUrl(nextParams) : undefined}>
-          <button className="btn btn-outline-secondary" disabled={!nextParams} type="button">
+          </a>
+        </button>
+        <button
+          className="btn btn-outline-secondary"
+          disabled={!nextParams}
+          onClick={() => {
+            if (nextParams) {
+              props.loadPage(nextParams);
+            }
+          }}
+          type="button"
+        >
+          <a
+            href={nextParams ? props.getNavigationUrl(nextParams) : undefined}
+            onClick={(event) => {
+              event.preventDefault();
+            }}
+          >
             ⏩
-          </button>
-        </a>
+          </a>
+        </button>
       </p>
 
       {!props.listState.data?.documents ? (
