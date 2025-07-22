@@ -36,6 +36,7 @@ export const StarredTabsView: React.FC = () => {
   }, [listState, state.searchParamsReady, state.user.document]);
 
   const listProps: ItemsListProps<StarredTab, StarredListParameters> = {
+    getNavigationUrl: getStarredListRelativeUrl,
     itemRenderer: (tab) => (
       <TabListItem
         allowRemoving={true}
@@ -55,9 +56,6 @@ export const StarredTabsView: React.FC = () => {
       />
     ),
     listState,
-    loadPage: (nextParams) => {
-      dispatch({ type: ActionType.setStarredListParameters, params: nextParams });
-    },
     noDocuments: <p style={{ textAlign: 'center' }}>You don't have starred tabs</p>,
   };
 

@@ -5,52 +5,46 @@ import { PagedQueryCursor } from '../../types';
 export type DefaultParams = { cursor?: PagedQueryCursor };
 
 export type ItemsListProps<TData, TParams extends DefaultParams> = {
+  getNavigationUrl: (nextParams: ListState<TData, TParams>['params']) => string;
   itemRenderer: (item: TData) => React.ReactNode;
   listState: ListState<TData, TParams>;
-  loadPage: (nextParams: ListState<TData, TParams>['params']) => void;
   noDocuments: React.ReactNode;
 };
 
 export const ItemsList: React.FC<ItemsListProps<any, DefaultParams>> = (props) => {
+  const previousParams: DefaultParams | undefined = props.listState.data?.previousFields
+    ? {
+        ...props.listState.params,
+        cursor: {
+          direction: 'desc',
+          fields: props.listState.data.previousFields,
+        },
+      }
+    : undefined;
+
+  const nextParams: DefaultParams | undefined = props.listState.data?.nextFields
+    ? {
+        ...props.listState.params,
+        cursor: {
+          direction: 'asc',
+          fields: props.listState.data.nextFields,
+        },
+      }
+    : undefined;
+
   return (
     <div className="items-list">
       <p style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button
-          className="btn btn-outline-secondary"
-          disabled={!props.listState.data?.previousFields}
-          onClick={() => {
-            const nextParams: ListState<any, DefaultParams>['params'] = {
-              ...props.listState.params,
-              cursor: {
-                direction: 'desc',
-                fields: props.listState.data!.previousFields!,
-              },
-            };
-
-            props.loadPage(nextParams);
-          }}
-          type="button"
-        >
-          ⏪️
-        </button>
-        <button
-          className="btn btn-outline-secondary"
-          disabled={!props.listState.data?.nextFields}
-          onClick={() => {
-            const nextParams: ListState<any, DefaultParams>['params'] = {
-              ...props.listState.params,
-              cursor: {
-                direction: 'asc',
-                fields: props.listState.data!.nextFields!,
-              },
-            };
-
-            props.loadPage(nextParams);
-          }}
-          type="button"
-        >
-          ⏩
-        </button>
+        <a href={previousParams ? props.getNavigationUrl(previousParams) : undefined}>
+          <button className="btn btn-outline-secondary" disabled={!previousParams} type="button">
+            ⏪️
+          </button>
+        </a>
+        <a href={nextParams ? props.getNavigationUrl(nextParams) : undefined}>
+          <button className="btn btn-outline-secondary" disabled={!nextParams} type="button">
+            ⏩
+          </button>
+        </a>
       </p>
 
       {!props.listState.data?.documents ? (

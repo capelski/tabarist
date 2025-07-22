@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
 import { RouteNames } from '../../constants';
+import { getTabListRelativeUrl } from '../../operations';
 import { ActionType, ListState, StateProvider } from '../../state';
 import { Tab, TabListParameters } from '../../types';
 import { ItemsList, ItemsListProps } from '../common/items-list';
@@ -26,6 +27,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
   };
 
   const listProps: ItemsListProps<Tab, TabListParameters> = {
+    getNavigationUrl: (params) => getTabListRelativeUrl(props.route, params),
     itemRenderer: (tab) => (
       <TabListItem
         allowRemoving={!!props.user && props.user.uid === tab.ownerId}
@@ -35,9 +37,6 @@ export const TabList: React.FC<TabListProps> = (props) => {
       />
     ),
     listState: props.listState,
-    loadPage: (nextParams) => {
-      dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
-    },
     noDocuments: (
       <p style={{ textAlign: 'center' }}>
         No tabs to display. Create a tab by clicking on{' '}
