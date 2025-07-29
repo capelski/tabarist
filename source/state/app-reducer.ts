@@ -172,7 +172,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       tab: {
         ...state.tab,
         discardChangesModal: undefined,
-        document: JSON.parse(state.tab.originalDocument!),
+        document: state.tab.originalDocument && JSON.parse(state.tab.originalDocument),
         isDirty: false,
         isEditMode: undefined,
         positionOperation: undefined,
