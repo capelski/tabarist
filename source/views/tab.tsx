@@ -1,29 +1,45 @@
-import React, { RefObject, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { RefObject, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { BeatEngine } from '../classes';
-import { BarGroup, getYoutubeId, TabDetails, TabFooter, TabHeader } from '../components';
+import {
+  BarGroup,
+  CenteredMessage,
+  getYoutubeId,
+  TabDetails,
+  TabFooter,
+  TabHeader,
+} from '../components';
 import { barsToBarContainers } from '../operations';
 import { tabRepository, userRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
 import { Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
+import { NotFound } from './not-found';
 
 export type TabViewProps = {
   scrollView: RefObject<HTMLDivElement>;
 };
 
 export const TabView: React.FC<TabViewProps> = (props) => {
+  const [loading, setLoading] = useState(false);
   const { dispatch, state } = useContext(StateProvider);
   const { tabId } = useParams();
 
   // Fetch the tab document if a tabId is provided and the corresponding tab is not loaded
   useEffect(() => {
     if (tabId && state.tab.document?.id !== tabId) {
-      tabRepository.getById(tabId).then((nextTab) => {
-        if (nextTab) {
-          dispatch({ type: ActionType.setTab, tab: nextTab });
-        }
-      });
+      setLoading(true);
+
+      tabRepository
+        .getById(tabId)
+        .then((nextTab) => {
+          if (nextTab) {
+            dispatch({ type: ActionType.setTab, tab: nextTab });
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [tabId]);
 
@@ -43,7 +59,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
           dispatch({ type: ActionType.setStarredTab, starredTab: false });
         });
     }
-  }, [state.tab.isStarred, state.tab.document, state.user.document]);
+  }, [state.tab.document, state.tab.isStarred, state.user.document]);
 
   // The beat engine must be available to both tab header and tab footer
   const beatEngine = useRef(new BeatEngine());
@@ -66,8 +82,12 @@ export const TabView: React.FC<TabViewProps> = (props) => {
     state.tab.document?.rhythms,
   ]);
 
+  if (loading) {
+    return <CenteredMessage>Loading...</CenteredMessage>;
+  }
+
   if (!state.tab.document) {
-    return <h3>Couldn't load tab</h3>;
+    return <NotFound />;
   }
 
   const updateTab = (nextTab: Tab) => {
