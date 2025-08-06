@@ -2,12 +2,30 @@ import admin from 'firebase-admin';
 import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Helmet } from 'react-helmet';
-import { adSenseId } from '../secrets.json';
-import { AppProps, SsrApp, SsrAppProps, getHtml } from '../ssr/ssr';
+import { adSenseId } from './secrets.json';
+import { AppProps, SsrApp, SsrAppProps, getHtml } from './ssr/ssr';
 
 export const firebaseApp = admin.initializeApp();
 export const firestore = firebaseApp.firestore();
 export const storage = firebaseApp.storage();
+
+export const readBucketFile = async (filename: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    let buffer = '';
+    const fileStream = storage.bucket('tabarist').file(filename).createReadStream();
+
+    fileStream
+      .on('data', (d) => {
+        buffer += d;
+      })
+      .on('end', () => {
+        resolve(buffer);
+      })
+      .on('error', (e) => {
+        reject(e);
+      });
+  });
+};
 
 export const renderHtml = (originalUrl: string, initialState: AppProps = {}): string => {
   const ssrAppProps: SsrAppProps = {

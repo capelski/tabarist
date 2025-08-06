@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import { error } from 'firebase-functions/logger';
+import { firestore, renderHtml } from '../common';
 import { AppProps, DiminishedTab, tabOperations } from '../ssr/ssr';
-import { firestore, renderHtml } from './common';
 
 const getDiminishedTab = async (tabId: string) => {
   const docSnap = await firestore.collection('tabs').doc(tabId).get();

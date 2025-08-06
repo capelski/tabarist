@@ -1,7 +1,7 @@
 import express from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
+import { renderHtml } from '../common';
 import { assetsPath, functionsRegion, RouteNames } from '../ssr/ssr';
-import { renderHtml } from './common';
 import { homeHandler } from './home';
 import { sitemapHandler } from './sitemap';
 import { tabDetailsHandler } from './tab-details';

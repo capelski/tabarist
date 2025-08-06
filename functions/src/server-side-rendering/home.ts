@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import { error } from 'firebase-functions/logger';
+import { firestore, renderHtml } from '../common';
 import {
   AppProps,
   DiminishedTab,
@@ -12,7 +13,6 @@ import {
   TabListParameters,
   tabOperations,
 } from '../ssr/ssr';
-import { firestore, renderHtml } from './common';
 
 const getHomeTabs = async (params: TabListParameters): Promise<PagedResponse<Tab>> => {
   const fetcher = async (_pageSize: number) => {
