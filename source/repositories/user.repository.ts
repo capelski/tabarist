@@ -1,13 +1,10 @@
 import { User } from 'firebase/auth';
 import { collection, getDocs, limit, orderBy, query, startAt } from 'firebase/firestore';
 import { fetchPagedData } from '../common';
-import { pageSize } from '../constants';
+import { pageSize, starredTabsCollection, usersCollection } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { PagedResponse, StarredListParameters, StarredTab, Tab } from '../types';
-
-const usersCollection = 'users';
-const starredTabsCollection = 'starredTabs';
 
 const getStarredTabPath = (userId: string, tabId: string) => {
   return [usersCollection, userId, starredTabsCollection, tabId];

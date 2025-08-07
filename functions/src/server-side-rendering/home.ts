@@ -12,12 +12,13 @@ import {
   Tab,
   TabListParameters,
   tabOperations,
+  tabsCollection,
 } from '../ssr/ssr';
 
 const getHomeTabs = async (params: TabListParameters): Promise<PagedResponse<Tab>> => {
   const fetcher = async (_pageSize: number) => {
     let query = firestore
-      .collection('tabs')
+      .collection(tabsCollection)
       .orderBy('title', params?.cursor?.direction)
       .orderBy('id', params?.cursor?.direction);
 

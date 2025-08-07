@@ -27,6 +27,7 @@ export const pageSize = 10;
 
 export * from './add-mode';
 export * from './bar-type';
+export * from './collections';
 export * from './container-discriminator';
 export * from './container-type';
 export * from './query-parameters';

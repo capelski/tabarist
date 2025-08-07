@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express';
 import { error } from 'firebase-functions/logger';
 import { firestore, renderHtml } from '../common';
-import { AppProps, DiminishedTab, tabOperations } from '../ssr/ssr';
+import { AppProps, DiminishedTab, tabOperations, tabsCollection } from '../ssr/ssr';
 
 const getDiminishedTab = async (tabId: string) => {
-  const docSnap = await firestore.collection('tabs').doc(tabId).get();
+  const docSnap = await firestore.collection(tabsCollection).doc(tabId).get();
   return docSnap.exists ? (docSnap.data() as DiminishedTab) : undefined;
 };
 

@@ -10,13 +10,11 @@ import {
   where,
 } from 'firebase/firestore';
 import { fetchPagedData, parseTitle } from '../common';
-import { pageSize } from '../constants';
+import { pageSize, tabsCollection } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { tabOperations } from '../operations';
 import { DiminishedTab, PagedResponse, Tab, TabListParameters } from '../types';
-
-const tabsCollection = 'tabs';
 
 const getTabPath = (tabId: string) => {
   return [tabsCollection, tabId];
