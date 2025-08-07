@@ -1,4 +1,5 @@
 // Own collections
+export const sitemapDeletionsCollection = 'sitemapDeletions';
 export const starredTabsCollection = 'starredTabs';
 export const tabsCollection = 'tabs';
 export const usersCollection = 'users';

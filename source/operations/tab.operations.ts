@@ -97,6 +97,7 @@ export const tabOperations = {
       backingTrack: undefined,
       bars: [],
       capo: undefined,
+      created: Date.now(),
       id: nanoid(),
       ownerId,
       rhythms: [],

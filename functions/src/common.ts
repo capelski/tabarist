@@ -39,3 +39,21 @@ export const renderHtml = (originalUrl: string, initialState: AppProps = {}): st
 
   return getHtml({ adSenseId, appHtml, headTags, initialState });
 };
+
+export const writeBucketFile = async (filename: string, content: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const fileStream = storage.bucket('tabarist').file(filename).createWriteStream();
+
+    fileStream
+      .on('finish', () => {
+        resolve(undefined);
+      })
+      .on('error', (e) => {
+        reject(e);
+      });
+
+    fileStream.write(content);
+
+    fileStream.end();
+  });
+};

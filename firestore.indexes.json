@@ -109,6 +109,19 @@
         "where": "titleWords, ownerId",
         "orderBy": "title, id (descending)"
       }
+    },
+    {
+      "collectionGroup": "tabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "id", "order": "ASCENDING" },
+        { "fieldPath": "created", "order": "ASCENDING" }
+      ],
+      "usage": {
+        "description": "Fetching tabs that were created in the last 24 hours",
+        "where": "created",
+        "orderBy": "id (ascending)"
+      }
     }
   ],
   "fieldOverrides": []
