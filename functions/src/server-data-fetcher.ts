@@ -2,7 +2,7 @@ import { QuerySnapshot } from 'firebase-admin/firestore';
 import { firestore } from './common';
 import { CollectionQueryResolver, CollectionWhereClause, getPagedDataFetcher } from './ssr/ssr';
 
-export type ServerWhereClause = CollectionWhereClause<QuerySnapshot>;
+export type ServerWhereClause<TField> = CollectionWhereClause<QuerySnapshot, keyof TField>;
 
 export const serverResolver: CollectionQueryResolver<QuerySnapshot> = (
   collectionPath,

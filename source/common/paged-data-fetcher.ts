@@ -11,52 +11,53 @@ import {
 import { defaultPageSize } from '../constants';
 import { PagedQueryCursor, PagedResponse } from '../types';
 
-export type CollectionOrderByClause<T extends QuerySnapshot_C | QuerySnapshot_S> = [
-  fieldPath: string,
+type CollectionOrderByClause<T extends QuerySnapshot_C | QuerySnapshot_S, TField = string> = [
+  fieldPath: TField,
   direction?: T extends QuerySnapshot_C ? OrderByDirection_C : OrderByDirection_S,
 ];
 
-export type CollectionWhereClause<T extends QuerySnapshot_C | QuerySnapshot_S> = [
-  fieldPath: string,
+export type CollectionWhereClause<T extends QuerySnapshot_C | QuerySnapshot_S, TField = string> = [
+  fieldPath: TField,
   operator: T extends QuerySnapshot_C ? WhereFilterOp_C : WhereFilterOp_S,
   value: unknown,
 ];
 
-export type CollectionQueryResolver<T extends QuerySnapshot_C | QuerySnapshot_S> = (
+export type CollectionQueryResolver<
+  T extends QuerySnapshot_C | QuerySnapshot_S,
+  TField = string,
+> = (
   collectionPath: string[],
-  orderBy: CollectionOrderByClause<T>[],
+  orderBy: CollectionOrderByClause<T, TField>[],
   limit: number,
   options?: {
     startAt?: string[];
-    where?: CollectionWhereClause<T>[];
+    where?: CollectionWhereClause<T, TField>[];
   },
 ) => Promise<T>;
 
-export type PagedDataFetcher<TQuery extends QuerySnapshot_C | QuerySnapshot_S> = <TData>(
+type PagedDataFetcherArguments<TQuery extends QuerySnapshot_C | QuerySnapshot_S, TData> = [
   collectionPath: string[],
   cursorFields: (keyof TData)[],
   options?: {
     cursor?: PagedQueryCursor<TData>;
     limit?: number;
-    where?: CollectionWhereClause<TQuery>[];
+    where?: CollectionWhereClause<TQuery, keyof TData>[];
   },
+];
+
+export type PagedDataFetcher<TQuery extends QuerySnapshot_C | QuerySnapshot_S> = <TData>(
+  ...args: PagedDataFetcherArguments<TQuery, TData>
 ) => Promise<PagedResponse<TData>>;
 
 export const getPagedDataFetcher = <TQuery extends QuerySnapshot_C | QuerySnapshot_S>(
   resolver: CollectionQueryResolver<TQuery>,
 ): PagedDataFetcher<TQuery> => {
   return async function pagedDataFetcher<TData>(
-    collectionPath: string[],
-    cursorFields: (keyof TData)[],
-    {
-      cursor,
-      limit = defaultPageSize,
-      where,
-    }: {
-      cursor?: PagedQueryCursor<TData>;
-      limit?: number;
-      where?: CollectionWhereClause<TQuery>[];
-    } = {},
+    ...[
+      collectionPath,
+      cursorFields,
+      { cursor, limit = defaultPageSize, where } = {},
+    ]: PagedDataFetcherArguments<TQuery, TData>
   ): Promise<PagedResponse<TData>> {
     const cursorOffset = cursor ? 1 : 0;
     const requestedLimit = limit + 1 + cursorOffset;
@@ -67,7 +68,7 @@ export const getPagedDataFetcher = <TQuery extends QuerySnapshot_C | QuerySnapsh
       requestedLimit,
       {
         startAt: cursor?.values,
-        where,
+        where: where as CollectionWhereClause<TQuery>[],
       },
     );
     const response = snapshot.docs.map((doc) => doc.data() as TData);

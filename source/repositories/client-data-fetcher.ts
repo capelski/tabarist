@@ -11,7 +11,7 @@ import {
 import { CollectionQueryResolver, CollectionWhereClause, getPagedDataFetcher } from '../common';
 import { getFirebaseContext } from '../firebase-context';
 
-export type ClientWhereClause = CollectionWhereClause<QuerySnapshot>;
+export type ClientWhereClause<TField> = CollectionWhereClause<QuerySnapshot, keyof TField>;
 
 const clientResolver: CollectionQueryResolver<QuerySnapshot> = (
   [collectionName, ...collectionPath],

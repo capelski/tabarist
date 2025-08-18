@@ -17,7 +17,7 @@ import {
 const getHomeTabs = async (
   params?: TabListParameters,
 ): Promise<PagedResponse<DiminishedTab, Tab>> => {
-  const where: ServerWhereClause[] = params?.titleFilter
+  const where: ServerWhereClause<DiminishedTab>[] = params?.titleFilter
     ? [['titleWords', 'array-contains', parseTitle(params.titleFilter)]]
     : [];
 

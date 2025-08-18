@@ -12,7 +12,7 @@ const getTabPath = (tabId: string) => {
 
 const getTabs = async (
   params?: TabListParameters,
-  additionalWhereClauses: ClientWhereClause[] = [],
+  additionalWhereClauses: ClientWhereClause<DiminishedTab>[] = [],
 ): Promise<PagedResponse<DiminishedTab, Tab>> => {
   const where = [...additionalWhereClauses];
 
