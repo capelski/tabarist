@@ -6,7 +6,6 @@ typings/
 
 # Node.js dependency directory
 node_modules/
-*.local
 
 secrets.json
 src/ssr
