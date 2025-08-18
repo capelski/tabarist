@@ -1,32 +1,27 @@
-import { firestore } from '../common';
-import {
-  fetchPagedData,
-  PagedQueryCursor,
-  PagedResponse,
-  sitemapDeletionsCollection,
-} from '../ssr/ssr';
+import { serverDataFetcher } from '../server-data-fetcher';
+import { PagedQueryCursor, PagedResponse, sitemapDeletionsCollection } from '../ssr/ssr';
+
+type DeletedTabId = { id: string };
 
 export const getDeletedTabIds_page = async (
-  cursor?: PagedQueryCursor['fields'],
-): Promise<PagedResponse<string>> => {
-  const fetcher = async (_pageSize: number) => {
-    const collectionRef = firestore.collection(sitemapDeletionsCollection);
-    const query = cursor ? collectionRef.startAt(...cursor) : collectionRef;
-    const querySnapshot = await query.limit(_pageSize).get();
-    return querySnapshot.docs.map((doc) => doc.id);
+  cursor?: PagedQueryCursor<DeletedTabId>,
+): Promise<PagedResponse<DeletedTabId, string>> => {
+  const page = await serverDataFetcher<DeletedTabId>([sitemapDeletionsCollection], ['id'], {
+    cursor,
+  });
+
+  return {
+    ...page,
+    documents: page.documents.map((document) => document.id),
   };
-
-  const response = await fetchPagedData(100, undefined, fetcher, (documentId) => [documentId]);
-
-  return response;
 };
 
 export const getDeletedTabIds = async () => {
-  let deletedTabsResponse: PagedResponse<string> | undefined;
+  let deletedTabsResponse: PagedResponse<DeletedTabId, string> | undefined;
   const deletedTabIds: string[] = [];
 
-  while (!deletedTabsResponse || deletedTabsResponse.nextFields) {
-    deletedTabsResponse = await getDeletedTabIds_page(deletedTabsResponse?.nextFields);
+  while (!deletedTabsResponse || deletedTabsResponse.nextCursor) {
+    deletedTabsResponse = await getDeletedTabIds_page(deletedTabsResponse?.nextCursor);
 
     for (const tabId of deletedTabsResponse.documents) {
       deletedTabIds.push(tabId);

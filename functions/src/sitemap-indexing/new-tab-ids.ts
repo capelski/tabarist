@@ -1,36 +1,31 @@
-import { firestore } from '../common';
-import { fetchPagedData, tabsCollection } from '../ssr/ssr';
-import { PagedQueryCursor, PagedResponse } from '../ssr/types';
+import { serverDataFetcher } from '../server-data-fetcher';
+import { DiminishedTab, PagedQueryCursor, PagedResponse, tabsCollection } from '../ssr/ssr';
 
 export const getNewTabIds_page = async (
-  cursor?: PagedQueryCursor['fields'],
-): Promise<PagedResponse<string>> => {
-  const fetcher = async (_pageSize: number) => {
-    let query = firestore
-      .collection(tabsCollection)
-      .orderBy('id')
-      .where('created', '>', Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
-      .where('created', '<=', Date.now());
+  cursor?: PagedQueryCursor<DiminishedTab>,
+): Promise<PagedResponse<DiminishedTab, string>> => {
+  const now = Date.now();
 
-    if (cursor) {
-      query = query.startAt(...cursor);
-    }
+  const page = await serverDataFetcher<DiminishedTab>([tabsCollection], ['id'], {
+    cursor,
+    where: [
+      ['created', '>', now - 24 * 60 * 60 * 1000], // Last 24 hours
+      ['created', '<=', now],
+    ],
+  });
 
-    const querySnapshot = await query.limit(_pageSize).get();
-    return querySnapshot.docs.map((doc) => doc.id);
+  return {
+    ...page,
+    documents: page.documents.map((document) => document.id),
   };
-
-  const response = await fetchPagedData(100, undefined, fetcher, (documentId) => [documentId]);
-
-  return response;
 };
 
 export const getNewTabIds = async () => {
-  let newTabsResponse: PagedResponse<string> | undefined;
+  let newTabsResponse: PagedResponse<DiminishedTab, string> | undefined;
   const newTabIds: string[] = [];
 
-  while (!newTabsResponse || newTabsResponse.nextFields) {
-    newTabsResponse = await getNewTabIds_page(newTabsResponse?.nextFields);
+  while (!newTabsResponse || newTabsResponse.nextCursor) {
+    newTabsResponse = await getNewTabIds_page(newTabsResponse?.nextCursor);
 
     for (const tabId of newTabsResponse.documents) {
       newTabIds.push(tabId);

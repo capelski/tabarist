@@ -1,39 +1,20 @@
 import { User } from 'firebase/auth';
-import { collection, getDocs, limit, orderBy, query, startAt } from 'firebase/firestore';
-import { fetchPagedData } from '../common';
-import { pageSize, starredTabsCollection, usersCollection } from '../constants';
-import { getFirebaseContext } from '../firebase-context';
+import { starredTabsCollection, usersCollection } from '../constants';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { PagedResponse, StarredListParameters, StarredTab, Tab } from '../types';
+import { clientDataFetcher } from './client-data-fetcher';
 
 const getStarredTabPath = (userId: string, tabId: string) => {
   return [usersCollection, userId, starredTabsCollection, tabId];
 };
 
-const getStarredTabs = async (
+const getStarredTabs = (
   userId: string,
   params?: StarredListParameters,
 ): Promise<PagedResponse<StarredTab>> => {
-  const fetcher = async (_pageSize: number) => {
-    const queryData = query(
-      collection(getFirebaseContext().firestore, usersCollection, userId, starredTabsCollection),
-      orderBy('id', params?.cursor?.direction),
-      ...(params?.cursor ? [startAt(...params?.cursor.fields)] : []),
-      limit(_pageSize),
-    );
-
-    const querySnapshot = await getDocs(queryData);
-    return querySnapshot.docs.map((snapshot) => snapshot.data() as StarredTab);
-  };
-
-  const response = await fetchPagedData(
-    pageSize,
-    params?.cursor?.direction,
-    fetcher,
-    (document) => [document.id],
-  );
-
-  return response;
+  return clientDataFetcher<StarredTab>([usersCollection, userId, starredTabsCollection], ['id'], {
+    cursor: params?.cursor,
+  });
 };
 
 export const userRepository = {

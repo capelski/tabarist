@@ -1,16 +1,21 @@
 import { Given, Then, When } from '@cucumber/cucumber';
 import { expect } from 'chai';
+import { QuerySnapshot } from 'firebase/firestore';
 import { PagedQueryCursor, PagedResponse } from '../types';
-import { fetchPagedData } from './paged-queries';
+import {
+  CollectionQueryResolver,
+  getPagedDataFetcher,
+  PagedDataFetcher,
+} from './paged-data-fetcher';
 
 type SampleDocument = { id: number };
-const getCursorFields = (document: SampleDocument) => [String(document.id)];
 
 let documents: SampleDocument[];
 let documentsRequested: number;
 let pageSize: number = 0;
-let cursor: PagedQueryCursor | undefined;
-let fetcher: (pageSize: number) => Promise<SampleDocument[]>;
+let cursor: PagedQueryCursor<SampleDocument> | undefined;
+let resolver: CollectionQueryResolver<QuerySnapshot>;
+let fetcher: PagedDataFetcher<QuerySnapshot>;
 let result: PagedResponse<SampleDocument>;
 
 Given('a collection of {int} sample documents', (documentsCount: number) => {
@@ -28,24 +33,30 @@ Given(
   (direction: 'next' | 'previous', index: number) => {
     cursor = {
       direction: direction === 'next' ? 'asc' : 'desc',
-      fields: [String(index)],
+      values: [String(index)],
     };
   },
 );
 
 When('running the query', async () => {
-  fetcher = (_pageSize) => {
-    documentsRequested = _pageSize;
+  resolver = (_collectionPath, orderBy, limit, options) => {
+    documentsRequested = limit;
 
-    const sortedDocuments = cursor?.direction === 'desc' ? documents.reverse() : documents;
+    const [[, direction]] = orderBy;
+    const sortedDocuments = direction === 'desc' ? documents.reverse() : documents;
 
-    const startPosition = cursor
-      ? sortedDocuments.findIndex((d) => String(d.id) === cursor!.fields[0])
+    const startPosition = options?.startAt?.length
+      ? sortedDocuments.findIndex((d) => String(d.id) === options.startAt?.[0])
       : 0;
 
-    return Promise.resolve(sortedDocuments.slice(startPosition, startPosition + _pageSize));
+    const documentsWindow = sortedDocuments.slice(startPosition, startPosition + limit);
+
+    return Promise.resolve({
+      docs: documentsWindow.map((document) => ({ data: () => document })),
+    } as unknown as QuerySnapshot);
   };
-  result = await fetchPagedData(pageSize, cursor?.direction, fetcher, getCursorFields);
+  fetcher = getPagedDataFetcher(resolver);
+  result = await fetcher(['SampleDocument'], ['id'], { cursor, limit: pageSize });
 });
 
 Then('{int} documents are requested', (_documentsRequested: number) => {
@@ -63,12 +74,12 @@ Then('the document {int} has id {int}', (position: number, id: number) => {
 Then(
   /the response has a (next|previous) cursor pointing at document (\d+)/,
   (direction: 'next' | 'previous', documentId: number) => {
-    const target = direction === 'next' ? result.nextFields : result.previousFields;
-    expect(target?.[0]).to.equal(String(documentId));
+    const target = direction === 'next' ? result.nextCursor : result.previousCursor;
+    expect(target?.values[0]).to.equal(String(documentId));
   },
 );
 
 Then(/the response doesn't have a (next|previous) cursor/, (direction: 'next' | 'previous') => {
-  const target = direction === 'next' ? result.nextFields : result.previousFields;
+  const target = direction === 'next' ? result.nextCursor : result.previousCursor;
   expect(target).to.equal(undefined);
 });

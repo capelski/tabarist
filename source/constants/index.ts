@@ -23,7 +23,7 @@ export const sectionColor = '#ebf3e8';
 export const rhythmLineColor = '#bbb';
 export const rhythmNestedLineColor = '#ddd';
 
-export const pageSize = 10;
+export const defaultPageSize = 10;
 
 export * from './add-mode';
 export * from './bar-type';

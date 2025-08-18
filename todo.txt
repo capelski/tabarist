@@ -12,3 +12,5 @@
 - If search params change, clear them everywhere where they are stored
     E.g. navigating from my-tabs?params to home, and then clicking on my-tabs,
     displays the page with params, but the URL doesn't have them
+
+- When creating new tab, use id "new"

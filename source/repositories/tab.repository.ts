@@ -1,20 +1,10 @@
 import { User } from 'firebase/auth';
-import {
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  QueryFieldFilterConstraint,
-  startAt,
-  where,
-} from 'firebase/firestore';
-import { fetchPagedData, parseTitle } from '../common';
-import { pageSize, tabsCollection } from '../constants';
-import { getFirebaseContext } from '../firebase-context';
+import { parseTitle } from '../common';
+import { tabsCollection } from '../constants';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { tabOperations } from '../operations';
 import { DiminishedTab, PagedResponse, Tab, TabListParameters } from '../types';
+import { clientDataFetcher, ClientWhereClause } from './client-data-fetcher';
 
 const getTabPath = (tabId: string) => {
   return [tabsCollection, tabId];
@@ -22,35 +12,23 @@ const getTabPath = (tabId: string) => {
 
 const getTabs = async (
   params?: TabListParameters,
-  whereClauses: QueryFieldFilterConstraint[] = [],
-): Promise<PagedResponse<Tab>> => {
-  const fetcher = async (_pageSize: number) => {
-    const queryData = query(
-      collection(getFirebaseContext().firestore, tabsCollection),
-      orderBy('title', params?.cursor?.direction),
-      orderBy('id', params?.cursor?.direction),
-      ...(params?.titleFilter
-        ? [where('titleWords', 'array-contains', parseTitle(params.titleFilter))]
-        : []),
-      ...whereClauses,
-      ...(params?.cursor ? [startAt(...params?.cursor.fields)] : []),
-      limit(_pageSize),
-    );
+  additionalWhereClauses: ClientWhereClause[] = [],
+): Promise<PagedResponse<DiminishedTab, Tab>> => {
+  const where = [...additionalWhereClauses];
 
-    const querySnapshot = await getDocs(queryData);
-    return querySnapshot.docs.map((snapshot) =>
-      tabOperations.augmentTab(snapshot.data() as DiminishedTab),
-    );
+  if (params?.titleFilter) {
+    where.unshift(['titleWords', 'array-contains', parseTitle(params.titleFilter)]);
+  }
+
+  const page = await clientDataFetcher<DiminishedTab>([tabsCollection], ['title', 'id'], {
+    cursor: params?.cursor,
+    where,
+  });
+
+  return {
+    ...page,
+    documents: page.documents.map((document) => tabOperations.augmentTab(document)),
   };
-
-  const response = await fetchPagedData(
-    pageSize,
-    params?.cursor?.direction,
-    fetcher,
-    (document) => [document.title, document.id],
-  );
-
-  return response;
 };
 
 export const tabRepository = {
@@ -62,7 +40,7 @@ export const tabRepository = {
     return getTabs(params);
   },
   getUserTabs: (userId: User['uid'], params?: TabListParameters) => {
-    return getTabs(params, [where('ownerId', '==', userId)]);
+    return getTabs(params, [['ownerId', '==', userId]]);
   },
   remove: (tabId: string) => {
     return deleteDocument(getTabPath(tabId));

@@ -50,7 +50,7 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
     if (pathname === RouteNames.home || pathname === RouteNames.myTabs) {
       const titleParameter = searchParams.get(QueryParameters.title);
       const cDParameter = searchParams.get(QueryParameters.cursorDirection);
-      const cFParameters = searchParams.getAll(QueryParameters.cursorFields + '[]');
+      const cVParameters = searchParams.getAll(QueryParameters.cursorValues + '[]');
 
       const currentParams = state[pathname].params;
 
@@ -59,14 +59,14 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
         // Deliberately using loose equality to allow for null/undefined
         titleParameter != currentParams.titleFilter ||
         cDParameter != currentParams.cursor?.direction ||
-        cFParameters.some((field, index) => field != currentParams.cursor?.fields[index])
+        cVParameters.some((field, index) => field != currentParams.cursor?.values[index])
       ) {
         const nextParams: TabListParameters = {
           cursor:
-            cDParameter && cFParameters.length
+            cDParameter && cVParameters.length
               ? {
                   direction: cDParameter as CursorDirection,
-                  fields: cFParameters,
+                  values: cVParameters,
                 }
               : undefined,
           titleFilter: titleParameter ?? undefined,
@@ -83,7 +83,7 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
 
     if (pathname === RouteNames.starredTabs) {
       const cDParameter = searchParams.get(QueryParameters.cursorDirection);
-      const cFParameters = searchParams.getAll(QueryParameters.cursorFields + '[]');
+      const cVParameters = searchParams.getAll(QueryParameters.cursorValues + '[]');
 
       const currentParams = state.starredTabs.params;
 
@@ -91,14 +91,14 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
         !currentParams ||
         // Deliberately using loose equality to allow for null/undefined
         cDParameter != currentParams.cursor?.direction ||
-        cFParameters.some((field, index) => field != currentParams.cursor?.fields[index])
+        cVParameters.some((field, index) => field != currentParams.cursor?.values[index])
       ) {
         const nextParams: StarredListParameters = {
           cursor:
-            cDParameter && cFParameters.length
+            cDParameter && cVParameters.length
               ? {
                   direction: cDParameter as CursorDirection,
-                  fields: cFParameters,
+                  values: cVParameters,
                 }
               : undefined,
         };

@@ -1,6 +1,6 @@
 export enum QueryParameters {
   cursorDirection = 'cD',
-  cursorFields = 'cF',
+  cursorValues = 'cV',
   editMode = 'editMode',
   title = 'title',
 }

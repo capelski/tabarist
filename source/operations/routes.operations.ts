@@ -4,7 +4,7 @@ import { StarredListParameters, TabListParameters } from '../types';
 export const getStarredListRelativeUrl = (params: StarredListParameters) => {
   const cursorParams = params.cursor
     ? `${QueryParameters.cursorDirection}=${params.cursor.direction}&` +
-      params.cursor.fields.map((field) => `${QueryParameters.cursorFields}[]=${field}`).join('&')
+      params.cursor.values.map((field) => `${QueryParameters.cursorValues}[]=${field}`).join('&')
     : '';
 
   return `${RouteNames.starredTabs}${cursorParams ? `?${cursorParams}` : ''}`;
@@ -17,7 +17,7 @@ export const getTabListRelativeUrl = (
   const titleParam = params.titleFilter ? `${QueryParameters.title}=${params.titleFilter}&` : '';
   const cursorParams = params.cursor
     ? `${QueryParameters.cursorDirection}=${params.cursor.direction}&` +
-      params.cursor.fields.map((field) => `${QueryParameters.cursorFields}[]=${field}`).join('&')
+      params.cursor.values.map((field) => `${QueryParameters.cursorValues}[]=${field}`).join('&')
     : '';
 
   const hasParams = titleParam || cursorParams;

@@ -2,7 +2,7 @@ import React from 'react';
 import { ListState } from '../../state';
 import { PagedQueryCursor } from '../../types';
 
-export type DefaultParams = { cursor?: PagedQueryCursor };
+export type DefaultParams = { cursor?: PagedQueryCursor<any> };
 
 export type ItemsListProps<TData, TParams extends DefaultParams> = {
   getNavigationUrl: (nextParams: ListState<TData, TParams>['params']) => string;
@@ -13,23 +13,17 @@ export type ItemsListProps<TData, TParams extends DefaultParams> = {
 };
 
 export const ItemsList: React.FC<ItemsListProps<any, DefaultParams>> = (props) => {
-  const previousParams: DefaultParams | undefined = props.listState.data?.previousFields
+  const previousParams: DefaultParams | undefined = props.listState.data?.previousCursor
     ? {
         ...props.listState.params,
-        cursor: {
-          direction: 'desc',
-          fields: props.listState.data.previousFields,
-        },
+        cursor: props.listState.data.previousCursor,
       }
     : undefined;
 
-  const nextParams: DefaultParams | undefined = props.listState.data?.nextFields
+  const nextParams: DefaultParams | undefined = props.listState.data?.nextCursor
     ? {
         ...props.listState.params,
-        cursor: {
-          direction: 'asc',
-          fields: props.listState.data.nextFields,
-        },
+        cursor: props.listState.data.nextCursor,
       }
     : undefined;
 
