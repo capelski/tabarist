@@ -110,7 +110,7 @@ export type AppAction =
     }
   | {
       type: ActionType.setStarredTab;
-      starredTab: boolean;
+      starredTab: StarredTab | undefined;
     }
   | {
       type: ActionType.setStripeSubscription;

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { ItemsList, ItemsListProps, TabListItem } from '../components';
 import { getStarredListRelativeUrl } from '../operations';
-import { userRepository } from '../repositories';
+import { starredTabRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
 import { StarredListParameters, StarredTab } from '../types';
 import { MetaTags } from './common/meta-tags';
@@ -17,7 +17,7 @@ export const StarredTabsView: React.FC = () => {
     }
 
     dispatch({ type: ActionType.fetchStarredTabsStart });
-    const response = await userRepository.getStarredTabs(state.user.document.uid, listState.params);
+    const response = await starredTabRepository.getMany(state.user.document.uid, listState.params);
     dispatch({
       type: ActionType.fetchStarredTabsEnd,
       navigate: listState.skipUrlUpdate
@@ -37,22 +37,22 @@ export const StarredTabsView: React.FC = () => {
 
   const listProps: ItemsListProps<StarredTab, StarredListParameters> = {
     getNavigationUrl: getStarredListRelativeUrl,
-    itemRenderer: (tab) => (
+    itemRenderer: (starredTab) => (
       <TabListItem
         allowRemoving={true}
-        key={tab.id}
+        key={starredTab.id}
         remove={async () => {
           if (!state.user.document) {
             return;
           }
 
-          await userRepository.removeStarredTab(state.user.document.uid, tab.id);
+          await starredTabRepository.remove(starredTab.id);
           dispatch({
             type: ActionType.setStarredListParameters,
             params: listState.params,
           });
         }}
-        tab={tab}
+        tab={starredTab}
       />
     ),
     listState,

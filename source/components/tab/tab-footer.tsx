@@ -4,7 +4,7 @@ import { BeatEngine } from '../../classes';
 import { BeatEngineMode, BeatEnginePhase } from '../../classes/beat-engine-core';
 import { maxTempo, minTempo } from '../../constants';
 import { tabOperations } from '../../operations';
-import { userRepository } from '../../repositories';
+import { starredTabRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
 import { ActiveSlot, BarContainer, StripeSubscription, Tab } from '../../types';
 
@@ -14,7 +14,7 @@ export type TabFooterProps = {
   beatEngine: BeatEngine;
   isDraft?: boolean;
   isEditMode: boolean | undefined;
-  isStarred?: boolean;
+  starredTabId: string | undefined;
   subscription?: StripeSubscription;
   tab: Tab;
   updateTab: (tab: Tab) => void;
@@ -103,12 +103,12 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
       return;
     }
 
-    if (props.isStarred) {
-      await userRepository.removeStarredTab(props.user.uid, props.tab.id);
-      dispatch({ type: ActionType.setStarredTab, starredTab: false });
+    if (props.starredTabId) {
+      await starredTabRepository.remove(props.starredTabId);
+      dispatch({ type: ActionType.setStarredTab, starredTab: undefined });
     } else {
-      await userRepository.setStarredTab(props.user.uid, props.tab);
-      dispatch({ type: ActionType.setStarredTab, starredTab: true });
+      const starredTab = await starredTabRepository.create(props.user.uid, props.tab);
+      dispatch({ type: ActionType.setStarredTab, starredTab });
     }
   };
 
@@ -143,7 +143,7 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
     >
       {!props.isEditMode && (
         <button
-          className={`btn ${props.isStarred ? 'btn-primary' : 'btn-outline-primary'}`}
+          className={`btn ${props.starredTabId ? 'btn-primary' : 'btn-outline-primary'}`}
           disabled={props.isDraft}
           onClick={toggleStarredTab}
           style={{ marginRight: 8 }}

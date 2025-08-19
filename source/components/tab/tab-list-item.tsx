@@ -13,12 +13,10 @@ export type TabListItemProps = {
 
 export const TabListItem: React.FC<TabListItemProps> = (props) => {
   const { dispatch } = useContext(StateProvider);
+  const tabId = 'bars' in props.tab ? props.tab.id : props.tab.tabId;
 
   return (
-    <div
-      key={props.tab.id}
-      style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}
-    >
+    <div key={tabId} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
       <NavLink
         className="nav-link"
         style={{ flexGrow: 1 }}
@@ -28,7 +26,7 @@ export const TabListItem: React.FC<TabListItemProps> = (props) => {
             dispatch({ type: ActionType.setTab, tab: props.tab });
           }
         }}
-        to={getTabRelativeUrl(props.tab.id)}
+        to={getTabRelativeUrl(tabId)}
       >
         {props.tab.title}
       </NavLink>

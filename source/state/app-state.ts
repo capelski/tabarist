@@ -50,6 +50,7 @@ export type AppState = {
     /** Snapshot of the unmodified document */
     originalDocument?: string;
     positionOperation?: PositionOperation;
+    starredTabId?: string;
   };
   upgradeModal?: {
     message?: string;

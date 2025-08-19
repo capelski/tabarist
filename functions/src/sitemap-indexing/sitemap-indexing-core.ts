@@ -49,7 +49,7 @@ export const indexingCore = async (updateBucketFile = true) => {
 
     // Only after updating the sitemap, remove all the IDs from the sitemapDeletions collection
     for (const tabId of deletedTabIds) {
-      await firestore.collection(sitemapDeletionsCollection).doc(tabId).delete({});
+      await firestore.collection(sitemapDeletionsCollection).doc(tabId).delete();
     }
   }
 

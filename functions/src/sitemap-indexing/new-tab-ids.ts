@@ -1,7 +1,7 @@
 import { serverDataFetcher } from '../server-data-fetcher';
 import { DiminishedTab, PagedQueryCursor, PagedResponse, tabsCollection } from '../ssr/ssr';
 
-export const getNewTabIds_page = async (
+const getNewTabIds_page = async (
   cursor?: PagedQueryCursor<DiminishedTab>,
 ): Promise<PagedResponse<DiminishedTab, string>> => {
   const now = Date.now();

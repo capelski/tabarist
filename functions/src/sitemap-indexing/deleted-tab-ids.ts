@@ -3,7 +3,7 @@ import { PagedQueryCursor, PagedResponse, sitemapDeletionsCollection } from '../
 
 type DeletedTabId = { id: string };
 
-export const getDeletedTabIds_page = async (
+const getDeletedTabIds_page = async (
   cursor?: PagedQueryCursor<DeletedTabId>,
 ): Promise<PagedResponse<DeletedTabId, string>> => {
   const page = await serverDataFetcher<DeletedTabId>([sitemapDeletionsCollection], ['id'], {

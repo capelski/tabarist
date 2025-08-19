@@ -346,7 +346,8 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
           },
       tab: {
         ...state.tab,
-        isStarred: action.starredTab,
+        isStarred: !!action.starredTab,
+        starredTabId: action.starredTab?.id,
       },
     };
   }

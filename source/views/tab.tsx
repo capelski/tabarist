@@ -10,7 +10,7 @@ import {
   TabHeader,
 } from '../components';
 import { barsToBarContainers } from '../operations';
-import { tabRepository, userRepository } from '../repositories';
+import { starredTabRepository, tabRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
 import { Tab } from '../types';
 import { MetaTags } from './common/meta-tags';
@@ -45,18 +45,19 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
   useEffect(() => {
     if (state.tab.document && state.user.document && state.tab.isStarred === undefined) {
-      userRepository
-        .getStarredTab(state.user.document.uid, state.tab.document.id)
+      starredTabRepository
+        .getOne(state.user.document.uid, state.tab.document.id)
         .then((starredTab) => {
-          dispatch({ type: ActionType.setStarredTab, starredTab: !!starredTab });
+          dispatch({ type: ActionType.setStarredTab, starredTab });
           if (starredTab && starredTab.title !== state.tab.document!.title) {
             // If the tab title has changed after it was starred, update the starred title
-            userRepository.setStarredTab(state.user.document!.uid, state.tab.document!);
+            starredTab.title = state.tab.document!.title;
+            starredTabRepository.update(starredTab);
           }
         })
         .catch((error) => {
           console.error(error);
-          dispatch({ type: ActionType.setStarredTab, starredTab: false });
+          dispatch({ type: ActionType.setStarredTab, starredTab: undefined });
         });
     }
   }, [state.tab.document, state.tab.isStarred, state.user.document]);
@@ -138,7 +139,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
         barContainers={barContainers}
         isDraft={state.tab.isDraft}
         isEditMode={state.tab.isEditMode}
-        isStarred={state.tab.isStarred}
+        starredTabId={state.tab.starredTabId}
         subscription={state.user.stripeSubscription}
         tab={state.tab.document}
         updateTab={updateTab}

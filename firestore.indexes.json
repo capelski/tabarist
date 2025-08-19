@@ -1,6 +1,62 @@
 {
   "indexes": [
     {
+      "collectionGroup": "starredTabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": {
+        "description": "Fetching the starred tabs of a user (next page)",
+        "where": "userId",
+        "orderBy": "title, id (ascending)"
+      }
+    },
+    {
+      "collectionGroup": "starredTabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "title", "order": "DESCENDING" },
+        { "fieldPath": "id", "order": "DESCENDING" }
+      ],
+      "usage": {
+        "description": "Fetching the starred tabs of a user (previous page)",
+        "where": "userId",
+        "orderBy": "title, id (descending)"
+      }
+    },
+    {
+      "collectionGroup": "starredTabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tabId", "mode": "ASCENDING" },
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": {
+        "description": "Fetching a starred tab by userId and tabId",
+        "where": "tabId, userId",
+        "orderBy": "title, id (ascending)"
+      }
+    },
+    {
+      "collectionGroup": "starredTabs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tabId", "mode": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ],
+      "usage": {
+        "description": "Fetching all the starred tabs for a tabId (used via document trigger)",
+        "where": "tabId",
+        "orderBy": "id (ascending)"
+      }
+    },
+    {
       "collectionGroup": "tabs",
       "queryScope": "COLLECTION",
       "fields": [
@@ -33,7 +89,7 @@
         { "fieldPath": "id", "order": "ASCENDING" }
       ],
       "usage": {
-        "description": "Fetching the tabs of a user",
+        "description": "Fetching the tabs of a user (next page)",
         "where": "ownerId",
         "orderBy": "title, id (ascending)"
       }
@@ -47,7 +103,7 @@
         { "fieldPath": "id", "order": "DESCENDING" }
       ],
       "usage": {
-        "description": "Fetching the tabs of a user",
+        "description": "Fetching the tabs of a user (previous page)",
         "where": "ownerId",
         "orderBy": "title, id (descending)"
       }

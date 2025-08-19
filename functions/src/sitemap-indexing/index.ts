@@ -1,8 +1,11 @@
-import { onDocumentDeleted } from 'firebase-functions/firestore';
+import express from 'express';
+import { logger } from 'firebase-functions';
+import { onRequest } from 'firebase-functions/https';
 import { onSchedule } from 'firebase-functions/scheduler';
 import { functionsRegion } from '../ssr/ssr';
+import { getDeletedTabIds } from './deleted-tab-ids';
+import { getNewTabIds } from './new-tab-ids';
 import { indexingCore } from './sitemap-indexing-core';
-import { tabDeletedCore } from './tab-deleted-core';
 
 /** Cron job that retrieves tabs created in the last 24 hours and adds them to the sitemap */
 export const sitemapIndexing = onSchedule(
@@ -12,14 +15,21 @@ export const sitemapIndexing = onSchedule(
   },
 );
 
-/** Trigger that adds the ID of each deleted tab to the sitemapDeletions collection */
-export const tabDeleted = onDocumentDeleted(
-  { region: functionsRegion, document: 'tabs/{tabId}' },
-  async (event) => {
-    if (event.data) {
-      await tabDeletedCore(event.data.id);
-    }
-  },
-);
+/** HTTP endpoint for testing sitemapIndexing in local */
+export const sitemapIndexingHttp = onRequest(
+  { region: functionsRegion },
+  express().use(async (_req, res) => {
+    try {
+      const newTabIds = await getNewTabIds();
+      logger.info('newTabIds', newTabIds);
+      const deletedTabIds = await getDeletedTabIds();
+      logger.info('deletedTabIds', deletedTabIds);
 
-export * from './local';
+      const newSitemap = await indexingCore(false);
+      res.status(200).send(newSitemap || 'No changes to the sitemap.');
+    } catch (error) {
+      logger.error('Error during sitemap indexing:', error);
+      res.status(500).send('Error during sitemap indexing');
+    }
+  }),
+);

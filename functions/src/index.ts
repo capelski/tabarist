@@ -1,10 +1,6 @@
 import { serverSideRendering } from './server-side-rendering';
-import {
-  sitemapIndexing,
-  sitemapIndexingHttp,
-  tabDeleted,
-  tabDeletedHttp,
-} from './sitemap-indexing';
+import { sitemapIndexing, sitemapIndexingHttp } from './sitemap-indexing';
+import { tabDeleted, tabDeletedHttp } from './tabs';
 
 exports.serverSideRendering = serverSideRendering;
 exports.sitemapIndexing = sitemapIndexing;
