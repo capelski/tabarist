@@ -1,16 +1,15 @@
-- Cron job to build a dynamic sitemap
+- Adding a new tab doesn't refresh the list
+- Refresh starred-tabs after removing a starred tab
+- When creating new tab, use id "new"
+
 - Universal rhythms
 - Allow clicking on a slot to start playing from there
 - List of chords + chord display. Ability to define custom chords
     - Allow display chords in Spanish format
 - Check whether Stripe subscription is active
-- <meta property="og:image" content={`${PRODUCTION_URL_BASE}/TODO`} /> 
 - Allow copying a tab from another user
-- Support lyrics underneath the bars
 - Add capacitor and build APP bundle. Integrate AdMob
 
 - If search params change, clear them everywhere where they are stored
     E.g. navigating from my-tabs?params to home, and then clicking on my-tabs,
     displays the page with params, but the URL doesn't have them
-
-- When creating new tab, use id "new"
