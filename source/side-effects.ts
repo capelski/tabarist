@@ -17,11 +17,12 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
   useEffect(() => {
     getFirebaseContext().auth.onAuthStateChanged(
       (user) => {
-        dispatch({ type: ActionType.authStateChanged, user });
         if (user) {
           customerRepository.getSubscription(user.uid).then((subscription) => {
-            dispatch({ type: ActionType.setStripeSubscription, subscription });
+            dispatch({ type: ActionType.setUser, subscription, user });
           });
+        } else if (state.user.document) {
+          dispatch({ type: ActionType.setUser, subscription: undefined, user: null });
         }
       },
       (error) => {

@@ -1,7 +1,6 @@
 export enum ActionType {
   activeSlotClear = 'activeSlotClear',
   activeSlotUpdate = 'activeSlotUpdate',
-  authStateChanged = 'authStateChanged',
   clearNavigation = 'clearNavigation',
   createTab = 'createTab',
   deleteCancel = 'deleteCancel',
@@ -23,9 +22,9 @@ export enum ActionType {
   searchParamsReady = 'searchParamsReady',
   setStarredListParameters = 'setStarredListParameters',
   setStarredTab = 'setStarredTab',
-  setStripeSubscription = 'setStripeSubscription',
   setTab = 'setTab',
   setTabListParams = 'setTabListParams',
+  setUser = 'setUser',
   signInFinish = 'signInFinish',
   signInStart = 'signInStart',
   updateTab = 'updateTab',

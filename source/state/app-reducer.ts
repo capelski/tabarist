@@ -92,15 +92,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.authStateChanged) {
-    return {
-      ...state,
-      user: {
-        document: action.user,
-      },
-    };
-  }
-
   if (action.type === ActionType.clearNavigation) {
     return {
       ...state,
@@ -352,16 +343,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.setStripeSubscription) {
-    return {
-      ...state,
-      user: {
-        ...state.user,
-        stripeSubscription: action.subscription,
-      },
-    };
-  }
-
   if (action.type === ActionType.setTab) {
     return {
       ...state,
@@ -385,6 +366,16 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         // Clearing data will trigger a fetch request
         params: action.params,
         skipUrlUpdate: action.skipUrlUpdate,
+      },
+    };
+  }
+
+  if (action.type === ActionType.setUser) {
+    return {
+      ...state,
+      user: {
+        document: action.user,
+        stripeSubscription: action.subscription,
       },
     };
   }

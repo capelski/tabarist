@@ -23,10 +23,6 @@ export type AppAction =
       barContainers: BarContainer[];
     }
   | {
-      type: ActionType.authStateChanged;
-      user: User | null;
-    }
-  | {
       type: ActionType.clearNavigation;
     }
   | {
@@ -113,13 +109,14 @@ export type AppAction =
       starredTab: StarredTab | undefined;
     }
   | {
-      type: ActionType.setStripeSubscription;
-      subscription: StripeSubscription;
-    }
-  | {
       type: ActionType.setTab;
       navigate?: AppState['navigate'];
       tab: Tab;
+    }
+  | {
+      type: ActionType.setUser;
+      subscription: StripeSubscription | undefined;
+      user: User | null;
     }
   | {
       type: ActionType.signInFinish;
