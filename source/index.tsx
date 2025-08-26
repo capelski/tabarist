@@ -1,23 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import Modal from 'react-modal';
 import { BrowserRouter } from 'react-router';
 import { App, AppProps } from './app';
 
 const AppWithRouter: React.FC<AppProps> = (props) => {
-  const [initialState, setInitialState] = useState<AppProps | undefined>(props);
-
-  useEffect(() => {
-    // After first render, clear the state so components re-fetch data when needed
-    // Otherwise, the same data will be used through out the page lifespan
-    setInitialState(undefined);
-  }, []);
-
   return (
     <BrowserRouter>
-      <App {...initialState} />
+      <App {...props} />
     </BrowserRouter>
   );
 };
