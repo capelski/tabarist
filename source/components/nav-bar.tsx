@@ -10,7 +10,7 @@ import { StripeSubscription } from '../types';
 
 export type NavBarProps = {
   isCurrentTabDirty: boolean;
-  loading?: boolean;
+  loading?: true;
   subscription?: StripeSubscription;
   user: User | null;
 };

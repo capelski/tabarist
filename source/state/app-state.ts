@@ -14,14 +14,14 @@ import {
 
 export type ListState<TData, TParams> = {
   data?: PagedResponse<TData>;
-  loading?: boolean;
+  loading?: true;
   params: TParams;
 };
 
 export type AppState = {
   deletingTab?: Tab;
   [RouteNames.home]: ListState<Tab, TabListParameters>;
-  loading?: boolean;
+  loading?: true;
   [RouteNames.myTabs]: ListState<Tab, TabListParameters>;
   navigate?:
     | {

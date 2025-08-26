@@ -240,7 +240,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.loaderHide) {
     return {
       ...state,
-      loading: true,
+      loading: undefined,
     };
   }
 
