@@ -1,5 +1,3 @@
-- Adding a new tab doesn't refresh the list
-- Refresh starred-tabs after removing a starred tab
 - When creating new tab, use id "new"
 
 - Universal rhythms

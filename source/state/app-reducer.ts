@@ -194,9 +194,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state.starredTabs,
         data: action.response,
         loading: undefined,
-        skipUrlUpdate: undefined,
       },
-      navigate: action.navigate,
     };
   }
 
@@ -204,8 +202,8 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     return {
       ...state,
       starredTabs: {
-        ...state.starredTabs,
         loading: true,
+        params: action.params,
       },
     };
   }
@@ -217,9 +215,7 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         ...state[action.route],
         data: action.response,
         loading: undefined,
-        skipUrlUpdate: undefined,
       },
-      navigate: action.navigate,
     };
   }
 
@@ -228,8 +224,8 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       ...state,
       deletingTab: undefined, // Might come from a tab deletion modal
       [action.route]: {
-        ...state[action.route],
         loading: true,
+        params: action.params,
       },
     };
   }
@@ -307,24 +303,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.searchParamsReady) {
-    return {
-      ...state,
-      searchParamsReady: true,
-    };
-  }
-
-  if (action.type === ActionType.setStarredListParameters) {
-    return {
-      ...state,
-      starredTabs: {
-        // Clearing data will trigger a fetch request
-        params: action.params,
-        skipUrlUpdate: action.skipUrlUpdate,
-      },
-    };
-  }
-
   if (action.type === ActionType.setStarredTab) {
     return {
       ...state,
@@ -355,17 +333,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
         isDraft: undefined,
         isStarred: undefined,
         originalDocument: JSON.stringify(action.tab),
-      },
-    };
-  }
-
-  if (action.type === ActionType.setTabListParams) {
-    return {
-      ...state,
-      [action.route]: {
-        // Clearing data will trigger a fetch request
-        params: action.params,
-        skipUrlUpdate: action.skipUrlUpdate,
       },
     };
   }

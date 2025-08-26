@@ -5,8 +5,47 @@ import { QueryParameters, RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
 import { getTabRelativeUrl } from './operations';
 import { customerRepository } from './repositories';
-import { ActionType, AppAction, AppState } from './state';
+import {
+  ActionType,
+  AppAction,
+  AppState,
+  loadHomeTabs,
+  loadMyTabs,
+  loadStarredTabs,
+} from './state';
 import { CursorDirection, StarredListParameters, TabListParameters } from './types';
+
+const getTabListParameters = (searchParams: URLSearchParams): TabListParameters => {
+  const titleParameter = searchParams.get(QueryParameters.title);
+  const cDParameter = searchParams.get(QueryParameters.cursorDirection);
+  const cVParameters = searchParams.getAll(QueryParameters.cursorValues + '[]');
+
+  return {
+    cursor:
+      cDParameter && cVParameters.length
+        ? {
+            direction: cDParameter as CursorDirection,
+            values: cVParameters,
+          }
+        : undefined,
+    titleFilter: titleParameter ?? undefined,
+  };
+};
+
+const getStarredListParameters = (searchParams: URLSearchParams): StarredListParameters => {
+  const cDParameter = searchParams.get(QueryParameters.cursorDirection);
+  const cVParameters = searchParams.getAll(QueryParameters.cursorValues + '[]');
+
+  return {
+    cursor:
+      cDParameter && cVParameters.length
+        ? {
+            direction: cDParameter as CursorDirection,
+            values: cVParameters,
+          }
+        : undefined,
+  };
+};
 
 export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) => {
   const navigate = useNavigate();
@@ -32,6 +71,27 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
     );
   }, []);
 
+  // Effects triggered by navigation events
+  useEffect(() => {
+    if (pathname === RouteNames.home) {
+      const params = getTabListParameters(searchParams);
+      loadHomeTabs(params, dispatch);
+    }
+  }, [pathname, searchParams]);
+
+  // Effects triggered by navigation events that require a logged in user
+  useEffect(() => {
+    if (state.user.document) {
+      if (pathname === RouteNames.myTabs) {
+        const params = getTabListParameters(searchParams);
+        loadMyTabs(state.user.document.uid, params, dispatch);
+      } else if (pathname === RouteNames.starredTabs) {
+        const params = getStarredListParameters(searchParams);
+        loadStarredTabs(state.user.document.uid, params, dispatch);
+      }
+    }
+  }, [pathname, searchParams, state.user]);
+
   // Update the state upon browser back/forward navigation events
   useEffect(() => {
     const editModeParam = searchParams.get(QueryParameters.editMode) === 'true';
@@ -46,74 +106,6 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
       } else {
         dispatch({ type: ActionType.discardChangesConfirm });
       }
-    }
-
-    if (pathname === RouteNames.home || pathname === RouteNames.myTabs) {
-      const titleParameter = searchParams.get(QueryParameters.title);
-      const cDParameter = searchParams.get(QueryParameters.cursorDirection);
-      const cVParameters = searchParams.getAll(QueryParameters.cursorValues + '[]');
-
-      const currentParams = state[pathname].params;
-
-      if (
-        !currentParams ||
-        // Deliberately using loose equality to allow for null/undefined
-        titleParameter != currentParams.titleFilter ||
-        cDParameter != currentParams.cursor?.direction ||
-        cVParameters.some((field, index) => field != currentParams.cursor?.values[index])
-      ) {
-        const nextParams: TabListParameters = {
-          cursor:
-            cDParameter && cVParameters.length
-              ? {
-                  direction: cDParameter as CursorDirection,
-                  values: cVParameters,
-                }
-              : undefined,
-          titleFilter: titleParameter ?? undefined,
-        };
-
-        dispatch({
-          type: ActionType.setTabListParams,
-          params: nextParams,
-          route: pathname,
-          skipUrlUpdate: true,
-        });
-      }
-    }
-
-    if (pathname === RouteNames.starredTabs) {
-      const cDParameter = searchParams.get(QueryParameters.cursorDirection);
-      const cVParameters = searchParams.getAll(QueryParameters.cursorValues + '[]');
-
-      const currentParams = state.starredTabs.params;
-
-      if (
-        !currentParams ||
-        // Deliberately using loose equality to allow for null/undefined
-        cDParameter != currentParams.cursor?.direction ||
-        cVParameters.some((field, index) => field != currentParams.cursor?.values[index])
-      ) {
-        const nextParams: StarredListParameters = {
-          cursor:
-            cDParameter && cVParameters.length
-              ? {
-                  direction: cDParameter as CursorDirection,
-                  values: cVParameters,
-                }
-              : undefined,
-        };
-
-        dispatch({
-          type: ActionType.setStarredListParameters,
-          params: nextParams,
-          skipUrlUpdate: true,
-        });
-      }
-    }
-
-    if (!state.searchParamsReady) {
-      dispatch({ type: ActionType.searchParamsReady });
     }
   }, [searchParams]);
 

@@ -56,20 +56,20 @@ export type AppAction =
     }
   | {
       type: ActionType.fetchStarredTabsEnd;
-      navigate?: AppState['navigate'];
       response: PagedResponse<StarredTab>;
     }
   | {
       type: ActionType.fetchStarredTabsStart;
+      params: StarredListParameters;
     }
   | {
       type: ActionType.fetchTabsEnd;
-      navigate?: AppState['navigate'];
       response: PagedResponse<Tab>;
       route: RouteNames.home | RouteNames.myTabs;
     }
   | {
       type: ActionType.fetchTabsStart;
+      params: TabListParameters;
       route: RouteNames.home | RouteNames.myTabs;
     }
   | {
@@ -89,20 +89,6 @@ export type AppAction =
   | {
       type: ActionType.positionOperationStart;
       positionOperation: PositionOperation;
-    }
-  | {
-      type: ActionType.searchParamsReady;
-    }
-  | {
-      type: ActionType.setStarredListParameters;
-      params: StarredListParameters;
-      skipUrlUpdate?: boolean;
-    }
-  | {
-      type: ActionType.setTabListParams;
-      params: TabListParameters;
-      route: RouteNames.home | RouteNames.myTabs;
-      skipUrlUpdate?: boolean;
     }
   | {
       type: ActionType.setStarredTab;

@@ -16,7 +16,6 @@ export type ListState<TData, TParams> = {
   data?: PagedResponse<TData>;
   loading?: boolean;
   params: TParams;
-  skipUrlUpdate?: boolean;
 };
 
 export type AppState = {
@@ -33,8 +32,6 @@ export type AppState = {
         back: true;
         to?: undefined;
       };
-  /** Used to delay data fetching operations until query string parameters have been parsed */
-  searchParamsReady: boolean;
   signInModal?: {
     message?: string;
   };
@@ -68,7 +65,6 @@ export const getInitialState = (props: AppProps): AppState => ({
   [RouteNames.myTabs]: {
     params: {},
   },
-  searchParamsReady: false,
   starredTabs: {
     params: {},
   },

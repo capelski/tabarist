@@ -1,8 +1,9 @@
 import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router';
 import { RouteNames } from '../../constants';
 import { getTabListRelativeUrl } from '../../operations';
-import { ActionType, ListState, StateProvider } from '../../state';
+import { ActionType, ListState, loadHomeTabs, loadMyTabs, StateProvider } from '../../state';
 import { Tab, TabListParameters } from '../../types';
 import { ItemsList, ItemsListProps } from '../common/items-list';
 import { TextFilter } from '../common/text-filter';
@@ -21,6 +22,7 @@ export type TabListProps = TabListBaseProps & {
 
 export const TabList: React.FC<TabListProps> = (props) => {
   const { dispatch } = useContext(StateProvider);
+  const navigate = useNavigate();
 
   const removeTab = (tab: Tab) => {
     dispatch({ type: ActionType.deletePrompt, tab });
@@ -37,9 +39,6 @@ export const TabList: React.FC<TabListProps> = (props) => {
       />
     ),
     listState: props.listState,
-    loadPage: (nextParams) => {
-      dispatch({ type: ActionType.setTabListParams, params: nextParams, route: props.route });
-    },
     noDocuments: (
       <p style={{ textAlign: 'center' }}>
         No tabs to display. Create a tab by clicking on{' '}
@@ -61,22 +60,18 @@ export const TabList: React.FC<TabListProps> = (props) => {
       <TabDeletionModal
         deletingTab={props.deletingTab}
         onTabDeleted={() => {
-          dispatch({
-            type: ActionType.setTabListParams,
-            params: props.listState.params,
-            route: props.route,
-          });
+          if (props.route === RouteNames.home) {
+            loadHomeTabs(props.listState.params, dispatch);
+          } else if (props.route === RouteNames.myTabs && props.user) {
+            loadMyTabs(props.user.uid, props.listState.params, dispatch);
+          }
         }}
       />
 
       <TextFilter
         initialValue={props.listState.params.titleFilter ?? ''}
         update={(titleFilter) => {
-          dispatch({
-            type: ActionType.setTabListParams,
-            params: { titleFilter },
-            route: props.route,
-          });
+          navigate(getTabListRelativeUrl(props.route, { titleFilter }));
         }}
       />
 
