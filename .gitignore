@@ -4,3 +4,4 @@ node_modules/
 .firebaserc
 ads.txt
 firebase-config.json
+firebase-debug.log
