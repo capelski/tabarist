@@ -23,15 +23,6 @@ export type AppState = {
   [RouteNames.home]: ListState<Tab, TabListParameters>;
   loading?: true;
   [RouteNames.myTabs]: ListState<Tab, TabListParameters>;
-  navigate?:
-    | {
-        back?: undefined;
-        to: string[];
-      }
-    | {
-        back: true;
-        to?: undefined;
-      };
   signInModal?: {
     message?: string;
   };
@@ -43,7 +34,7 @@ export type AppState = {
     isDirty?: boolean;
     isDraft?: boolean;
     isEditMode?: boolean;
-    isStarred?: boolean;
+    loading?: true;
     /** Snapshot of the unmodified document */
     originalDocument?: string;
     positionOperation?: PositionOperation;

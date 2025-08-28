@@ -5,6 +5,7 @@ export const slotValueOptions = ['', '↓', '↑', 'S', 'x'];
 export const maxTempo = 200;
 export const minTempo = 30;
 export const stringsNumber = 6;
+export const newTabId = 'new';
 
 export const addBarWidth = 25;
 export const barMinWidth = 165;

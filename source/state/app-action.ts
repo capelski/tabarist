@@ -12,7 +12,6 @@ import {
   TabListParameters,
 } from '../types';
 import { ActionType } from './action-type';
-import { AppState } from './app-state';
 
 export type AppAction =
   | {
@@ -23,17 +22,14 @@ export type AppAction =
       barContainers: BarContainer[];
     }
   | {
-      type: ActionType.clearNavigation;
-    }
-  | {
       type: ActionType.createTab;
+      isEditMode: boolean;
     }
   | {
       type: ActionType.deleteCancel;
     }
   | {
       type: ActionType.deleteConfirm;
-      navigate?: AppState['navigate'];
     }
   | {
       type: ActionType.deletePrompt;
@@ -43,16 +39,18 @@ export type AppAction =
       type: ActionType.discardChangesCancel;
     }
   | {
-      type: ActionType.discardChangesConfirm;
-      navigate?: AppState['navigate'];
-    }
-  | {
       type: ActionType.discardChangesPrompt;
-      navigate?: AppState['navigate'];
     }
   | {
-      type: ActionType.enterEditMode;
-      navigate?: AppState['navigate'];
+      type: ActionType.editModeCancel;
+    }
+  | {
+      type: ActionType.editModeEnter;
+    }
+  | {
+      type: ActionType.editModeSave;
+      /** Passing the tab so handlers can modify the document if needed */
+      tab: Tab;
     }
   | {
       type: ActionType.fetchStarredTabsEnd;
@@ -61,6 +59,14 @@ export type AppAction =
   | {
       type: ActionType.fetchStarredTabsStart;
       params: StarredListParameters;
+    }
+  | {
+      type: ActionType.fetchTabDetailsEnd;
+      starredTabId: string | undefined;
+      tab: Tab | undefined;
+    }
+  | {
+      type: ActionType.fetchTabDetailsStart;
     }
   | {
       type: ActionType.fetchTabsEnd;
@@ -91,13 +97,8 @@ export type AppAction =
       positionOperation: PositionOperation;
     }
   | {
-      type: ActionType.setStarredTab;
-      starredTab: StarredTab | undefined;
-    }
-  | {
-      type: ActionType.setTab;
-      navigate?: AppState['navigate'];
-      tab: Tab;
+      type: ActionType.setStarredTabId;
+      starredTabId: string | undefined;
     }
   | {
       type: ActionType.setUser;

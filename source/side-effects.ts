@@ -3,7 +3,6 @@ import { useBeforeUnload, useLocation, useNavigate, useSearchParams } from 'reac
 import { toast } from 'react-toastify';
 import { QueryParameters, RouteNames } from './constants';
 import { getFirebaseContext } from './firebase-context';
-import { getTabRelativeUrl } from './operations';
 import { customerRepository } from './repositories';
 import {
   ActionType,
@@ -12,6 +11,7 @@ import {
   loadHomeTabs,
   loadMyTabs,
   loadStarredTabs,
+  loadTabDetails,
 } from './state';
 import { CursorDirection, StarredListParameters, TabListParameters } from './types';
 
@@ -47,6 +47,8 @@ const getStarredListParameters = (searchParams: URLSearchParams): StarredListPar
   };
 };
 
+let isAuthStateChange = false;
+
 export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -56,6 +58,8 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
   useEffect(() => {
     getFirebaseContext().auth.onAuthStateChanged(
       (user) => {
+        isAuthStateChange = true;
+
         if (user) {
           customerRepository.getSubscription(user.uid).then((subscription) => {
             dispatch({ type: ActionType.setUser, subscription, user });
@@ -73,52 +77,55 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
 
   // Effects triggered by navigation events
   useEffect(() => {
-    if (pathname === RouteNames.home) {
+    const isEditMode = searchParams.get(QueryParameters.editMode) === 'true';
+    const enteringEditMode = isEditMode && !state.tab.isEditMode;
+    const exitingEditMode = !isEditMode && state.tab.isEditMode;
+
+    if (exitingEditMode && state.tab.isDirty) {
+      // This can only happen when navigating back via browser back button
+      // Restore the previous URL and prompt the user
+      navigate(1);
+      dispatch({ type: ActionType.discardChangesPrompt });
+      return;
+    }
+
+    if (pathname === RouteNames.home && !isAuthStateChange) {
       const params = getTabListParameters(searchParams);
       loadHomeTabs(params, dispatch);
-    }
-  }, [pathname, searchParams]);
+    } else if (pathname === RouteNames.myTabs && state.user.document) {
+      const params = getTabListParameters(searchParams);
+      loadMyTabs(state.user.document.uid, params, dispatch);
+    } else if (pathname === RouteNames.starredTabs && state.user.document) {
+      const params = getStarredListParameters(searchParams);
+      loadStarredTabs(state.user.document.uid, params, dispatch);
+    } else {
+      const tabDetailsRegExp = new RegExp(RouteNames.tabDetails.replace(':tabId', '(.+)'));
+      const tabDetailsMatch = pathname.match(tabDetailsRegExp);
+      if (tabDetailsMatch) {
+        const tabId = tabDetailsMatch[1];
 
-  // Effects triggered by navigation events that require a logged in user
-  useEffect(() => {
-    if (state.user.document) {
-      if (pathname === RouteNames.myTabs) {
-        const params = getTabListParameters(searchParams);
-        loadMyTabs(state.user.document.uid, params, dispatch);
-      } else if (pathname === RouteNames.starredTabs) {
-        const params = getStarredListParameters(searchParams);
-        loadStarredTabs(state.user.document.uid, params, dispatch);
+        if (tabId === 'new' && (tabId !== state.tab.document?.id || isAuthStateChange)) {
+          dispatch({
+            type: ActionType.createTab,
+            isEditMode,
+          });
+        } else if (tabId !== 'new' && state.tab.document?.id === 'new') {
+          if (state.tab.isEditMode) {
+            dispatch({ type: ActionType.editModeCancel });
+          }
+          loadTabDetails(tabId, state.user.document?.uid, dispatch);
+        } else if (enteringEditMode) {
+          dispatch({ type: ActionType.editModeEnter });
+        } else if (exitingEditMode && !state.tab.isDirty) {
+          dispatch({ type: ActionType.editModeCancel });
+        } else if (tabId !== state.tab.document?.id || isAuthStateChange) {
+          loadTabDetails(tabId, state.user.document?.uid, dispatch);
+        }
       }
     }
+
+    isAuthStateChange = false;
   }, [pathname, searchParams, state.user]);
-
-  // Update the state upon browser back/forward navigation events
-  useEffect(() => {
-    const editModeParam = searchParams.get(QueryParameters.editMode) === 'true';
-    if (editModeParam && !state.tab.isEditMode) {
-      dispatch({ type: ActionType.enterEditMode });
-    } else if (!editModeParam && state.tab.isEditMode) {
-      if (state.tab.isDirty) {
-        dispatch({
-          type: ActionType.discardChangesPrompt,
-          navigate: { to: [getTabRelativeUrl(state.tab.document!.id, true)] },
-        });
-      } else {
-        dispatch({ type: ActionType.discardChangesConfirm });
-      }
-    }
-  }, [searchParams]);
-
-  // Trigger navigation events via state
-  useEffect(() => {
-    if (state.navigate?.to && state.navigate?.to.length > 0) {
-      navigate(state.navigate.to[0]);
-      dispatch({ type: ActionType.clearNavigation });
-    } else if (state.navigate?.back) {
-      window.history.back();
-      dispatch({ type: ActionType.clearNavigation });
-    }
-  }, [state.navigate]);
 
   // Prevent the user from navigating away if there are unsaved changes
   useBeforeUnload((event) => {

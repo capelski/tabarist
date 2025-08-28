@@ -1,7 +1,6 @@
 import { User } from 'firebase/auth';
-import { nanoid } from 'nanoid';
 import { getTitleWords } from '../common';
-import { BarType, NonReferenceBarType } from '../constants';
+import { BarType, newTabId, NonReferenceBarType } from '../constants';
 import {
   Bar,
   BarBase,
@@ -98,7 +97,7 @@ export const tabOperations = {
       bars: [],
       capo: undefined,
       created: Date.now(),
-      id: nanoid(),
+      id: newTabId,
       ownerId,
       rhythms: [],
       tempo: undefined,

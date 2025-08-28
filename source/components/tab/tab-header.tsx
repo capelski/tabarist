@@ -1,12 +1,15 @@
 import { User } from 'firebase/auth';
+import { nanoid } from 'nanoid';
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router';
 import { BeatEngine } from '../../classes';
-import { editSymbol, removeSymbol, RouteNames, saveSymbol } from '../../constants';
-import { getTabRelativeUrl, tabOperations } from '../../operations';
+import { editSymbol, newTabId, removeSymbol, saveSymbol } from '../../constants';
+import { tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
 import { Tab } from '../../types';
 import { TabDeletionModal } from './tab-deletion-modal';
+import { enterEditMode, exitEditMode } from './tab-utils';
 
 export type TabHeaderProps = {
   beatEngine: BeatEngine;
@@ -14,6 +17,7 @@ export type TabHeaderProps = {
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean | undefined;
+  starredTabId: string | undefined;
   tab: Tab;
   updateTab: (tab: Tab) => void;
   user: User | null;
@@ -21,19 +25,21 @@ export type TabHeaderProps = {
 
 export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   const { dispatch } = useContext(StateProvider);
+  const navigate = useNavigate();
   const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
 
-  const enterEditMode = () => {
+  const enterEditModeHandler = () => {
     if (!isTabOwner) {
       return;
     }
 
     props.beatEngine.stop();
 
-    dispatch({
-      type: ActionType.enterEditMode,
-      navigate: { to: [getTabRelativeUrl(props.tab.id, true)] },
-    });
+    enterEditMode(props.tab.id, navigate);
+  };
+
+  const discardEditChanges = () => {
+    exitEditMode(props.tab, props.isDirty, 'prompt', dispatch, navigate);
   };
 
   const saveEditChanges = async () => {
@@ -41,9 +47,10 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
       return;
     }
 
-    await tabRepository.set(props.tab, props.user.uid);
+    const savedTab = props.tab.id === newTabId ? { ...props.tab, id: nanoid() } : props.tab;
+    await tabRepository.set(savedTab, props.user.uid);
 
-    dispatch({ type: ActionType.setTab, tab: props.tab, navigate: { back: true } });
+    exitEditMode(savedTab, props.isDirty, 'save', dispatch, navigate);
   };
 
   const removeTab = () => {
@@ -56,7 +63,6 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
         deletingTab={props.deletingTab}
         onTabDeleted={() => {
           dispatch({
-            navigate: window.history.length > 0 ? { back: true } : { to: [RouteNames.myTabs] },
             type: ActionType.deleteConfirm,
           });
         }}
@@ -92,16 +98,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
                 </button>
                 <button
                   className="btn btn-outline-danger"
-                  onClick={() => {
-                    if (props.isDirty) {
-                      dispatch({ type: ActionType.discardChangesPrompt });
-                    } else {
-                      dispatch({
-                        type: ActionType.discardChangesConfirm,
-                        navigate: { back: true },
-                      });
-                    }
-                  }}
+                  onClick={discardEditChanges}
                   style={{ marginLeft: 8 }}
                   type="button"
                 >
@@ -112,7 +109,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
               <React.Fragment>
                 <button
                   className="btn btn-outline-primary"
-                  onClick={enterEditMode}
+                  onClick={enterEditModeHandler}
                   style={{ marginLeft: 8 }}
                   type="button"
                 >

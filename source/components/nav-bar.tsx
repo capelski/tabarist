@@ -7,6 +7,7 @@ import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
 import { StripeSubscription } from '../types';
+import { createNewTab } from './tab';
 
 export type NavBarProps = {
   isCurrentTabDirty: boolean;
@@ -16,7 +17,7 @@ export type NavBarProps = {
 };
 
 export const NavBar: React.FC<NavBarProps> = (props) => {
-  const { dispatch } = useContext(StateProvider);
+  const { dispatch, state } = useContext(StateProvider);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -105,7 +106,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
               <a
                 className="nav-link mb-2 mb-sm-0"
                 onClick={() => {
-                  dispatch({ type: ActionType.createTab });
+                  createNewTab(state, dispatch, navigate);
                 }}
                 style={{ cursor: 'pointer' }}
               >

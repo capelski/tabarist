@@ -105,10 +105,10 @@ export const TabFooter: React.FC<TabFooterProps> = (props) => {
 
     if (props.starredTabId) {
       await starredTabRepository.remove(props.starredTabId);
-      dispatch({ type: ActionType.setStarredTab, starredTab: undefined });
+      dispatch({ type: ActionType.setStarredTabId, starredTabId: undefined });
     } else {
       const starredTab = await starredTabRepository.create(props.user.uid, props.tab);
-      dispatch({ type: ActionType.setStarredTab, starredTab });
+      dispatch({ type: ActionType.setStarredTabId, starredTabId: starredTab.id });
     }
   };
 

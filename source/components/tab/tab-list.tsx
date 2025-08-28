@@ -9,6 +9,7 @@ import { ItemsList, ItemsListProps } from '../common/items-list';
 import { TextFilter } from '../common/text-filter';
 import { TabDeletionModal } from './tab-deletion-modal';
 import { TabListItem } from './tab-list-item';
+import { createNewTab } from './tab-utils';
 
 export type TabListBaseProps = {
   deletingTab?: Tab;
@@ -21,7 +22,7 @@ export type TabListProps = TabListBaseProps & {
 };
 
 export const TabList: React.FC<TabListProps> = (props) => {
-  const { dispatch } = useContext(StateProvider);
+  const { dispatch, state } = useContext(StateProvider);
   const navigate = useNavigate();
 
   const removeTab = (tab: Tab) => {
@@ -44,7 +45,7 @@ export const TabList: React.FC<TabListProps> = (props) => {
         No tabs to display. Create a tab by clicking on{' '}
         <a
           onClick={() => {
-            dispatch({ type: ActionType.createTab });
+            createNewTab(state, dispatch, navigate);
           }}
           style={{ cursor: 'pointer', fontWeight: 'bold' }}
         >

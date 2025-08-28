@@ -1,16 +1,19 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router';
 import { ActionType, StateProvider } from '../../state';
 import { Modal } from '../common/modal';
+import { exitEditMode } from './tab-utils';
 
 export const TabDiscardModal: React.FC = () => {
-  const { dispatch } = useContext(StateProvider);
+  const { dispatch, state } = useContext(StateProvider);
+  const navigate = useNavigate();
 
   const cancelDiscardChanges = () => {
     dispatch({ type: ActionType.discardChangesCancel });
   };
 
   const discardEditChanges = () => {
-    dispatch({ type: ActionType.discardChangesConfirm, navigate: { back: true } });
+    exitEditMode(state.tab.document!, state.tab.isDirty, 'discard', dispatch, navigate);
   };
 
   return (

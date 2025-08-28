@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router';
 import { removeSymbol } from '../../constants';
 import { getTabRelativeUrl } from '../../operations';
-import { ActionType, StateProvider } from '../../state';
 import { StarredTab, Tab } from '../../types';
 
 export type TabListItemProps = {
@@ -12,22 +11,11 @@ export type TabListItemProps = {
 };
 
 export const TabListItem: React.FC<TabListItemProps> = (props) => {
-  const { dispatch } = useContext(StateProvider);
   const tabId = 'bars' in props.tab ? props.tab.id : props.tab.tabId;
 
   return (
     <div key={tabId} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-      <NavLink
-        className="nav-link"
-        style={{ flexGrow: 1 }}
-        onClick={() => {
-          if ('bars' in props.tab) {
-            // Set the tab here to prevent a redundant network query
-            dispatch({ type: ActionType.setTab, tab: props.tab });
-          }
-        }}
-        to={getTabRelativeUrl(tabId)}
-      >
+      <NavLink className="nav-link" style={{ flexGrow: 1 }} to={getTabRelativeUrl(tabId)}>
         {props.tab.title}
       </NavLink>
       {props.allowRemoving && (

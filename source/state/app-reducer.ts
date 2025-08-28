@@ -1,18 +1,21 @@
 import { BarType, ContainerType } from '../constants';
-import { getTabRelativeUrl, tabOperations } from '../operations';
-import { ActiveSlot, BarContainer } from '../types';
+import { tabOperations } from '../operations';
+import { ActiveSlot, BarContainer, Tab } from '../types';
 import { ActionType } from './action-type';
 import { AppAction } from './app-action';
 import { AppState } from './app-state';
 
-const getDiscardPromptState = (state: AppState, navigate: AppState['navigate']): AppState => ({
-  ...state,
-  navigate,
-  tab: {
-    ...state.tab,
-    discardChangesModal: true,
-  },
-});
+const clearTabState = (tabState: AppState['tab'], tab: Tab | undefined): AppState['tab'] => {
+  return {
+    ...tabState,
+    activeSlot: undefined,
+    document: tab,
+    isDirty: undefined,
+    isDraft: undefined,
+    loading: undefined,
+    originalDocument: tab && JSON.stringify(tab),
+  };
+};
 
 const getActiveSlot = (
   barContainers: BarContainer[],
@@ -92,36 +95,14 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.clearNavigation) {
-    return {
-      ...state,
-      navigate:
-        state.navigate?.to && state.navigate?.to.length > 1
-          ? { to: state.navigate?.to.slice(1) }
-          : undefined,
-    };
-  }
-
   if (action.type === ActionType.createTab) {
-    if (!state.user.document) {
-      return {
-        ...state,
-        signInModal: { message: 'Sign in to start creating tabs' },
-      };
-    }
-
-    if (state.tab.isDirty) {
-      return getDiscardPromptState(state, undefined);
-    }
-
-    const document = tabOperations.create(state.user.document.uid);
+    const document = tabOperations.create(state.user.document?.uid || 'NA');
     return {
       ...state,
-      navigate: { to: [getTabRelativeUrl(document.id), getTabRelativeUrl(document.id, true)] },
       tab: {
         document,
         isDraft: true,
-        isEditMode: true,
+        isEditMode: action.isEditMode,
         originalDocument: JSON.stringify(document),
       },
     };
@@ -138,7 +119,9 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     return {
       ...state,
       deletingTab: undefined,
-      navigate: action.navigate,
+      tab: {
+        document: undefined,
+      },
     };
   }
 
@@ -156,34 +139,44 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.discardChangesConfirm) {
+  if (action.type === ActionType.discardChangesPrompt) {
     return {
       ...state,
-      navigate: action.navigate,
+      tab: {
+        ...state.tab,
+        discardChangesModal: true,
+      },
+    };
+  }
+
+  if (action.type === ActionType.editModeCancel) {
+    return {
+      ...state,
       tab: {
         ...state.tab,
         discardChangesModal: undefined,
         document: state.tab.originalDocument && JSON.parse(state.tab.originalDocument),
         isDirty: false,
-        isEditMode: undefined,
-        positionOperation: undefined,
+        isEditMode: false,
       },
     };
   }
 
-  if (action.type === ActionType.discardChangesPrompt) {
-    return getDiscardPromptState(state, action.navigate);
-  }
-
-  if (action.type === ActionType.enterEditMode) {
+  if (action.type === ActionType.editModeEnter) {
     return {
       ...state,
-      navigate: action.navigate,
       tab: {
         ...state.tab,
         activeSlot: undefined,
         isEditMode: true,
       },
+    };
+  }
+
+  if (action.type === ActionType.editModeSave) {
+    return {
+      ...state,
+      tab: clearTabState(state.tab, action.tab),
     };
   }
 
@@ -204,6 +197,23 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
       starredTabs: {
         loading: true,
         params: action.params,
+      },
+    };
+  }
+
+  if (action.type === ActionType.fetchTabDetailsEnd) {
+    return {
+      ...state,
+      tab: clearTabState({ ...state.tab, starredTabId: action.starredTabId }, action.tab),
+    };
+  }
+
+  if (action.type === ActionType.fetchTabDetailsStart) {
+    return {
+      ...state,
+      tab: {
+        ...state.tab,
+        loading: true,
       },
     };
   }
@@ -303,29 +313,12 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
     };
   }
 
-  if (action.type === ActionType.setStarredTab) {
+  if (action.type === ActionType.setStarredTabId) {
     return {
       ...state,
       tab: {
         ...state.tab,
-        isStarred: !!action.starredTab,
-        starredTabId: action.starredTab?.id,
-      },
-    };
-  }
-
-  if (action.type === ActionType.setTab) {
-    return {
-      ...state,
-      navigate: action.navigate,
-      tab: {
-        ...state.tab,
-        activeSlot: undefined,
-        document: action.tab,
-        isDirty: undefined,
-        isDraft: undefined,
-        isStarred: undefined,
-        originalDocument: JSON.stringify(action.tab),
+        starredTabId: action.starredTabId,
       },
     };
   }
