@@ -111,14 +111,15 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.deleteCancel) {
     return {
       ...state,
-      deletingTab: undefined,
+      deleteTabModal: undefined,
     };
   }
 
-  if (action.type === ActionType.deleteConfirm) {
+  if (action.type === ActionType.deleteCompleted) {
     return {
       ...state,
-      deletingTab: undefined,
+      deleteTabModal: undefined,
+      loading: undefined,
       tab: {
         document: undefined,
       },
@@ -126,7 +127,13 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   }
 
   if (action.type === ActionType.deletePrompt) {
-    return { ...state, deletingTab: action.tab };
+    return {
+      ...state,
+      deleteTabModal: {
+        route: action.route,
+        document: action.tab,
+      },
+    };
   }
 
   if (action.type === ActionType.discardChangesCancel) {
@@ -232,7 +239,6 @@ export const appReducer = (state: AppState, action: AppAction): AppState => {
   if (action.type === ActionType.fetchTabsStart) {
     return {
       ...state,
-      deletingTab: undefined, // Might come from a tab deletion modal
       [action.route]: {
         loading: true,
         params: action.params,

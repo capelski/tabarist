@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { ActionType, StateProvider } from '../../state';
 import { Modal } from '../common/modal';
 import { exitEditMode } from './tab-utils';
@@ -7,13 +7,21 @@ import { exitEditMode } from './tab-utils';
 export const TabDiscardModal: React.FC = () => {
   const { dispatch, state } = useContext(StateProvider);
   const navigate = useNavigate();
+  const { state: locationState } = useLocation();
 
   const cancelDiscardChanges = () => {
     dispatch({ type: ActionType.discardChangesCancel });
   };
 
   const discardEditChanges = () => {
-    exitEditMode(state.tab.document!, state.tab.isDirty, 'discard', dispatch, navigate);
+    exitEditMode(
+      state.tab.document!,
+      state.tab.isDirty,
+      'discard',
+      dispatch,
+      navigate,
+      locationState,
+    );
   };
 
   return (

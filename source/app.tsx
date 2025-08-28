@@ -1,7 +1,14 @@
 import React, { useReducer, useRef } from 'react';
 import { Route, Routes } from 'react-router';
 import { ToastContainer } from 'react-toastify';
-import { BlockingLoader, NavBar, SignInModal, TabDiscardModal, UpgradeModal } from './components';
+import {
+  BlockingLoader,
+  NavBar,
+  SignInModal,
+  TabDeletionModal,
+  TabDiscardModal,
+  UpgradeModal,
+} from './components';
 import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
 import { appReducer, getInitialState, ListState, StateProvider } from './state';
@@ -32,13 +39,15 @@ export const App: React.FC<AppProps> = (props) => {
       >
         {state.loading && <BlockingLoader />}
 
+        {state.deleteTabModal && <TabDeletionModal tab={state.deleteTabModal.document} />}
+
+        {state.tab.discardChangesModal && <TabDiscardModal />}
+
         {state.signInModal && (
           <SignInModal>
             {state.signInModal.message && <p>{state.signInModal.message}</p>}
           </SignInModal>
         )}
-
-        {state.tab.discardChangesModal && <TabDiscardModal />}
 
         {state.upgradeModal && (
           <UpgradeModal user={state.user.document}>

@@ -65,7 +65,6 @@ export const TabView: React.FC<TabViewProps> = (props) => {
 
       <TabHeader
         beatEngine={beatEngine.current}
-        deletingTab={state.deletingTab}
         isDirty={state.tab.isDirty}
         isDraft={state.tab.isDraft}
         isEditMode={state.tab.isEditMode}

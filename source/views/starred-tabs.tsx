@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { ItemsList, ItemsListProps, TabListItem } from '../components';
+import { RouteNames } from '../constants';
 import { getStarredListRelativeUrl } from '../operations';
 import { starredTabRepository } from '../repositories';
 import { loadStarredTabs, StateProvider } from '../state';
@@ -25,6 +26,7 @@ export const StarredTabsView: React.FC = () => {
           await starredTabRepository.remove(starredTab.id);
           await loadStarredTabs(state.user.document.uid, listState.params, dispatch);
         }}
+        route={RouteNames.starredTabs}
         tab={starredTab}
       />
     ),

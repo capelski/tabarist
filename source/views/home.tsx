@@ -15,12 +15,7 @@ export const HomeView: React.FC = () => {
     <React.Fragment>
       <MetaTags title="Tabarist" />
 
-      <TabList
-        deletingTab={state.deletingTab}
-        listState={listState}
-        user={state.user.document}
-        route={currentRoute}
-      />
+      <TabList listState={listState} user={state.user.document} route={currentRoute} />
     </React.Fragment>
   );
 };

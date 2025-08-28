@@ -15,12 +15,7 @@ export const MyTabsView: React.FC = () => {
     <React.Fragment>
       <MetaTags title="Tabarist - My tabs" />
 
-      <TabList
-        deletingTab={state.deletingTab}
-        listState={listState}
-        user={state.user.document}
-        route={currentRoute}
-      />
+      <TabList listState={listState} user={state.user.document} route={currentRoute} />
     </React.Fragment>
   );
 };

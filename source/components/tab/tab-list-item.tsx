@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router';
-import { removeSymbol } from '../../constants';
+import { removeSymbol, RouteNames } from '../../constants';
 import { getTabRelativeUrl } from '../../operations';
 import { StarredTab, Tab } from '../../types';
 
 export type TabListItemProps = {
   allowRemoving: boolean;
   remove: () => void;
+  route: RouteNames.home | RouteNames.myTabs | RouteNames.starredTabs;
   tab: StarredTab | Tab;
 };
 
@@ -15,7 +16,12 @@ export const TabListItem: React.FC<TabListItemProps> = (props) => {
 
   return (
     <div key={tabId} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-      <NavLink className="nav-link" style={{ flexGrow: 1 }} to={getTabRelativeUrl(tabId)}>
+      <NavLink
+        className="nav-link"
+        style={{ flexGrow: 1 }}
+        to={getTabRelativeUrl(tabId)}
+        state={{ navigateBack: true }}
+      >
         {props.tab.title}
       </NavLink>
       {props.allowRemoving && (

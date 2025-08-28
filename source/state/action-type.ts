@@ -3,7 +3,7 @@ export enum ActionType {
   activeSlotUpdate = 'activeSlotUpdate',
   createTab = 'createTab',
   deleteCancel = 'deleteCancel',
-  deleteConfirm = 'deleteConfirm',
+  deleteCompleted = 'deleteCompleted',
   deletePrompt = 'deletePrompt',
   discardChangesCancel = 'discardChangesCancel',
   discardChangesPrompt = 'discardChangesPrompt',

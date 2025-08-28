@@ -27,8 +27,8 @@ export const createNewTab = (
   multiple history entries on the tab details page
 */
 
-export const enterEditMode = (tabId: string, navigate: NavigateFunction) => {
-  navigate(getTabRelativeUrl(tabId, true), { replace: true });
+export const enterEditMode = (tabId: string, navigate: NavigateFunction, state: any) => {
+  navigate(getTabRelativeUrl(tabId, true), { replace: true, state });
 };
 
 export const exitEditMode = (
@@ -37,6 +37,7 @@ export const exitEditMode = (
   dirtyChanges: 'discard' | 'prompt' | 'save',
   dispatch: Dispatch<AppAction>,
   navigate: NavigateFunction,
+  state: any,
 ) => {
   if (isDirty && dirtyChanges === 'prompt') {
     dispatch({ type: ActionType.discardChangesPrompt });
@@ -49,7 +50,7 @@ export const exitEditMode = (
     dispatch({ type: ActionType.editModeSave, tab });
   }
 
-  navigate(getTabRelativeUrl(tab.id, false), { replace: true });
+  navigate(getTabRelativeUrl(tab.id, false), { replace: true, state });
 };
 
 export const getYoutubeId = (backingTrack: string | undefined) => {

@@ -12,6 +12,7 @@ import {
   TabListParameters,
 } from '../types';
 import { ActionType } from './action-type';
+import { RoutesForDelete } from './app-state';
 
 export type AppAction =
   | {
@@ -29,10 +30,11 @@ export type AppAction =
       type: ActionType.deleteCancel;
     }
   | {
-      type: ActionType.deleteConfirm;
+      type: ActionType.deleteCompleted;
     }
   | {
       type: ActionType.deletePrompt;
+      route: RoutesForDelete;
       tab: Tab;
     }
   | {

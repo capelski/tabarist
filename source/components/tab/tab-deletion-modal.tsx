@@ -1,31 +1,47 @@
 import React, { useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { RouteNames } from '../../constants';
 import { tabRepository } from '../../repositories';
-import { ActionType, StateProvider } from '../../state';
+import { ActionType, loadHomeTabs, loadMyTabs, StateProvider } from '../../state';
 import { Tab } from '../../types';
 import { Modal } from '../common/modal';
 
 export type TabDeletionModalProps = {
-  deletingTab?: Tab;
-  onTabDeleted: () => void;
+  tab: Tab;
 };
 
 export const TabDeletionModal: React.FC<TabDeletionModalProps> = (props) => {
-  const { dispatch } = useContext(StateProvider);
+  const { dispatch, state } = useContext(StateProvider);
+  const { state: locationState } = useLocation();
+  const navigate = useNavigate();
 
   const cancelDelete = () => {
     dispatch({ type: ActionType.deleteCancel });
   };
 
   const confirmDelete = async () => {
-    await tabRepository.remove(props.deletingTab!.id);
-    props.onTabDeleted();
+    dispatch({ type: ActionType.loaderDisplay });
+    await tabRepository.remove(props.tab!.id);
+    dispatch({ type: ActionType.deleteCompleted });
+
+    if (state.deleteTabModal!.route === RouteNames.home) {
+      loadHomeTabs(state[RouteNames.home].params, dispatch);
+    } else if (state.deleteTabModal!.route === RouteNames.myTabs) {
+      loadMyTabs(state.user.document!.uid, state[RouteNames.myTabs].params, dispatch);
+    } else if (state.deleteTabModal!.route === RouteNames.tabDetails) {
+      if (locationState?.navigateBack) {
+        navigate(-1);
+      } else {
+        navigate(RouteNames.home);
+      }
+    }
   };
 
   return (
-    props.deletingTab && (
+    props.tab && (
       <Modal closeHandler={cancelDelete} hideCloseButton={true}>
         <p>
-          Are you sure you want to delete <b>{props.deletingTab.title}</b>?
+          Are you sure you want to delete <b>{props.tab.title}</b>?
         </p>
         <div>
           <button

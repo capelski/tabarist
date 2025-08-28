@@ -1,19 +1,17 @@
 import { User } from 'firebase/auth';
 import { nanoid } from 'nanoid';
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { BeatEngine } from '../../classes';
-import { editSymbol, newTabId, removeSymbol, saveSymbol } from '../../constants';
+import { editSymbol, newTabId, removeSymbol, RouteNames, saveSymbol } from '../../constants';
 import { tabOperations } from '../../operations';
 import { tabRepository } from '../../repositories';
 import { ActionType, StateProvider } from '../../state';
 import { Tab } from '../../types';
-import { TabDeletionModal } from './tab-deletion-modal';
 import { enterEditMode, exitEditMode } from './tab-utils';
 
 export type TabHeaderProps = {
   beatEngine: BeatEngine;
-  deletingTab?: Tab;
   isDirty?: boolean;
   isDraft?: boolean;
   isEditMode: boolean | undefined;
@@ -27,6 +25,7 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
   const { dispatch } = useContext(StateProvider);
   const navigate = useNavigate();
   const isTabOwner = !!props.user && props.user.uid === props.tab.ownerId;
+  const { state: locationState } = useLocation();
 
   const enterEditModeHandler = () => {
     if (!isTabOwner) {
@@ -35,11 +34,11 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
 
     props.beatEngine.stop();
 
-    enterEditMode(props.tab.id, navigate);
+    enterEditMode(props.tab.id, navigate, locationState);
   };
 
   const discardEditChanges = () => {
-    exitEditMode(props.tab, props.isDirty, 'prompt', dispatch, navigate);
+    exitEditMode(props.tab, props.isDirty, 'prompt', dispatch, navigate, locationState);
   };
 
   const saveEditChanges = async () => {
@@ -50,24 +49,19 @@ export const TabHeader: React.FC<TabHeaderProps> = (props) => {
     const savedTab = props.tab.id === newTabId ? { ...props.tab, id: nanoid() } : props.tab;
     await tabRepository.set(savedTab, props.user.uid);
 
-    exitEditMode(savedTab, props.isDirty, 'save', dispatch, navigate);
+    exitEditMode(savedTab, props.isDirty, 'save', dispatch, navigate, locationState);
   };
 
   const removeTab = () => {
-    dispatch({ type: ActionType.deletePrompt, tab: props.tab });
+    dispatch({
+      type: ActionType.deletePrompt,
+      route: RouteNames.tabDetails,
+      tab: props.tab,
+    });
   };
 
   return (
     <div className="tab-header">
-      <TabDeletionModal
-        deletingTab={props.deletingTab}
-        onTabDeleted={() => {
-          dispatch({
-            type: ActionType.deleteConfirm,
-          });
-        }}
-      />
-
       <div className="mb-3" style={{ alignItems: 'center', display: 'flex' }}>
         {props.isEditMode ? (
           <div className="input-group ">

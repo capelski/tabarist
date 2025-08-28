@@ -18,8 +18,13 @@ export type ListState<TData, TParams> = {
   params: TParams;
 };
 
+export type RoutesForDelete = RouteNames.home | RouteNames.myTabs | RouteNames.tabDetails;
+
 export type AppState = {
-  deletingTab?: Tab;
+  deleteTabModal?: {
+    document: Tab;
+    route: RoutesForDelete;
+  };
   [RouteNames.home]: ListState<Tab, TabListParameters>;
   loading?: true;
   [RouteNames.myTabs]: ListState<Tab, TabListParameters>;
