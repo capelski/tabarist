@@ -49,7 +49,7 @@ export const App: React.FC<AppProps> = (props) => {
         <ToastContainer position="bottom-center" />
 
         <NavBar
-          isCurrentTabDirty={!!state.tab.isDirty}
+          isTabDirty={!!state.tab.isDirty}
           loading={state.loading}
           subscription={state.user.stripeSubscription}
           user={state.user.document}

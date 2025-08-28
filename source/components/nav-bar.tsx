@@ -1,16 +1,17 @@
 import { User } from 'firebase/auth';
 import React, { useContext } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { RouteNames } from '../constants';
 import { getFirebaseContext } from '../firebase-context';
 import { customerRepository } from '../repositories';
 import { ActionType, StateProvider } from '../state';
 import { StripeSubscription } from '../types';
+import { PromptChangesLink } from './common/prompt-changes-link';
 import { createNewTab } from './tab';
 
 export type NavBarProps = {
-  isCurrentTabDirty: boolean;
+  isTabDirty: boolean;
   loading?: true;
   subscription?: StripeSubscription;
   user: User | null;
@@ -26,7 +27,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       return;
     }
 
-    if (props.isCurrentTabDirty) {
+    if (props.isTabDirty) {
       dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
@@ -48,7 +49,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   };
 
   const signOut = () => {
-    if (props.isCurrentTabDirty) {
+    if (props.isTabDirty) {
       dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
@@ -64,7 +65,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
       return;
     }
 
-    if (props.isCurrentTabDirty) {
+    if (props.isTabDirty) {
       dispatch({ type: ActionType.discardChangesPrompt });
       return;
     }
@@ -75,18 +76,13 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
   return (
     <nav className="navbar navbar-expand-sm navbar-light bg-light">
       <div className="container-fluid">
-        <NavLink
+        <PromptChangesLink
           className="navbar-brand"
-          onClick={(event) => {
-            if (props.isCurrentTabDirty) {
-              dispatch({ type: ActionType.discardChangesPrompt });
-              event.preventDefault();
-            }
-          }}
+          isTabDirty={props.isTabDirty}
           to={RouteNames.home}
         >
           Tabarist
-        </NavLink>
+        </PromptChangesLink>
 
         <button
           className="navbar-toggler"
@@ -136,32 +132,22 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
               </a>
               <ul className="dropdown-menu dropdown-menu-sm-end" aria-labelledby="navbarDropdown">
                 <li>
-                  <NavLink
+                  <PromptChangesLink
                     className="dropdown-item"
-                    onClick={(event) => {
-                      if (props.isCurrentTabDirty) {
-                        dispatch({ type: ActionType.discardChangesPrompt });
-                        event.preventDefault();
-                      }
-                    }}
+                    isTabDirty={props.isTabDirty}
                     to={RouteNames.starredTabs}
                   >
                     Starred tabs
-                  </NavLink>
+                  </PromptChangesLink>
                 </li>
                 <li>
-                  <NavLink
+                  <PromptChangesLink
                     className="dropdown-item"
-                    onClick={(event) => {
-                      if (props.isCurrentTabDirty) {
-                        dispatch({ type: ActionType.discardChangesPrompt });
-                        event.preventDefault();
-                      }
-                    }}
+                    isTabDirty={props.isTabDirty}
                     to={RouteNames.myTabs}
                   >
                     My tabs
-                  </NavLink>
+                  </PromptChangesLink>
                 </li>
                 <li>
                   <hr className="dropdown-divider" />
