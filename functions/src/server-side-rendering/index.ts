@@ -1,5 +1,5 @@
 import express from 'express';
-import { onRequest } from 'firebase-functions/v2/https';
+import { onRequest } from 'firebase-functions/https';
 import { renderHtml } from '../common';
 import { assetsPath, functionsRegion, RouteNames } from '../ssr/ssr';
 import { homeHandler } from './home';
