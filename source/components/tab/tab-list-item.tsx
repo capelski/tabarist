@@ -7,7 +7,7 @@ import { StarredTab, Tab } from '../../types';
 export type TabListItemProps = {
   allowRemoving: boolean;
   remove: () => void;
-  route: RouteNames.home | RouteNames.myTabs | RouteNames.starredTabs;
+  route: RouteNames.allTabs | RouteNames.myTabs | RouteNames.starredTabs;
   tab: StarredTab | Tab;
 };
 

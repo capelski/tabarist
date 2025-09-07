@@ -18,14 +18,14 @@ export type ListState<TData, TParams> = {
   params: TParams;
 };
 
-export type RoutesForDelete = RouteNames.home | RouteNames.myTabs | RouteNames.tabDetails;
+export type RoutesForDelete = RouteNames.allTabs | RouteNames.myTabs | RouteNames.tabDetails;
 
 export type AppState = {
   deleteTabModal?: {
     document: Tab;
     route: RoutesForDelete;
   };
-  [RouteNames.home]: ListState<Tab, TabListParameters>;
+  [RouteNames.allTabs]: ListState<Tab, TabListParameters>;
   loading?: true;
   [RouteNames.myTabs]: ListState<Tab, TabListParameters>;
   signInModal?: {
@@ -55,7 +55,7 @@ export type AppState = {
 };
 
 export const getInitialState = (props: AppProps): AppState => ({
-  [RouteNames.home]: props.homeState ?? {
+  [RouteNames.allTabs]: props.allTabsState ?? {
     params: {},
   },
   [RouteNames.myTabs]: {

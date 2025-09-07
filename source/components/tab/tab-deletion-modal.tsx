@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { RouteNames } from '../../constants';
 import { tabRepository } from '../../repositories';
-import { ActionType, loadHomeTabs, loadMyTabs, StateProvider } from '../../state';
+import { ActionType, loadAllTabs, loadMyTabs, StateProvider } from '../../state';
 import { Tab } from '../../types';
 import { Modal } from '../common/modal';
 
@@ -24,15 +24,15 @@ export const TabDeletionModal: React.FC<TabDeletionModalProps> = (props) => {
     await tabRepository.remove(props.tab!.id);
     dispatch({ type: ActionType.deleteCompleted });
 
-    if (state.deleteTabModal!.route === RouteNames.home) {
-      loadHomeTabs(state[RouteNames.home].params, dispatch);
+    if (state.deleteTabModal!.route === RouteNames.allTabs) {
+      loadAllTabs(state[RouteNames.allTabs].params, dispatch);
     } else if (state.deleteTabModal!.route === RouteNames.myTabs) {
       loadMyTabs(state.user.document!.uid, state[RouteNames.myTabs].params, dispatch);
     } else if (state.deleteTabModal!.route === RouteNames.tabDetails) {
       if (locationState?.navigateBack) {
         navigate(-1);
       } else {
-        navigate(RouteNames.home);
+        navigate(RouteNames.allTabs);
       }
     }
   };

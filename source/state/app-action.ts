@@ -73,12 +73,12 @@ export type AppAction =
   | {
       type: ActionType.fetchTabsEnd;
       response: PagedResponse<Tab>;
-      route: RouteNames.home | RouteNames.myTabs;
+      route: RouteNames.allTabs | RouteNames.myTabs;
     }
   | {
       type: ActionType.fetchTabsStart;
       params: TabListParameters;
-      route: RouteNames.home | RouteNames.myTabs;
+      route: RouteNames.allTabs | RouteNames.myTabs;
     }
   | {
       type: ActionType.loaderDisplay;

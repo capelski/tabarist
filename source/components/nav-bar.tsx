@@ -56,7 +56,7 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
 
     getFirebaseContext().auth.signOut();
     if (pathname === RouteNames.myTabs) {
-      navigate(RouteNames.home);
+      navigate(RouteNames.allTabs);
     }
   };
 
@@ -98,6 +98,15 @@ export const NavBar: React.FC<NavBarProps> = (props) => {
 
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto">
+            <li className="nav-item">
+              <PromptChangesLink
+                className="nav-link mb-2 mb-sm-0"
+                isTabDirty={props.isTabDirty}
+                to={RouteNames.allTabs}
+              >
+                All tabs
+              </PromptChangesLink>
+            </li>
             <li className="nav-item">
               <a
                 className="nav-link mb-2 mb-sm-0"

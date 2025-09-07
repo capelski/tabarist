@@ -12,7 +12,7 @@ import { createNewTab } from './tab-utils';
 
 export type TabListProps = {
   listState: ListState<Tab, TabListParameters>;
-  route: RouteNames.home | RouteNames.myTabs;
+  route: RouteNames.allTabs | RouteNames.myTabs;
   user: User | null;
 };
 

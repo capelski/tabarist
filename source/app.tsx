@@ -13,10 +13,10 @@ import { RouteNames } from './constants';
 import { useSideEffects } from './side-effects';
 import { appReducer, getInitialState, ListState, StateProvider } from './state';
 import { Tab, TabListParameters } from './types';
-import { HomeView, MyTabsView, NotFound, StarredTabsView, TabView } from './views';
+import { AllTabsView, HomeView, MyTabsView, NotFound, StarredTabsView, TabView } from './views';
 
 export type AppProps = {
-  homeState?: ListState<Tab, TabListParameters>;
+  allTabsState?: ListState<Tab, TabListParameters>;
   tab?: Tab;
 };
 
@@ -69,6 +69,8 @@ export const App: React.FC<AppProps> = (props) => {
           style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
         >
           <Routes>
+            <Route path={RouteNames.allTabs} element={<AllTabsView />} />
+
             <Route path={RouteNames.home} element={<HomeView />} />
 
             <Route path={RouteNames.myTabs} element={<MyTabsView />} />

@@ -11,7 +11,7 @@ export const getStarredListRelativeUrl = (params: StarredListParameters) => {
 };
 
 export const getTabListRelativeUrl = (
-  tabListRoute: RouteNames.home | RouteNames.myTabs,
+  tabListRoute: RouteNames.allTabs | RouteNames.myTabs,
   params: TabListParameters,
 ) => {
   const titleParam = params.titleFilter ? `${QueryParameters.title}=${params.titleFilter}&` : '';

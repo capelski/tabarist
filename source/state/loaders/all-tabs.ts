@@ -5,11 +5,11 @@ import { TabListParameters } from '../../types';
 import { ActionType } from '../action-type';
 import { AppAction } from '../app-action';
 
-export const loadHomeTabs = async (params: TabListParameters, dispatch: Dispatch<AppAction>) => {
+export const loadAllTabs = async (params: TabListParameters, dispatch: Dispatch<AppAction>) => {
   dispatch({
     type: ActionType.fetchTabsStart,
     params,
-    route: RouteNames.home,
+    route: RouteNames.allTabs,
   });
 
   const response = await tabRepository.getPublicTabs(params);
@@ -17,6 +17,6 @@ export const loadHomeTabs = async (params: TabListParameters, dispatch: Dispatch
   dispatch({
     type: ActionType.fetchTabsEnd,
     response,
-    route: RouteNames.home,
+    route: RouteNames.allTabs,
   });
 };

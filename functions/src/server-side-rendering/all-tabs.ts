@@ -14,7 +14,7 @@ import {
   tabsCollection,
 } from '../ssr/ssr';
 
-const getHomeTabs = async (
+const getAllTabs = async (
   params?: TabListParameters,
 ): Promise<PagedResponse<DiminishedTab, Tab>> => {
   const where: ServerWhereClause<DiminishedTab>[] = params?.titleFilter
@@ -32,7 +32,7 @@ const getHomeTabs = async (
   };
 };
 
-export const homeHandler: RequestHandler = async (req, res) => {
+export const allTabsHandler: RequestHandler = async (req, res) => {
   const initialState: AppProps = {};
 
   try {
@@ -58,12 +58,12 @@ export const homeHandler: RequestHandler = async (req, res) => {
       params.titleFilter = title;
     }
 
-    initialState.homeState = {
-      data: await getHomeTabs(params),
+    initialState.allTabsState = {
+      data: await getAllTabs(params),
       params,
     };
   } catch (e) {
-    error('Error fetching the home tabs', e);
+    error('Error fetching tabs', e);
   }
 
   res.send(renderHtml(req.originalUrl, initialState));

@@ -8,7 +8,7 @@ import {
   ActionType,
   AppAction,
   AppState,
-  loadHomeTabs,
+  loadAllTabs,
   loadMyTabs,
   loadStarredTabs,
   loadTabDetails,
@@ -89,9 +89,9 @@ export const useSideEffects = (state: AppState, dispatch: Dispatch<AppAction>) =
       return;
     }
 
-    if (pathname === RouteNames.home && !isAuthStateChange) {
+    if (pathname === RouteNames.allTabs && !isAuthStateChange) {
       const params = getTabListParameters(searchParams);
-      loadHomeTabs(params, dispatch);
+      loadAllTabs(params, dispatch);
     } else if (pathname === RouteNames.myTabs && state.user.document) {
       const params = getTabListParameters(searchParams);
       loadMyTabs(state.user.document.uid, params, dispatch);
