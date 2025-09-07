@@ -1,12 +1,13 @@
 import { RequestHandler } from 'express';
+import { QuerySnapshot } from 'firebase-admin/firestore';
 import { error } from 'firebase-functions/logger';
 import { renderHtml } from '../common';
 import { serverDataFetcher, ServerWhereClause } from '../server-data-fetcher';
 import {
   AppProps,
   DiminishedTab,
+  getTitleWordsClause,
   PagedResponse,
-  parseTitle,
   QueryParameters,
   Tab,
   TabListParameters,
@@ -18,7 +19,7 @@ const getAllTabs = async (
   params?: TabListParameters,
 ): Promise<PagedResponse<DiminishedTab, Tab>> => {
   const where: ServerWhereClause<DiminishedTab>[] = params?.titleFilter
-    ? [['titleWords', 'array-contains', parseTitle(params.titleFilter)]]
+    ? [getTitleWordsClause<QuerySnapshot>(params.titleFilter)]
     : [];
 
   const page = await serverDataFetcher<DiminishedTab>([tabsCollection], ['title', 'id'], {

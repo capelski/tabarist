@@ -1,5 +1,6 @@
 import { User } from 'firebase/auth';
-import { parseTitle } from '../common';
+import { QuerySnapshot } from 'firebase/firestore';
+import { getTitleWordsClause } from '../common';
 import { tabsCollection } from '../constants';
 import { deleteDocument, getDocument, setDocument } from '../firestore-operations';
 import { tabOperations } from '../operations';
@@ -17,7 +18,7 @@ const getTabs = async (
   const where = [...additionalWhereClauses];
 
   if (params?.titleFilter) {
-    where.unshift(['titleWords', 'array-contains', parseTitle(params.titleFilter)]);
+    where.unshift(getTitleWordsClause<QuerySnapshot>(params.titleFilter));
   }
 
   const page = await clientDataFetcher<DiminishedTab>([tabsCollection], ['title', 'id'], {
