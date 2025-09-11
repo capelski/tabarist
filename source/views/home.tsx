@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from 'react';
-import browseTabs from '../assets/images/browse-tabs.png';
-import create from '../assets/images/create.png';
-import playAlong from '../assets/images/play-along.png';
+import browseTabs from '../assets/browse-tabs.png';
+import create from '../assets/create.png';
+import playAlong from '../assets/play-along.png';
 import { MetaTags } from './common/meta-tags';
 
 export type FullScreenSectionProps = PropsWithChildren<{}>;
