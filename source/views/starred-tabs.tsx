@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ItemsList, ItemsListProps, TabListItem } from '../components';
-import { RouteNames } from '../constants';
+import { RouteNames, viewsPadding } from '../constants';
 import { getStarredListRelativeUrl } from '../operations';
 import { starredTabRepository } from '../repositories';
 import { loadStarredTabs, StateProvider } from '../state';
@@ -35,10 +35,10 @@ export const StarredTabsView: React.FC = () => {
   };
 
   return (
-    <React.Fragment>
+    <div style={{ padding: viewsPadding }}>
       <MetaTags title="Tabarist - Starred tabs" />
 
       <ItemsList {...listProps} />
-    </React.Fragment>
+    </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 
-export const CenteredMessage: React.FC<PropsWithChildren> = (props) => {
+export const CenteredContent: React.FC<PropsWithChildren> = (props) => {
   return (
     <div
       style={{ alignItems: 'center', display: 'flex', justifyContent: 'center', height: '100%' }}

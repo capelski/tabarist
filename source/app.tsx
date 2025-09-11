@@ -64,10 +64,7 @@ export const App: React.FC<AppProps> = (props) => {
           user={state.user.document}
         />
 
-        <div
-          ref={scrollViewRef}
-          style={{ flexGrow: 1, overflow: 'auto', padding: '8px 8px 0 8px', position: 'relative' }}
-        >
+        <div ref={scrollViewRef} style={{ flexGrow: 1, overflow: 'auto', position: 'relative' }}>
           <Routes>
             <Route path={RouteNames.allTabs} element={<AllTabsView />} />
 

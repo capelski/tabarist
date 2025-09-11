@@ -1,6 +1,6 @@
 import React from 'react';
-import { CenteredMessage } from '../components';
+import { CenteredContent } from '../components';
 
 export const NotFound: React.FC = () => {
-  return <CenteredMessage>The page you are looking for doesn't exist</CenteredMessage>;
+  return <CenteredContent>The page you are looking for doesn't exist</CenteredContent>;
 };

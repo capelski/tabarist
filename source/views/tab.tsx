@@ -2,12 +2,13 @@ import React, { RefObject, useContext, useMemo, useRef } from 'react';
 import { BeatEngine } from '../classes';
 import {
   BarGroup,
-  CenteredMessage,
+  CenteredContent,
   getYoutubeId,
   TabDetails,
   TabFooter,
   TabHeader,
 } from '../components';
+import { viewsPadding } from '../constants';
 import { barsToBarContainers } from '../operations';
 import { ActionType, StateProvider } from '../state';
 import { Tab } from '../types';
@@ -43,7 +44,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   ]);
 
   if (state.tab.loading) {
-    return <CenteredMessage>Loading...</CenteredMessage>;
+    return <CenteredContent>Loading...</CenteredContent>;
   }
 
   if (!state.tab.document) {
@@ -57,7 +58,7 @@ export const TabView: React.FC<TabViewProps> = (props) => {
   const youtubeVideoId = getYoutubeId(state.tab.document.backingTrack);
 
   return (
-    <div className="tab">
+    <div className="tab" style={{ padding: viewsPadding }}>
       <MetaTags
         description={`Guitar tab for ${state.tab.document.title}`}
         title={state.tab.document.title}

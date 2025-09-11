@@ -15,6 +15,7 @@ export const repeatsMinHeight = 20;
 export const stringHeight = 16;
 export const sectionCharacterWidth = 9;
 export const sectionControlsWidth = 140;
+export const viewsPadding = '8px 8px 0 8px';
 
 export const activeColor = '#fff2cc';
 export const addBarColor = '#fff8e5';

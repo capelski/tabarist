@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { TabList } from '../components';
-import { RouteNames } from '../constants';
+import { RouteNames, viewsPadding } from '../constants';
 import { StateProvider } from '../state';
 import { MetaTags } from './common/meta-tags';
 
@@ -12,10 +12,10 @@ export const MyTabsView: React.FC = () => {
   const listState = state[currentRoute];
 
   return (
-    <React.Fragment>
+    <div style={{ padding: viewsPadding }}>
       <MetaTags title="Tabarist - My tabs" />
 
       <TabList listState={listState} user={state.user.document} route={currentRoute} />
-    </React.Fragment>
+    </div>
   );
 };

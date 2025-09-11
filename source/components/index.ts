@@ -1,6 +1,6 @@
 export * from './bars/bar-group';
 export * from './common/blocking-loader';
-export * from './common/centered-message';
+export * from './common/centered-content';
 export * from './common/items-list';
 export * from './common/modal';
 export * from './common/text-filter';
