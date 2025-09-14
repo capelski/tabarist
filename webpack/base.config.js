@@ -2,6 +2,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { resolve } = require('path');
 const { DefinePlugin } = require('webpack');
+const { assetsPath } = require('../source/html');
 
 module.exports = {
   entry: './source/index.tsx',
@@ -23,6 +24,9 @@ module.exports = {
         type: 'asset/resource',
       },
     ],
+  },
+  output: {
+    publicPath: assetsPath,
   },
   plugins: [
     new DefinePlugin({

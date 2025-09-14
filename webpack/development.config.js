@@ -19,7 +19,4 @@ module.exports = merge(baseConfig, {
       return middlewares;
     },
   },
-  output: {
-    publicPath: assetsPath,
-  },
 });
