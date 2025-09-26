@@ -1,8 +1,5 @@
-- Home page with explanation of what Tabarist is
-    Screenshots/iframes of songs
-    WYSIWYG editor. Browse existing tabs. Play along. Control the speed. Upgrade to play with YT sound tracks
 - Walk-trough of a tab creation
-- Paid vs Non-paid users...
+    Control the speed. Upgrade to play with YT sound tracks
 - If list data available, show it while loading
 - Universal rhythms
 - Allow clicking on a slot to start playing from there
